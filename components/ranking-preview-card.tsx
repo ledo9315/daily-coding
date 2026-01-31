@@ -1,0 +1,113 @@
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PointsChip } from "@/components/points-chip";
+import {
+  Trophy,
+  Membercard,
+  Label,
+  ArrowRight,
+  Clock,
+} from "@nsmr/pixelart-react";
+import { cn } from "@/lib/utils";
+
+interface RankingUser {
+  rank: number;
+  name: string;
+  avatar?: string;
+  initials: string;
+  points: number;
+  time?: string;
+}
+
+interface RankingPreviewCardProps {
+  title: string;
+  users: RankingUser[];
+  href: string;
+  showTime?: boolean;
+}
+
+const getRankIcon = (rank: number) => {
+  switch (rank) {
+    case 1:
+      return <Trophy className="h-5 w-5 text-yellow-500" />;
+    case 2:
+      return <Membercard className="h-5 w-5 text-gray-400" />;
+    case 3:
+      return <Label className="h-5 w-5 text-amber-700" />;
+    default:
+      return null;
+  }
+};
+
+export function RankingPreviewCard({
+  title,
+  users,
+  href,
+  showTime = false,
+}: RankingPreviewCardProps) {
+  return (
+    <div className="pixel-box h-full">
+      <div className="flex items-center justify-between p-4 border-b-2 border-border">
+        <h3 className="font-pixel text-sm text-primary">{title}</h3>
+        <Link
+          href={href}
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+        >
+          ALLE
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+      <div className="p-2">
+        {users.map((user) => {
+          const rankIconComponent = getRankIcon(user.rank);
+
+          return (
+            <div
+              key={user.rank}
+              className={cn(
+                "flex items-center gap-3 p-2 border-2 border-transparent transition-colors",
+                user.rank <= 3
+                  ? "bg-secondary/50"
+                  : "hover:border-border hover:bg-secondary/30",
+              )}
+            >
+              <div className="flex h-8 w-8 items-center justify-center">
+                {rankIconComponent ? (
+                  rankIconComponent
+                ) : (
+                  <span className="text-xl font-sans text-muted-foreground">
+                    {user.rank}
+                  </span>
+                )}
+              </div>
+
+              <Avatar className="h-8 w-8 rounded-none border-2 border-border">
+                <AvatarImage
+                  src={user.avatar || "/placeholder.svg"}
+                  alt={user.name}
+                />
+                <AvatarFallback className="rounded-none text-xs bg-secondary">
+                  {user.initials}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-lg font-sans uppercase">
+                  {user.name}
+                </p>
+                {showTime && user.time && (
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {user.time}
+                  </div>
+                )}
+              </div>
+
+              <PointsChip points={user.points} size="sm" />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
