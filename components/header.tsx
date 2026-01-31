@@ -20,13 +20,41 @@ import {
   Zap,
   Sliders,
   Logout,
+  Users,
 } from "@nsmr/pixelart-react";
+import { FlickeringGrid } from "./ui/flickering-grid";
 
 const navigation = [
-  { name: "HOME", href: "/", icon: Home },
-  { name: "CHALLENGE", href: "/challenge", icon: Tournament },
-  { name: "RANKING", href: "/ranking", icon: Trophy },
-  { name: "PROFILE", href: "/profile", icon: User },
+  {
+    name: "HOME",
+    href: "/",
+    icon: Home,
+    color: "border-primary bg-primary/20 text-primary",
+  },
+  {
+    name: "CHALLENGE",
+    href: "/challenge",
+    icon: Tournament,
+    color: "border-chart-5 bg-chart-5/20 text-chart-5",
+  },
+  {
+    name: "RANKING",
+    href: "/ranking",
+    icon: Trophy,
+    color: "border-accent bg-accent/20 text-accent",
+  },
+  {
+    name: "TEAM",
+    href: "/team",
+    icon: Users,
+    color: "border-chart-1 bg-chart-1/20 text-chart-1",
+  },
+  {
+    name: "PROFILE",
+    href: "/profile",
+    icon: User,
+    color: "border-chart-2 bg-chart-2/20 text-chart-2",
+  },
 ];
 
 export function Header() {
@@ -44,7 +72,7 @@ export function Header() {
             <span className="font-pixel text-xs text-foreground tracking-tight">
               DAILY
               <br />
-              CODING
+              DEV
             </span>
           </Link>
 
@@ -58,7 +86,7 @@ export function Header() {
                   className={cn(
                     "flex items-center gap-2 border-2 px-4 py-2 text-lg font-sans uppercase tracking-wider transition-all",
                     isActive
-                      ? "border-primary bg-primary/20 text-primary"
+                      ? item.color
                       : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary hover:text-foreground",
                   )}
                 >

@@ -12,6 +12,8 @@ import {
   CalendarMonth,
   Users,
 } from "@nsmr/pixelart-react";
+import { EncryptedText } from "@/components/ui/encrypted-text";
+import { FlickeringGrid } from "@/components/ui/flickering-grid";
 
 const todayRanking = [
   {
@@ -427,9 +429,19 @@ export default function RankingPage() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <FlickeringGrid
+        className="absolute inset-0 z-0 mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
+        squareSize={6}
+        gridGap={1}
+        color="#A371F7"
+        maxOpacity={0.2}
+        flickerChance={0.1}
+        height={300}
+        width={1920}
+      />
       {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
       </div>
 
@@ -440,9 +452,11 @@ export default function RankingPage() {
           <h1 className="text-3xl font-pixel uppercase tracking-tight mb-2">
             Ranking
           </h1>
-          <p className="mt-1 text-muted-foreground">
-            Vergleiche dich mit anderen Entwicklern und Teams
-          </p>
+          <EncryptedText
+            text="Vergleiche dich mit anderen Entwicklern und Teams"
+            revealDelayMs={20}
+            className="text-xl text-muted-foreground uppercase tracking-wide"
+          />
         </div>
 
         <Tabs

@@ -54,7 +54,6 @@ export function SubmissionStatus({
         className,
       )}
     >
-      <StatusIcon className="h-5 w-5 shrink-0" fill="currentColor" />
       <div>
         <p className="font-medium">{config.label}</p>
         <p className="text-sm opacity-80">

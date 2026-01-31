@@ -87,6 +87,20 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --animate-meteor: meteor 5s linear infinite;
+  @keyframes meteor {
+    0% {
+      transform: rotate(var(--angle)) translateX(0);
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(var(--angle)) translateX(-500px);
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
@@ -140,9 +154,9 @@
 
   .retro-glow {
     text-shadow:
-      0 0 10px var(--primary),
-      0 0 20px var(--primary),
-      0 0 30px var(--primary);
+      0 0 10px var(--chart-5),
+      0 0 20px var(--chart-5),
+      0 0 30px var(--chart-5);
   }
 
   .scanlines {

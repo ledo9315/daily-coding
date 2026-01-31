@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { ComponentType, SVGProps } from "react";
+import { CardSpotlight } from "@/components/ui/card-spotlight";
 
 interface StatsCardProps {
   title: string;
@@ -22,8 +23,11 @@ export function StatsCard({
   className,
 }: StatsCardProps) {
   return (
-    <div className={cn("pixel-box p-4", className)}>
-      <div className="flex flex-col items-start justify-between h-full">
+    <CardSpotlight
+      className={cn("pixel-box p-4 bg-card", className)}
+      color="#262626"
+    >
+      <div className="flex flex-col items-start justify-between h-full relative z-10">
         <div className="flex justify-between w-full items-start">
           <div className="space-y-1">
             <p className="text-sm uppercase tracking-wider text-muted-foreground">
@@ -53,6 +57,6 @@ export function StatsCard({
           </div>
         )}
       </div>
-    </div>
+    </CardSpotlight>
   );
 }

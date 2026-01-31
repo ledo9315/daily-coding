@@ -24,6 +24,9 @@ import {
   Lightbulb,
   BookOpen,
 } from "@nsmr/pixelart-react";
+import { ConfettiButton } from "@/components/ui/confetti";
+import { EncryptedText } from "@/components/ui/encrypted-text";
+import { FlickeringGrid } from "@/components/ui/flickering-grid";
 
 const initialTestCases: TestCase[] = [
   { id: 1, name: "Test Case 1: Einfaches Array", status: "pending" },
@@ -83,9 +86,19 @@ export default function ChallengePage() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <FlickeringGrid
+        className="absolute inset-0 z-0 mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
+        squareSize={6}
+        gridGap={1}
+        color="#A371F7"
+        maxOpacity={0.2}
+        flickerChance={0.1}
+        height={300}
+        width={1920}
+      />
       {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
       </div>
 
@@ -100,9 +113,11 @@ export default function ChallengePage() {
               </h1>
               <DifficultyBadge difficulty="medium" />
             </div>
-            <p className="mt-1 text-muted-foreground uppercase tracking-wide text-sm">
-              Algorithmen • Tag 47
-            </p>
+            <EncryptedText
+              text="Algorithmen • Tag 47"
+              revealDelayMs={30}
+              className="text-xl text-muted-foreground uppercase tracking-wide"
+            />
           </div>
 
           <div className="flex items-center gap-4">

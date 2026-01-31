@@ -43,7 +43,7 @@ export function RankingPreviewCard({
   return (
     <div className="pixel-box h-full">
       <div className="flex items-center justify-between p-4 border-b-2 border-border">
-        <h3 className="font-pixel text-sm text-primary">{title}</h3>
+        <h3 className="font-pixel text-sm text-accent">{title}</h3>
         <Link
           href={href}
           className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
