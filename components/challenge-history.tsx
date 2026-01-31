@@ -1,23 +1,23 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DifficultyBadge } from "@/components/difficulty-badge"
-import { PointsChip } from "@/components/points-chip"
-import { CheckCircle2, XCircle, Clock } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DifficultyBadge } from "@/components/difficulty-badge";
+import { PointsChip } from "@/components/points-chip";
+import { CheckCircle2, XCircle, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ChallengeHistoryEntry {
-  id: string
-  title: string
-  date: string
-  difficulty: "easy" | "medium" | "hard"
-  status: "completed" | "failed" | "skipped"
-  points: number
-  time?: string
-  rank?: number
+  id: string;
+  title: string;
+  date: string;
+  difficulty: "easy" | "medium" | "hard";
+  status: "completed" | "failed" | "skipped";
+  points: number;
+  time?: string;
+  rank?: number;
 }
 
 interface ChallengeHistoryProps {
-  entries: ChallengeHistoryEntry[]
-  className?: string
+  entries: ChallengeHistoryEntry[];
+  className?: string;
 }
 
 const statusConfig = {
@@ -36,9 +36,12 @@ const statusConfig = {
     label: "Übersprungen",
     className: "text-muted-foreground",
   },
-}
+};
 
-export function ChallengeHistory({ entries, className }: ChallengeHistoryProps) {
+export function ChallengeHistory({
+  entries,
+  className,
+}: ChallengeHistoryProps) {
   return (
     <Card className={className}>
       <CardHeader>
@@ -47,15 +50,15 @@ export function ChallengeHistory({ entries, className }: ChallengeHistoryProps) 
       <CardContent>
         <div className="space-y-4">
           {entries.map((entry) => {
-            const config = statusConfig[entry.status]
-            const StatusIcon = config.icon
+            const config = statusConfig[entry.status];
+            const StatusIcon = config.icon;
 
             return (
               <div
                 key={entry.id}
                 className="flex items-center gap-4 rounded-lg border border-border bg-card p-4"
               >
-                <div className={cn("flex-shrink-0", config.className)}>
+                <div className={cn("shrink-0", config.className)}>
                   <StatusIcon className="h-5 w-5" />
                 </div>
 
@@ -81,10 +84,10 @@ export function ChallengeHistory({ entries, className }: ChallengeHistoryProps) 
                   variant={entry.status === "completed" ? "default" : "default"}
                 />
               </div>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

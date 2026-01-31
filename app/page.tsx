@@ -5,19 +5,84 @@ import { StatsCard } from "@/components/stats-card";
 import { Zap, Bullseye, Trophy, Users } from "@nsmr/pixelart-react";
 
 const todayRanking = [
-  { rank: 1, name: "Anna Schmidt", initials: "AS", points: 150, time: "4:23" },
-  { rank: 2, name: "Tom Weber", initials: "TW", points: 145, time: "5:12" },
-  { rank: 3, name: "Lisa Müller", initials: "LM", points: 140, time: "5:45" },
-  { rank: 4, name: "Jan Becker", initials: "JB", points: 130, time: "6:02" },
-  { rank: 5, name: "Sarah Klein", initials: "SK", points: 125, time: "6:30" },
+  {
+    rank: 1,
+    name: "Anna Schmidt",
+    initials: "AS",
+    points: 150,
+    time: "4:23",
+    avatar: "/user/chibi1.png",
+  },
+  {
+    rank: 2,
+    name: "Tom Weber",
+    initials: "TW",
+    points: 145,
+    time: "5:12",
+    avatar: "/user/chibi2.png",
+  },
+  {
+    rank: 3,
+    name: "Lisa Müller",
+    initials: "LM",
+    points: 140,
+    time: "5:45",
+    avatar: "/user/chibi3.png",
+  },
+  {
+    rank: 4,
+    name: "Jan Becker",
+    initials: "JB",
+    points: 130,
+    time: "6:02",
+    avatar: "/user/minipix2.png",
+  },
+  {
+    rank: 5,
+    name: "Sarah Klein",
+    initials: "SK",
+    points: 125,
+    time: "6:30",
+    avatar: "/user/minipix4.png",
+  },
 ];
 
 const teamRanking = [
-  { rank: 1, name: "Team Frontend", initials: "TF", points: 2450 },
-  { rank: 2, name: "Team Backend", initials: "TB", points: 2280 },
-  { rank: 3, name: "Team DevOps", initials: "TD", points: 2150 },
-  { rank: 4, name: "Team Mobile", initials: "TM", points: 1980 },
-  { rank: 5, name: "Team QA", initials: "TQ", points: 1850 },
+  {
+    rank: 1,
+    name: "Team Frontend",
+    initials: "TF",
+    points: 2450,
+    avatar: "/user/pony2.png",
+  },
+  {
+    rank: 2,
+    name: "Team Backend",
+    initials: "TB",
+    points: 2280,
+    avatar: "/user/minipix2.png",
+  },
+  {
+    rank: 3,
+    name: "Team DevOps",
+    initials: "TD",
+    points: 2150,
+    avatar: "/user/pony3.png",
+  },
+  {
+    rank: 4,
+    name: "Team Mobile",
+    initials: "TM",
+    points: 1980,
+    avatar: "/user/minipix4.png",
+  },
+  {
+    rank: 5,
+    name: "Team QA",
+    initials: "TQ",
+    points: 1850,
+    avatar: "/user/minipix5.png",
+  },
 ];
 
 export default function DashboardPage() {

@@ -43,7 +43,7 @@ export function CountdownTimer({ className }: CountdownTimerProps) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
       <Clock className="h-5 w-5 text-muted-foreground" />
-      <div className="flex items-center gap-1">
+      <div className="flex items-start gap-1">
         <TimeBlock value={hours} label="Std" />
         <span className="text-xl font-bold text-muted-foreground">:</span>
         <TimeBlock value={minutes} label="Min" />
@@ -57,7 +57,9 @@ export function CountdownTimer({ className }: CountdownTimerProps) {
 function TimeBlock({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <span className="text-2xl font-bold tabular-nums">{value}</span>
+      <span className="text-2xl font-bold tabular-nums leading-none">
+        {value}
+      </span>
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>
   );

@@ -23,15 +23,9 @@ export function TodaysChallengeCard({
 }: TodaysChallengeCardProps) {
   return (
     <div className="pixel-box relative overflow-hidden p-6">
-      {/* Pixel art corner decorations */}
-      <div className="absolute top-0 left-0 w-4 h-4 border-r-4 border-b-4 border-primary/30" />
-      <div className="absolute top-0 right-0 w-4 h-4 border-l-4 border-b-4 border-primary/30" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-r-4 border-t-4 border-primary/30" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-l-4 border-t-4 border-primary/30" />
-
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center border-2 border-accent bg-accent/20">
+          <div className="flex h-12 w-12 items-center justify-center border-2 border-primary bg-primary/20">
             <Tournament className="h-5 w-5 text-primary" />
           </div>
           <div>

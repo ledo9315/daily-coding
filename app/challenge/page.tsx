@@ -1,65 +1,102 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Header } from "@/components/header"
-import { CodeEditor } from "@/components/code-editor"
-import { TestResults } from "@/components/test-results"
-import { SubmissionStatus } from "@/components/submission-status"
-import { DifficultyBadge } from "@/components/difficulty-badge"
-import { PointsChip } from "@/components/points-chip"
-import { CountdownTimer } from "@/components/countdown-timer"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Play, Send, AlertTriangle, Lightbulb, BookOpen } from "lucide-react"
+import { useState } from "react";
+import { Header } from "@/components/header";
+import { CodeEditor } from "@/components/code-editor";
+import { TestResults, type TestCase } from "@/components/test-results";
+import { SubmissionStatus } from "@/components/submission-status";
+import { DifficultyBadge } from "@/components/difficulty-badge";
+import { PointsChip } from "@/components/points-chip";
+import { CountdownTimer } from "@/components/countdown-timer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Play,
+  ArrowRight,
+  Alert as AlertIcon,
+  Lightbulb,
+  BookOpen,
+} from "@nsmr/pixelart-react";
 
-const initialTestCases = [
-  { id: 1, name: "Test Case 1: Einfaches Array", status: "pending" as const },
-  { id: 2, name: "Test Case 2: Leeres Array", status: "pending" as const },
-  { id: 3, name: "Test Case 3: Negative Zahlen", status: "pending" as const },
-  { id: 4, name: "Test Case 4: Großes Array", status: "pending" as const },
-  { id: 5, name: "Test Case 5: Edge Cases", status: "pending" as const },
-]
+const initialTestCases: TestCase[] = [
+  { id: 1, name: "Test Case 1: Einfaches Array", status: "pending" },
+  { id: 2, name: "Test Case 2: Leeres Array", status: "pending" },
+  { id: 3, name: "Test Case 3: Negative Zahlen", status: "pending" },
+  { id: 4, name: "Test Case 4: Großes Array", status: "pending" },
+  { id: 5, name: "Test Case 5: Edge Cases", status: "pending" },
+];
 
 export default function ChallengePage() {
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [testCases, setTestCases] = useState(initialTestCases)
-  const [isRunning, setIsRunning] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [testCases, setTestCases] = useState<TestCase[]>(initialTestCases);
+  const [isRunning, setIsRunning] = useState(false);
 
   const handleRunTests = () => {
-    setIsRunning(true)
-    
+    setIsRunning(true);
+
     // Simulate test execution
     setTimeout(() => {
       setTestCases([
-        { id: 1, name: "Test Case 1: Einfaches Array", status: "passed", time: "12ms" },
-        { id: 2, name: "Test Case 2: Leeres Array", status: "passed", time: "8ms" },
-        { id: 3, name: "Test Case 3: Negative Zahlen", status: "failed", input: "[-1, -2, -3]", expected: "[-1, -3, -6]", actual: "[-1, -2, -3]", time: "10ms" },
-        { id: 4, name: "Test Case 4: Großes Array", status: "passed", time: "45ms" },
+        {
+          id: 1,
+          name: "Test Case 1: Einfaches Array",
+          status: "passed",
+          time: "12ms",
+        },
+        {
+          id: 2,
+          name: "Test Case 2: Leeres Array",
+          status: "passed",
+          time: "8ms",
+        },
+        {
+          id: 3,
+          name: "Test Case 3: Negative Zahlen",
+          status: "failed",
+          input: "[-1, -2, -3]",
+          expected: "[-1, -3, -6]",
+          actual: "[-1, -2, -3]",
+          time: "10ms",
+        },
+        {
+          id: 4,
+          name: "Test Case 4: Großes Array",
+          status: "passed",
+          time: "45ms",
+        },
         { id: 5, name: "Test Case 5: Edge Cases", status: "pending" },
-      ])
-      setIsRunning(false)
-    }, 1500)
-  }
+      ]);
+      setIsRunning(false);
+    }, 1500);
+  };
 
   const handleSubmit = () => {
-    setIsSubmitted(true)
-  }
+    setIsSubmitted(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight">Array Manipulation Challenge</h1>
+              <h1 className="text-2xl font-bold tracking-tight">
+                Array Manipulation Challenge
+              </h1>
               <DifficultyBadge difficulty="medium" />
             </div>
             <p className="mt-1 text-muted-foreground">Algorithmen • Tag 47</p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <PointsChip points={150} variant="highlight" size="lg" />
             <CountdownTimer />
@@ -71,15 +108,24 @@ export default function ChallengePage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">Aufgabenbeschreibung</CardTitle>
+                  <BookOpen
+                    className="h-5 w-5 text-primary"
+                    fill="currentColor"
+                  />
+                  <CardTitle className="text-lg">
+                    Aufgabenbeschreibung
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-base leading-relaxed text-foreground">
-                  Implementiere eine Funktion <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm">transformArray(arr)</code>, 
-                  die ein Array von Zahlen nimmt und ein neues Array zurückgibt, bei dem jedes Element 
-                  die kumulative Summe aller vorherigen Elemente (inklusive sich selbst) enthält.
+                  Implementiere eine Funktion{" "}
+                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm">
+                    transformArray(arr)
+                  </code>
+                  , die ein Array von Zahlen nimmt und ein neues Array
+                  zurückgibt, bei dem jedes Element die kumulative Summe aller
+                  vorherigen Elemente (inklusive sich selbst) enthält.
                 </CardDescription>
 
                 <div className="space-y-3 rounded-lg bg-secondary/50 p-4">
@@ -91,7 +137,9 @@ export default function ChallengePage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Output: </span>
-                      <span className="text-emerald-500">[1, 3, 6, 10, 15]</span>
+                      <span className="text-emerald-500">
+                        [1, 3, 6, 10, 15]
+                      </span>
                     </div>
                   </div>
                   <div className="space-y-2 font-mono text-sm">
@@ -106,12 +154,16 @@ export default function ChallengePage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
-                  <Lightbulb className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500" />
+                <div className="flex items-start gap-2 border border-amber-500/30 bg-amber-500/10 p-4">
+                  <Lightbulb
+                    className="mt-0.5 h-5 w-5 shrink-0 text-accent"
+                    fill="currentColor"
+                  />
                   <div>
-                    <h4 className="font-medium text-amber-500">Hinweis</h4>
-                    <p className="text-sm text-amber-500/90">
-                      Versuche die Lösung mit O(n) Zeitkomplexität und O(1) zusätzlichem Speicher zu implementieren.
+                    <h4 className="font-medium text-accent">Hinweis</h4>
+                    <p className="text-sm text-accent/90">
+                      Versuche die Lösung mit O(n) Zeitkomplexität und O(1)
+                      zusätzlichem Speicher zu implementieren.
                     </p>
                   </div>
                 </div>
@@ -126,41 +178,45 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || isSubmitted}
-                    className="gap-2 bg-transparent"
+                    className="gap-2 bg-transparent rounded-none cursor-pointer"
                   >
-                    <Play className="h-4 w-4" />
+                    <Play className="h-4 w-4" fill="currentColor" />
                     {isRunning ? "Läuft..." : "Test ausführen"}
                   </Button>
                 </div>
               </div>
-              
+
               <CodeEditor readOnly={isSubmitted} />
             </div>
           </div>
 
           <div className="space-y-6">
-            <SubmissionStatus 
+            <SubmissionStatus
               status={isSubmitted ? "submitted" : "not-submitted"}
               submittedAt={isSubmitted ? "14:32" : undefined}
             />
 
             {!isSubmitted && (
-              <Alert variant="destructive" className="border-amber-500/30 bg-amber-500/10 text-amber-500 [&>svg]:text-amber-500">
-                <AlertTriangle className="h-4 w-4" />
+              <Alert
+                variant="destructive"
+                className="border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none"
+              >
+                <AlertIcon className="h-4 w-4" fill="currentColor" />
                 <AlertTitle>Achtung</AlertTitle>
-                <AlertDescription className="text-amber-500/90">
-                  Du kannst deine Lösung nur einmal final abgeben. Stelle sicher, dass alle Tests bestanden sind.
+                <AlertDescription>
+                  Du kannst deine Lösung nur einmal final abgeben. Stelle
+                  sicher, dass alle Tests bestanden sind.
                 </AlertDescription>
               </Alert>
             )}
 
             <Button
               size="lg"
-              className="w-full gap-2"
+              className="w-full gap-2 cursor-pointer rounded-none"
               onClick={handleSubmit}
               disabled={isSubmitted}
             >
-              <Send className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" fill="currentColor" />
               {isSubmitted ? "Bereits abgegeben" : "Final abgeben"}
             </Button>
 
@@ -169,5 +225,5 @@ export default function ChallengePage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

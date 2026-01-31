@@ -85,10 +85,10 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-12 w-12 border-2 border-border p-0 hover:border-primary"
+                className="relative h-12 w-12 border-2 border-border p-0 hover:border-primary hover:bg-primary/20 cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
               >
                 <Avatar className="h-full w-full rounded-none">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
+                  <AvatarImage src="/user/minipix4.png" alt="User" />
                   <AvatarFallback className="rounded-none bg-secondary text-foreground font-sans text-xl">
                     MK
                   </AvatarFallback>

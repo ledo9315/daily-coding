@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
-import {
-  Trophy,
-  Membercard,
-  Label,
-  ArrowRight,
-  Clock,
-} from "@nsmr/pixelart-react";
+import { Trophy, ArrowRight, Clock } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
 interface RankingUser {
@@ -31,9 +25,9 @@ const getRankIcon = (rank: number) => {
     case 1:
       return <Trophy className="h-5 w-5 text-yellow-500" />;
     case 2:
-      return <Membercard className="h-5 w-5 text-gray-400" />;
+      return <Trophy className="h-5 w-5 text-gray-400" />;
     case 3:
-      return <Label className="h-5 w-5 text-amber-700" />;
+      return <Trophy className="h-5 w-5 text-amber-700" />;
     default:
       return null;
   }
