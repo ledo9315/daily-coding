@@ -71,11 +71,9 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="pixel-box flex items-center gap-2 px-4 py-2">
-            <Zap className="h-5 w-5 text-primary animate-pulse" />
-            <span className="text-xl font-sans text-primary">
-              {streakCount}
-            </span>
+          <div className="pixel-box flex items-center gap-2 px-4 py-2 text-orange-500 border-2 border-orange-500/20">
+            <Zap className="h-5 w-5 animate-pulse" />
+            <span className="text-xl font-sans">{streakCount}</span>
             <span className="text-sm text-muted-foreground uppercase">
               STREAK
             </span>
@@ -102,7 +100,12 @@ export function Header() {
             >
               <div className="flex items-center justify-start gap-2 p-3 border-b-2 border-border">
                 <div className="flex flex-col space-y-1 leading-none">
-                  <p className="font-sans text-lg">MAX MUSTERMANN</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-sans text-lg">MAX MUSTERMANN</p>
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                      LVL 12
+                    </span>
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     max@company.de
                   </p>

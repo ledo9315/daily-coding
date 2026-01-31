@@ -11,6 +11,7 @@ interface RankingUser {
   initials: string;
   points: number;
   time?: string;
+  level?: number;
 }
 
 interface RankingPreviewCardProps {
@@ -86,9 +87,16 @@ export function RankingPreviewCard({
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <p className="truncate text-lg font-sans uppercase">
-                  {user.name}
-                </p>
+                <div className="flex items-baseline gap-2">
+                  <p className="truncate text-lg font-sans uppercase">
+                    {user.name}
+                  </p>
+                  {user.level && (
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Lvl {user.level}
+                    </span>
+                  )}
+                </div>
                 {showTime && user.time && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Clock className="h-3 w-3" />

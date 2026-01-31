@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Star } from "lucide-react";
+import { Coin } from "@nsmr/pixelart-react";
 
 interface PointsChipProps {
   points: number;
@@ -15,30 +15,35 @@ export function PointsChip({
   className,
 }: PointsChipProps) {
   const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs",
-    md: "px-2.5 py-1 text-sm",
-    lg: "px-3 py-1.5 text-base",
+    sm: "px-2 py-0.5 text-xs border-2",
+    md: "px-3 py-1 text-sm border-2",
+    lg: "px-4 py-1.5 text-base border-2",
   };
 
   const iconSizes = {
     sm: "h-3 w-3",
-    md: "h-3.5 w-3.5",
-    lg: "h-4 w-4",
+    md: "h-4 w-4",
+    lg: "h-5 w-5",
   };
 
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 rounded-full font-semibold",
+        "inline-flex items-center gap-2 font-bold font-sans tracking-wide shadow-sm",
         variant === "default"
-          ? "bg-primary/10 text-accent"
-          : "bg-accent text-primary-foreground",
+          ? "bg-secondary text-accent border-border"
+          : "bg-accent/10 text-accent border-accent",
         sizeClasses[size],
         className,
       )}
     >
-      <Star className={cn(iconSizes[size], "fill-current")} />
-      <span>{points.toLocaleString("de-DE")}</span>
+      <Coin
+        className={cn(iconSizes[size], "fill-current shrink-0")}
+        fill="currentColor"
+      />
+      <span className="translate-y-px font-sans">
+        {points.toLocaleString("de-DE")}
+      </span>
     </div>
   );
 }

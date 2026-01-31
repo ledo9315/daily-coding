@@ -50,7 +50,7 @@ export function TestResults({ testCases, className }: TestResultsProps) {
   const totalCount = testCases.length;
 
   return (
-    <div className={cn("rounded-lg border border-border bg-card", className)}>
+    <div className={cn("rounded-none border border-border bg-card", className)}>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h3 className="font-semibold">Testergebnisse</h3>
         <div className="flex items-center gap-2">

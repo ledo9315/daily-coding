@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Clock } from "@nsmr/pixelart-react";
 
 interface CountdownTimerProps {
   className?: string;

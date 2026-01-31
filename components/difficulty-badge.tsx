@@ -1,13 +1,17 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-type Difficulty = "easy" | "medium" | "hard"
+type Difficulty = "easy" | "medium" | "hard";
 
 interface DifficultyBadgeProps {
-  difficulty: Difficulty
-  className?: string
+  difficulty: Difficulty;
+  className?: string;
+  size?: "sm" | "md" | "lg";
 }
 
-const difficultyConfig: Record<Difficulty, { label: string; className: string }> = {
+const difficultyConfig: Record<
+  Difficulty,
+  { label: string; className: string }
+> = {
   easy: {
     label: "Einfach",
     className: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -20,20 +24,31 @@ const difficultyConfig: Record<Difficulty, { label: string; className: string }>
     label: "Schwer",
     className: "bg-rose-500/10 text-rose-500 border-rose-500/20",
   },
-}
+};
 
-export function DifficultyBadge({ difficulty, className }: DifficultyBadgeProps) {
-  const config = difficultyConfig[difficulty]
+export function DifficultyBadge({
+  difficulty,
+  size = "md",
+  className,
+}: DifficultyBadgeProps) {
+  const config = difficultyConfig[difficulty];
+
+  const sizeClasses = {
+    sm: "px-2 py-0.5 text-xs border-2",
+    md: "px-3 py-1.5 text-sm border-2",
+    lg: "px-4 py-1.5 text-base border-2",
+  };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+        "inline-flex items-center border-2 font-bold font-sans uppercase tracking-wide",
         config.className,
-        className
+        sizeClasses[size],
+        className,
       )}
     >
       {config.label}
     </span>
-  )
+  );
 }

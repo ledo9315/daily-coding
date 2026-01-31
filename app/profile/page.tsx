@@ -1,32 +1,31 @@
-import { Header } from "@/components/header"
-import { StreakBadge } from "@/components/streak-badge"
-import { PointsChip } from "@/components/points-chip"
-import { AchievementBadge } from "@/components/achievement-badge"
-import { ProgressBar } from "@/components/progress-bar"
-import { ChallengeHistory } from "@/components/challenge-history"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Header } from "@/components/header";
+import { StreakBadge } from "@/components/streak-badge";
+import { PointsChip } from "@/components/points-chip";
+import { StatsCard } from "@/components/stats-card";
+import { AchievementBadge } from "@/components/achievement-badge";
+import { ProgressBar } from "@/components/progress-bar";
+import { ChallengeHistory } from "@/components/challenge-history";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Trophy,
-  Target,
-  Flame,
+  Bullseye,
   Zap,
-  Star,
-  Award,
-  Code2,
-  Rocket,
-  Crown,
-  Shield,
-  Calendar,
+  CalendarToday,
+  User,
+  Tournament,
+  Check,
+  CalendarWeek,
+  Clock,
   TrendingUp,
-} from "lucide-react"
+} from "@nsmr/pixelart-react";
 
 const achievements = [
   {
     id: "1",
     title: "Erste Schritte",
     description: "Erste Challenge abgeschlossen",
-    icon: Rocket,
+    icon: Check,
     unlocked: true,
     rarity: "common" as const,
     unlockedAt: "15.01.2026",
@@ -35,7 +34,7 @@ const achievements = [
     id: "2",
     title: "Wochenend-Krieger",
     description: "7 Tage Streak erreicht",
-    icon: Flame,
+    icon: CalendarWeek,
     unlocked: true,
     rarity: "rare" as const,
     unlockedAt: "22.01.2026",
@@ -44,7 +43,7 @@ const achievements = [
     id: "3",
     title: "Code-Meister",
     description: "10 schwere Challenges gelöst",
-    icon: Crown,
+    icon: Trophy,
     unlocked: true,
     rarity: "epic" as const,
     unlockedAt: "28.01.2026",
@@ -53,7 +52,7 @@ const achievements = [
     id: "4",
     title: "Blitzschnell",
     description: "Challenge in unter 3 Minuten gelöst",
-    icon: Zap,
+    icon: Clock,
     unlocked: true,
     rarity: "rare" as const,
     unlockedAt: "25.01.2026",
@@ -62,7 +61,7 @@ const achievements = [
     id: "5",
     title: "Unaufhaltsam",
     description: "30 Tage Streak erreicht",
-    icon: Shield,
+    icon: Zap,
     unlocked: false,
     rarity: "legendary" as const,
   },
@@ -70,11 +69,11 @@ const achievements = [
     id: "6",
     title: "Perfektionist",
     description: "20 Challenges ohne Fehler",
-    icon: Star,
+    icon: Bullseye,
     unlocked: false,
     rarity: "epic" as const,
   },
-]
+];
 
 const challengeHistory = [
   {
@@ -126,23 +125,35 @@ const challengeHistory = [
     time: "4:30",
     rank: 5,
   },
-]
+];
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
+      </div>
+
       <Header />
-      
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border-2 border-primary">
-              <AvatarImage src="/placeholder-avatar.jpg" alt="Max Mustermann" />
-              <AvatarFallback className="text-2xl">MM</AvatarFallback>
+            <Avatar className="h-20 w-20 border-4 border-zinc-700 rounded-none">
+              <AvatarImage src="/user/minipix4.png" alt="Max Mustermann" />
+              <AvatarFallback className="text-2xl rounded-none">
+                MM
+              </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Max Mustermann</h1>
-              <p className="text-muted-foreground">Team Frontend • Senior Developer</p>
+              <h1 className="text-2xl font-sans font-bold tracking-widest uppercase">
+                MAX MUSTERMANN
+              </h1>
+              <p className="text-muted-foreground uppercase tracking-wider text-sm">
+                Team Frontend • Senior Developer
+              </p>
               <div className="mt-2 flex items-center gap-3">
                 <StreakBadge count={12} />
                 <PointsChip points={2450} variant="highlight" />
@@ -154,64 +165,16 @@ export default function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Trophy className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Rang</p>
-                      <p className="text-xl font-bold">#12</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
-                      <Target className="h-5 w-5 text-emerald-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Gelöst</p>
-                      <p className="text-xl font-bold">47</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10">
-                      <Flame className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Rekord</p>
-                      <p className="text-xl font-bold">28 Tage</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
-                      <Award className="h-5 w-5 text-amber-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Badges</p>
-                      <p className="text-xl font-bold">4/6</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <StatsCard title="RANG" value="#12" icon={Trophy} />
+              <StatsCard title="GELÖST" value="47" icon={Bullseye} />
+              <StatsCard title="REKORD" value="28" icon={Zap} />
+              <StatsCard title="BADGES" value="4/6" icon={Trophy} />
             </div>
 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
+                  <Tournament className="h-5 w-5 text-primary" />
                   Fortschritt
                 </CardTitle>
               </CardHeader>
@@ -244,7 +207,7 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-amber-500" />
+                  <Trophy className="h-5 w-5 text-amber-500" />
                   Achievements
                 </CardTitle>
               </CardHeader>
@@ -266,18 +229,18 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
+                  <CalendarToday className="h-5 w-5 text-primary" />
                   Aktivität
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-7 gap-1">
                   {Array.from({ length: 28 }).map((_, i) => {
-                    const intensity = Math.random()
+                    const intensity = Math.random();
                     return (
                       <div
                         key={i}
-                        className={`aspect-square rounded-sm ${
+                        className={`aspect-square ${
                           intensity > 0.7
                             ? "bg-primary"
                             : intensity > 0.4
@@ -288,7 +251,7 @@ export default function ProfilePage() {
                         }`}
                         title={`Tag ${i + 1}`}
                       />
-                    )
+                    );
                   })}
                 </div>
                 <p className="mt-3 text-center text-sm text-muted-foreground">
@@ -300,5 +263,5 @@ export default function ProfilePage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

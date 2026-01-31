@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
-import { CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Check, Close, Clock } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
 interface ChallengeHistoryEntry {
@@ -22,12 +22,12 @@ interface ChallengeHistoryProps {
 
 const statusConfig = {
   completed: {
-    icon: CheckCircle2,
+    icon: Check,
     label: "Abgeschlossen",
     className: "text-emerald-500",
   },
   failed: {
-    icon: XCircle,
+    icon: Close,
     label: "Nicht bestanden",
     className: "text-rose-500",
   },
@@ -56,7 +56,7 @@ export function ChallengeHistory({
             return (
               <div
                 key={entry.id}
-                className="flex items-center gap-4 rounded-lg border border-border bg-card p-4"
+                className="flex items-center gap-4 border-2 border-border bg-card p-4"
               >
                 <div className={cn("shrink-0", config.className)}>
                   <StatusIcon className="h-5 w-5" />
@@ -65,7 +65,7 @@ export function ChallengeHistory({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="truncate font-medium">{entry.title}</h4>
-                    <DifficultyBadge difficulty={entry.difficulty} />
+                    <DifficultyBadge size="sm" difficulty={entry.difficulty} />
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
                     <span>{entry.date}</span>

@@ -6,12 +6,15 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { PointsChip } from "@/components/points-chip";
 import { ArrowRight, Tournament, Zap } from "@nsmr/pixelart-react";
 
+import { cn } from "@/lib/utils";
+
 interface TodaysChallengeCardProps {
   title: string;
   description: string;
   difficulty: "easy" | "medium" | "hard";
   points: number;
   category: string;
+  className?: string;
 }
 
 export function TodaysChallengeCard({
@@ -20,9 +23,10 @@ export function TodaysChallengeCard({
   difficulty,
   points,
   category,
+  className,
 }: TodaysChallengeCardProps) {
   return (
-    <div className="pixel-box relative overflow-hidden p-6">
+    <div className={cn("pixel-box relative overflow-hidden p-6", className)}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center border-2 border-primary bg-primary/20">
@@ -36,11 +40,13 @@ export function TodaysChallengeCard({
               <span className="text-xs uppercase text-muted-foreground">
                 {category}
               </span>
-              <DifficultyBadge difficulty={difficulty} />
             </div>
           </div>
         </div>
-        <PointsChip points={points} variant="highlight" />
+        <div className="flex gap-2 items-start">
+          <DifficultyBadge difficulty={difficulty} size="md" />
+          <PointsChip points={points} variant="highlight" size="md" />
+        </div>
       </div>
 
       <div className="space-y-4 mb-6">

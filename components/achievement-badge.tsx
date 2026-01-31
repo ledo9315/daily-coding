@@ -1,14 +1,14 @@
-import { cn } from "@/lib/utils"
-import type { LucideIcon } from "lucide-react"
+import { cn } from "@/lib/utils";
+// import type { LucideIcon } from "lucide-react"
 
 interface AchievementBadgeProps {
-  title: string
-  description: string
-  icon: LucideIcon
-  unlocked?: boolean
-  rarity?: "common" | "rare" | "epic" | "legendary"
-  unlockedAt?: string
-  className?: string
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  unlocked?: boolean;
+  rarity?: "common" | "rare" | "epic" | "legendary";
+  unlockedAt?: string;
+  className?: string;
 }
 
 const rarityConfig = {
@@ -40,7 +40,7 @@ const rarityConfig = {
     labelClassName: "text-amber-500",
     label: "Legendär",
   },
-}
+};
 
 export function AchievementBadge({
   title,
@@ -51,32 +51,39 @@ export function AchievementBadge({
   unlockedAt,
   className,
 }: AchievementBadgeProps) {
-  const config = rarityConfig[rarity]
+  const config = rarityConfig[rarity];
 
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border p-4 transition-all",
+        "relative overflow-hidden border-2 p-4 transition-all",
         unlocked ? config.borderClassName : "border-border",
         unlocked ? config.bgClassName : "bg-secondary/30",
         !unlocked && "opacity-50 grayscale",
-        className
+        className,
       )}
     >
       <div className="flex items-start gap-3">
         <div
           className={cn(
-            "flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg",
-            unlocked ? config.bgClassName : "bg-muted"
+            "flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-transparent",
+            unlocked ? config.bgClassName : "bg-muted",
           )}
         >
-          <Icon className={cn("h-6 w-6", unlocked ? config.iconClassName : "text-muted-foreground")} />
+          <Icon
+            className={cn(
+              "h-6 w-6",
+              unlocked ? config.iconClassName : "text-muted-foreground",
+            )}
+          />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h4 className="truncate font-semibold">{title}</h4>
             {unlocked && (
-              <span className={cn("text-xs font-medium", config.labelClassName)}>
+              <span
+                className={cn("text-xs font-medium", config.labelClassName)}
+              >
                 {config.label}
               </span>
             )}
@@ -90,5 +97,5 @@ export function AchievementBadge({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -4,8 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import {
   Trophy,
-  Membercard,
-  Label,
   Clock,
   TrendingUp,
   TrendingDown,
@@ -23,6 +21,7 @@ interface RankingEntry {
   time?: string;
   challengesSolved?: number;
   team?: string;
+  level?: number;
 }
 
 interface RankingTableProps {
@@ -35,11 +34,11 @@ interface RankingTableProps {
 const rankIcons = [
   { icon: Trophy, className: "text-amber-500", bgClassName: "bg-amber-500/10" },
   {
-    icon: Membercard,
+    icon: Trophy,
     className: "text-zinc-400",
     bgClassName: "bg-zinc-400/10",
   },
-  { icon: Label, className: "text-amber-700", bgClassName: "bg-amber-700/10" },
+  { icon: Trophy, className: "text-amber-700", bgClassName: "bg-amber-700/10" },
 ];
 
 function RankChange({
@@ -80,12 +79,12 @@ export function RankingTable({
   showTeam = false,
 }: RankingTableProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
+    <div className="overflow-hidden rounded-none border border-border">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-secondary/50">
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground w-16">
                 Rang
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
@@ -156,7 +155,14 @@ export function RankingTable({
                         <AvatarFallback>{entry.initials}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{entry.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{entry.name}</p>
+                          {entry.level && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+                              Lvl {entry.level}
+                            </span>
+                          )}
+                        </div>
                         {entry.challengesSolved !== undefined && (
                           <p className="text-sm text-muted-foreground">
                             {entry.challengesSolved} Challenges gelöst

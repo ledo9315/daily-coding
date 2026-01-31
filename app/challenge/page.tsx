@@ -82,19 +82,27 @@ export default function ChallengePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
+      </div>
+
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight">
+              <h1 className="text-2xl font-pixel uppercase tracking-tight">
                 Array Manipulation Challenge
               </h1>
               <DifficultyBadge difficulty="medium" />
             </div>
-            <p className="mt-1 text-muted-foreground">Algorithmen • Tag 47</p>
+            <p className="mt-1 text-muted-foreground uppercase tracking-wide text-sm">
+              Algorithmen • Tag 47
+            </p>
           </div>
 
           <div className="flex items-center gap-4">

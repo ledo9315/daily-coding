@@ -12,6 +12,7 @@ const todayRanking = [
     points: 150,
     time: "4:23",
     avatar: "/user/chibi1.png",
+    level: 15,
   },
   {
     rank: 2,
@@ -20,6 +21,7 @@ const todayRanking = [
     points: 145,
     time: "5:12",
     avatar: "/user/chibi2.png",
+    level: 14,
   },
   {
     rank: 3,
@@ -28,6 +30,7 @@ const todayRanking = [
     points: 140,
     time: "5:45",
     avatar: "/user/chibi3.png",
+    level: 13,
   },
   {
     rank: 4,
@@ -36,6 +39,7 @@ const todayRanking = [
     points: 130,
     time: "6:02",
     avatar: "/user/minipix2.png",
+    level: 12,
   },
   {
     rank: 5,
@@ -44,6 +48,7 @@ const todayRanking = [
     points: 125,
     time: "6:30",
     avatar: "/user/minipix4.png",
+    level: 11,
   },
 ];
 
@@ -54,6 +59,7 @@ const teamRanking = [
     initials: "TF",
     points: 2450,
     avatar: "/user/pony2.png",
+    level: 25,
   },
   {
     rank: 2,
@@ -61,6 +67,7 @@ const teamRanking = [
     initials: "TB",
     points: 2280,
     avatar: "/user/minipix2.png",
+    level: 23,
   },
   {
     rank: 3,
@@ -68,6 +75,7 @@ const teamRanking = [
     initials: "TD",
     points: 2150,
     avatar: "/user/pony3.png",
+    level: 21,
   },
   {
     rank: 4,
@@ -75,6 +83,7 @@ const teamRanking = [
     initials: "TM",
     points: 1980,
     avatar: "/user/minipix4.png",
+    level: 20,
   },
   {
     rank: 5,
@@ -82,19 +91,24 @@ const teamRanking = [
     initials: "TQ",
     points: 1850,
     avatar: "/user/minipix5.png",
+    level: 18,
   },
 ];
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-primary/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
+      </div>
+
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8">
-          <h1 className="font-pixel text-xl text-primary mb-2">
-            WILLKOMMEN ZURUECK!
-          </h1>
+          <h1 className="font-pixel text-xl mb-2">WILLKOMMEN ZURÜCK!</h1>
           <p className="text-xl text-muted-foreground uppercase tracking-wide">
             Bereit fuer die heutige Challenge? Zeig was du kannst!
           </p>
@@ -128,13 +142,14 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8" style={{ "--primary": "var(--chart-5)" } as any}>
           <TodaysChallengeCard
             title="ARRAY MANIPULATION"
             description="Implementiere eine Funktion, die ein Array von Zahlen nimmt und das Array so transformiert, dass jedes Element die Summe aller vorherigen Elemente enthaelt."
-            difficulty="medium"
+            difficulty="easy"
             points={150}
             category="ALGORITHMEN"
+            className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-primary/50"
           />
         </div>
 
