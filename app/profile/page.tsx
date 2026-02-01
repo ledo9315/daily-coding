@@ -175,7 +175,7 @@ export default function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
-              <StatsCard title="RANG" value="#12" icon={Trophy} />
+              <StatsCard title="LEVEL" value="#12" icon={Trophy} />
               <StatsCard title="GELÖST" value="47" icon={Bullseye} />
               <StatsCard title="REKORD" value="28" icon={Zap} />
               <StatsCard title="BADGES" value="4/6" icon={Trophy} />

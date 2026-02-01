@@ -30,7 +30,7 @@ export function LandingCTA() {
           </p>
 
           <Link
-            href="/join"
+            href="/join?token=123124"
             className="pixel-btn bg-primary text-primary-foreground text-xl px-8 py-4 inline-block hover:scale-105 transition-transform"
           >
             CHALLENGE ANNEHMEN
