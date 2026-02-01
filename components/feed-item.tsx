@@ -29,21 +29,21 @@ export function FeedItem({ user, event }: FeedItemProps) {
         return {
           icon: Zap,
           color: "bg-green-500/10 text-green-500 border-green-500/20",
-          cardBorder: "hover:border-green-500/50",
+          cardBorder: "",
           badge: "Level-Aufstieg",
         };
       case "milestone":
         return {
           icon: Bullseye,
           color: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-          cardBorder: "hover:border-amber-500/50",
+          cardBorder: "",
           badge: "Meilenstein",
         };
       case "badge-earned":
         return {
           icon: Trophy,
           color: "bg-purple-500/10 text-purple-500 border-purple-500/20",
-          cardBorder: "hover:border-purple-500/50",
+          cardBorder: "",
           badge: "Abzeichen",
         };
     }
@@ -55,13 +55,13 @@ export function FeedItem({ user, event }: FeedItemProps) {
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all duration-300 hover:bg-accent/5",
+        "group relative overflow-hidden transition-all duration-300",
         styles.cardBorder,
       )}
     >
       <div className="p-6">
         <div className="flex gap-4">
-          <Avatar className="h-12 w-12 border-2 border-border group-hover:border-primary/50 transition-colors">
+          <Avatar className="h-12 w-12 border-2 border-border transition-colors">
             <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback>{user.initials}</AvatarFallback>
           </Avatar>

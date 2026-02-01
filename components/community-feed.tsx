@@ -127,7 +127,7 @@ export function CommunityFeed() {
     <div className="space-y-4">
       {/* Today Section */}
       <div className="space-y-4">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">
+        <h3 className="text-md font-semibold text-muted-foreground uppercase tracking-wider px-1">
           Heute
         </h3>
         <div className="grid gap-4">
@@ -146,7 +146,7 @@ export function CommunityFeed() {
 
       {/* Yesterday Section */}
       <div className="space-y-4 pt-4">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1">
+        <h3 className="text-md font-semibold text-muted-foreground uppercase tracking-wider px-1">
           Gestern
         </h3>
         <div className="grid gap-4">

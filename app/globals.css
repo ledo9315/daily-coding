@@ -47,6 +47,7 @@
   --font-sans: "VT323", monospace;
   --font-mono: "VT323", monospace;
   --font-heading: "Press Start 2P", monospace;
+  --font-code: var(--font-jetbrains-mono), monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

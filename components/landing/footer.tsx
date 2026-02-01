@@ -11,7 +11,7 @@ export function LandingFooter() {
               {">_"}
             </span>
             <span className="font-pixel text-xs text-foreground tracking-tight">
-              DAILY CODING
+              DAILY DEV
             </span>
           </Link>
           <p className="text-sm text-muted-foreground">

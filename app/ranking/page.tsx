@@ -467,7 +467,7 @@ export default function RankingPage() {
           <TabsList className="w-full sm:w-auto sm:grid-cols-none rounded-none">
             <TabsTrigger
               value="today"
-              className="gap-2 cursor-pointer rounded-none"
+              className="gap-2 cursor-pointer rounded-none text-md"
             >
               <CalendarToday
                 className="h-4 w-4 hidden sm:block"
@@ -477,7 +477,7 @@ export default function RankingPage() {
             </TabsTrigger>
             <TabsTrigger
               value="week"
-              className="gap-2 cursor-pointer rounded-none"
+              className="gap-2 cursor-pointer rounded-none text-md"
             >
               <CalendarWeek
                 className="h-4 w-4 hidden sm:block"
@@ -487,7 +487,7 @@ export default function RankingPage() {
             </TabsTrigger>
             <TabsTrigger
               value="month"
-              className="gap-2 cursor-pointer rounded-none"
+              className="gap-2 cursor-pointer rounded-none text-md"
             >
               <CalendarMonth
                 className="h-4 w-4 hidden sm:block"
@@ -497,7 +497,7 @@ export default function RankingPage() {
             </TabsTrigger>
             <TabsTrigger
               value="team"
-              className="gap-2 cursor-pointer rounded-none"
+              className="gap-2 cursor-pointer rounded-none text-md"
             >
               <Users className="h-4 w-4 hidden sm:block" fill="currentColor" />
               Team

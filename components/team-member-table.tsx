@@ -54,7 +54,7 @@ export function TeamMemberTable({
         return (
           <Badge
             variant="outline"
-            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-sm"
           >
             Aktiv
           </Badge>
@@ -63,14 +63,17 @@ export function TeamMemberTable({
         return (
           <Badge
             variant="outline"
-            className="bg-amber-500/10 text-amber-500 border-amber-500/20"
+            className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-sm"
           >
             Eingeladen
           </Badge>
         );
       case "inactive":
         return (
-          <Badge variant="outline" className="bg-muted text-muted-foreground">
+          <Badge
+            variant="outline"
+            className="bg-muted text-muted-foreground text-sm"
+          >
             Inaktiv
           </Badge>
         );
@@ -130,7 +133,7 @@ export function TeamMemberTable({
                   </div>
                 </td>
                 <td className="hidden px-4 py-4 md:table-cell">
-                  <div className="text-sm">{member.department || "-"}</div>
+                  <div className="text-md">{member.department || "-"}</div>
                 </td>
                 <td className="px-4 py-4">{getStatusBadge(member.status)}</td>
                 <td className="px-4 py-4 text-right">

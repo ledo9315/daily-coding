@@ -51,7 +51,7 @@ export function CodeEditor({
       </div>
 
       <div className="flex max-h-[500px] overflow-auto">
-        <div className="flex flex-col border-r border-border/30 bg-secondary/20 px-3 py-4 text-right font-mono text-sm text-muted-foreground select-none">
+        <div className="flex flex-col border-r border-border/30 bg-secondary/20 px-3 py-4 text-right font-code text-base text-muted-foreground select-none">
           {lines.map((_, i) => (
             <span key={i} className="leading-6">
               {i + 1}
@@ -65,7 +65,7 @@ export function CodeEditor({
           readOnly={readOnly}
           spellCheck={false}
           className={cn(
-            "flex-1 resize-none bg-transparent p-4 font-mono text-sm leading-6 text-foreground outline-none",
+            "flex-1 resize-none bg-transparent p-4 font-code text-sm leading-6 text-foreground outline-none",
             "placeholder:text-muted-foreground/50",
           )}
           rows={lines.length + 5}

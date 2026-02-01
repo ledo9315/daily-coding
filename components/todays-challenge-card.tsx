@@ -33,7 +33,7 @@ export function TodaysChallengeCard({
             <Tournament className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm uppercase tracking-wider text-muted-foreground">
+            <p className="text-md uppercase tracking-wider text-muted-foreground">
               TAGES-CHALLENGE
             </p>
             <div className="flex items-center gap-2 mt-1">

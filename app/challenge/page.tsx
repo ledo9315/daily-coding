@@ -141,9 +141,9 @@ export default function ChallengePage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <CardDescription className="text-base leading-relaxed text-foreground">
+                <CardDescription className="text-lg text-muted-foreground">
                   Implementiere eine Funktion{" "}
-                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm">
+                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm text-primary">
                     transformArray(arr)
                   </code>
                   , die ein Array von Zahlen nimmt und ein neues Array
@@ -153,7 +153,7 @@ export default function ChallengePage() {
 
                 <div className="space-y-3 rounded-lg bg-secondary/50 p-4">
                   <h4 className="font-semibold">Beispiele:</h4>
-                  <div className="space-y-2 font-mono text-sm">
+                  <div className="space-y-2 text-sm font-code">
                     <div>
                       <span className="text-muted-foreground">Input: </span>
                       <span className="text-primary">[1, 2, 3, 4, 5]</span>
@@ -165,7 +165,7 @@ export default function ChallengePage() {
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-2 font-mono text-sm">
+                  <div className="space-y-2 text-sm font-code">
                     <div>
                       <span className="text-muted-foreground">Input: </span>
                       <span className="text-primary">[5, -2, 3, 1]</span>
@@ -184,7 +184,7 @@ export default function ChallengePage() {
                   />
                   <div>
                     <h4 className="font-medium text-accent">Hinweis</h4>
-                    <p className="text-sm text-accent/90">
+                    <p className="text-base text-accent/90">
                       Versuche die Lösung mit O(n) Zeitkomplexität und O(1)
                       zusätzlichem Speicher zu implementieren.
                     </p>

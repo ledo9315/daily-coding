@@ -43,10 +43,10 @@ export function RankingPreviewCard({
   return (
     <div className="pixel-box h-full">
       <div className="flex items-center justify-between p-4 border-b-2 border-border">
-        <h3 className="font-pixel text-sm text-accent">{title}</h3>
+        <h3 className="font-pixel text-md text-accent">{title}</h3>
         <Link
           href={href}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+          className="flex items-center gap-1 text-md text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
         >
           ALLE
           <ArrowRight className="h-4 w-4" />
@@ -61,9 +61,7 @@ export function RankingPreviewCard({
               key={user.rank}
               className={cn(
                 "flex items-center gap-3 p-2 border-2 border-transparent transition-colors",
-                user.rank <= 3
-                  ? "bg-secondary/50"
-                  : "hover:border-border hover:bg-secondary/30",
+                user.rank <= 3 ? "bg-secondary/50" : "",
               )}
             >
               <div className="flex h-8 w-8 items-center justify-center">
@@ -92,13 +90,13 @@ export function RankingPreviewCard({
                     {user.name}
                   </p>
                   {user.level && (
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                       Lvl {user.level}
                     </span>
                   )}
                 </div>
                 {showTime && user.time && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1 text-md text-muted-foreground">
                     <Clock className="h-3 w-3" />
                     {user.time}
                   </div>

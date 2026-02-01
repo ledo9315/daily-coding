@@ -158,7 +158,7 @@ export function RankingTable({
                         <div className="flex items-center gap-2">
                           <p className="font-medium">{entry.name}</p>
                           {entry.level && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                               Lvl {entry.level}
                             </span>
                           )}
@@ -174,7 +174,7 @@ export function RankingTable({
 
                   {showTeam && (
                     <td className="hidden px-4 py-4 sm:table-cell">
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-md text-muted-foreground">
                         {entry.team}
                       </span>
                     </td>
@@ -183,7 +183,7 @@ export function RankingTable({
                   {showTime && (
                     <td className="hidden px-4 py-4 md:table-cell">
                       {entry.time && (
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-md text-muted-foreground">
                           <Clock className="h-4 w-4" />
                           {entry.time}
                         </div>

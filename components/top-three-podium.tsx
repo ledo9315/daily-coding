@@ -39,11 +39,11 @@ export function TopThreePodium({
         <div className="mt-2 text-center flex flex-col items-center gap-1">
           <p className="font-semibold">{second.name}</p>
           {second.level && (
-            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+            <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
               Level {second.level}
             </span>
           )}
-          <PointsChip points={second.points} size="sm" />
+          <PointsChip points={second.points} size="md" />
         </div>
         <div className="mt-3 flex h-24 w-24 flex-col items-center justify-start rounded-none bg-zinc-400/20 pt-4">
           <Trophy className="h-8 w-8 text-zinc-400" />
@@ -71,7 +71,7 @@ export function TopThreePodium({
               Level {first.level}
             </span>
           )}
-          <PointsChip points={first.points} size="sm" variant="highlight" />
+          <PointsChip points={first.points} size="md" variant="highlight" />
         </div>
         <div className="mt-3 flex h-32 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-500/20 pt-4">
           <Trophy className="h-8 w-8 text-amber-500" />
@@ -91,11 +91,11 @@ export function TopThreePodium({
         <div className="mt-2 text-center flex flex-col items-center gap-1">
           <p className="font-semibold">{third.name}</p>
           {third.level && (
-            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+            <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
               Level {third.level}
             </span>
           )}
-          <PointsChip points={third.points} size="sm" />
+          <PointsChip points={third.points} size="md" />
         </div>
         <div className="mt-3 flex h-16 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-700/20 pt-2">
           <Trophy className="h-6 w-6 text-amber-700" />
