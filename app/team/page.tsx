@@ -17,7 +17,7 @@ const initialMembers: TeamMember[] = [
     id: "1",
     name: "Anna Schmidt",
     email: "anna.schmidt@company.com",
-    role: "admin",
+    role: "Administrator",
     status: "active",
     initials: "AS",
     avatar: "/user/chibi1.png",
@@ -28,7 +28,7 @@ const initialMembers: TeamMember[] = [
     id: "2",
     name: "Tom Weber",
     email: "tom.weber@company.com",
-    role: "member",
+    role: "Mitglied",
     status: "active",
     initials: "TW",
     avatar: "/user/chibi2.png",
@@ -39,7 +39,7 @@ const initialMembers: TeamMember[] = [
     id: "3",
     name: "Max Mustermann",
     email: "max.mustermann@company.com",
-    role: "member",
+    role: "Mitglied",
     status: "invited",
     initials: "MM",
     avatar: "/user/minipix5.png",
@@ -50,7 +50,7 @@ const initialMembers: TeamMember[] = [
     id: "4",
     name: "Lisa Müller",
     email: "lisa.mueller@company.com",
-    role: "member",
+    role: "Mitglied",
     status: "active",
     initials: "LM",
     avatar: "/user/chibi3.png",
@@ -61,7 +61,7 @@ const initialMembers: TeamMember[] = [
     id: "5",
     name: "Sarah Klein",
     email: "sarah.klein@company.com",
-    role: "viewer",
+    role: "Beobachter",
     status: "inactive",
     initials: "SK",
     avatar: "/user/minipix4.png",
@@ -134,7 +134,7 @@ export default function TeamPage() {
           />
           <StatsCard
             title="Admins"
-            value={members.filter((m) => m.role === "admin").length}
+            value={members.filter((m) => m.role === "Administrator").length}
             description="Administratoren"
             icon={Shield}
           />

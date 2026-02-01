@@ -34,7 +34,7 @@ export function TodaysChallengeCard({
           </div>
           <div>
             <p className="text-sm uppercase tracking-wider text-muted-foreground">
-              DAILY CHALLENGE
+              TAGES-CHALLENGE
             </p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs uppercase text-muted-foreground">
@@ -69,7 +69,7 @@ export function TodaysChallengeCard({
           className="pixel-btn inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 group"
         >
           <Zap className="h-5 w-5" />
-          START CHALLENGE
+          CHALLENGE STARTEN
           <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>

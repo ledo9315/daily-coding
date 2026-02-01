@@ -18,7 +18,7 @@ export interface TeamMember {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "member" | "viewer";
+  role: "Administrator" | "Mitglied" | "Beobachter";
   status: "active" | "invited" | "inactive";
   avatar?: string;
   initials: string;
@@ -39,9 +39,9 @@ export function TeamMemberTable({
 }: TeamMemberTableProps) {
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "admin":
+      case "Administrator":
         return <Shield className="h-3 w-3 text-red-500" />;
-      case "member":
+      case "Mitglied":
         return <User className="h-3 w-3 text-blue-500" />;
       default:
         return <Shield className="h-3 w-3 text-gray-500" />;

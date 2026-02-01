@@ -148,13 +148,13 @@ export function Header() {
               <DropdownMenuItem asChild className="rounded-none text-lg">
                 <Link href="/settings" className="cursor-pointer">
                   <Sliders className="mr-2 h-5 w-5" />
-                  SETTINGS
+                  EINSTELLUNGEN
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem className="rounded-none text-lg text-destructive focus:text-destructive">
                 <Logout className="mr-2 h-5 w-5" />
-                LOGOUT
+                ABMELDEN
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

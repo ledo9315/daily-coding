@@ -5,6 +5,7 @@ import { StatsCard } from "@/components/stats-card";
 import { Zap, Bullseye, Trophy, Users } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { EncryptedText } from "@/components/ui/encrypted-text";
+import { CommunityFeed } from "@/components/community-feed";
 
 const todayRanking = [
   {
@@ -169,7 +170,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2 mb-12">
           <RankingPreviewCard
             title="TAGES-RANKING"
             users={todayRanking}
@@ -182,6 +183,11 @@ export default function DashboardPage() {
             href="/ranking?tab=team"
           />
         </div>
+
+        <div className="mb-6">
+          <h2 className="font-pixel text-lg mb-4">COMMUNITY-FEED</h2>
+        </div>
+        <CommunityFeed />
       </main>
     </div>
   );
