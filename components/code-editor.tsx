@@ -65,7 +65,7 @@ export function CodeEditor({
           readOnly={readOnly}
           spellCheck={false}
           className={cn(
-            "flex-1 resize-none bg-transparent p-4 font-code text-sm leading-6 text-foreground outline-none",
+            "flex-1 resize-none bg-transparent p-4 font-code text-xs leading-6 text-foreground outline-none",
             "placeholder:text-muted-foreground/50",
           )}
           rows={lines.length + 5}

@@ -153,7 +153,7 @@ export default function ChallengePage() {
 
                 <div className="space-y-3 rounded-lg bg-secondary/50 p-4">
                   <h4 className="font-semibold">Beispiele:</h4>
-                  <div className="space-y-2 text-sm font-code">
+                  <div className="space-y-2 text-xs font-code">
                     <div>
                       <span className="text-muted-foreground">Input: </span>
                       <span className="text-primary">[1, 2, 3, 4, 5]</span>
@@ -165,7 +165,7 @@ export default function ChallengePage() {
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-2 text-sm font-code">
+                  <div className="space-y-2 text-xs font-code">
                     <div>
                       <span className="text-muted-foreground">Input: </span>
                       <span className="text-primary">[5, -2, 3, 1]</span>
@@ -225,8 +225,10 @@ export default function ChallengePage() {
                 className="border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none"
               >
                 <AlertIcon className="h-4 w-4" fill="currentColor" />
-                <AlertTitle>Achtung</AlertTitle>
-                <AlertDescription>
+                <AlertTitle className="text-lg leading-none mb-2">
+                  Achtung
+                </AlertTitle>
+                <AlertDescription className="text-sm">
                   Du kannst deine Lösung nur einmal final abgeben. Stelle
                   sicher, dass alle Tests bestanden sind.
                 </AlertDescription>
