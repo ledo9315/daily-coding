@@ -88,7 +88,7 @@ export function LandingHero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
-            href="/join"
+            href="/join?token=12312"
             className="pixel-btn bg-primary text-primary-foreground min-w-[200px] text-center"
           >
             CHALLENGE STARTEN

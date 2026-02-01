@@ -21,7 +21,7 @@ export function LandingNavbar() {
             LOGIN
           </Link>
           <Link
-            href="/join"
+            href="/join?token=12312"
             className="pixel-btn bg-primary text-primary-foreground hover:translate-x-1 hover:translate-y-1"
           >
             JETZT BEITRETEN
