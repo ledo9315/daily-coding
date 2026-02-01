@@ -3,20 +3,35 @@ import { ArrowRight, Code2, Trophy, Users } from "lucide-react";
 import { Meteors } from "../ui/meteors";
 import Image from "next/image";
 import { BorderBeam } from "../ui/border-beam";
+import { EncryptedText } from "../ui/encrypted-text";
+import { FlickeringGrid } from "../ui/flickering-grid";
 
 export function LandingHero() {
   return (
     <div className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
+      <FlickeringGrid
+        className="absolute inset-0 z-0 mask-[radial-gradient(400px_circle_at_center,white,transparent)]"
+        squareSize={6}
+        gridGap={1}
+        color="#A371F7"
+        maxOpacity={0.2}
+        flickerChance={0.1}
+        height={800}
+        width={1920}
+      />
       {/* Background patterns */}
       <Meteors />
       <div className="absolute inset-0 z-0 opacity-20 scanlines" />
-      <div className="absolute top-20 right-0 h-[400px] w-[400px] bg-primary/20 blur-[100px] rounded-full mix-blend-screen" />
+      <div className="absolute top-20 right-0 h-[400px] w-[400px] bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
       <div className="absolute bottom-0 left-0 h-[300px] w-[300px] bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center z-10">
         <div className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm">
           <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-          Heutige Challenge: Array Manipulation
+          <EncryptedText
+            text="Heutige Challenge: Array Manipulation"
+            revealDelayMs={40}
+          />
         </div>
 
         <h1 className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6">

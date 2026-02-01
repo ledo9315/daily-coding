@@ -3,6 +3,7 @@ import { LandingHero } from "@/components/landing/hero";
 import { LandingFeatures } from "@/components/landing/features";
 import { LandingCTA } from "@/components/landing/cta";
 import { LandingFooter } from "@/components/landing/footer";
+import { LandingCodeDemo } from "@/components/landing/code-demo";
 
 export default function LandingPage() {
   return (
@@ -11,6 +12,7 @@ export default function LandingPage() {
       <main>
         <LandingHero />
         <LandingFeatures />
+        <LandingCodeDemo />
         <LandingCTA />
       </main>
       <LandingFooter />

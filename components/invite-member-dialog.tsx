@@ -76,7 +76,7 @@ export function InviteMemberDialog() {
           <div className="grid gap-2">
             <Label htmlFor="role">Rolle</Label>
             <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="bg-background">
+              <SelectTrigger className="bg-background cursor-pointer">
                 <SelectValue placeholder="Wähle eine Rolle" />
               </SelectTrigger>
               <SelectContent>
@@ -87,7 +87,7 @@ export function InviteMemberDialog() {
             </Select>
           </div>
           <DialogFooter>
-            <Button type="submit" className="pixel-btn w-full">
+            <Button type="submit" className="pixel-btn w-full cursor-pointer">
               EINLADUNG SENDEN
             </Button>
           </DialogFooter>

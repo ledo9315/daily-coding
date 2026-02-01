@@ -32,16 +32,6 @@ export function LandingCTA() {
           </p>
         </div>
       </div>
-      <FlickeringGrid
-        className="absolute bottom-0 z-0 mask-[radial-gradient(400px_circle_at_bottom,white,transparent)]"
-        squareSize={6}
-        gridGap={1}
-        color="#A371F7"
-        maxOpacity={0.2}
-        flickerChance={0.1}
-        height={800}
-        width={1920}
-      />
     </section>
   );
 }
