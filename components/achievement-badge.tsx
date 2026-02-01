@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface AchievementBadgeProps {
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   unlocked?: boolean;
   rarity?: "common" | "rare" | "epic" | "legendary";
   unlockedAt?: string;
@@ -13,10 +13,10 @@ interface AchievementBadgeProps {
 
 const rarityConfig = {
   common: {
-    bgClassName: "bg-zinc-500/10",
-    borderClassName: "border-zinc-500/30",
-    iconClassName: "text-zinc-500",
-    labelClassName: "text-zinc-500",
+    bgClassName: "bg-green-500/10",
+    borderClassName: "border-green-500/30",
+    iconClassName: "text-green-500",
+    labelClassName: "text-green-500",
     label: "Gewöhnlich",
   },
   rare: {
@@ -66,7 +66,7 @@ export function AchievementBadge({
       <div className="flex items-start gap-3">
         <div
           className={cn(
-            "flex h-12 w-12 flex-shrink-0 items-center justify-center border-2 border-transparent",
+            "flex h-12 w-12 shrink-0 items-center justify-center border-2 border-transparent",
             unlocked ? config.bgClassName : "bg-muted",
           )}
         >

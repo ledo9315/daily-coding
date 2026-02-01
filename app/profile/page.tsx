@@ -12,12 +12,10 @@ import {
   Bullseye,
   Zap,
   CalendarToday,
-  User,
   Tournament,
   Check,
   CalendarWeek,
   Clock,
-  TrendingUp,
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 
@@ -42,21 +40,21 @@ const achievements = [
   },
   {
     id: "3",
-    title: "Code-Meister",
-    description: "10 schwere Challenges gelöst",
-    icon: Trophy,
-    unlocked: true,
-    rarity: "epic" as const,
-    unlockedAt: "28.01.2026",
-  },
-  {
-    id: "4",
     title: "Blitzschnell",
     description: "Challenge in unter 3 Minuten gelöst",
     icon: Clock,
     unlocked: true,
     rarity: "rare" as const,
     unlockedAt: "25.01.2026",
+  },
+  {
+    id: "4",
+    title: "Code-Meister",
+    description: "10 schwere Challenges gelöst",
+    icon: Trophy,
+    unlocked: true,
+    rarity: "epic" as const,
+    unlockedAt: "28.01.2026",
   },
   {
     id: "5",
@@ -183,7 +181,7 @@ export default function ProfilePage() {
             </div>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Tournament className="h-5 w-5 text-primary" />
                   Fortschritt
@@ -216,7 +214,7 @@ export default function ProfilePage() {
 
           <div className="space-y-6">
             <Card>
-              <CardHeader>
+              <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-amber-500" />
                   Achievements
@@ -238,7 +236,7 @@ export default function ProfilePage() {
             </Card>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
                   <CalendarToday className="h-5 w-5 text-primary" />
                   Aktivität

@@ -15,9 +15,9 @@ export function PointsChip({
   className,
 }: PointsChipProps) {
   const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs border-2",
-    md: "px-3 py-1 text-sm border-2",
-    lg: "px-4 py-1.5 text-base border-2",
+    sm: "px-2 h-6 text-xs border-2",
+    md: "px-3 h-9 text-sm border-2",
+    lg: "px-4 h-10 text-base border-2",
   };
 
   const iconSizes = {
@@ -29,10 +29,10 @@ export function PointsChip({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 font-bold font-sans tracking-wide shadow-sm",
+        "inline-flex items-center gap-2 font-bold font-sans tracking-wide",
         variant === "default"
           ? "bg-secondary text-accent border-border"
-          : "bg-accent/10 text-accent border-accent",
+          : "bg-accent/10 text-accent border-accent/20",
         sizeClasses[size],
         className,
       )}

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Code2, Trophy, Users } from "lucide-react";
 import { Meteors } from "../ui/meteors";
@@ -5,8 +7,31 @@ import Image from "next/image";
 import { BorderBeam } from "../ui/border-beam";
 import { EncryptedText } from "../ui/encrypted-text";
 import { FlickeringGrid } from "../ui/flickering-grid";
+import { motion, Variants } from "framer-motion";
 
 export function LandingHero() {
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+      },
+    },
+  };
+
   return (
     <div className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
       <FlickeringGrid
@@ -25,26 +50,43 @@ export function LandingHero() {
       <div className="absolute top-20 right-0 h-[400px] w-[400px] bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
       <div className="absolute bottom-0 left-0 h-[300px] w-[300px] bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center z-10">
-        <div className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm">
+      <motion.div
+        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center z-10"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <motion.div
+          variants={itemVariants}
+          className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm"
+        >
           <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
           <EncryptedText
             text="Heutige Challenge: Array Manipulation"
             revealDelayMs={40}
           />
-        </div>
+        </motion.div>
 
-        <h1 className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6">
+        <motion.h1
+          variants={itemVariants}
+          className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6"
+        >
           VERBESSERE DEINE <br />
           <span className="text-chart-5 retro-glow">CODING-SKILLS</span> <br />
-        </h1>
+        </motion.h1>
 
-        <p className="mx-auto max-w-2xl text-xl text-muted-foreground mb-10">
+        <motion.p
+          variants={itemVariants}
+          className="mx-auto max-w-2xl text-xl text-muted-foreground mb-10"
+        >
           Tritt gegen dein Team an, sammle XP und baue deinen Streak auf. Eine
           tägliche Coding-Challenge, um dich fit zu halten.
-        </p>
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
           <Link
             href="/join"
             className="pixel-btn bg-primary text-primary-foreground min-w-[200px] text-center"
@@ -57,7 +99,7 @@ export function LandingHero() {
           >
             FEATURES ANSEHEN
           </Link>
-        </div>
+        </motion.div>
 
         <div className="relative mt-16 mx-auto max-w-4xl rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm">
           <BorderBeam size={250} duration={12} delay={9} />
@@ -70,7 +112,10 @@ export function LandingHero() {
           />
         </div>
 
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-5xl mx-auto border-t border-border pt-8">
+        <motion.div
+          variants={itemVariants}
+          className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-5xl mx-auto border-t border-border pt-8"
+        >
           <div className="flex flex-col items-center gap-2">
             <Code2 className="h-8 w-8 text-primary" />
             <span className="font-heading text-lg">TÄGLICHE AUFGABEN</span>
@@ -92,8 +137,8 @@ export function LandingHero() {
               Miss dich mit Kollegen
             </span>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

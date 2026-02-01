@@ -44,7 +44,7 @@ export function ChallengeHistory({
 }: ChallengeHistoryProps) {
   return (
     <Card className={className}>
-      <CardHeader>
+      <CardHeader className="mb-2">
         <CardTitle>Letzte Challenges</CardTitle>
       </CardHeader>
       <CardContent>

@@ -34,9 +34,9 @@ export function DifficultyBadge({
   const config = difficultyConfig[difficulty];
 
   const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs border-2",
-    md: "px-3 py-1.5 text-sm border-2",
-    lg: "px-4 py-1.5 text-base border-2",
+    sm: "px-2 h-6 text-xs border-2",
+    md: "px-3 h-9 text-sm border-2",
+    lg: "px-4 h-10 text-base border-2",
   };
 
   return (

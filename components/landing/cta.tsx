@@ -1,12 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import { FlickeringGrid } from "../ui/flickering-grid";
+import { motion } from "framer-motion";
 
 export function LandingCTA() {
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-primary/5 scanlines opacity-50" />
 
-      <div className="relative mx-auto max-w-4xl px-4 text-center">
+      <motion.div
+        className="relative mx-auto max-w-4xl px-4 text-center"
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+      >
         <div className="pixel-box bg-card p-12 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <span className="font-heading text-9xl">?</span>
@@ -31,7 +40,7 @@ export function LandingCTA() {
             Keine Kreditkarte erforderlich • Sofortiger Zugang
           </p>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

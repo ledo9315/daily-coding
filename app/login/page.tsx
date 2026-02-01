@@ -22,8 +22,11 @@ function LoginPageContent() {
 
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
-          <h1 className="text-2xl font-pixel mb-2 tracking-tight">
-            {">_"} DAILY DEV
+          <h1 className="text-2xl font-pixel mb-2 tracking-tighter">
+            <span className="text-xl font-pixel tracking-tighter text-primary">
+              {">_"}
+            </span>{" "}
+            DAILY DEV
           </h1>
           <EncryptedText
             text="Logge dich ein um fortzufahren"

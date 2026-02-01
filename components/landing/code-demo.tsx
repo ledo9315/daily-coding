@@ -1,10 +1,10 @@
 "use client";
-
 import {
   AnimatedSpan,
   Terminal,
   TypingAnimation,
 } from "@/components/ui/terminal";
+import { motion } from "framer-motion";
 
 export function LandingCodeDemo() {
   return (
@@ -12,7 +12,13 @@ export function LandingCodeDemo() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Text Content */}
-          <div className="flex-1 space-y-8">
+          <motion.div
+            className="flex-1 space-y-8"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
+          >
             <h2 className="font-heading text-3xl sm:text-4xl">
               REALER CODE, <br />
               <span className="text-chart-5 retro-glow">ECHTE ERGEBNISSE</span>
@@ -22,10 +28,21 @@ export function LandingCodeDemo() {
               Lieblingssprache. Nutze deine vorhandenen Tools oder unseren
               integrierten Editor.
             </p>
-          </div>
+          </motion.div>
 
           {/* Terminal Demo */}
-          <div className="flex-1 w-full max-w-lg">
+          <motion.div
+            className="flex-1 w-full max-w-lg"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{
+              duration: 0.8,
+              type: "spring",
+              bounce: 0.3,
+              delay: 0.2,
+            }}
+          >
             <Terminal className="w-full bg-black/90 shadow-2xl border-border">
               <TypingAnimation>&gt; test transform-array</TypingAnimation>
 
@@ -57,7 +74,7 @@ export function LandingCodeDemo() {
               </AnimatedSpan>
               <TypingAnimation delay={5500}>&gt; </TypingAnimation>
             </Terminal>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
