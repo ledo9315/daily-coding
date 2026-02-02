@@ -105,7 +105,7 @@ export function LandingHero() {
           <BorderBeam size={250} duration={12} delay={9} />
           <Image
             src="/screen.png"
-            alt="Daily Coding Challenge Dashboard"
+            alt="Daily Dev Challenge Dashboard"
             width={1200}
             height={600}
             className="rounded-lg border border-border"

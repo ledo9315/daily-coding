@@ -89,7 +89,7 @@ export function LandingFooter() {
         </div>
       </div>
       <div className="mt-12 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-        {new Date().getFullYear()} Daily Coding. Gemacht mit Pixeln.
+        {new Date().getFullYear()} Daily Dev. Gemacht mit Pixeln.
       </div>
     </footer>
   );
