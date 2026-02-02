@@ -441,8 +441,8 @@ export default function RankingPage() {
       />
       {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] h-[600px] w-[600px] bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
-        <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute top-[-10%] right-[-5%] h-150 w-150 bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
       </div>
 
       <Header />
@@ -505,7 +505,7 @@ export default function RankingPage() {
           </TabsList>
 
           <TabsContent value="today" className="space-y-8">
-            <Card>
+            <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
               <CardHeader>
                 <CardTitle className="text-center">Top 3 des Tages</CardTitle>
               </CardHeader>

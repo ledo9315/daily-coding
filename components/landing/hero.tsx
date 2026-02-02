@@ -47,8 +47,8 @@ export function LandingHero() {
       {/* Background patterns */}
       <Meteors />
       <div className="absolute inset-0 z-0 opacity-20 scanlines" />
-      <div className="absolute top-20 right-0 h-[400px] w-[400px] bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
-      <div className="absolute bottom-0 left-0 h-[300px] w-[300px] bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
+      <div className="absolute top-20 right-0 h-100 w-100 bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
+      <div className="absolute bottom-0 left-0 h-75 w-75 bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
 
       <motion.div
         className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center z-10"
@@ -89,13 +89,13 @@ export function LandingHero() {
         >
           <Link
             href="/join?token=12312"
-            className="pixel-btn bg-primary text-primary-foreground min-w-[200px] text-center"
+            className="pixel-btn bg-primary text-primary-foreground min-w-50 text-center"
           >
             CHALLENGE STARTEN
           </Link>
           <Link
             href="#features"
-            className="pixel-btn bg-card hover:bg-muted min-w-[200px] text-center"
+            className="pixel-btn bg-card hover:bg-muted min-w-50 text-center"
           >
             FEATURES ANSEHEN
           </Link>
