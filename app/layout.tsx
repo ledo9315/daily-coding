@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeArena - Daily Coding Challenges",
+  title: "Daily-Dev - Daily Coding Challenges",
   description: "Compete in daily coding challenges with your team",
   generator: "v0.app",
   icons: {
