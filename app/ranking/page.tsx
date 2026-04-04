@@ -521,7 +521,7 @@ export default function RankingPage() {
           </TabsContent>
 
           <TabsContent value="week" className="space-y-8">
-            <Card>
+            <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
               <CardHeader>
                 <CardTitle className="text-center">Top 3 der Woche</CardTitle>
               </CardHeader>
@@ -537,7 +537,7 @@ export default function RankingPage() {
           </TabsContent>
 
           <TabsContent value="month" className="space-y-8">
-            <Card>
+            <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
               <CardHeader>
                 <CardTitle className="text-center">Top 3 des Monats</CardTitle>
               </CardHeader>
@@ -553,7 +553,7 @@ export default function RankingPage() {
           </TabsContent>
 
           <TabsContent value="team" className="space-y-8">
-            <Card>
+            <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
               <CardHeader>
                 <CardTitle className="text-center">Top 3 Teams</CardTitle>
               </CardHeader>
