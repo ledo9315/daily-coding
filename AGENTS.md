@@ -45,3 +45,7 @@ Always use the Prisma client from lib/prisma.ts — never raw SQL.
   assigned to the QA agent to write tests for the new code.
 - No feature is considered done without passing tests.
 - The CEO is responsible for keeping the QA agent busy — check after every CTO run.
+
+## Package Management
+- Always commit pnpm-lock.yaml when adding or updating dependencies
+- Run  ERR_PNPM_NO_PKG_MANIFEST  No package.json found in /Users/leonid after changing package.json and include the updated lockfile in the same commit
