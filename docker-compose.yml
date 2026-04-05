@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: daily-dev-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: daily_dev
+      POSTGRES_USER: daily_dev
+      POSTGRES_PASSWORD: daily_dev_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - /mnt/ssd/daily-coding-challenge-ui/data/postgres:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: daily-dev-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://daily_dev:daily_dev_secret@db:5432/daily_dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - /mnt/ssd/daily-coding-challenge-ui:/app
+      - /app/node_modules
