@@ -22,7 +22,7 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-// ─── shared test data ─────────────────────────────────────────────────────────
+// ─── shared test data ─────────────────────────────────────────────────────���───
 
 const baseUser = {
   id: "user-max",
@@ -40,7 +40,7 @@ const baseUser = {
   submissions: [],
 };
 
-// ─── /api/user/stats ─────────────────────────────────────────────────────────
+// ─── /api/user/stats ────────────────────��────────────────────────────────────
 
 describe("GET /api/user/stats", () => {
   it("returns 200 with user stats", async () => {
@@ -92,9 +92,25 @@ describe("GET /api/user/stats", () => {
     const json = await res.json();
     expect(json.badgesTotal).toBe(6);
   });
+
+  it("does not include teamRank or teamName in response", async () => {
+    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
+    mockFindUnique.mockResolvedValueOnce(null);
+    const res = await getUserStatsHandler();
+    const json = await res.json();
+    expect(json).not.toHaveProperty("teamRank");
+    expect(json).not.toHaveProperty("teamName");
+  });
+
+  it("only calls findUnique once (no team rank query)", async () => {
+    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
+    mockFindUnique.mockResolvedValueOnce(null);
+    await getUserStatsHandler();
+    expect(mockFindUnique).toHaveBeenCalledTimes(1);
+  });
 });
 
-// ─── /api/user/profile ────────────────────────────────────────────────────────
+// ─── /api/user/profile ──────────────────────────────���─────────────────────────
 
 describe("GET /api/user/profile", () => {
   const submission = {
@@ -147,6 +163,20 @@ describe("GET /api/user/profile", () => {
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.name).toBe("MAX MUSTERMANN");
+  });
+
+  it("does not include team in response", async () => {
+    mockFindUniqueOrThrow.mockResolvedValueOnce({
+      ...baseUser,
+      achievements: [],
+      submissions: [],
+    });
+    mockFindUnique.mockResolvedValueOnce(null);
+    const res = await getUserProfileHandler();
+    const json = await res.json();
+    expect(json).not.toHaveProperty("team");
+    expect(json.stats).not.toHaveProperty("teamRank");
+    expect(json.stats).not.toHaveProperty("teamName");
   });
 
   it("maps achievement fields correctly", async () => {

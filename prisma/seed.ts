@@ -6,78 +6,6 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // ─── Teams ───────────────────────────────────────────────────────────────────
-
-  const teamFrontend = await prisma.team.upsert({
-    where: { id: "team-frontend" },
-    update: {},
-    create: {
-      id: "team-frontend",
-      name: "Team Frontend",
-      initials: "TF",
-      avatar: "/user/pony2.png",
-      level: 25,
-      points: 9500,
-      challengesSolved: 78,
-    },
-  });
-
-  const teamBackend = await prisma.team.upsert({
-    where: { id: "team-backend" },
-    update: {},
-    create: {
-      id: "team-backend",
-      name: "Team Backend",
-      initials: "TB",
-      avatar: "/user/minipix2.png",
-      level: 23,
-      points: 8780,
-      challengesSolved: 72,
-    },
-  });
-
-  const teamDevOps = await prisma.team.upsert({
-    where: { id: "team-devops" },
-    update: {},
-    create: {
-      id: "team-devops",
-      name: "Team DevOps",
-      initials: "TD",
-      avatar: "/user/pony3.png",
-      level: 21,
-      points: 7650,
-      challengesSolved: 65,
-    },
-  });
-
-  const teamMobile = await prisma.team.upsert({
-    where: { id: "team-mobile" },
-    update: {},
-    create: {
-      id: "team-mobile",
-      name: "Team Mobile",
-      initials: "TM",
-      avatar: "/user/minipix4.png",
-      level: 20,
-      points: 7200,
-      challengesSolved: 60,
-    },
-  });
-
-  const teamQA = await prisma.team.upsert({
-    where: { id: "team-qa" },
-    update: {},
-    create: {
-      id: "team-qa",
-      name: "Team QA",
-      initials: "TQ",
-      avatar: "/user/minipix5.png",
-      level: 18,
-      points: 5800,
-      challengesSolved: 48,
-    },
-  });
-
   // ─── Users ───────────────────────────────────────────────────────────────────
 
   const anna = await prisma.user.upsert({
@@ -99,7 +27,6 @@ async function main() {
       streakRecord: 28,
       totalSolved: 28,
       badges: 5,
-      teamId: teamFrontend.id,
     },
   });
 
@@ -122,7 +49,6 @@ async function main() {
       streakRecord: 30,
       totalSolved: 27,
       badges: 4,
-      teamId: teamBackend.id,
     },
   });
 
@@ -144,7 +70,6 @@ async function main() {
       streakRecord: 28,
       totalSolved: 47,
       badges: 4,
-      teamId: teamFrontend.id,
     },
   });
 
@@ -167,7 +92,6 @@ async function main() {
       streakRecord: 20,
       totalSolved: 26,
       badges: 3,
-      teamId: teamFrontend.id,
     },
   });
 
@@ -190,7 +114,6 @@ async function main() {
       streakRecord: 15,
       totalSolved: 22,
       badges: 2,
-      teamId: teamMobile.id,
     },
   });
 
@@ -212,7 +135,6 @@ async function main() {
       streakRecord: 18,
       totalSolved: 23,
       badges: 3,
-      teamId: teamDevOps.id,
     },
   });
 
@@ -234,7 +156,6 @@ async function main() {
       streakRecord: 14,
       totalSolved: 21,
       badges: 2,
-      teamId: teamBackend.id,
     },
   });
 
@@ -256,7 +177,6 @@ async function main() {
       streakRecord: 10,
       totalSolved: 20,
       badges: 2,
-      teamId: teamQA.id,
     },
   });
 
@@ -278,7 +198,6 @@ async function main() {
       streakRecord: 12,
       totalSolved: 19,
       badges: 2,
-      teamId: teamDevOps.id,
     },
   });
 
@@ -300,7 +219,6 @@ async function main() {
       streakRecord: 9,
       totalSolved: 18,
       badges: 1,
-      teamId: teamMobile.id,
     },
   });
 
@@ -545,23 +463,6 @@ async function main() {
       where: { userId_period_periodDate: { userId: entry.userId, period: "month", periodDate: monthDate } },
       update: {},
       create: { period: "month", periodDate: monthDate, ...entry },
-    });
-  }
-
-  // Team rankings
-  const teams = [
-    { team: teamFrontend, rank: 1, previousRank: 1, points: 9500, challengesSolved: 78 },
-    { team: teamBackend, rank: 2, previousRank: 2, points: 8780, challengesSolved: 72 },
-    { team: teamDevOps, rank: 3, previousRank: 4, points: 7650, challengesSolved: 65 },
-    { team: teamMobile, rank: 4, previousRank: 3, points: 7200, challengesSolved: 60 },
-    { team: teamQA, rank: 5, previousRank: 5, points: 5800, challengesSolved: 48 },
-  ];
-
-  for (const entry of teams) {
-    await prisma.rankingEntry.upsert({
-      where: { teamId_period_periodDate: { teamId: entry.team.id, period: "team", periodDate: today } },
-      update: {},
-      create: { period: "team", periodDate: today, teamId: entry.team.id, rank: entry.rank, previousRank: entry.previousRank, points: entry.points, challengesSolved: entry.challengesSolved },
     });
   }
 

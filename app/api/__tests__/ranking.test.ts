@@ -62,6 +62,14 @@ describe("GET /api/ranking", () => {
     );
   });
 
+  it("uses period=month when specified", async () => {
+    mockFindMany.mockResolvedValueOnce([]);
+    await getRankingHandler(makeRequest("month"));
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ period: "month" }) })
+    );
+  });
+
   it("falls back to today for an invalid period", async () => {
     mockFindMany.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("invalid"));
@@ -85,6 +93,14 @@ describe("GET /api/ranking", () => {
     const json = await res.json();
     expect(json).toEqual([]);
   });
+
+  it("does not handle team period (falls back to today)", async () => {
+    mockFindMany.mockResolvedValueOnce([]);
+    await getRankingHandler(makeRequest("team"));
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
+    );
+  });
 });
 
 // ─── /api/ranking/preview ─────────────────────────────────────────────────────
@@ -99,7 +115,6 @@ describe("GET /api/ranking/preview", () => {
 
   it("returns 200 with today preview", async () => {
     mockFindMany.mockResolvedValueOnce([dbEntry()]);
-    mockFindMany.mockResolvedValueOnce([]);
     const res = await getRankingPreviewHandler();
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -108,8 +123,14 @@ describe("GET /api/ranking/preview", () => {
     expect(json.today[0]).toMatchObject({ rank: 1, name: "Bob", points: 300 });
   });
 
+  it("does not include a team property", async () => {
+    mockFindMany.mockResolvedValueOnce([dbEntry()]);
+    const res = await getRankingPreviewHandler();
+    const json = await res.json();
+    expect(json).not.toHaveProperty("team");
+  });
+
   it("queries with take: 5", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
     mockFindMany.mockResolvedValueOnce([]);
     await getRankingPreviewHandler();
     expect(mockFindMany).toHaveBeenCalledWith(
@@ -119,9 +140,14 @@ describe("GET /api/ranking/preview", () => {
 
   it("returns empty today array when no entries", async () => {
     mockFindMany.mockResolvedValueOnce([]);
-    mockFindMany.mockResolvedValueOnce([]);
     const res = await getRankingPreviewHandler();
     const json = await res.json();
     expect(json.today).toEqual([]);
+  });
+
+  it("only calls findMany once (no team query)", async () => {
+    mockFindMany.mockResolvedValueOnce([]);
+    await getRankingPreviewHandler();
+    expect(mockFindMany).toHaveBeenCalledTimes(1);
   });
 });

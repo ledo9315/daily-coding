@@ -9,7 +9,6 @@ export interface RankingEntry {
   initials: string;
   points: number;
   time?: string;
-  team?: string;
   avatar: string;
   level: number;
   challengesSolved?: number;
@@ -28,8 +27,6 @@ export interface UserStats {
   points: string;
   streak: number;
   streakRecord: number;
-  teamRank: string;
-  teamName: string;
   totalSolved: number;
   level: number;
   levelMax: number;
@@ -63,23 +60,10 @@ export interface UserProfile {
   name: string;
   initials: string;
   avatar: string;
-  team: string;
   role: string;
   stats: UserStats;
   achievements: Achievement[];
   challengeHistory: ChallengeHistoryEntry[];
-}
-
-export interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: "active" | "invited" | "inactive";
-  initials: string;
-  avatar: string;
-  joinDate: string;
-  department: string;
 }
 
 export interface ChallengeTestCase {
@@ -135,7 +119,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 // ─── Ranking ──────────────────────────────────────────────────────────────────
 
 export function getRanking(
-  period: "today" | "week" | "month" | "team"
+  period: "today" | "week" | "month"
 ): Promise<RankingEntry[]> {
   return apiFetch<RankingEntry[]>(`/api/ranking?period=${period}`);
 }
@@ -148,7 +132,6 @@ export function getTodayChallenge(): Promise<TodayChallenge> {
 
 export function getDashboardRankingPreview(): Promise<{
   today: RankingEntry[];
-  team: RankingEntry[];
 }> {
   return apiFetch("/api/ranking/preview");
 }
@@ -161,16 +144,6 @@ export function getUserStats(): Promise<UserStats> {
 
 export function getUserProfile(): Promise<UserProfile> {
   return apiFetch<UserProfile>("/api/user/profile");
-}
-
-// ─── Team ─────────────────────────────────────────────────────────────────────
-
-export function getTeamMembers(): Promise<TeamMember[]> {
-  return apiFetch<TeamMember[]>("/api/team/members");
-}
-
-export async function removeTeamMember(id: string): Promise<void> {
-  await apiFetch(`/api/team/members/${id}`, { method: "DELETE" });
 }
 
 // ─── Challenge ────────────────────────────────────────────────────────────────
