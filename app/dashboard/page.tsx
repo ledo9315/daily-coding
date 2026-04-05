@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";

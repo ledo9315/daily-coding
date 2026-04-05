@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/header";
 import { InviteMemberDialog } from "@/components/invite-member-dialog";
 import { TeamMemberTable } from "@/components/team-member-table";

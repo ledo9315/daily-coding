@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/header";
 import { StreakBadge } from "@/components/streak-badge";
 import { PointsChip } from "@/components/points-chip";
