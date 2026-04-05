@@ -10,7 +10,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - /mnt/ssd/daily-coding-challenge-ui/data/postgres:/var/lib/postgresql/data
+      - /mnt/ssd/data/daily-dev-postgres/data:/var/lib/postgresql/data
 
   app:
     build: .
