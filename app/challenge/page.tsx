@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { CodeEditor } from "@/components/code-editor";
 import { TestResults, type TestCase } from "@/components/test-results";
@@ -27,62 +27,36 @@ import {
 import { ConfettiButton } from "@/components/ui/confetti";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-
-const initialTestCases: TestCase[] = [
-  { id: 1, name: "Test Case 1: Einfaches Array", status: "pending" },
-  { id: 2, name: "Test Case 2: Leeres Array", status: "pending" },
-  { id: 3, name: "Test Case 3: Negative Zahlen", status: "pending" },
-  { id: 4, name: "Test Case 4: Großes Array", status: "pending" },
-  { id: 5, name: "Test Case 5: Edge Cases", status: "pending" },
-];
+import { getDailyChallenge, runTests, submitSolution, type DailyChallenge } from "@/lib/api";
 
 export default function ChallengePage() {
+  const [challenge, setChallenge] = useState<DailyChallenge | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [testCases, setTestCases] = useState<TestCase[]>(initialTestCases);
+  const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [isRunning, setIsRunning] = useState(false);
 
-  const handleRunTests = () => {
-    setIsRunning(true);
+  useEffect(() => {
+    getDailyChallenge().then((data) => {
+      setChallenge(data);
+      setTestCases(data.testCases as TestCase[]);
+    });
+  }, []);
 
-    // Simulate test execution
-    setTimeout(() => {
-      setTestCases([
-        {
-          id: 1,
-          name: "Test Case 1: Einfaches Array",
-          status: "passed",
-          time: "12ms",
-        },
-        {
-          id: 2,
-          name: "Test Case 2: Leeres Array",
-          status: "passed",
-          time: "8ms",
-        },
-        {
-          id: 3,
-          name: "Test Case 3: Negative Zahlen",
-          status: "failed",
-          input: "[-1, -2, -3]",
-          expected: "[-1, -3, -6]",
-          actual: "[-1, -2, -3]",
-          time: "10ms",
-        },
-        {
-          id: 4,
-          name: "Test Case 4: Großes Array",
-          status: "passed",
-          time: "45ms",
-        },
-        { id: 5, name: "Test Case 5: Edge Cases", status: "pending" },
-      ]);
-      setIsRunning(false);
-    }, 1500);
+  const handleRunTests = async () => {
+    if (!challenge) return;
+    setIsRunning(true);
+    const result = await runTests(challenge.id, "");
+    setTestCases(result.testCases as TestCase[]);
+    setIsRunning(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!challenge) return;
+    await submitSolution(challenge.id, "");
     setIsSubmitted(true);
   };
+
+  if (!challenge) return null;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -109,19 +83,19 @@ export default function ChallengePage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-pixel uppercase tracking-tight">
-                Array Manipulation Challenge
+                {challenge.title}
               </h1>
-              <DifficultyBadge difficulty="medium" />
+              <DifficultyBadge difficulty={challenge.difficulty} />
             </div>
             <EncryptedText
-              text="Algorithmen • Tag 47"
+              text={challenge.category}
               revealDelayMs={30}
               className="text-xl text-muted-foreground uppercase tracking-wide"
             />
           </div>
 
           <div className="flex items-center gap-4">
-            <PointsChip points={150} variant="highlight" size="lg" />
+            <PointsChip points={challenge.points} variant="highlight" size="lg" />
             <CountdownTimer />
           </div>
         </div>
@@ -142,39 +116,23 @@ export default function ChallengePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <CardDescription className="text-lg text-muted-foreground">
-                  Implementiere eine Funktion{" "}
-                  <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-sm text-primary">
-                    transformArray(arr)
-                  </code>
-                  , die ein Array von Zahlen nimmt und ein neues Array
-                  zurückgibt, bei dem jedes Element die kumulative Summe aller
-                  vorherigen Elemente (inklusive sich selbst) enthält.
+                  {challenge.description}
                 </CardDescription>
 
                 <div className="space-y-3 rounded-lg bg-secondary/50 p-4">
                   <h4 className="font-semibold">Beispiele:</h4>
-                  <div className="space-y-2 text-xs font-code">
-                    <div>
-                      <span className="text-muted-foreground">Input: </span>
-                      <span className="text-primary">[1, 2, 3, 4, 5]</span>
+                  {challenge.examples.map((ex, i) => (
+                    <div key={i} className="space-y-2 text-xs font-code">
+                      <div>
+                        <span className="text-muted-foreground">Input: </span>
+                        <span className="text-primary">{ex.input}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Output: </span>
+                        <span className="text-emerald-500">{ex.output}</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground">Output: </span>
-                      <span className="text-emerald-500">
-                        [1, 3, 6, 10, 15]
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-xs font-code">
-                    <div>
-                      <span className="text-muted-foreground">Input: </span>
-                      <span className="text-primary">[5, -2, 3, 1]</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Output: </span>
-                      <span className="text-emerald-500">[5, 3, 6, 7]</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 <div className="flex items-start gap-2 border border-amber-500/30 bg-amber-500/10 p-4">
@@ -184,10 +142,7 @@ export default function ChallengePage() {
                   />
                   <div>
                     <h4 className="font-medium text-accent">Hinweis</h4>
-                    <p className="text-base text-accent/90">
-                      Versuche die Lösung mit O(n) Zeitkomplexität und O(1)
-                      zusätzlichem Speicher zu implementieren.
-                    </p>
+                    <p className="text-base text-accent/90">{challenge.hint}</p>
                   </div>
                 </div>
               </CardContent>

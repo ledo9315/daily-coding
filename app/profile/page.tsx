@@ -19,115 +19,24 @@ import {
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { getUserProfile, type Achievement } from "@/lib/api";
 
-const achievements = [
-  {
-    id: "1",
-    title: "Erste Schritte",
-    description: "Erste Challenge abgeschlossen",
-    icon: Check,
-    unlocked: true,
-    rarity: "common" as const,
-    unlockedAt: "15.01.2026",
-  },
-  {
-    id: "2",
-    title: "Wochenend-Krieger",
-    description: "7 Tage Streak erreicht",
-    icon: CalendarWeek,
-    unlocked: true,
-    rarity: "rare" as const,
-    unlockedAt: "22.01.2026",
-  },
-  {
-    id: "3",
-    title: "Blitzschnell",
-    description: "Challenge in unter 3 Minuten gelöst",
-    icon: Clock,
-    unlocked: true,
-    rarity: "rare" as const,
-    unlockedAt: "25.01.2026",
-  },
-  {
-    id: "4",
-    title: "Code-Meister",
-    description: "10 schwere Challenges gelöst",
-    icon: Trophy,
-    unlocked: true,
-    rarity: "epic" as const,
-    unlockedAt: "28.01.2026",
-  },
-  {
-    id: "5",
-    title: "Unaufhaltsam",
-    description: "30 Tage Streak erreicht",
-    icon: Zap,
-    unlocked: false,
-    rarity: "legendary" as const,
-  },
-  {
-    id: "6",
-    title: "Perfektionist",
-    description: "20 Challenges ohne Fehler",
-    icon: Bullseye,
-    unlocked: false,
-    rarity: "epic" as const,
-  },
-];
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Check,
+  CalendarWeek,
+  Clock,
+  Trophy,
+  Zap,
+  Bullseye,
+};
 
-const challengeHistory = [
-  {
-    id: "1",
-    title: "Array Manipulation",
-    date: "Heute",
-    difficulty: "medium" as const,
-    status: "completed" as const,
-    points: 150,
-    time: "5:23",
-    rank: 8,
-  },
-  {
-    id: "2",
-    title: "String Parsing",
-    date: "Gestern",
-    difficulty: "easy" as const,
-    status: "completed" as const,
-    points: 100,
-    time: "3:12",
-    rank: 3,
-  },
-  {
-    id: "3",
-    title: "Binary Tree Traversal",
-    date: "29.01.2026",
-    difficulty: "hard" as const,
-    status: "failed" as const,
-    points: 200,
-    time: "15:00",
-  },
-  {
-    id: "4",
-    title: "Hash Map Implementation",
-    date: "28.01.2026",
-    difficulty: "medium" as const,
-    status: "completed" as const,
-    points: 150,
-    time: "8:45",
-    rank: 12,
-  },
-  {
-    id: "5",
-    title: "Recursion Basics",
-    date: "27.01.2026",
-    difficulty: "easy" as const,
-    status: "completed" as const,
-    points: 100,
-    time: "4:30",
-    rank: 5,
-  },
-];
+function resolveIcon(iconKey: string): React.ComponentType<{ className?: string }> {
+  return iconMap[iconKey] ?? Trophy;
+}
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const profile = await getUserProfile();
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <FlickeringGrid
@@ -152,21 +61,21 @@ export default function ProfilePage() {
         <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-zinc-700 rounded-none">
-              <AvatarImage src="/user/minipix4.png" alt="Max Mustermann" />
+              <AvatarImage src={profile.avatar} alt={profile.name} />
               <AvatarFallback className="text-2xl rounded-none">
-                MM
+                {profile.initials}
               </AvatarFallback>
             </Avatar>
             <div>
               <h1 className="text-2xl font-sans font-bold tracking-widest uppercase">
-                MAX MUSTERMANN
+                {profile.name}
               </h1>
               <p className="text-muted-foreground uppercase tracking-wider text-sm">
-                Team Frontend • Senior Developer
+                {profile.team} • {profile.role}
               </p>
               <div className="mt-2 flex items-center gap-3">
-                <StreakBadge count={12} />
-                <PointsChip points={2450} variant="highlight" />
+                <StreakBadge count={profile.stats.streak} />
+                <PointsChip points={parseInt(profile.stats.points.replace(".", ""), 10)} variant="highlight" />
               </div>
             </div>
           </div>
@@ -175,10 +84,10 @@ export default function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
-              <StatsCard title="LEVEL" value="#12" icon={Trophy} />
-              <StatsCard title="GELÖST" value="47" icon={Bullseye} />
-              <StatsCard title="REKORD" value="28" icon={Zap} />
-              <StatsCard title="BADGES" value="4/6" icon={Trophy} />
+              <StatsCard title="LEVEL" value={profile.stats.rank} icon={Trophy} />
+              <StatsCard title="GELÖST" value={String(profile.stats.totalSolved)} icon={Bullseye} />
+              <StatsCard title="REKORD" value={String(profile.stats.streakRecord)} icon={Zap} />
+              <StatsCard title="BADGES" value={`${profile.stats.badges}/${profile.stats.badgesTotal}`} icon={Trophy} />
             </div>
 
             <Card>
@@ -190,9 +99,9 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <ProgressBar
-                  label="Level 12 - Code Ninja"
-                  value={2450}
-                  max={3000}
+                  label={`Level ${profile.stats.level} - Code Ninja`}
+                  value={parseInt(profile.stats.points.replace(".", ""), 10)}
+                  max={profile.stats.levelMax}
                   variant="default"
                 />
                 <ProgressBar
@@ -203,14 +112,14 @@ export default function ProfilePage() {
                 />
                 <ProgressBar
                   label="Streak zum Rekord"
-                  value={12}
-                  max={28}
+                  value={profile.stats.streak}
+                  max={profile.stats.streakRecord}
                   variant="warning"
                 />
               </CardContent>
             </Card>
 
-            <ChallengeHistory entries={challengeHistory} />
+            <ChallengeHistory entries={profile.challengeHistory} />
           </div>
 
           <div className="space-y-6">
@@ -222,12 +131,12 @@ export default function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {achievements.map((achievement) => (
+                {profile.achievements.map((achievement: Achievement) => (
                   <AchievementBadge
                     key={achievement.id}
                     title={achievement.title}
                     description={achievement.description}
-                    icon={achievement.icon}
+                    icon={resolveIcon(achievement.iconKey)}
                     unlocked={achievement.unlocked}
                     rarity={achievement.rarity}
                     unlockedAt={achievement.unlockedAt}

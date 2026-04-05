@@ -2,76 +2,23 @@
 
 import { Header } from "@/components/header";
 import { InviteMemberDialog } from "@/components/invite-member-dialog";
-import { TeamMember, TeamMemberTable } from "@/components/team-member-table";
+import { TeamMemberTable } from "@/components/team-member-table";
 import { StatsCard } from "@/components/stats-card";
 import { Card } from "@/components/ui/card";
 import { Shield, Users, Zap } from "@nsmr/pixelart-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-
-// Mock Data
-const initialMembers: TeamMember[] = [
-  {
-    id: "1",
-    name: "Anna Schmidt",
-    email: "anna.schmidt@company.com",
-    role: "Administrator",
-    status: "active",
-    initials: "AS",
-    avatar: "/user/chibi1.png",
-    joinDate: "01.01.2024",
-    department: "Frontend",
-  },
-  {
-    id: "2",
-    name: "Tom Weber",
-    email: "tom.weber@company.com",
-    role: "Mitglied",
-    status: "active",
-    initials: "TW",
-    avatar: "/user/chibi2.png",
-    joinDate: "15.02.2024",
-    department: "Backend",
-  },
-  {
-    id: "3",
-    name: "Max Mustermann",
-    email: "max.mustermann@company.com",
-    role: "Mitglied",
-    status: "invited",
-    initials: "MM",
-    avatar: "/user/minipix5.png",
-    joinDate: "-",
-    department: "Frontend",
-  },
-  {
-    id: "4",
-    name: "Lisa Müller",
-    email: "lisa.mueller@company.com",
-    role: "Mitglied",
-    status: "active",
-    initials: "LM",
-    avatar: "/user/chibi3.png",
-    joinDate: "03.03.2024",
-    department: "Design",
-  },
-  {
-    id: "5",
-    name: "Sarah Klein",
-    email: "sarah.klein@company.com",
-    role: "Beobachter",
-    status: "inactive",
-    initials: "SK",
-    avatar: "/user/minipix4.png",
-    joinDate: "01.01.2024",
-    department: "Marketing",
-  },
-];
+import { getTeamMembers, removeTeamMember } from "@/lib/api";
+import { type TeamMember } from "@/components/team-member-table";
 
 export default function TeamPage() {
-  const [members, setMembers] = useState<TeamMember[]>(initialMembers);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    getTeamMembers().then((data) => setMembers(data as TeamMember[]));
+  }, []);
 
   const handleEdit = (member: TeamMember) => {
     console.log("Edit member:", member);
@@ -79,9 +26,10 @@ export default function TeamPage() {
   };
 
   const handleRemove = (member: TeamMember) => {
-    console.log("Remove member:", member);
-    toast.error(`${member.name} wurde entfernt.`);
-    setMembers((prev) => prev.filter((m) => m.id !== member.id));
+    removeTeamMember(member.id).then(() => {
+      toast.error(`${member.name} wurde entfernt.`);
+      setMembers((prev) => prev.filter((m) => m.id !== member.id));
+    });
   };
 
   return (
