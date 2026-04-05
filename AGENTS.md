@@ -49,3 +49,13 @@ Always use the Prisma client from lib/prisma.ts — never raw SQL.
 ## Package Management
 - Always commit pnpm-lock.yaml when adding or updating dependencies
 - Run  ERR_PNPM_NO_PKG_MANIFEST  No package.json found in /Users/leonid after changing package.json and include the updated lockfile in the same commit
+
+## PR Requirements (mandatory)
+Before opening a Pull Request, the following steps must be completed in order:
+
+1. Write tests for the feature/fix (Vitest unit tests, Playwright E2E if applicable)
+2. Run all tests locally:  ERR_PNPM_RECURSIVE_EXEC_NO_PACKAGE  No package found in this workspace
+3. All tests must pass — zero failures allowed
+4. Only after all tests pass, open the Pull Request
+
+No PR may be opened with failing tests or without tests for the new code.
