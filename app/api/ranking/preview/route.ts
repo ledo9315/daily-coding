@@ -20,7 +20,7 @@ export async function GET() {
   ]);
 
   return NextResponse.json({
-    today: todayEntries.map((e) => ({
+    today: todayEntries.map((e: any) => ({
       rank: e.rank,
       name: e.user!.name,
       initials: e.user!.initials,
@@ -29,7 +29,7 @@ export async function GET() {
       avatar: e.user!.avatar,
       level: e.user!.level,
     })),
-    team: teamEntries.map((e) => ({
+    team: teamEntries.map((e: any) => ({
       rank: e.rank,
       name: e.team!.name,
       initials: e.team!.initials,

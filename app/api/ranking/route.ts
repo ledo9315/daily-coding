@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(
-      entries.map((e) => ({
+      entries.map((e: any) => ({
         rank: e.rank,
         previousRank: e.previousRank ?? undefined,
         name: e.team!.name,
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.json(
-    entries.map((e) => ({
+    entries.map((e: any) => ({
       rank: e.rank,
       previousRank: e.previousRank ?? undefined,
       name: e.user!.name,

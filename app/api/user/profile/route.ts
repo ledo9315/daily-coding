@@ -60,7 +60,7 @@ export async function GET() {
       badges: user.badges,
       badgesTotal: 6,
     },
-    achievements: user.achievements.map((a) => ({
+    achievements: user.achievements.map((a: any) => ({
       id: a.id,
       title: a.title,
       description: a.description,
@@ -69,7 +69,7 @@ export async function GET() {
       rarity: a.rarity,
       unlockedAt: a.unlockedAt ? formatDate(a.unlockedAt) : undefined,
     })),
-    challengeHistory: user.submissions.map((s) => ({
+    challengeHistory: user.submissions.map((s: any) => ({
       id: s.id,
       title: s.challenge.title,
       date: formatDate(s.createdAt),
