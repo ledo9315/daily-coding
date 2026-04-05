@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
@@ -68,17 +70,12 @@ export default async function DashboardPage() {
           />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-1">
           <RankingPreviewCard
             title="TAGES-RANKING"
             users={rankingPreview.today}
             href="/ranking"
             showTime
-          />
-          <RankingPreviewCard
-            title="TEAM-RANKING"
-            users={rankingPreview.team}
-            href="/ranking?tab=team"
           />
         </div>
       </main>

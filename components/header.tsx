@@ -20,7 +20,6 @@ import {
   Zap,
   Sliders,
   Logout,
-  Users,
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "./ui/flickering-grid";
 
@@ -42,12 +41,6 @@ const navigation = [
     href: "/ranking",
     icon: Trophy,
     color: "border-accent bg-accent/20 text-accent",
-  },
-  {
-    name: "TEAM",
-    href: "/team",
-    icon: Users,
-    color: "border-chart-1 bg-chart-1/20 text-chart-1",
   },
   {
     name: "PROFILE",
