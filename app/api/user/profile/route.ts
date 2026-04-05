@@ -1,43 +1,83 @@
 import { NextResponse } from "next/server";
-import type { UserProfile } from "@/lib/api";
+import { prisma } from "@/lib/prisma";
 
-const profile: UserProfile = {
-  id: "current-user",
-  name: "MAX MUSTERMANN",
-  initials: "MM",
-  avatar: "/user/minipix4.png",
-  team: "Team Frontend",
-  role: "Senior Developer",
-  stats: {
-    rank: "#12",
-    points: "2.450",
-    streak: 12,
-    streakRecord: 28,
-    teamRank: "#2",
-    teamName: "Team Frontend",
-    totalSolved: 47,
-    level: 12,
-    levelMax: 3000,
-    badges: 4,
-    badgesTotal: 6,
-  },
-  achievements: [
-    { id: "1", title: "Erste Schritte", description: "Erste Challenge abgeschlossen", iconKey: "Check", unlocked: true, rarity: "common", unlockedAt: "15.01.2026" },
-    { id: "2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht", iconKey: "CalendarWeek", unlocked: true, rarity: "rare", unlockedAt: "22.01.2026" },
-    { id: "3", title: "Blitzschnell", description: "Challenge in unter 3 Minuten gelöst", iconKey: "Clock", unlocked: true, rarity: "rare", unlockedAt: "25.01.2026" },
-    { id: "4", title: "Code-Meister", description: "10 schwere Challenges gelöst", iconKey: "Trophy", unlocked: true, rarity: "epic", unlockedAt: "28.01.2026" },
-    { id: "5", title: "Unaufhaltsam", description: "30 Tage Streak erreicht", iconKey: "Zap", unlocked: false, rarity: "legendary" },
-    { id: "6", title: "Perfektionist", description: "20 Challenges ohne Fehler", iconKey: "Bullseye", unlocked: false, rarity: "epic" },
-  ],
-  challengeHistory: [
-    { id: "1", title: "Array Manipulation", date: "Heute", difficulty: "medium", status: "completed", points: 150, time: "5:23", rank: 8 },
-    { id: "2", title: "String Parsing", date: "Gestern", difficulty: "easy", status: "completed", points: 100, time: "3:12", rank: 3 },
-    { id: "3", title: "Binary Tree Traversal", date: "29.01.2026", difficulty: "hard", status: "failed", points: 200, time: "15:00" },
-    { id: "4", title: "Hash Map Implementation", date: "28.01.2026", difficulty: "medium", status: "completed", points: 150, time: "8:45", rank: 12 },
-    { id: "5", title: "Recursion Basics", date: "27.01.2026", difficulty: "easy", status: "completed", points: 100, time: "4:30", rank: 5 },
-  ],
-};
+const CURRENT_USER_ID = "user-max";
 
 export async function GET() {
-  return NextResponse.json(profile);
+  const today = new Date("2026-04-05");
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: CURRENT_USER_ID },
+    include: {
+      team: true,
+      achievements: { orderBy: { createdAt: "asc" } },
+      submissions: {
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: { challenge: true },
+      },
+    },
+  });
+
+  const todayRank = await prisma.rankingEntry.findUnique({
+    where: { userId_period_periodDate: { userId: CURRENT_USER_ID, period: "today", periodDate: today } },
+  });
+  const teamRank = user.teamId
+    ? await prisma.rankingEntry.findUnique({
+        where: { teamId_period_periodDate: { teamId: user.teamId, period: "team", periodDate: today } },
+      })
+    : null;
+
+  const formatTime = (seconds: number | null) => {
+    if (!seconds) return "-";
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const formatDate = (date: Date) => {
+    const d = new Date(date);
+    return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  };
+
+  return NextResponse.json({
+    id: user.id,
+    name: user.name.toUpperCase(),
+    initials: user.initials,
+    avatar: user.avatar,
+    team: user.team?.name ?? "",
+    role: user.role,
+    stats: {
+      rank: todayRank ? `#${todayRank.rank}` : "#-",
+      points: user.points.toLocaleString("de-DE"),
+      streak: user.streak,
+      streakRecord: user.streakRecord,
+      teamRank: teamRank ? `#${teamRank.rank}` : "#-",
+      teamName: user.team?.name ?? "",
+      totalSolved: user.totalSolved,
+      level: user.level,
+      levelMax: 3000,
+      badges: user.badges,
+      badgesTotal: 6,
+    },
+    achievements: user.achievements.map((a) => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      iconKey: a.iconKey,
+      unlocked: a.unlocked,
+      rarity: a.rarity,
+      unlockedAt: a.unlockedAt ? formatDate(a.unlockedAt) : undefined,
+    })),
+    challengeHistory: user.submissions.map((s) => ({
+      id: s.id,
+      title: s.challenge.title,
+      date: formatDate(s.createdAt),
+      difficulty: s.challenge.difficulty,
+      status: s.status,
+      points: s.challenge.points,
+      time: formatTime(s.timeTaken),
+      rank: s.rank ?? undefined,
+    })),
+  });
 }
