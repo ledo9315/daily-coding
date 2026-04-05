@@ -39,3 +39,9 @@ Always use the Prisma client from lib/prisma.ts — never raw SQL.
 - Challenge submission logic
 - Live ranking & stats connected to DB
 - CI/CD pipeline (GitHub Actions)
+
+## Workflow Rules
+- After every CTO task is completed, the CEO must create a QA issue
+  assigned to the QA agent to write tests for the new code.
+- No feature is considered done without passing tests.
+- The CEO is responsible for keeping the QA agent busy — check after every CTO run.
