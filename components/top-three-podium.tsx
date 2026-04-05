@@ -8,7 +8,6 @@ interface TopUser {
   avatar?: string;
   initials: string;
   points: number;
-  team?: string;
   level?: number;
 }
 

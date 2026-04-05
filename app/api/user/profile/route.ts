@@ -9,7 +9,6 @@ export async function GET() {
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: CURRENT_USER_ID },
     include: {
-      team: true,
       achievements: { orderBy: { createdAt: "asc" } },
       submissions: {
         orderBy: { createdAt: "desc" },
@@ -22,11 +21,6 @@ export async function GET() {
   const todayRank = await prisma.rankingEntry.findUnique({
     where: { userId_period_periodDate: { userId: CURRENT_USER_ID, period: "today", periodDate: today } },
   });
-  const teamRank = user.teamId
-    ? await prisma.rankingEntry.findUnique({
-        where: { teamId_period_periodDate: { teamId: user.teamId, period: "team", periodDate: today } },
-      })
-    : null;
 
   const formatTime = (seconds: number | null) => {
     if (!seconds) return "-";
@@ -45,15 +39,12 @@ export async function GET() {
     name: user.name.toUpperCase(),
     initials: user.initials,
     avatar: user.avatar,
-    team: user.team?.name ?? "",
     role: user.role,
     stats: {
       rank: todayRank ? `#${todayRank.rank}` : "#-",
       points: user.points.toLocaleString("de-DE"),
       streak: user.streak,
       streakRecord: user.streakRecord,
-      teamRank: teamRank ? `#${teamRank.rank}` : "#-",
-      teamName: user.team?.name ?? "",
       totalSolved: user.totalSolved,
       level: user.level,
       levelMax: 3000,

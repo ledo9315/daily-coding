@@ -73,7 +73,7 @@ export default async function ProfilePage() {
                 {profile.name}
               </h1>
               <p className="text-muted-foreground uppercase tracking-wider text-sm">
-                {profile.team} • {profile.role}
+                {profile.role}
               </p>
               <div className="mt-2 flex items-center gap-3">
                 <StreakBadge count={profile.stats.streak} />

@@ -4,7 +4,7 @@ import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
 import { StatsCard } from "@/components/stats-card";
-import { Zap, Bullseye, Trophy, Users } from "@nsmr/pixelart-react";
+import { Zap, Bullseye, Trophy } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { CommunityFeed } from "@/components/community-feed";
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           />
         </div>
 
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
             title="DEIN RANG"
             value={userStats.rank}
@@ -73,12 +73,6 @@ export default async function DashboardPage() {
             description={`Rekord: ${userStats.streakRecord} Tage`}
             icon={Zap}
           />
-          <StatsCard
-            title="TEAM RANG"
-            value={userStats.teamRank}
-            description={userStats.teamName}
-            icon={Users}
-          />
         </div>
 
         <div className="mb-8" style={{ "--primary": "var(--chart-5)" } as any}>
@@ -92,17 +86,12 @@ export default async function DashboardPage() {
           />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 mb-12">
+        <div className="mb-12">
           <RankingPreviewCard
             title="TAGES-RANKING"
             users={rankingPreview.today}
             href="/ranking"
             showTime
-          />
-          <RankingPreviewCard
-            title="TEAM-RANKING"
-            users={rankingPreview.team}
-            href="/ranking?tab=team"
           />
         </div>
 

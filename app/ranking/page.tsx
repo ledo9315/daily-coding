@@ -12,13 +12,12 @@ import {
   CalendarToday,
   CalendarWeek,
   CalendarMonth,
-  Users,
 } from "@nsmr/pixelart-react";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { getRanking, type RankingEntry } from "@/lib/api";
 
-type Period = "today" | "week" | "month" | "team";
+type Period = "today" | "week" | "month";
 
 export default function RankingPage() {
   const [activeTab, setActiveTab] = useState<Period>("today");
@@ -26,7 +25,6 @@ export default function RankingPage() {
     today: [],
     week: [],
     month: [],
-    team: [],
   });
 
   useEffect(() => {
@@ -34,9 +32,8 @@ export default function RankingPage() {
       getRanking("today"),
       getRanking("week"),
       getRanking("month"),
-      getRanking("team"),
-    ]).then(([today, week, month, team]) => {
-      setRankings({ today, week, month, team });
+    ]).then(([today, week, month]) => {
+      setRankings({ today, week, month });
     });
   }, []);
 
@@ -68,7 +65,7 @@ export default function RankingPage() {
             Ranking
           </h1>
           <EncryptedText
-            text="Vergleiche dich mit anderen Entwicklern und Teams"
+            text="Vergleiche dich mit anderen Entwicklern"
             revealDelayMs={20}
             className="text-xl text-muted-foreground uppercase tracking-wide"
           />
@@ -110,13 +107,6 @@ export default function RankingPage() {
               />
               Monat
             </TabsTrigger>
-            <TabsTrigger
-              value="team"
-              className="gap-2 cursor-pointer rounded-none text-md"
-            >
-              <Users className="h-4 w-4 hidden sm:block" fill="currentColor" />
-              Team
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="today" className="space-y-8">
@@ -134,7 +124,7 @@ export default function RankingPage() {
                 </CardContent>
               </Card>
             )}
-            <RankingTable entries={currentRanking} showTime showTeam />
+            <RankingTable entries={currentRanking} showTime />
           </TabsContent>
 
           <TabsContent value="week" className="space-y-8">
@@ -152,7 +142,7 @@ export default function RankingPage() {
                 </CardContent>
               </Card>
             )}
-            <RankingTable entries={currentRanking} showTeam />
+            <RankingTable entries={currentRanking} />
           </TabsContent>
 
           <TabsContent value="month" className="space-y-8">
@@ -166,24 +156,6 @@ export default function RankingPage() {
                     first={rankings.month[0]}
                     second={rankings.month[1]}
                     third={rankings.month[2]}
-                  />
-                </CardContent>
-              </Card>
-            )}
-            <RankingTable entries={currentRanking} showTeam />
-          </TabsContent>
-
-          <TabsContent value="team" className="space-y-8">
-            {rankings.team.length > 0 && (
-              <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
-                <CardHeader>
-                  <CardTitle className="text-center">Top 3 Teams</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TopThreePodium
-                    first={rankings.team[0]}
-                    second={rankings.team[1]}
-                    third={rankings.team[2]}
                   />
                 </CardContent>
               </Card>

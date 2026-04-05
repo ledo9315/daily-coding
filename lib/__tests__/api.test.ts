@@ -131,11 +131,12 @@ describe("getDashboardRankingPreview", () => {
     );
   });
 
-  it("returns today ranking entries", async () => {
+  it("returns today ranking entries without team", async () => {
     const preview = { today: [{ rank: 1, name: "Bob", initials: "B", points: 200, avatar: "🐶", level: 3 }] };
     mockOkResponse(preview);
     const result = await getDashboardRankingPreview();
     expect(result).toEqual(preview);
+    expect(result).not.toHaveProperty("team");
   });
 });
 
@@ -148,7 +149,7 @@ describe("getUserStats", () => {
     expect(mockFetch).toHaveBeenCalledWith("/api/user/stats", expect.anything());
   });
 
-  it("returns user stats", async () => {
+  it("returns user stats without team fields", async () => {
     const stats = {
       rank: "#1",
       points: "1.500",
@@ -163,6 +164,8 @@ describe("getUserStats", () => {
     mockOkResponse(stats);
     const result = await getUserStats();
     expect(result).toEqual(stats);
+    expect(result).not.toHaveProperty("teamRank");
+    expect(result).not.toHaveProperty("teamName");
   });
 });
 

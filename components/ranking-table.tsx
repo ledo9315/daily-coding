@@ -20,14 +20,12 @@ interface RankingEntry {
   points: number;
   time?: string;
   challengesSolved?: number;
-  team?: string;
   level?: number;
 }
 
 interface RankingTableProps {
   entries: RankingEntry[];
   showTime?: boolean;
-  showTeam?: boolean;
   currentUserId?: string;
 }
 
@@ -76,7 +74,6 @@ function RankChange({
 export function RankingTable({
   entries,
   showTime = false,
-  showTeam = false,
 }: RankingTableProps) {
   return (
     <div className="overflow-hidden rounded-none border border-border">
@@ -90,11 +87,6 @@ export function RankingTable({
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Entwickler
               </th>
-              {showTeam && (
-                <th className="hidden px-4 py-3 text-left text-sm font-medium text-muted-foreground sm:table-cell">
-                  Team
-                </th>
-              )}
               {showTime && (
                 <th className="hidden px-4 py-3 text-left text-sm font-medium text-muted-foreground md:table-cell">
                   Zeit
@@ -171,14 +163,6 @@ export function RankingTable({
                       </div>
                     </div>
                   </td>
-
-                  {showTeam && (
-                    <td className="hidden px-4 py-4 sm:table-cell">
-                      <span className="text-md text-muted-foreground">
-                        {entry.team}
-                      </span>
-                    </td>
-                  )}
 
                   {showTime && (
                     <td className="hidden px-4 py-4 md:table-cell">
