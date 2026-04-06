@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
+  getServerApiBaseUrl,
   getRanking,
   getTodayChallenge,
   getDashboardRankingPreview,
@@ -38,6 +39,41 @@ function mockErrorResponse(status: number) {
     status,
   });
 }
+
+// ─── getServerApiBaseUrl ─────────────────────────────────────────────────────
+
+describe("getServerApiBaseUrl", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("trimmt NEXT_PUBLIC_APP_URL und hat Vorrang vor VERCEL_URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.example.com/");
+    vi.stubEnv("VERCEL_URL", "ignore.vercel.app");
+    expect(getServerApiBaseUrl()).toBe("https://app.example.com");
+  });
+
+  it("nutzt https://VERCEL_URL wenn kein NEXT_PUBLIC_APP_URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
+    vi.stubEnv("VERCEL_URL", "my-project.vercel.app");
+    expect(getServerApiBaseUrl()).toBe("https://my-project.vercel.app");
+  });
+
+  it("nutzt NEXTAUTH_URL als Fallback", () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
+    vi.stubEnv("VERCEL_URL", "");
+    vi.stubEnv("NEXTAUTH_URL", "https://auth.site/");
+    expect(getServerApiBaseUrl()).toBe("https://auth.site");
+  });
+
+  it("fällt auf localhost mit PORT zurück", () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
+    vi.stubEnv("VERCEL_URL", "");
+    vi.stubEnv("NEXTAUTH_URL", "");
+    vi.stubEnv("PORT", "3001");
+    expect(getServerApiBaseUrl()).toBe("http://localhost:3001");
+  });
+});
 
 // ─── apiFetch error handling ─────────────────────────────────────────────────
 

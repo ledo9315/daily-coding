@@ -10,7 +10,7 @@ export interface RankingEntry {
   points: number;
   time?: string;
   avatar: string;
-  level: number;
+  level?: number;
   challengesSolved?: number;
 }
 
@@ -49,7 +49,7 @@ export interface ChallengeHistoryEntry {
   title: string;
   date: string;
   difficulty: "easy" | "medium" | "hard";
-  status: "completed" | "failed" | "skipped";
+  status: "pending" | "completed" | "failed" | "skipped";
   points: number;
   time: string;
   rank?: number;
@@ -105,11 +105,24 @@ export interface CommunityFeedItem {
 
 // ─── Internal fetch helper ────────────────────────────────────────────────────
 
+/** Base URL for server-side fetches (SSR). Vercel sets VERCEL_URL automatically. */
+export function getServerApiBaseUrl(): string {
+  const trim = (u: string) => u.replace(/\/$/, "");
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return trim(process.env.NEXT_PUBLIC_APP_URL);
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (process.env.NEXTAUTH_URL) {
+    return trim(process.env.NEXTAUTH_URL);
+  }
+  const port = process.env.PORT ?? "3000";
+  return `http://localhost:${port}`;
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const base =
-    typeof window === "undefined"
-      ? (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000")
-      : "";
+  const base = typeof window === "undefined" ? getServerApiBaseUrl() : "";
   const res = await fetch(`${base}${path}`, {
     headers: { "Content-Type": "application/json" },
     ...init,

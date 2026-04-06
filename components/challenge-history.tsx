@@ -9,7 +9,7 @@ interface ChallengeHistoryEntry {
   title: string;
   date: string;
   difficulty: "easy" | "medium" | "hard";
-  status: "completed" | "failed" | "skipped";
+  status: "pending" | "completed" | "failed" | "skipped";
   points: number;
   time?: string;
   rank?: number;
@@ -21,6 +21,11 @@ interface ChallengeHistoryProps {
 }
 
 const statusConfig = {
+  pending: {
+    icon: Clock,
+    label: "Ausstehend",
+    className: "text-amber-500",
+  },
   completed: {
     icon: Check,
     label: "Abgeschlossen",
@@ -81,7 +86,7 @@ export function ChallengeHistory({
 
                 <PointsChip
                   points={entry.status === "completed" ? entry.points : 0}
-                  variant={entry.status === "completed" ? "default" : "default"}
+                  variant="default"
                 />
               </div>
             );

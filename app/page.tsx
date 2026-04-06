@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { notFound } from "next/navigation";
 import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
@@ -9,17 +10,18 @@ import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { CommunityFeed } from "@/components/community-feed";
 import {
-  getDashboardRankingPreview,
-  getTodayChallenge,
-  getUserStats,
-} from "@/lib/api";
+  getDashboardRankingPreviewData,
+  getTodayChallengeSummary,
+  getUserStatsData,
+} from "@/lib/server/dashboard-data";
 
 export default async function DashboardPage() {
   const [rankingPreview, todayChallenge, userStats] = await Promise.all([
-    getDashboardRankingPreview(),
-    getTodayChallenge(),
-    getUserStats(),
+    getDashboardRankingPreviewData(),
+    getTodayChallengeSummary(),
+    getUserStatsData(),
   ]);
+  if (!todayChallenge) notFound();
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
