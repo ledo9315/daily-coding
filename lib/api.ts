@@ -129,16 +129,24 @@ export interface DailyChallenge {
 
 export interface CommunityFeedItem {
   id: string;
+  kind: "challenge-solved";
   user: {
     name: string;
     initials: string;
     avatar: string;
     level: number;
   };
+  username: string;
   action: string;
-  challenge?: string;
-  points?: number;
+  challenge: string;
+  points: number;
   time: string;
+  createdAt: string;
+}
+
+export interface CommunityFeedPage {
+  items: CommunityFeedItem[];
+  nextCursor: string | null;
 }
 
 // ─── Internal fetch helper ────────────────────────────────────────────────────
@@ -259,6 +267,15 @@ export function runTests(
 
 // ─── Community Feed ───────────────────────────────────────────────────────────
 
-export function getCommunityFeed(): Promise<CommunityFeedItem[]> {
-  return apiFetch<CommunityFeedItem[]>("/api/community/feed");
+export function getCommunityFeed(params?: {
+  cursor?: string | null;
+  limit?: number;
+}): Promise<CommunityFeedPage> {
+  const sp = new URLSearchParams();
+  if (params?.cursor) sp.set("cursor", params.cursor);
+  if (params?.limit != null) sp.set("limit", String(params.limit));
+  const q = sp.toString();
+  return apiFetch<CommunityFeedPage>(
+    q ? `/api/community/feed?${q}` : "/api/community/feed"
+  );
 }

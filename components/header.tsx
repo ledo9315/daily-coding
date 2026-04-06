@@ -27,25 +27,25 @@ import {
 
 const navigation = [
   {
-    name: "HOME",
+    name: "START",
     href: "/",
     icon: Home,
     color: "border-primary bg-primary/20 text-primary",
   },
   {
-    name: "CHALLENGE",
+    name: "AUFGABE",
     href: "/challenge",
     icon: Tournament,
     color: "border-chart-5 bg-chart-5/20 text-chart-5",
   },
   {
-    name: "RANKING",
+    name: "RANGLISTE",
     href: "/ranking",
     icon: Trophy,
     color: "border-accent bg-accent/20 text-accent",
   },
   {
-    name: "PROFILE",
+    name: "PROFIL",
     href: "/profile",
     icon: User,
     color: "border-chart-2 bg-chart-2/20 text-chart-2",

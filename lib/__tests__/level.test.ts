@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { calculateLevel, nextLevelThreshold, levelTitleDe } from "../level";
+import {
+  calculateLevel,
+  nextLevelThreshold,
+  levelTitleDe,
+  levelUpSentenceDe,
+} from "../level";
 
 describe("calculateLevel", () => {
   it("returns level 1 for 0 points", () => {
@@ -49,6 +54,13 @@ describe("levelTitleDe", () => {
 
   it("clamps invalid levels to at least Einsteiger", () => {
     expect(levelTitleDe(0)).toBe("Einsteiger");
+  });
+});
+
+describe("levelUpSentenceDe", () => {
+  it("includes the tier name in parentheses (not stripped)", () => {
+    expect(levelUpSentenceDe(3)).toBe("hat Level 3 (Aufsteiger) erreicht");
+    expect(levelUpSentenceDe(3)).toMatch(/\([^)]+\)/);
   });
 });
 

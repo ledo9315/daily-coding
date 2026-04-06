@@ -3,7 +3,7 @@ import { formatTime } from "@/lib/format";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import type { RankingEntry, TodayChallenge, UserStats } from "@/lib/api";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
-import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
+import { getLiveRanking, getTodayRankNumber } from "@/lib/server/ranking-live";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
@@ -25,24 +25,18 @@ export async function getTodayChallengeSummary(): Promise<TodayChallenge | null>
 export async function getDashboardRankingPreviewData(): Promise<{
   today: RankingEntry[];
 }> {
-  const periodDate = getPeriodDateForRanking("today");
-  const todayEntries = await prisma.rankingEntry.findMany({
-    where: { period: "today", periodDate },
-    orderBy: { rank: "asc" },
-    take: 5,
-    include: { user: true },
-  });
-
-  const userIds = todayEntries.map((e) => e.userId);
+  const rows = await getLiveRanking("today");
+  const top = rows.slice(0, 5);
+  const userIds = top.map((e) => e.userId);
   const lifetimePoints = await getLifetimePointsByUserIds(userIds);
 
   return {
-    today: todayEntries.map((e) => ({
+    today: top.map((e) => ({
       rank: e.rank,
       name: e.user.name,
       initials: e.user.initials,
       points: e.points,
-      time: formatTime(e.timeTaken),
+      time: formatTime(e.timeSeconds),
       avatar: e.user.avatar,
       level: calculateLevel(lifetimePoints.get(e.userId) ?? 0),
     })),
@@ -53,17 +47,9 @@ export async function getUserStatsData(userId: string): Promise<UserStats | null
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return null;
 
-  const [todayRank, completedSubmissions, achievementDefs, userAchievements] =
+  const [todayRankNum, completedSubmissions, achievementDefs, userAchievements] =
     await Promise.all([
-      prisma.rankingEntry.findUnique({
-        where: {
-          userId_period_periodDate: {
-            userId: userId,
-            period: "today",
-            periodDate: getPeriodDateForRanking("today"),
-          },
-        },
-      }),
+      getTodayRankNumber(userId),
       prisma.submission.findMany({
         where: { userId: userId, status: "completed" },
         include: { challenge: { select: { points: true } } },
@@ -84,7 +70,7 @@ export async function getUserStatsData(userId: string): Promise<UserStats | null
   const monthlyChallengesSolved = countSubmissionsInUtcMonth(completedSubmissions);
 
   return {
-    rank: todayRank ? `#${todayRank.rank}` : "#-",
+    rank: todayRankNum != null ? `#${todayRankNum}` : "#-",
     points: points.toLocaleString("de-DE"),
     streak: user.streak,
     streakRecord: user.streakRecord,

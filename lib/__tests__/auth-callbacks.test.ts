@@ -20,6 +20,26 @@ describe("authJwtCallback", () => {
     expect(out).toBe(token);
     expect(out.id).toBe("existing");
   });
+
+  it("stores user image on token.picture at sign-in", () => {
+    const token = {} as JWT;
+    const out = authJwtCallback({
+      token,
+      user: { id: "u1", image: "/user/a.png" },
+    });
+    expect(out.picture).toBe("/user/a.png");
+  });
+
+  it("updates token.picture on session update trigger", () => {
+    const token = { id: "u1", picture: "/old.png" } as JWT;
+    const out = authJwtCallback({
+      token,
+      user: undefined,
+      trigger: "update",
+      session: { user: { image: "/user/minipix4.png" } },
+    });
+    expect(out.picture).toBe("/user/minipix4.png");
+  });
 });
 
 describe("authSessionCallback", () => {
@@ -31,6 +51,15 @@ describe("authSessionCallback", () => {
     const out = authSessionCallback({ session, token });
     expect(out.user.id).toBe("jwt-user");
     expect(out.user.role).toBe("admin");
+  });
+
+  it("sets session.user.image from token.picture", () => {
+    const session = {
+      user: { name: "N", email: "e@e.de", image: null, role: "user" as const },
+    } as Session;
+    const token = { id: "jwt-user", role: "user", picture: "/user/x.png" } as JWT;
+    const out = authSessionCallback({ session, token });
+    expect(out.user.image).toBe("/user/x.png");
   });
 
   it("leaves session user id unset when token has no id", () => {

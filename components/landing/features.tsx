@@ -1,6 +1,6 @@
 "use client";
 
-import { Zap, Trophy, Users, Bullseye } from "@nsmr/pixelart-react";
+import { Zap, Trophy, Script, Bullseye } from "@nsmr/pixelart-react";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
 import { motion, Variants } from "framer-motion";
 
@@ -38,10 +38,11 @@ export function LandingFeatures() {
       >
         <motion.div variants={itemVariants} className="text-center mb-16">
           <h2 className="font-heading text-3xl sm:text-4xl mb-4">
-            BRING DEINE KARRIERE VORAN
+            DEINE ROUTINE, DEIN FORTSCHRITT
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Gamifizierte Erfahrung, um dich motiviert und konsistent zu halten.
+            Streaks, XP und Bestenliste – gamifiziert, damit du dranbleibst und
+            deine Skills Schritt für Schritt ausbaust.
           </p>
         </motion.div>
 
@@ -69,7 +70,7 @@ export function LandingFeatures() {
                 Bestenlisten
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Miss dich, um die Top 3 zu erreichen!
+                Vergleiche dich mit anderen – von heute bis zum Monatsranking.
               </p>
             </CardSpotlight>
           </motion.div>
@@ -77,14 +78,14 @@ export function LandingFeatures() {
           <motion.div variants={itemVariants} className="h-full">
             <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
               <div className="h-12 w-12 flex items-center justify-center bg-chart-4/10 rounded-full mb-4 text-chart-4 relative z-10">
-                <Users className="h-8 w-8" />
+                <Script className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Team-Battle
+                Community-Feed
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Frontend vs. Backend? Finde heraus, wer die besseren Algorithmen
-                schreibt.
+                Kurzer Überblick, was in der Community gerade passiert – zum
+                Mitfeiern und Ideen holen.
               </p>
             </CardSpotlight>
           </motion.div>

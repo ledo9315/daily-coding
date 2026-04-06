@@ -1,0 +1,114 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+const mockSubmissionFindMany = vi.fn();
+const mockFindDailyChallengeForApp = vi.fn();
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    submission: {
+      findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
+    },
+  },
+}));
+
+vi.mock("@/lib/server/challenge-day", () => ({
+  findDailyChallengeForApp: () => mockFindDailyChallengeForApp(),
+}));
+
+import { getLiveRanking, getTodayRankNumber } from "@/lib/server/ranking-live";
+
+const user = (id: string, name: string) => ({
+  id,
+  name,
+  initials: name.slice(0, 2),
+  avatar: "🐱",
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+describe("getLiveRanking — today", () => {
+  it("sortiert nach schnellster Zeit (beste Zeit pro Nutzer)", async () => {
+    mockFindDailyChallengeForApp.mockResolvedValue({
+      id: "daily-1",
+      points: 100,
+    });
+    mockSubmissionFindMany.mockResolvedValue([
+      {
+        userId: "slow",
+        timeTaken: 300,
+        user: user("slow", "Slow"),
+      },
+      {
+        userId: "fast",
+        timeTaken: 90,
+        user: user("fast", "Fast"),
+      },
+    ]);
+
+    const rows = await getLiveRanking("today");
+    expect(rows.map((r) => r.userId)).toEqual(["fast", "slow"]);
+    expect(rows[0].points).toBe(100);
+    expect(rows[0].timeSeconds).toBe(90);
+  });
+
+  it("getTodayRankNumber gibt Platz zurück", async () => {
+    mockFindDailyChallengeForApp.mockResolvedValue({ id: "d", points: 10 });
+    mockSubmissionFindMany.mockResolvedValue([
+      { userId: "a", timeTaken: 50, user: user("a", "A") },
+      { userId: "b", timeTaken: 40, user: user("b", "B") },
+    ]);
+    await expect(getTodayRankNumber("a")).resolves.toBe(2);
+    await expect(getTodayRankNumber("b")).resolves.toBe(1);
+    await expect(getTodayRankNumber("nobody")).resolves.toBeNull();
+  });
+});
+
+describe("getLiveRanking — week/month", () => {
+  const d1 = new Date("2026-04-07T00:00:00.000Z");
+  const d2 = new Date("2026-04-08T00:00:00.000Z");
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-09T12:00:00.000Z"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("zählt gelöste Daily-Challenges und bricht Gleichstand mit Punktsumme", async () => {
+    mockSubmissionFindMany.mockResolvedValue([
+      {
+        userId: "u1",
+        challengeId: "ch1",
+        status: "completed",
+        user: user("u1", "One"),
+        challenge: { id: "ch1", points: 100, date: d1 },
+      },
+      {
+        userId: "u1",
+        challengeId: "ch2",
+        status: "completed",
+        user: user("u1", "One"),
+        challenge: { id: "ch2", points: 100, date: d2 },
+      },
+      {
+        userId: "u2",
+        challengeId: "ch1",
+        status: "completed",
+        user: user("u2", "Two"),
+        challenge: { id: "ch1", points: 100, date: d1 },
+      },
+    ]);
+
+    const rows = await getLiveRanking("week");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].userId).toBe("u1");
+    expect(rows[0].challengesSolved).toBe(2);
+    expect(rows[0].points).toBe(200);
+    expect(rows[1].userId).toBe("u2");
+    expect(rows[1].challengesSolved).toBe(1);
+  });
+});

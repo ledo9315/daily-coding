@@ -29,3 +29,9 @@ export function levelTitleDe(level: number): string {
   if (l <= 7) return "Meister";
   return "Legende";
 }
+
+/** Level-Aufstieg im Feed: Stufenname bleibt in Klammern (z. B. „hat Level 3 (Aufsteiger) erreicht“). */
+export function levelUpSentenceDe(level: number): string {
+  const l = Math.max(1, Math.floor(level));
+  return `hat Level ${l} (${levelTitleDe(l)}) erreicht`;
+}

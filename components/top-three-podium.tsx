@@ -1,13 +1,16 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
+import { avatarImageSrc } from "@/lib/avatar-src";
 import { cn } from "@/lib/utils";
-import { Trophy } from "@nsmr/pixelart-react";
+import { Clock, Trophy } from "@nsmr/pixelart-react";
 
 interface TopUser {
   name: string;
   avatar?: string;
   initials: string;
   points: number;
+  /** Für variant="time" (Tages-Speed-Ranking). */
+  time?: string;
   level?: number;
 }
 
@@ -16,6 +19,39 @@ interface TopThreePodiumProps {
   second: TopUser;
   third: TopUser;
   className?: string;
+  /** Tages-Ranking: Zeit statt identischer Challenge-Punkte. */
+  variant?: "points" | "time";
+}
+
+function PodiumMetric({
+  user,
+  variant,
+  pointsHighlight,
+}: {
+  user: TopUser;
+  variant: "points" | "time";
+  pointsHighlight?: boolean;
+}) {
+  if (variant === "time") {
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center gap-1.5 font-mono text-base tabular-nums tracking-tight",
+          pointsHighlight && "text-primary font-semibold",
+        )}
+      >
+        <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <span>{user.time ?? "—"}</span>
+      </div>
+    );
+  }
+  return (
+    <PointsChip
+      points={user.points}
+      size="md"
+      variant={pointsHighlight ? "highlight" : "default"}
+    />
+  );
 }
 
 export function TopThreePodium({
@@ -23,17 +59,26 @@ export function TopThreePodium({
   second,
   third,
   className,
+  variant = "points",
 }: TopThreePodiumProps) {
+  const fallbackBase =
+    "font-sans font-semibold tracking-tight bg-gradient-to-b from-zinc-600 to-zinc-900 text-zinc-100 ring-1 ring-inset ring-white/15";
+
+  const secondSrc = avatarImageSrc(second.avatar);
+  const firstSrc = avatarImageSrc(first.avatar);
+  const thirdSrc = avatarImageSrc(third.avatar);
+
   return (
     <div className={cn("flex items-end justify-center gap-4", className)}>
       {/* Second Place */}
       <div className="flex flex-col items-center">
         <Avatar className="h-16 w-16 border-2 border-zinc-400">
-          <AvatarImage
-            src={second.avatar || "/placeholder.svg"}
-            alt={second.name}
-          />
-          <AvatarFallback className="text-lg">{second.initials}</AvatarFallback>
+          {secondSrc ? (
+            <AvatarImage src={secondSrc} alt={second.name} />
+          ) : null}
+          <AvatarFallback className={cn("text-lg", fallbackBase)}>
+            {second.initials}
+          </AvatarFallback>
         </Avatar>
         <div className="mt-2 text-center flex flex-col items-center gap-1">
           <p className="font-semibold">{second.name}</p>
@@ -42,7 +87,7 @@ export function TopThreePodium({
               Level {second.level}
             </span>
           )}
-          <PointsChip points={second.points} size="md" />
+          <PodiumMetric user={second} variant={variant} />
         </div>
         <div className="mt-3 flex h-24 w-24 flex-col items-center justify-start rounded-none bg-zinc-400/20 pt-4">
           <Trophy className="h-8 w-8 text-zinc-400" />
@@ -54,11 +99,14 @@ export function TopThreePodium({
       <div className="flex flex-col items-center">
         <div className="relative">
           <Avatar className="h-20 w-20 border-2 border-amber-500">
-            <AvatarImage
-              src={first.avatar || "/placeholder.svg"}
-              alt={first.name}
-            />
-            <AvatarFallback className="text-xl">
+            {firstSrc ? <AvatarImage src={firstSrc} alt={first.name} /> : null}
+            <AvatarFallback
+              className={cn(
+                "text-xl",
+                fallbackBase,
+                "from-amber-900/90 to-zinc-950 text-amber-50 ring-amber-400/25",
+              )}
+            >
               {first.initials}
             </AvatarFallback>
           </Avatar>
@@ -70,7 +118,7 @@ export function TopThreePodium({
               Level {first.level}
             </span>
           )}
-          <PointsChip points={first.points} size="md" variant="highlight" />
+          <PodiumMetric user={first} variant={variant} pointsHighlight />
         </div>
         <div className="mt-3 flex h-32 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-500/20 pt-4">
           <Trophy className="h-8 w-8 text-amber-500" />
@@ -81,11 +129,16 @@ export function TopThreePodium({
       {/* Third Place */}
       <div className="flex flex-col items-center">
         <Avatar className="h-16 w-16 border-2 border-amber-700">
-          <AvatarImage
-            src={third.avatar || "/placeholder.svg"}
-            alt={third.name}
-          />
-          <AvatarFallback className="text-lg">{third.initials}</AvatarFallback>
+          {thirdSrc ? <AvatarImage src={thirdSrc} alt={third.name} /> : null}
+          <AvatarFallback
+            className={cn(
+              "text-lg",
+              fallbackBase,
+              "from-amber-950/80 to-zinc-950 text-amber-100/95 ring-amber-700/30",
+            )}
+          >
+            {third.initials}
+          </AvatarFallback>
         </Avatar>
         <div className="mt-2 text-center flex flex-col items-center gap-1">
           <p className="font-semibold">{third.name}</p>
@@ -94,7 +147,7 @@ export function TopThreePodium({
               Level {third.level}
             </span>
           )}
-          <PointsChip points={third.points} size="md" />
+          <PodiumMetric user={third} variant={variant} />
         </div>
         <div className="mt-3 flex h-16 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-700/20 pt-2">
           <Trophy className="h-6 w-6 text-amber-700" />

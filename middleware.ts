@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const PROTECTED_PATHS = ["/dashboard", "/profile", "/challenge", "/ranking"];
+const PROTECTED_PATHS = ["/profile", "/challenge", "/ranking"];
 const ADMIN_PREFIX = "/admin";
 
 export async function middleware(request: NextRequest) {
@@ -49,7 +49,6 @@ export const config = {
   matcher: [
     "/admin",
     "/admin/:path*",
-    "/dashboard/:path*",
     "/profile/:path*",
     "/challenge",
     "/challenge/:path*",

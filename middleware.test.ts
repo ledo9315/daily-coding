@@ -41,17 +41,17 @@ describe("middleware", () => {
     vi.resetModules();
     middleware = (await import("./middleware")).middleware;
 
-    const res = await middleware(req("http://localhost:3000/dashboard"));
+    const res = await middleware(req("http://localhost:3000/profile"));
     expect(mockGetToken).not.toHaveBeenCalled();
     expect(res.status).toBe(307);
     const loc = res.headers.get("location");
     expect(loc).toContain("/login");
-    expect(loc).toContain("callbackUrl=%2Fdashboard");
+    expect(loc).toContain("callbackUrl=%2Fprofile");
   });
 
   it("redirects to login when token is missing on protected path", async () => {
     mockGetToken.mockResolvedValueOnce(null);
-    const res = await middleware(req("http://localhost:3000/dashboard"));
+    const res = await middleware(req("http://localhost:3000/profile"));
     expect(mockGetToken).toHaveBeenCalled();
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("/login");

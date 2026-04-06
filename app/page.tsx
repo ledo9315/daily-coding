@@ -19,7 +19,7 @@ import {
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login?callbackUrl=/");
   const userId = session.user.id;
 
   const [rankingPreview, todayChallenge, userStats] = await Promise.all([
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8">
           <h1 className="font-pixel text-xl mb-2">
-            WILLKOMMEN ZURÜCK, LEONID!
+            WILLKOMMEN ZURÜCK!
           </h1>
           <EncryptedText
             text="Bereit für die heutige Challenge?"

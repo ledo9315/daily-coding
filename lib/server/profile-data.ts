@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import { formatTime, formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
-import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
+import { getTodayRankNumber } from "@/lib/server/ranking-live";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
@@ -21,17 +21,9 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
   });
   if (!user) return null;
 
-  const [todayRank, completedSubmissions, achievementDefs, userAchievements] =
+  const [todayRankNum, completedSubmissions, achievementDefs, userAchievements] =
     await Promise.all([
-      prisma.rankingEntry.findUnique({
-        where: {
-          userId_period_periodDate: {
-            userId: userId,
-            period: "today",
-            periodDate: getPeriodDateForRanking("today"),
-          },
-        },
-      }),
+      getTodayRankNumber(userId),
       prisma.submission.findMany({
         where: { userId: userId, status: "completed" },
         include: { challenge: { select: { points: true } } },
@@ -65,7 +57,7 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
     avatar: user.avatar,
     role: "",
     stats: {
-      rank: todayRank ? `#${todayRank.rank}` : "#-",
+      rank: todayRankNum != null ? `#${todayRankNum}` : "#-",
       points: points.toLocaleString("de-DE"),
       streak: user.streak,
       streakRecord: user.streakRecord,
