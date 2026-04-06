@@ -38,7 +38,7 @@ export interface UserStats {
   badgesTotal: number;
   /** Abgeschlossene Challenges im laufenden UTC-Monat (siehe `monthlyChallengeGoal`). */
   monthlyChallengesSolved: number;
-  /** Festes Soll für den Monats-Fortschrittsbalken (z. B. 30 Challenges). */
+  /** Festes Soll für den Monats-Fortschrittsbalken (z.B. 30 Challenges). */
   monthlyChallengeGoal: number;
 }
 
