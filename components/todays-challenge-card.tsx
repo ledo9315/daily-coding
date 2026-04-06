@@ -59,7 +59,7 @@ export function TodaysChallengeCard({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t-2 border-border pt-4">
         <div className="space-y-1">
           <p className="text-sm uppercase tracking-wider text-muted-foreground">
-            ZEIT VERBLEIBEND
+            Zeit verbleibend
           </p>
           <CountdownTimer />
         </div>

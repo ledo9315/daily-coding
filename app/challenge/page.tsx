@@ -33,7 +33,9 @@ import {
   submitSolution,
   type CodeLanguageId,
   type DailyChallenge,
+  type SubmitCelebration,
 } from "@/lib/api";
+import { ChallengeSuccessModal } from "@/components/challenge-success-modal";
 import { languageFileName, languageLabel } from "@/lib/challenge-languages";
 import { notifyUserStatsChanged } from "@/lib/user-stats-events";
 import {
@@ -48,6 +50,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+/** Abstand für stillen API-Check (neuer UTC-Tag / neue Challenge). */
+const CHALLENGE_POLL_MS = 60_000;
 
 export default function ChallengePage() {
   const [challenge, setChallenge] = useState<DailyChallenge | null>(null);
@@ -66,15 +71,28 @@ export default function ChallengePage() {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
+  const [testRunCount, setTestRunCount] = useState(0);
+  const [celebrationOpen, setCelebrationOpen] = useState(false);
+  const [celebration, setCelebration] = useState<SubmitCelebration | null>(null);
 
   const isSubmitLocked = submitOutcome !== "none";
 
-  const loadChallenge = useCallback(() => {
-    setLoadError(null);
-    setIsLoadingChallenge(true);
+  const loadChallenge = useCallback((options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? false;
+    if (!silent) {
+      setLoadError(null);
+      setIsLoadingChallenge(true);
+    }
     getDailyChallenge()
       .then((data) => {
-        setChallenge(data);
+        setChallenge((prev) => {
+          if (prev && prev.id !== data.id) {
+            toast.message("Neue Daily Challenge", {
+              description: "Der UTC-Tag hat gewechselt.",
+            });
+          }
+          return data;
+        });
         setTestCases(data.testCases as TestCase[]);
         setLanguage(data.defaultLanguage);
         setSources({ ...data.starterCodes });
@@ -95,18 +113,32 @@ export default function ChallengePage() {
         }
       })
       .catch((e) => {
+        if (silent) return;
         setChallenge(null);
         const msg =
           e instanceof Error ? e.message : "Challenge konnte nicht geladen werden.";
         setLoadError(msg);
         toast.error("Daily Challenge", { description: msg });
       })
-      .finally(() => setIsLoadingChallenge(false));
+      .finally(() => {
+        if (!silent) setIsLoadingChallenge(false);
+      });
   }, []);
 
   useEffect(() => {
     loadChallenge();
   }, [loadChallenge]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      loadChallenge({ silent: true });
+    }, CHALLENGE_POLL_MS);
+    return () => clearInterval(id);
+  }, [loadChallenge]);
+
+  useEffect(() => {
+    setTestRunCount(0);
+  }, [challenge?.id]);
 
   useEffect(() => {
     if (!challenge || isSubmitLocked) return;
@@ -127,6 +159,7 @@ export default function ChallengePage() {
     try {
       const result = await runTests(challenge.id, currentCode, language);
       setTestCases(result.testCases as TestCase[]);
+      setTestRunCount((c) => c + 1);
       if (result.runtimeOk === false) {
         toast.message("Tests ausgeführt", {
           description: "Mindestens ein Test ist fehlgeschlagen.",
@@ -159,9 +192,14 @@ export default function ChallengePage() {
       if (result.success) {
         setSubmitOutcome("success");
         notifyUserStatsChanged();
-        toast.success("Lösung eingereicht", {
-          description: "Alle Tests wurden bestanden.",
-        });
+        if (result.celebration) {
+          setCelebration(result.celebration);
+          setCelebrationOpen(true);
+        } else {
+          toast.success("Lösung eingereicht", {
+            description: "Alle Tests wurden bestanden.",
+          });
+        }
       } else {
         setSubmitOutcome("failed");
         toast.error("Abgabe nicht bestanden", {
@@ -225,6 +263,19 @@ export default function ChallengePage() {
       </div>
 
       <Header />
+
+      {celebration ? (
+        <ChallengeSuccessModal
+          open={celebrationOpen}
+          onOpenChange={(o) => {
+            setCelebrationOpen(o);
+            if (!o) setCelebration(null);
+          }}
+          celebration={celebration}
+          testRunsBeforeSubmit={testRunCount}
+          pointsEarned={challenge.points}
+        />
+      ) : null}
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

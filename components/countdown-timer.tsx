@@ -3,16 +3,10 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Clock } from "@nsmr/pixelart-react";
+import { getMsUntilNextUtcMidnight } from "@/lib/utc-midnight";
 
 interface CountdownTimerProps {
   className?: string;
-}
-
-function getTimeUntilMidnight() {
-  const now = new Date();
-  const midnight = new Date();
-  midnight.setHours(24, 0, 0, 0);
-  return midnight.getTime() - now.getTime();
 }
 
 function formatTime(ms: number) {
@@ -28,11 +22,11 @@ function formatTime(ms: number) {
 }
 
 export function CountdownTimer({ className }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState(getTimeUntilMidnight());
+  const [timeLeft, setTimeLeft] = useState(() => getMsUntilNextUtcMidnight());
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(getTimeUntilMidnight());
+      setTimeLeft(getMsUntilNextUtcMidnight());
     }, 1000);
 
     return () => clearInterval(interval);
