@@ -38,6 +38,13 @@ enum AchievementRarity {
   legendary
 }
 
+/// Programming languages available for daily challenges (extend as runners are added).
+enum CodeLanguage {
+  javascript
+  typescript
+  python
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -96,7 +103,14 @@ model Challenge {
   hint        String?
   examples    Json         @default("[]")
   testCases   Json         @default("[]")
+  /// Optional: { "callableByLanguage": { "javascript": "fn", "typescript": "fn", "python": "sn_fn" } } für stdin/stdout-Auswertung
+  evaluationConfig Json?
+  /// @deprecated Prefer starterCodes; kept for seeds / legacy rows.
   starterCode String?
+  /// All languages users may submit in for this challenge.
+  supportedLanguages CodeLanguage[] @default([javascript, typescript, python])
+  /// Map language id → starter template (JSON object).
+  starterCodes Json @default("{}")
   isActive    Boolean      @default(false)
   date        DateTime?    @unique
   submissions Submission[]
@@ -109,6 +123,7 @@ model Submission {
   userId      String
   challengeId String
   code        String
+  language    CodeLanguage     @default(javascript)
   status      SubmissionStatus @default(pending)
   timeTaken   Int?
   rank        Int?

@@ -1,4 +1,19 @@
 services:
+  # Eigener Piston (opensource). Nach Start: pnpm piston:install (HTTP /api/v2/packages).
+  piston:
+    image: ghcr.io/engineer-man/piston
+    # Image nur amd64; auf Apple Silicon (arm64) erzwingt das QEMU/Rosetta-Emulation.
+    platform: linux/amd64
+    container_name: daily-dev-piston
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston_packages:/piston/packages
+    tmpfs:
+      - /tmp:exec
+
   db:
     image: postgres:16-alpine
     container_name: daily-dev-db
@@ -10,18 +25,8 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - /mnt/ssd/data/daily-dev-postgres/data:/var/lib/postgresql/data
+      - daily_dev_pgdata:/var/lib/postgresql/data
 
-  app:
-    build: .
-    container_name: daily-dev-app
-    restart: unless-stopped
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgresql://daily_dev:daily_dev_secret@db:5432/daily_dev
-    ports:
-      - "3000:3000"
-    volumes:
-      - /mnt/ssd/daily-coding-challenge-ui:/app
-      - /app/node_modules
+volumes:
+  daily_dev_pgdata:
+  piston_packages:

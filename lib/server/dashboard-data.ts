@@ -47,9 +47,11 @@ export async function getDashboardRankingPreviewData(): Promise<{
   };
 }
 
-export async function getUserStatsData(userId: string): Promise<UserStats> {
-  const [user, todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
-    prisma.user.findUniqueOrThrow({ where: { id: userId } }),
+export async function getUserStatsData(userId: string): Promise<UserStats | null> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return null;
+
+  const [todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
     prisma.rankingEntry.findUnique({
       where: {
         userId_period_periodDate: {

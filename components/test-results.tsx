@@ -69,7 +69,11 @@ export function TestResults({ testCases, className }: TestResultsProps) {
 
       <div className="divide-y divide-border">
         {testCases.map((testCase) => {
-          const config = statusConfig[testCase.status];
+          const st =
+            testCase.status && testCase.status in statusConfig
+              ? testCase.status
+              : "pending";
+          const config = statusConfig[st];
           const StatusIcon = config.icon;
 
           return (
@@ -91,7 +95,7 @@ export function TestResults({ testCases, className }: TestResultsProps) {
                 )}
               </div>
 
-              {testCase.status === "failed" && (
+              {st === "failed" && (
                 <div className="mt-3 space-y-2 rounded-lg bg-rose-500/5 p-3 font-mono text-sm">
                   <div>
                     <span className="text-muted-foreground">Input: </span>

@@ -7,5 +7,14 @@ export async function GET() {
   if (result.error) return result.error;
   const { userId } = result;
   const data = await getUserStatsData(userId);
+  if (!data) {
+    return NextResponse.json(
+      {
+        error:
+          "Benutzer nicht gefunden. Bitte abmelden und erneut anmelden (z. B. nach Datenbank-Reset).",
+      },
+      { status: 401 }
+    );
+  }
   return NextResponse.json(data);
 }

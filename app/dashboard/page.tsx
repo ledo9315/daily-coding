@@ -24,6 +24,9 @@ export default async function DashboardPage() {
     getTodayChallengeSummary(),
     getUserStatsData(userId),
   ]);
+  if (!userStats) {
+    redirect("/api/auth/signout?callbackUrl=/login");
+  }
   if (!todayChallenge) notFound();
 
   return (

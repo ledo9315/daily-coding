@@ -43,6 +43,9 @@ export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
   const profile = await getUserProfileData(session.user.id);
+  if (!profile) {
+    redirect("/api/auth/signout?callbackUrl=/login");
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">

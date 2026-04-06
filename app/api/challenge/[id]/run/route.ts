@@ -1,28 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { ChallengeTestCase } from "@/lib/api";
+import { prisma } from "@/lib/prisma";
+import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
+import { runChallengeTests } from "@/lib/server/challenge-execution";
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  await params; // consume params — stub endpoint ignores challengeId and code
+  const { id: challengeId } = await params;
+  const body = await request.json().catch(() => ({}));
+  const code: string = typeof body.code === "string" ? body.code : "";
 
-  // Stub: simulate test execution results
-  const testCases: ChallengeTestCase[] = [
-    { id: 1, name: "Test Case 1: Einfaches Array", status: "passed", time: "12ms" },
-    { id: 2, name: "Test Case 2: Leeres Array", status: "passed", time: "8ms" },
-    {
-      id: 3,
-      name: "Test Case 3: Negative Zahlen",
-      status: "failed",
-      input: "[-1, -2, -3]",
-      expected: "[-1, -3, -6]",
-      actual: "[-1, -2, -3]",
-      time: "10ms",
-    },
-    { id: 4, name: "Test Case 4: Großes Array", status: "passed", time: "45ms" },
-    { id: 5, name: "Test Case 5: Edge Cases", status: "pending" },
-  ];
+  const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
+  if (!challenge) {
+    return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
+  }
 
-  return NextResponse.json({ testCases });
+  const allowed = normalizeSupportedLanguages(
+    challenge.supportedLanguages as unknown as string[]
+  );
+  const language = parseCodeLanguage(body.language, allowed);
+  if (!language) {
+    return NextResponse.json(
+      { error: "Ungültige oder nicht unterstützte Sprache für diese Challenge." },
+      { status: 400 }
+    );
+  }
+
+  const { testCases, runtimeOk } = await runChallengeTests(challenge, code, language, "run");
+  return NextResponse.json({ testCases, language, runtimeOk });
 }

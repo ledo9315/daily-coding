@@ -14,14 +14,18 @@ vi.mock("@/lib/auth-session", () => ({
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindFirst = vi.fn();
-const mockFindUnique = vi.fn();
+const mockFindUniqueChallenge = vi.fn();
+const mockUserFindUnique = vi.fn();
 const mockCreate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    user: {
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+    },
     challenge: {
       findFirst: (...args: unknown[]) => mockFindFirst(...args),
-      findUnique: (...args: unknown[]) => mockFindUnique(...args),
+      findUnique: (...args: unknown[]) => mockFindUniqueChallenge(...args),
     },
     submission: {
       create: (...args: unknown[]) => mockCreate(...args),
@@ -31,6 +35,7 @@ vi.mock("@/lib/prisma", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockUserFindUnique.mockResolvedValue({ id: "user-test" });
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -47,6 +52,12 @@ const activeChallenge = {
   examples: [{ input: "[2,7,11,15], 9", output: "[0,1]" }],
   testCases: [{ id: 1, name: "T1", status: "pending" }],
   starterCode: "function twoSum(nums, target) {}",
+  supportedLanguages: ["javascript", "typescript", "python"] as const,
+  starterCodes: {
+    javascript: "function twoSum(nums, target) {}",
+    typescript: "function twoSum(nums: number[], target: number): number[] {}",
+    python: "def two_sum(nums, target):\n    pass",
+  },
   isActive: true,
   date: new Date("2026-04-05"),
 };
@@ -65,6 +76,11 @@ describe("GET /api/challenge/daily", () => {
       difficulty: "medium",
       points: 200,
       hint: "Use a hash map",
+      defaultLanguage: "javascript",
+      supportedLanguages: ["javascript", "typescript", "python"],
+    });
+    expect(json.starterCodes).toMatchObject({
+      javascript: "function twoSum(nums, target) {}",
     });
   });
 
@@ -83,11 +99,16 @@ describe("GET /api/challenge/daily", () => {
     expect(json.hint).toBe("");
   });
 
-  it("returns empty string for null starterCode", async () => {
-    mockFindFirst.mockResolvedValueOnce({ ...activeChallenge, starterCode: null });
+  it("fills starterCodes from legacy starterCode when JSON map empty", async () => {
+    mockFindFirst.mockResolvedValueOnce({
+      ...activeChallenge,
+      starterCode: "function legacy() {}",
+      starterCodes: {},
+    });
     const res = await getDailyHandler();
     const json = await res.json();
-    expect(json.starterCode).toBe("");
+    expect(json.starterCodes.javascript).toBe("function legacy() {}");
+    expect(json.starterCode).toBe("function legacy() {}");
   });
 
   it("versucht zuerst Challenge am UTC-Tag, dann aktiven Fallback", async () => {
@@ -146,15 +167,32 @@ describe("GET /api/challenge/today", () => {
 // ─── /api/challenge/[id]/run ──────────────────────────────────────────────────
 
 describe("POST /api/challenge/[id]/run", () => {
-  function makeRequest(id: string, code = "code") {
+  function makeRequest(id: string, code = "code", language = "javascript") {
     return new NextRequest(`http://localhost/api/challenge/${id}/run`, {
       method: "POST",
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, language }),
       headers: { "Content-Type": "application/json" },
     });
   }
 
+  it("returns 404 when challenge does not exist", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(null);
+    const res = await runTestsHandler(makeRequest("missing"), {
+      params: Promise.resolve({ id: "missing" }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 400 when language is not allowed", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await runTestsHandler(makeRequest("ch-1", "x", "rust"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(400);
+  });
+
   it("returns 200 with test cases", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     const res = await runTestsHandler(makeRequest("ch-1"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
@@ -162,9 +200,11 @@ describe("POST /api/challenge/[id]/run", () => {
     const json = await res.json();
     expect(json).toHaveProperty("testCases");
     expect(Array.isArray(json.testCases)).toBe(true);
+    expect(json.language).toBe("javascript");
   });
 
   it("returns 5 test cases in the stub", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     const res = await runTestsHandler(makeRequest("ch-1"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
@@ -173,6 +213,7 @@ describe("POST /api/challenge/[id]/run", () => {
   });
 
   it("includes passed and failed test cases", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     const res = await runTestsHandler(makeRequest("ch-1"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
@@ -181,21 +222,31 @@ describe("POST /api/challenge/[id]/run", () => {
     expect(statuses).toContain("passed");
     expect(statuses).toContain("failed");
   });
+
+  it("echoes python in stub names when language is python", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await runTestsHandler(makeRequest("ch-1", "print(1)", "python"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const json = await res.json();
+    expect(json.language).toBe("python");
+    expect(json.testCases[0].name).toContain("python");
+  });
 });
 
 // ─── /api/challenge/[id]/submit ───────────────────────────────────────────────
 
 describe("POST /api/challenge/[id]/submit", () => {
-  function makeRequest(id: string, code = "function solve() {}") {
+  function makeRequest(id: string, code = "function solve() {}", language = "javascript") {
     return new NextRequest(`http://localhost/api/challenge/${id}/submit`, {
       method: "POST",
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, language }),
       headers: { "Content-Type": "application/json" },
     });
   }
 
   it("returns 200 with success=true and test cases on valid challenge", async () => {
-    mockFindUnique.mockResolvedValueOnce(activeChallenge);
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     mockCreate.mockResolvedValueOnce({});
     const res = await submitHandler(makeRequest("ch-1"), {
       params: Promise.resolve({ id: "ch-1" }),
@@ -207,7 +258,7 @@ describe("POST /api/challenge/[id]/submit", () => {
   });
 
   it("returns 404 when challenge does not exist", async () => {
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockFindUniqueChallenge.mockResolvedValueOnce(null);
     const res = await submitHandler(makeRequest("nonexistent"), {
       params: Promise.resolve({ id: "nonexistent" }),
     });
@@ -216,10 +267,19 @@ describe("POST /api/challenge/[id]/submit", () => {
     expect(json).toHaveProperty("error");
   });
 
+  it("returns 401 when session user is not in database", async () => {
+    mockUserFindUnique.mockResolvedValueOnce(null);
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(401);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
   it("creates a submission record in the database", async () => {
-    mockFindUnique.mockResolvedValueOnce(activeChallenge);
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     mockCreate.mockResolvedValueOnce({});
-    await submitHandler(makeRequest("ch-1", "my code"), {
+    await submitHandler(makeRequest("ch-1", "my code", "typescript"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
     expect(mockCreate).toHaveBeenCalledWith(
@@ -227,14 +287,24 @@ describe("POST /api/challenge/[id]/submit", () => {
         data: expect.objectContaining({
           challengeId: "ch-1",
           code: "my code",
+          language: "typescript",
           status: "completed",
         }),
       })
     );
   });
 
+  it("returns 400 when language is not allowed", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await submitHandler(makeRequest("ch-1", "x", "rust"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(400);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
   it("all stub test cases have status=passed on submit", async () => {
-    mockFindUnique.mockResolvedValueOnce(activeChallenge);
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     mockCreate.mockResolvedValueOnce({});
     const res = await submitHandler(makeRequest("ch-1"), {
       params: Promise.resolve({ id: "ch-1" }),

@@ -5,8 +5,12 @@ import {
   startOfUtcWeek,
   startOfUtcMonth,
 } from "../lib/server/ranking-period";
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import { resolve } from "node:path";
 import bcrypt from "bcryptjs";
+
+loadEnv({ path: resolve(process.cwd(), ".env") });
+loadEnv({ path: resolve(process.cwd(), ".env.local"), override: true });
 
 function addUtcDays(d: Date, delta: number): Date {
   const x = new Date(d);
@@ -14,7 +18,13 @@ function addUtcDays(d: Date, delta: number): Date {
   return x;
 }
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL fehlt. Lege .env oder .env.local an (siehe .env.example)."
+  );
+}
+const adapter = new PrismaPg({ connectionString: databaseUrl });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -240,9 +250,50 @@ async function main() {
 
   // ─── Challenges ───────────────────────────────────────────────────────────────
 
+  const supportedLangs = ["javascript", "typescript", "python"] as const;
+
   const challengeToday = await prisma.challenge.upsert({
     where: { id: "challenge-array-manipulation" },
-    update: {},
+    update: {
+      supportedLanguages: [...supportedLangs],
+      evaluationConfig: {
+        callableByLanguage: {
+          javascript: "transformArray",
+          typescript: "transformArray",
+          python: "transform_array",
+        },
+      },
+      testCases: [
+        {
+          id: 1,
+          name: "Einfaches Array",
+          input: "[1,2,3,4,5]",
+          expected: "[1,3,6,10,15]",
+        },
+        { id: 2, name: "Leeres Array", input: "[]", expected: "[]" },
+        {
+          id: 3,
+          name: "Negative Zahlen",
+          input: "[-1,-2,-3]",
+          expected: "[-1,-3,-6]",
+        },
+        {
+          id: 4,
+          name: "Gemischte Werte",
+          input: "[5,-2,3,1]",
+          expected: "[5,3,6,7]",
+        },
+        { id: 5, name: "Ein Element", input: "[42]", expected: "[42]" },
+      ],
+      starterCodes: {
+        javascript: "function transformArray(arr) {\n  // Your solution here\n}",
+        typescript:
+          "function transformArray(arr: number[]): number[] {\n  // Your solution here\n  return arr;\n}",
+        python:
+          "def transform_array(arr):\n    # Your solution here\n    pass\n",
+      },
+      starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
+    },
     create: {
       id: "challenge-array-manipulation",
       title: "Array Manipulation Challenge",
@@ -255,13 +306,43 @@ async function main() {
         { input: "[1, 2, 3, 4, 5]", output: "[1, 3, 6, 10, 15]" },
         { input: "[5, -2, 3, 1]", output: "[5, 3, 6, 7]" },
       ],
+      evaluationConfig: {
+        callableByLanguage: {
+          javascript: "transformArray",
+          typescript: "transformArray",
+          python: "transform_array",
+        },
+      },
       testCases: [
-        { id: 1, name: "Test Case 1: Einfaches Array", status: "pending" },
-        { id: 2, name: "Test Case 2: Leeres Array", status: "pending" },
-        { id: 3, name: "Test Case 3: Negative Zahlen", status: "pending" },
-        { id: 4, name: "Test Case 4: Großes Array", status: "pending" },
-        { id: 5, name: "Test Case 5: Edge Cases", status: "pending" },
+        {
+          id: 1,
+          name: "Einfaches Array",
+          input: "[1,2,3,4,5]",
+          expected: "[1,3,6,10,15]",
+        },
+        { id: 2, name: "Leeres Array", input: "[]", expected: "[]" },
+        {
+          id: 3,
+          name: "Negative Zahlen",
+          input: "[-1,-2,-3]",
+          expected: "[-1,-3,-6]",
+        },
+        {
+          id: 4,
+          name: "Gemischte Werte",
+          input: "[5,-2,3,1]",
+          expected: "[5,3,6,7]",
+        },
+        { id: 5, name: "Ein Element", input: "[42]", expected: "[42]" },
       ],
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function transformArray(arr) {\n  // Your solution here\n}",
+        typescript:
+          "function transformArray(arr: number[]): number[] {\n  // Your solution here\n  return arr;\n}",
+        python:
+          "def transform_array(arr):\n    # Your solution here\n    pass\n",
+      },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
       isActive: true,
       date: anchor,
@@ -270,7 +351,17 @@ async function main() {
 
   const challengeBinarySearch = await prisma.challenge.upsert({
     where: { id: "challenge-binary-search" },
-    update: {},
+    update: {
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function binarySearch(arr, target) {\n  // Your solution here\n}",
+        typescript:
+          "function binarySearch(arr: number[], target: number): number {\n  // Your solution here\n  return -1;\n}",
+        python:
+          "def binary_search(arr, target):\n    # Your solution here\n    return -1\n",
+      },
+      starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
+    },
     create: {
       id: "challenge-binary-search",
       title: "Binary Search",
@@ -284,6 +375,14 @@ async function main() {
         { id: 1, name: "Test Case 1", status: "pending" },
         { id: 2, name: "Test Case 2", status: "pending" },
       ],
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function binarySearch(arr, target) {\n  // Your solution here\n}",
+        typescript:
+          "function binarySearch(arr: number[], target: number): number {\n  // Your solution here\n  return -1;\n}",
+        python:
+          "def binary_search(arr, target):\n    # Your solution here\n    return -1\n",
+      },
       starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
       isActive: false,
       date: addUtcDays(anchor, -1),
@@ -292,7 +391,17 @@ async function main() {
 
   const challengeStringReversal = await prisma.challenge.upsert({
     where: { id: "challenge-string-reversal" },
-    update: {},
+    update: {
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function reverseString(s) {\n  // Your solution here\n}",
+        typescript:
+          "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
+        python:
+          "def reverse_string(s: str):\n    # Your solution here\n    return s\n",
+      },
+      starterCode: "function reverseString(s) {\n  // Your solution here\n}",
+    },
     create: {
       id: "challenge-string-reversal",
       title: "String Reversal",
@@ -306,6 +415,14 @@ async function main() {
         { id: 1, name: "Test Case 1", status: "pending" },
         { id: 2, name: "Test Case 2", status: "pending" },
       ],
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function reverseString(s) {\n  // Your solution here\n}",
+        typescript:
+          "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
+        python:
+          "def reverse_string(s: str):\n    # Your solution here\n    return s\n",
+      },
       starterCode: "function reverseString(s) {\n  // Your solution here\n}",
       isActive: false,
       date: addUtcDays(anchor, -2),
@@ -314,7 +431,15 @@ async function main() {
 
   const challengeHashMap = await prisma.challenge.upsert({
     where: { id: "challenge-hashmap" },
-    update: {},
+    update: {
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "class HashMap {\n  // Your solution here\n}",
+        typescript: "class HashMap {\n  // Your solution here\n}",
+        python: "class HashMap:\n    # Your solution here\n    pass\n",
+      },
+      starterCode: "class HashMap {\n  // Your solution here\n}",
+    },
     create: {
       id: "challenge-hashmap",
       title: "Hash Map Implementation",
@@ -324,6 +449,12 @@ async function main() {
       categoryId: catDatenstrukturen.id,
       examples: [],
       testCases: [],
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "class HashMap {\n  // Your solution here\n}",
+        typescript: "class HashMap {\n  // Your solution here\n}",
+        python: "class HashMap:\n    # Your solution here\n    pass\n",
+      },
       starterCode: "class HashMap {\n  // Your solution here\n}",
       isActive: false,
       date: addUtcDays(anchor, -3),
@@ -332,7 +463,17 @@ async function main() {
 
   const challengeRecursion = await prisma.challenge.upsert({
     where: { id: "challenge-recursion" },
-    update: {},
+    update: {
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function fibonacci(n) {\n  // Your solution here\n}",
+        typescript:
+          "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
+        python:
+          "def fibonacci(n: int) -> int:\n    # Your solution here\n    return 0\n",
+      },
+      starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
+    },
     create: {
       id: "challenge-recursion",
       title: "Recursion Basics",
@@ -342,6 +483,14 @@ async function main() {
       categoryId: catAlgorithmen.id,
       examples: [{ input: "5", output: "5" }],
       testCases: [],
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function fibonacci(n) {\n  // Your solution here\n}",
+        typescript:
+          "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
+        python:
+          "def fibonacci(n: int) -> int:\n    # Your solution here\n    return 0\n",
+      },
       starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
       isActive: false,
       date: addUtcDays(anchor, -4),
@@ -350,7 +499,17 @@ async function main() {
 
   const challengeBinaryTree = await prisma.challenge.upsert({
     where: { id: "challenge-binary-tree" },
-    update: {},
+    update: {
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function inorderTraversal(root) {\n  // Your solution here\n}",
+        typescript:
+          "function inorderTraversal(root: TreeNode | null): number[] {\n  // Your solution here\n  return [];\n}",
+        python:
+          "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
+      },
+      starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
+    },
     create: {
       id: "challenge-binary-tree",
       title: "Binary Tree Traversal",
@@ -360,6 +519,14 @@ async function main() {
       categoryId: catBaeume.id,
       examples: [],
       testCases: [],
+      supportedLanguages: [...supportedLangs],
+      starterCodes: {
+        javascript: "function inorderTraversal(root) {\n  // Your solution here\n}",
+        typescript:
+          "function inorderTraversal(root: TreeNode | null): number[] {\n  // Your solution here\n  return [];\n}",
+        python:
+          "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
+      },
       starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
       isActive: false,
       date: addUtcDays(anchor, -5),

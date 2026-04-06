@@ -6,8 +6,11 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface CodeEditorProps {
+  /** Controlled value (preferred for language switching). */
+  value?: string;
   defaultValue?: string;
-  language?: string;
+  /** Tab / window title (e.g. solution.ts). */
+  fileName?: string;
   onChange?: (value: string) => void;
   className?: string;
   readOnly?: boolean;
@@ -25,17 +28,21 @@ const defaultCode = `function transformArray(arr) {
 `;
 
 export function CodeEditor({
+  value: controlledValue,
   defaultValue = defaultCode,
+  fileName = "solution.js",
   onChange,
   className,
   readOnly = false,
 }: CodeEditorProps) {
-  const [value, setValue] = useState(defaultValue);
+  const [internal, setInternal] = useState(defaultValue);
+  const isControlled = controlledValue !== undefined;
+  const value = isControlled ? controlledValue : internal;
   const lines = value.split("\n");
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    setValue(newValue);
+    if (!isControlled) setInternal(newValue);
     onChange?.(newValue);
   };
 
@@ -47,7 +54,7 @@ export function CodeEditor({
           <div className="h-3 w-3 rounded-full bg-amber-500/80" />
           <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
         </div>
-        <span className="text-xs text-muted-foreground">solution.js</span>
+        <span className="text-xs text-muted-foreground font-code">{fileName}</span>
       </div>
 
       <div className="flex max-h-[500px] overflow-auto">
@@ -68,7 +75,7 @@ export function CodeEditor({
             "flex-1 resize-none bg-transparent p-4 font-code text-xs leading-6 text-foreground outline-none",
             "placeholder:text-muted-foreground/50",
           )}
-          rows={lines.length + 5}
+          rows={Math.max(lines.length + 2, 8)}
           placeholder="// Schreibe deinen Code hier..."
         />
       </div>

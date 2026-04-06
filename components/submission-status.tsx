@@ -1,7 +1,7 @@
 import { CheckboxOn, Clock, WarningBox } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
-type Status = "not-submitted" | "submitted" | "pending";
+type Status = "not-submitted" | "submitted" | "pending" | "failed";
 
 interface SubmissionStatusProps {
   status: Status;
@@ -35,6 +35,12 @@ const statusConfig: Record<
     label: "Wird ausgewertet",
     description: "Deine Lösung wird gerade überprüft",
     className: "border-amber-500/30 bg-amber-500/10 text-amber-500",
+  },
+  failed: {
+    icon: WarningBox,
+    label: "Abgabe nicht bestanden",
+    description: "Die Tests waren nicht vollständig erfolgreich",
+    className: "border-destructive/40 bg-destructive/10 text-destructive",
   },
 };
 

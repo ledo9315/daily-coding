@@ -71,4 +71,11 @@ describe("middleware", () => {
     );
     expect(res.status).toBe(307);
   });
+
+  it("protects /challenge (ohne Unterpfad)", async () => {
+    mockGetToken.mockResolvedValueOnce(null);
+    const res = await middleware(req("http://localhost:3000/challenge"));
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toContain("callbackUrl=%2Fchallenge");
+  });
 });

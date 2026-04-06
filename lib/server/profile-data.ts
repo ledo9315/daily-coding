@@ -4,19 +4,21 @@ import { formatTime, formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
 import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
 
-export async function getUserProfileData(userId: string): Promise<UserProfile> {
-  const [user, todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
-    prisma.user.findUniqueOrThrow({
-      where: { id: userId },
-      include: {
-        achievements: { include: { achievement: true }, orderBy: { createdAt: "asc" } },
-        submissions: {
-          orderBy: { createdAt: "desc" },
-          take: 10,
-          include: { challenge: true },
-        },
+export async function getUserProfileData(userId: string): Promise<UserProfile | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      achievements: { include: { achievement: true }, orderBy: { createdAt: "asc" } },
+      submissions: {
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: { challenge: true },
       },
-    }),
+    },
+  });
+  if (!user) return null;
+
+  const [todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
     prisma.rankingEntry.findUnique({
       where: {
         userId_period_periodDate: {
