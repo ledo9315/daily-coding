@@ -24,7 +24,6 @@ import {
   Lightbulb,
   BookOpen,
 } from "@nsmr/pixelart-react";
-import { ConfettiButton } from "@/components/ui/confetti";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { toast } from "sonner";

@@ -22,7 +22,6 @@ import {
   Clock,
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { getUserProfileData } from "@/lib/server/profile-data";
 import type { Achievement } from "@/lib/api";
 

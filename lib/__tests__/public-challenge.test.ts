@@ -5,9 +5,11 @@ describe("stripTestCaseSecretsForClient", () => {
   it("entfernt expected, lässt Rest stehen, setzt status=pending", () => {
     const out = stripTestCaseSecretsForClient([
       { id: 1, name: "A", input: "[1]", expected: "[1]" },
-    ]) as { id: number; name: string; input: string; status: string }[];
-    expect(out[0]?.expected).toBeUndefined();
-    expect(out[0]?.input).toBe("[1]");
-    expect(out[0]?.status).toBe("pending");
+    ]);
+    expect(Array.isArray(out)).toBe(true);
+    const first = (out as Record<string, unknown>[])[0];
+    expect(first?.expected).toBeUndefined();
+    expect(first?.input).toBe("[1]");
+    expect(first?.status).toBe("pending");
   });
 });

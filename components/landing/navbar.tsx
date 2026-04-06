@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Terminal } from "lucide-react";
 
 export function LandingNavbar() {
   return (

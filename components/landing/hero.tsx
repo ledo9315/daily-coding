@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Code2, Trophy, Users } from "lucide-react";
+import { Code2, Trophy, Users } from "lucide-react";
 import { Meteors } from "../ui/meteors";
 import Image from "next/image";
 import { BorderBeam } from "../ui/border-beam";

@@ -71,7 +71,7 @@ export function normalizeStarterCodes(
 
 export function parseCodeLanguage(
   raw: unknown,
-  allowed: CodeLanguageId[]
+  allowed: readonly CodeLanguageId[]
 ): CodeLanguageId | null {
   if (allowed.length === 0) return null;
   if (raw == null || raw === "") return allowed[0];

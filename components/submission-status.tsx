@@ -50,7 +50,7 @@ export function SubmissionStatus({
   className,
 }: SubmissionStatusProps) {
   const config = statusConfig[status];
-  const StatusIcon = config.icon;
+  const Icon = config.icon;
 
   return (
     <div
@@ -60,6 +60,7 @@ export function SubmissionStatus({
         className,
       )}
     >
+      <Icon className="h-8 w-8 shrink-0 text-current opacity-90" aria-hidden />
       <div>
         <p className="font-medium">{config.label}</p>
         <p className="text-sm opacity-80">
