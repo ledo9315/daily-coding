@@ -1,4 +1,5 @@
-import { CheckboxOn, Clock, WarningBox } from "@nsmr/pixelart-react";
+import type { ComponentType } from "react";
+import { Check, Clock, WarningBox } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
 type Status = "not-submitted" | "submitted" | "pending" | "failed";
@@ -12,7 +13,7 @@ interface SubmissionStatusProps {
 const statusConfig: Record<
   Status,
   {
-    icon: typeof CheckboxOn;
+    icon: ComponentType<{ className?: string }>;
     label: string;
     description: string;
     className: string;
@@ -25,7 +26,7 @@ const statusConfig: Record<
     className: "border-muted bg-muted/30 text-muted-foreground",
   },
   submitted: {
-    icon: CheckboxOn,
+    icon: Check,
     label: "Erfolgreich abgegeben",
     description: "Deine Lösung wurde eingereicht",
     className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",

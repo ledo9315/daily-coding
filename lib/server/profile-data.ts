@@ -3,12 +3,13 @@ import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import { formatTime, formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
 import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
+import { buildUserAchievementsView } from "@/lib/server/achievements";
+import { MONTHLY_CHALLENGE_GOAL, countSubmissionsInUtcMonth } from "@/lib/monthly-challenge-goal";
 
 export async function getUserProfileData(userId: string): Promise<UserProfile | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
-      achievements: { include: { achievement: true }, orderBy: { createdAt: "asc" } },
       submissions: {
         orderBy: { createdAt: "desc" },
         take: 10,
@@ -18,28 +19,35 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
   });
   if (!user) return null;
 
-  const [todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
-    prisma.rankingEntry.findUnique({
-      where: {
-        userId_period_periodDate: {
-          userId: userId,
-          period: "today",
-          periodDate: getPeriodDateForRanking("today"),
+  const [todayRank, completedSubmissions, achievementDefs, userAchievements] =
+    await Promise.all([
+      prisma.rankingEntry.findUnique({
+        where: {
+          userId_period_periodDate: {
+            userId: userId,
+            period: "today",
+            periodDate: getPeriodDateForRanking("today"),
+          },
         },
-      },
-    }),
-    prisma.submission.findMany({
-      where: { userId: userId, status: "completed" },
-      include: { challenge: { select: { points: true } } },
-    }),
-    prisma.userAchievement.count({
-      where: { userId: userId, unlockedAt: { not: null } },
-    }),
-  ]);
+      }),
+      prisma.submission.findMany({
+        where: { userId: userId, status: "completed" },
+        include: { challenge: { select: { points: true } } },
+      }),
+      prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
+      prisma.userAchievement.findMany({ where: { userId } }),
+    ]);
 
   const points = completedSubmissions.reduce((sum, s) => sum + s.challenge.points, 0);
   const totalSolved = completedSubmissions.length;
   const level = calculateLevel(points);
+  const monthlyChallengesSolved = countSubmissionsInUtcMonth(completedSubmissions);
+
+  const { achievements, unlockedCount: unlockedBadges } = buildUserAchievementsView(
+    achievementDefs,
+    userAchievements,
+    completedSubmissions
+  );
 
   return {
     id: user.id,
@@ -56,17 +64,11 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
       level,
       levelMax: nextLevelThreshold(level),
       badges: unlockedBadges,
-      badgesTotal: 6,
+      badgesTotal: achievementDefs.length,
+      monthlyChallengesSolved,
+      monthlyChallengeGoal: MONTHLY_CHALLENGE_GOAL,
     },
-    achievements: user.achievements.map((a) => ({
-      id: a.achievementId,
-      title: a.achievement.title,
-      description: a.achievement.description,
-      iconKey: a.achievement.iconKey,
-      unlocked: a.unlockedAt !== null,
-      rarity: a.achievement.rarity,
-      unlockedAt: a.unlockedAt ? formatDate(a.unlockedAt) : undefined,
-    })),
+    achievements,
     challengeHistory: user.submissions.map((s) => ({
       id: s.id,
       title: s.challenge.title,

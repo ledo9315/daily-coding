@@ -42,7 +42,7 @@ export function ChallengeRowActions({
         type="button"
         variant="outline"
         size="sm"
-        className="rounded-none font-sans"
+        className="rounded-none font-sans border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
         asChild
       >
         <Link href={`/admin/challenges/${encodeURIComponent(challengeId)}/edit`}>

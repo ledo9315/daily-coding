@@ -13,7 +13,8 @@ vi.mock("@/lib/auth-session", () => ({
 const mockUserFindUnique = vi.fn();
 const mockRankingFindUnique = vi.fn();
 const mockSubmissionFindMany = vi.fn();
-const mockUserAchievementCount = vi.fn();
+const mockAchievementDefFindMany = vi.fn();
+const mockUserAchievementFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -26,17 +27,29 @@ vi.mock("@/lib/prisma", () => ({
     submission: {
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
     },
+    achievementDef: {
+      findMany: (...args: unknown[]) => mockAchievementDefFindMany(...args),
+    },
     userAchievement: {
-      count: (...args: unknown[]) => mockUserAchievementCount(...args),
+      findMany: (...args: unknown[]) => mockUserAchievementFindMany(...args),
     },
   },
 }));
 
+/** Six global achievement definitions (matches seed). */
+const sixAchievementDefs = [1, 2, 3, 4, 5, 6].map((n) => ({
+  id: `ach-${n}`,
+  title: `Achievement ${n}`,
+  description: "desc",
+  iconKey: "Check",
+  rarity: "common" as const,
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
-  // Sane defaults so tests don't fail on unrelated mocks
   mockSubmissionFindMany.mockResolvedValue([]);
-  mockUserAchievementCount.mockResolvedValue(0);
+  mockAchievementDefFindMany.mockResolvedValue(sixAchievementDefs);
+  mockUserAchievementFindMany.mockResolvedValue([]);
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -67,11 +80,15 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockRankingFindUnique.mockResolvedValueOnce({ rank: 2 });
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 100 } },
-      { challenge: { points: 150 } },
-      { challenge: { points: 200 } },
+      { challenge: { points: 100 }, createdAt: new Date() },
+      { challenge: { points: 150 }, createdAt: new Date() },
+      { challenge: { points: 200 }, createdAt: new Date() },
     ]);
-    mockUserAchievementCount.mockResolvedValueOnce(3);
+    mockUserAchievementFindMany.mockResolvedValueOnce([
+      { achievementId: "ach-1", unlockedAt: new Date() },
+      { achievementId: "ach-2", unlockedAt: new Date() },
+      { achievementId: "ach-3", unlockedAt: new Date() },
+    ]);
     const res = await getUserStatsHandler();
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -81,6 +98,8 @@ describe("GET /api/user/stats", () => {
       totalSolved: 3,
       badges: 3,
       badgesTotal: 6,
+      monthlyChallengesSolved: 3,
+      monthlyChallengeGoal: 30,
     });
     expect(json.level).toBeGreaterThanOrEqual(1);
     expect(json.levelMax).toBeGreaterThan(0);
@@ -106,8 +125,8 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 1000 } },
-      { challenge: { points: 500 } },
+      { challenge: { points: 1000 }, createdAt: new Date() },
+      { challenge: { points: 500 }, createdAt: new Date() },
     ]);
     const res = await getUserStatsHandler();
     const json = await res.json();
@@ -118,9 +137,9 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 100 } },
-      { challenge: { points: 100 } },
-      { challenge: { points: 100 } },
+      { challenge: { points: 100 }, createdAt: new Date() },
+      { challenge: { points: 100 }, createdAt: new Date() },
+      { challenge: { points: 100 }, createdAt: new Date() },
     ]);
     const res = await getUserStatsHandler();
     const json = await res.json();
@@ -135,9 +154,11 @@ describe("GET /api/user/stats", () => {
     const json = await res.json();
     expect(json.points).toBe("0");
     expect(json.totalSolved).toBe(0);
+    expect(json.monthlyChallengesSolved).toBe(0);
+    expect(json.monthlyChallengeGoal).toBe(30);
   });
 
-  it("always returns badgesTotal=6", async () => {
+  it("sets badgesTotal from the number of achievement definitions", async () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserStatsHandler();
@@ -154,12 +175,15 @@ describe("GET /api/user/stats", () => {
     expect(json).not.toHaveProperty("teamName");
   });
 
-  it("loads user then ranking (one user + one ranking query)", async () => {
+  it("loading user, ranking, submissions, and achievements", async () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockRankingFindUnique.mockResolvedValueOnce(null);
     await getUserStatsHandler();
     expect(mockUserFindUnique).toHaveBeenCalledTimes(1);
     expect(mockRankingFindUnique).toHaveBeenCalledTimes(1);
+    expect(mockSubmissionFindMany).toHaveBeenCalledTimes(1);
+    expect(mockAchievementDefFindMany).toHaveBeenCalledTimes(1);
+    expect(mockUserAchievementFindMany).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -182,21 +206,6 @@ describe("GET /api/user/profile", () => {
       title: "Two Sum",
       difficulty: "medium",
       points: 200,
-    },
-  };
-
-  const achievement = {
-    userId: "user-max",
-    achievementId: "ach-1",
-    unlockedAt: new Date("2026-01-01T00:00:00Z"),
-    createdAt: new Date(),
-    achievement: {
-      id: "ach-1",
-      title: "First Blood",
-      description: "Solve your first challenge",
-      iconKey: "sword",
-      rarity: "common",
-      createdAt: new Date(),
     },
   };
 
@@ -231,8 +240,20 @@ describe("GET /api/user/profile", () => {
   });
 
   it("maps achievement fields correctly", async () => {
-    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [achievement], submissions: [] });
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
     mockRankingFindUnique.mockResolvedValueOnce(null);
+    mockAchievementDefFindMany.mockResolvedValueOnce([
+      {
+        id: "ach-1",
+        title: "First Blood",
+        description: "Solve your first challenge",
+        iconKey: "sword",
+        rarity: "common",
+      },
+    ]);
+    mockUserAchievementFindMany.mockResolvedValueOnce([
+      { achievementId: "ach-1", unlockedAt: new Date("2026-01-01T00:00:00Z") },
+    ]);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.achievements).toHaveLength(1);
@@ -296,19 +317,26 @@ describe("GET /api/user/profile", () => {
     mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
     mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 150 } },
-      { challenge: { points: 100 } },
+      { challenge: { points: 150 }, createdAt: new Date() },
+      { challenge: { points: 100 }, createdAt: new Date() },
     ]);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.stats.totalSolved).toBe(2);
     expect(json.stats.points).toBe("250");
+    expect(json.stats.monthlyChallengesSolved).toBe(2);
+    expect(json.stats.monthlyChallengeGoal).toBe(30);
   });
 
   it("calculates badges live from unlocked achievements", async () => {
     mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
     mockRankingFindUnique.mockResolvedValueOnce(null);
-    mockUserAchievementCount.mockResolvedValueOnce(4);
+    mockUserAchievementFindMany.mockResolvedValueOnce([
+      { achievementId: "ach-1", unlockedAt: new Date() },
+      { achievementId: "ach-2", unlockedAt: new Date() },
+      { achievementId: "ach-3", unlockedAt: new Date() },
+      { achievementId: "ach-4", unlockedAt: new Date() },
+    ]);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.stats.badges).toBe(4);

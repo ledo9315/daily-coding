@@ -72,14 +72,14 @@ describe("middleware", () => {
     expect(res.status).toBe(307);
   });
 
-  it("protects /challenge (ohne Unterpfad)", async () => {
+  it("protects /challenge (exact path, no subpath)", async () => {
     mockGetToken.mockResolvedValueOnce(null);
     const res = await middleware(req("http://localhost:3000/challenge"));
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("callbackUrl=%2Fchallenge");
   });
 
-  it("allows /admin when token exists (Admin-Rechte prüft die App per DB)", async () => {
+  it("allows /admin when token exists (admin role is checked in the app via DB)", async () => {
     mockGetToken.mockResolvedValueOnce({ sub: "u1", role: "user" });
     const res = await middleware(
       req("http://localhost:3000/admin/challenges/new"),

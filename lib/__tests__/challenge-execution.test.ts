@@ -9,7 +9,10 @@ vi.mock("@/lib/server/piston-runner", () => ({
 }));
 
 import { executeWithPiston } from "@/lib/server/piston-runner";
-import { runChallengeTests } from "@/lib/server/challenge-execution";
+import {
+  runChallengeTests,
+  sumDurationMsFromTestCases,
+} from "@/lib/server/challenge-execution";
 
 const mockExecute = vi.mocked(executeWithPiston);
 
@@ -39,7 +42,19 @@ beforeEach(() => {
   mockExecute.mockReset();
 });
 
-describe("runChallengeTests (IO)", () => {
+describe("sumDurationMsFromTestCases", () => {
+  it("parses ms values and ignores em dash placeholders", () => {
+    expect(
+      sumDurationMsFromTestCases([
+        { id: 1, name: "a", status: "passed", time: "100ms" },
+        { id: 2, name: "b", status: "passed", time: "50ms" },
+        { id: 3, name: "c", status: "passed", time: "—" },
+      ])
+    ).toBe(150);
+  });
+});
+
+describe("runChallengeTests (IO evaluation)", () => {
   const ioChallenge = {
     evaluationConfig: {
       callableByLanguage: {
@@ -54,7 +69,7 @@ describe("runChallengeTests (IO)", () => {
     ],
   };
 
-  it("markiert runtimeOk=true wenn alle stdout mit expected übereinstimmen", async () => {
+  it("sets runtimeOk=true when all stdout values match expected", async () => {
     mockExecute
       .mockResolvedValueOnce(pistonOk("[1]"))
       .mockResolvedValueOnce(pistonOk("[99]"));
@@ -71,7 +86,20 @@ describe("runChallengeTests (IO)", () => {
     expect(mockExecute).toHaveBeenCalledTimes(2);
   });
 
-  it("markiert runtimeOk=false bei stdout-Abweichung", async () => {
+  it("sums totalDurationMs across all IO runs", async () => {
+    mockExecute.mockResolvedValueOnce(pistonOk("[1]")).mockResolvedValueOnce(pistonOk("[99]"));
+
+    const { totalDurationMs } = await runChallengeTests(
+      ioChallenge,
+      "function solve(x){return x;}",
+      "javascript",
+      "submit"
+    );
+
+    expect(totalDurationMs).toBe(16);
+  });
+
+  it("sets runtimeOk=false when stdout differs from expected", async () => {
     mockExecute.mockResolvedValueOnce(pistonOk("[1]")).mockResolvedValueOnce(pistonOk("[2]"));
 
     const { runtimeOk, testCases } = await runChallengeTests(
@@ -85,7 +113,7 @@ describe("runChallengeTests (IO)", () => {
     expect(testCases.some((t) => t.status === "failed")).toBe(true);
   });
 
-  it("markiert fehlgeschlagen wenn Piston ok=false", async () => {
+  it("marks failed when Piston returns ok=false", async () => {
     mockExecute.mockResolvedValueOnce(pistonFail("boom"));
 
     const { runtimeOk, testCases } = await runChallengeTests(
@@ -103,8 +131,8 @@ describe("runChallengeTests (IO)", () => {
   });
 });
 
-describe("runChallengeTests (Smoke ohne IO)", () => {
-  it("nutzt einen Lauf ohne stdin wenn keine evaluationConfig", async () => {
+describe("runChallengeTests (smoke, no IO)", () => {
+  it("uses a single run without stdin when there is no evaluationConfig", async () => {
     mockExecute.mockResolvedValueOnce(pistonOk(""));
 
     const { testCases, runtimeOk } = await runChallengeTests(

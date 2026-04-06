@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckboxOn, CloseBox, Clock, WarningBox } from "@nsmr/pixelart-react";
+import { Check, CloseBox, Clock, WarningBox } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
 export interface TestCase {
@@ -20,7 +20,7 @@ interface TestResultsProps {
 
 const statusConfig = {
   passed: {
-    icon: CheckboxOn,
+    icon: Check,
     label: "Bestanden",
     className: "text-emerald-500",
     bgClassName: "bg-emerald-500/10",

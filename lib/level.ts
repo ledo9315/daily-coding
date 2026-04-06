@@ -19,3 +19,13 @@ export function calculateLevel(points: number): number {
 export function nextLevelThreshold(level: number): number {
   return Math.round(100 * (Math.pow(2, level) - 1));
 }
+
+/** Kurzer Stufenname für die UI (abhängig vom Level, nicht hardcodiert pro Screen). */
+export function levelTitleDe(level: number): string {
+  const l = Math.max(1, Math.floor(level));
+  if (l <= 1) return "Einsteiger";
+  if (l <= 3) return "Aufsteiger";
+  if (l <= 5) return "Experte";
+  if (l <= 7) return "Meister";
+  return "Legende";
+}

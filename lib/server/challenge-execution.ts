@@ -78,11 +78,30 @@ function usesIoEvaluation(
 
 export type ChallengeExecutionMode = "run" | "submit";
 
+/** Summiert „123ms“-Zeiten aus Testfällen (Gesamtlaufzeit aller Läufe). */
+export function sumDurationMsFromTestCases(cases: ChallengeTestCase[]): number {
+  let sum = 0;
+  for (const tc of cases) {
+    const t = tc.time?.trim();
+    if (!t || t === "—") continue;
+    const m = /^(\d+)ms$/i.exec(t);
+    if (m) sum += parseInt(m[1], 10);
+  }
+  return sum;
+}
+
+export type ChallengeRunResult = {
+  testCases: ChallengeTestCase[];
+  runtimeOk: boolean;
+  /** Summe aller gemessenen Laufzeiten (Piston), für `Submission.timeTaken` (Sekunden). */
+  totalDurationMs: number;
+};
+
 async function runPistonIoCases(
   challenge: ChallengeLike,
   code: string,
   language: CodeLanguageId
-): Promise<{ testCases: ChallengeTestCase[]; runtimeOk: boolean }> {
+): Promise<ChallengeRunResult> {
   const cfg = parseEvaluationConfig(challenge.evaluationConfig);
   const callable = cfg?.callableByLanguage?.[language];
   if (!callable) {
@@ -97,6 +116,7 @@ async function runPistonIoCases(
         },
       ],
       runtimeOk: false,
+      totalDurationMs: 0,
     };
   }
 
@@ -106,6 +126,7 @@ async function runPistonIoCases(
   const wrapped = buildWrappedProgram(language, code, callable);
   const results: ChallengeTestCase[] = [];
   let allPassed = true;
+  let totalDurationMs = 0;
 
   for (const tc of list) {
     if (tc.input == null || tc.expected == null) {
@@ -120,6 +141,7 @@ async function runPistonIoCases(
     }
 
     const piston = await executeWithPiston(language, wrapped, tc.input);
+    totalDurationMs += piston.durationMs;
     const timeStr = `${piston.durationMs}ms`;
 
     if (!piston.ok) {
@@ -160,7 +182,7 @@ async function runPistonIoCases(
     }
   }
 
-  return { testCases: results, runtimeOk: allPassed };
+  return { testCases: results, runtimeOk: allPassed, totalDurationMs };
 }
 
 async function runPistonSmoke(
@@ -168,8 +190,9 @@ async function runPistonSmoke(
   code: string,
   language: CodeLanguageId,
   mode: ChallengeExecutionMode
-): Promise<{ testCases: ChallengeTestCase[]; runtimeOk: boolean }> {
+): Promise<ChallengeRunResult> {
   const piston = await executeWithPiston(language, code, "");
+  const totalDurationMs = piston.durationMs;
   const list = parseTestCasesIo(challenge.testCases);
   const slots = list.length > 0 ? list : defaultSlots();
 
@@ -183,6 +206,7 @@ async function runPistonSmoke(
           time: i === 0 ? `${piston.durationMs}ms` : "—",
         })),
         runtimeOk: true,
+        totalDurationMs,
       };
     }
     return {
@@ -197,6 +221,7 @@ async function runPistonSmoke(
             : undefined,
       })),
       runtimeOk: false,
+      totalDurationMs,
     };
   }
 
@@ -221,6 +246,7 @@ async function runPistonSmoke(
   return {
     testCases: [first, ...rest],
     runtimeOk: piston.ok,
+    totalDurationMs,
   };
 }
 
@@ -229,12 +255,22 @@ export async function runChallengeTests(
   code: string,
   language: CodeLanguageId,
   mode: ChallengeExecutionMode
-): Promise<{ testCases: ChallengeTestCase[]; runtimeOk: boolean }> {
+): Promise<ChallengeRunResult> {
   if (!isCodeExecutionEnabled()) {
     if (mode === "submit") {
-      return { testCases: stubSubmitPassedResults(language), runtimeOk: true };
+      const testCases = stubSubmitPassedResults(language);
+      return {
+        testCases,
+        runtimeOk: true,
+        totalDurationMs: sumDurationMsFromTestCases(testCases),
+      };
     }
-    return { testCases: stubRunResults(language), runtimeOk: true };
+    const testCases = stubRunResults(language);
+    return {
+      testCases,
+      runtimeOk: true,
+      totalDurationMs: sumDurationMsFromTestCases(testCases),
+    };
   }
 
   try {
@@ -255,6 +291,7 @@ export async function runChallengeTests(
         },
       ],
       runtimeOk: false,
+      totalDurationMs: 0,
     };
   }
 }

@@ -35,6 +35,12 @@ import {
   type DailyChallenge,
 } from "@/lib/api";
 import { languageFileName, languageLabel } from "@/lib/challenge-languages";
+import { notifyUserStatsChanged } from "@/lib/user-stats-events";
+import {
+  ensureSolveStart,
+  getSolveDurationSeconds,
+  clearSolveTimer,
+} from "@/lib/solve-timer";
 import {
   Select,
   SelectContent,
@@ -102,6 +108,11 @@ export default function ChallengePage() {
     loadChallenge();
   }, [loadChallenge]);
 
+  useEffect(() => {
+    if (!challenge || isSubmitLocked) return;
+    ensureSolveStart(challenge.id);
+  }, [challenge?.id, isSubmitLocked]);
+
   const currentCode =
     language != null ? (sources[language] ?? "") : "";
 
@@ -133,13 +144,21 @@ export default function ChallengePage() {
     if (!challenge || !language || isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const result = await submitSolution(challenge.id, currentCode, language);
+      const solveDurationSeconds = getSolveDurationSeconds(challenge.id);
+      const result = await submitSolution(
+        challenge.id,
+        currentCode,
+        language,
+        solveDurationSeconds
+      );
+      clearSolveTimer(challenge.id);
       setTestCases(result.testCases as TestCase[]);
       setSubmittedAtLabel(
         new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
       );
       if (result.success) {
         setSubmitOutcome("success");
+        notifyUserStatsChanged();
         toast.success("Lösung eingereicht", {
           description: "Alle Tests wurden bestanden.",
         });
@@ -316,7 +335,7 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || isSubmitLocked || !language}
-                    className="gap-2 bg-transparent rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="gap-2 rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />
                     {isRunning ? "Läuft..." : "Test ausführen"}

@@ -21,13 +21,16 @@ vi.mock("@/auth", () => ({
 const mockFindFirst = vi.fn();
 const mockFindUniqueChallenge = vi.fn();
 const mockUserFindUnique = vi.fn();
+const mockUserUpdate = vi.fn();
 const mockSubmissionFindFirst = vi.fn();
+const mockSubmissionFindMany = vi.fn();
 const mockCreate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+      update: (...args: unknown[]) => mockUserUpdate(...args),
     },
     challenge: {
       findFirst: (...args: unknown[]) => mockFindFirst(...args),
@@ -35,6 +38,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     submission: {
       findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
+      findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
       create: (...args: unknown[]) => mockCreate(...args),
     },
   },
@@ -42,8 +46,10 @@ vi.mock("@/lib/prisma", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockUserFindUnique.mockResolvedValue({ id: "user-test" });
+  mockUserFindUnique.mockResolvedValue({ id: "user-test", streakRecord: 0 });
   mockSubmissionFindFirst.mockResolvedValue(null);
+  mockSubmissionFindMany.mockResolvedValue([{ createdAt: new Date() }]);
+  mockUserUpdate.mockResolvedValue({});
   mockAuth.mockResolvedValue(null);
 });
 
@@ -121,7 +127,7 @@ describe("GET /api/challenge/daily", () => {
     expect(json.starterCode).toBe("function legacy() {}");
   });
 
-  it("versucht zuerst Challenge am UTC-Tag, dann aktiven Fallback", async () => {
+  it("tries UTC-day challenge first, then active fallback", async () => {
     mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(activeChallenge);
     await getDailyHandler();
     expect(mockFindFirst).toHaveBeenCalledTimes(2);
@@ -295,10 +301,15 @@ describe("POST /api/challenge/[id]/run", () => {
 // ─── /api/challenge/[id]/submit ───────────────────────────────────────────────
 
 describe("POST /api/challenge/[id]/submit", () => {
-  function makeRequest(id: string, code = "function solve() {}", language = "javascript") {
+  function makeRequest(
+    id: string,
+    code = "function solve() {}",
+    language = "javascript",
+    extra?: Record<string, unknown>
+  ) {
     return new NextRequest(`http://localhost/api/challenge/${id}/submit`, {
       method: "POST",
-      body: JSON.stringify({ code, language }),
+      body: JSON.stringify({ code, language, ...extra }),
       headers: { "Content-Type": "application/json" },
     });
   }
@@ -359,6 +370,40 @@ describe("POST /api/challenge/[id]/submit", () => {
           code: "my code",
           language: "typescript",
           status: "completed",
+          timeTaken: 1,
+        }),
+      })
+    );
+  });
+
+  it("stores solveDurationSeconds as timeTaken when the client sends it", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1", "code", "javascript", { solveDurationSeconds: 142 }), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          timeTaken: 142,
+        }),
+      })
+    );
+  });
+
+  it("update streak and record after successful submission", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(mockSubmissionFindMany).toHaveBeenCalled();
+    expect(mockUserUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "user-test" },
+        data: expect.objectContaining({
+          streak: expect.any(Number),
+          streakRecord: expect.any(Number),
         }),
       })
     );

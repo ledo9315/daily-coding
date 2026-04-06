@@ -5,6 +5,17 @@ import { getSessionUserId } from "@/lib/auth-session";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
 import { runChallengeTests } from "@/lib/server/challenge-execution";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
+import { computeConsecutiveStreakDays } from "@/lib/server/streak";
+
+const MAX_SOLVE_DURATION_SECONDS = 7 * 24 * 3600;
+
+function parseSolveDurationSeconds(body: Record<string, unknown>): number | null {
+  const v = body.solveDurationSeconds;
+  if (typeof v !== "number" || !Number.isFinite(v)) return null;
+  const s = Math.floor(v);
+  if (s < 0) return null;
+  return Math.min(s, MAX_SOLVE_DURATION_SECONDS);
+}
 
 export async function POST(
   request: NextRequest,
@@ -29,7 +40,7 @@ export async function POST(
   }
 
   const { id: challengeId } = await params;
-  const body = await request.json().catch(() => ({}));
+  const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const code: string = typeof body.code === "string" ? body.code : "";
 
   const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
@@ -71,12 +82,24 @@ export async function POST(
     );
   }
 
-  const { testCases: testResults, runtimeOk } = await runChallengeTests(
+  const { testCases: testResults, runtimeOk, totalDurationMs } = await runChallengeTests(
     challenge,
     code,
     language,
     "submit"
   );
+
+  const clientSolveSeconds = parseSolveDurationSeconds(body);
+  const executionSeconds =
+    totalDurationMs > 0 ? Math.max(1, Math.ceil(totalDurationMs / 1000)) : null;
+
+  /** Anzeige: bevorzugt Wandzeit seit Challenge-Start (Client); sonst Sandbox-Summe. */
+  let timeTakenSeconds: number | null = null;
+  if (clientSolveSeconds != null) {
+    timeTakenSeconds = clientSolveSeconds === 0 ? 1 : clientSolveSeconds;
+  } else if (executionSeconds != null) {
+    timeTakenSeconds = executionSeconds;
+  }
 
   await prisma.submission.create({
     data: {
@@ -85,9 +108,25 @@ export async function POST(
       code,
       language: language as CodeLanguage,
       status: runtimeOk ? "completed" : "failed",
+      timeTaken: timeTakenSeconds,
       testResults: testResults as unknown as Parameters<typeof prisma.submission.create>[0]["data"]["testResults"],
     },
   });
+
+  if (runtimeOk) {
+    const newStreak = await computeConsecutiveStreakDays(userId);
+    const u = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { streakRecord: true },
+    });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        streak: newStreak,
+        streakRecord: Math.max(u?.streakRecord ?? 0, newStreak),
+      },
+    });
+  }
 
   return NextResponse.json({
     success: runtimeOk,
