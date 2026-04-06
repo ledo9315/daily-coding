@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { formatTime } from "@/lib/format";
+import { DEMO_PERIOD_DATE } from "@/lib/server/app-config";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const period = searchParams.get("period") ?? "today";
 
-  const today = new Date("2026-04-05");
+  const today = DEMO_PERIOD_DATE;
 
   const validPeriods = ["today", "week", "month"] as const;
   const selectedPeriod = validPeriods.includes(period as (typeof validPeriods)[number])
