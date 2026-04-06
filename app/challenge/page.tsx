@@ -404,6 +404,7 @@ export default function ChallengePage() {
                 <CodeEditor
                   value={currentCode}
                   onChange={setCurrentCode}
+                  language={language}
                   fileName={languageFileName(language)}
                   readOnly={isSubmitLocked}
                   className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50"

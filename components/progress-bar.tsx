@@ -1,6 +1,9 @@
 "use client";
 
+import { progressPercentage } from "@/lib/progress-percentage";
 import { cn } from "@/lib/utils";
+
+export { progressPercentage as progressBarPercentage } from "@/lib/progress-percentage";
 
 interface ProgressBarProps {
   value: number;
@@ -21,7 +24,7 @@ export function ProgressBar({
   variant = "default",
   className,
 }: ProgressBarProps) {
-  const percentage = Math.min(Math.round((value / max) * 100), 100);
+  const percentage = progressPercentage(value, max);
 
   const sizeClasses = {
     sm: "h-1.5",

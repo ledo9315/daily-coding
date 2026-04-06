@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 import { GET as getUserStatsHandler } from "../user/stats/route";
 import { GET as getUserProfileHandler } from "../user/profile/route";
 
@@ -99,7 +100,7 @@ describe("GET /api/user/stats", () => {
       badges: 3,
       badgesTotal: 6,
       monthlyChallengesSolved: 3,
-      monthlyChallengeGoal: 30,
+      monthlyChallengeGoal: utcDaysInMonth(),
     });
     expect(json.level).toBeGreaterThanOrEqual(1);
     expect(json.levelMax).toBeGreaterThan(0);
@@ -155,7 +156,7 @@ describe("GET /api/user/stats", () => {
     expect(json.points).toBe("0");
     expect(json.totalSolved).toBe(0);
     expect(json.monthlyChallengesSolved).toBe(0);
-    expect(json.monthlyChallengeGoal).toBe(30);
+    expect(json.monthlyChallengeGoal).toBe(utcDaysInMonth());
   });
 
   it("sets badgesTotal from the number of achievement definitions", async () => {
@@ -219,6 +220,8 @@ describe("GET /api/user/profile", () => {
     expect(json).toHaveProperty("stats");
     expect(json).toHaveProperty("achievements");
     expect(json).toHaveProperty("challengeHistory");
+    expect(json).toHaveProperty("monthlyActivity");
+    expect(json.monthlyActivity.daysInMonth).toBe(utcDaysInMonth());
   });
 
   it("uppercases the user name", async () => {
@@ -325,7 +328,7 @@ describe("GET /api/user/profile", () => {
     expect(json.stats.totalSolved).toBe(2);
     expect(json.stats.points).toBe("250");
     expect(json.stats.monthlyChallengesSolved).toBe(2);
-    expect(json.stats.monthlyChallengeGoal).toBe(30);
+    expect(json.stats.monthlyChallengeGoal).toBe(utcDaysInMonth());
   });
 
   it("calculates badges live from unlocked achievements", async () => {

@@ -9,6 +9,7 @@ import { StatsCard } from "@/components/stats-card";
 import { AchievementBadge } from "@/components/achievement-badge";
 import { ProgressBar } from "@/components/progress-bar";
 import { ChallengeHistory } from "@/components/challenge-history";
+import { MonthlyActivityView } from "@/components/monthly-activity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -122,12 +123,6 @@ export default async function ProfilePage() {
                   variant="default"
                 />
                 <ProgressBar
-                  label="Monatsziel: Challenges"
-                  value={profile.stats.monthlyChallengesSolved}
-                  max={profile.stats.monthlyChallengeGoal}
-                  variant="success"
-                />
-                <ProgressBar
                   label="Streak zum Rekord"
                   value={profile.stats.streak}
                   max={profile.stats.streakRecord}
@@ -169,30 +164,8 @@ export default async function ProfilePage() {
                   Aktivität
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-7 gap-1">
-                  {Array.from({ length: 28 }).map((_, i) => {
-                    const intensity = Math.random();
-                    return (
-                      <div
-                        key={i}
-                        className={`aspect-square ${
-                          intensity > 0.7
-                            ? "bg-primary"
-                            : intensity > 0.4
-                              ? "bg-primary/60"
-                              : intensity > 0.2
-                                ? "bg-primary/30"
-                                : "bg-secondary"
-                        }`}
-                        title={`Tag ${i + 1}`}
-                      />
-                    );
-                  })}
-                </div>
-                <p className="mt-3 text-center text-sm text-muted-foreground">
-                  22 von 28 Tagen aktiv
-                </p>
+              <CardContent className="space-y-4">
+                <MonthlyActivityView activity={profile.monthlyActivity} />
               </CardContent>
             </Card>
           </div>

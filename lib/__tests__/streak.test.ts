@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   utcDayKey,
   consecutiveStreakFromCompletedDaySet,
+  currentStreakDayKeys,
 } from "@/lib/streak-days";
 
 describe("utcDayKey", () => {
@@ -42,5 +43,17 @@ describe("consecutiveStreakFromCompletedDaySet", () => {
         new Set(["2026-04-06", "2026-04-05", "2026-04-03"])
       )
     ).toBe(2);
+  });
+});
+
+describe("currentStreakDayKeys", () => {
+  const d = (s: string) => new Date(`${s}T12:00:00.000Z`);
+
+  it("returns the same count as consecutiveStreakFromCompletedDaySet", () => {
+    const today = d("2026-04-06");
+    const set = new Set(["2026-04-06", "2026-04-05", "2026-04-04"]);
+    expect(currentStreakDayKeys(today, set).size).toBe(
+      consecutiveStreakFromCompletedDaySet(today, set)
+    );
   });
 });

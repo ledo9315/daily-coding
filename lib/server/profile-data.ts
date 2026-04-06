@@ -4,7 +4,9 @@ import { formatTime, formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
 import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
-import { MONTHLY_CHALLENGE_GOAL, countSubmissionsInUtcMonth } from "@/lib/monthly-challenge-goal";
+import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
+import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
+import { utcDayKey } from "@/lib/streak-days";
 
 export async function getUserProfileData(userId: string): Promise<UserProfile | null> {
   const user = await prisma.user.findUnique({
@@ -41,7 +43,14 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
   const points = completedSubmissions.reduce((sum, s) => sum + s.challenge.points, 0);
   const totalSolved = completedSubmissions.length;
   const level = calculateLevel(points);
-  const monthlyChallengesSolved = countSubmissionsInUtcMonth(completedSubmissions);
+  const now = new Date();
+  const monthlyChallengesSolved = countSubmissionsInUtcMonth(completedSubmissions, now);
+
+  const allCompletedDayKeys = new Set<string>();
+  for (const s of completedSubmissions) {
+    allCompletedDayKeys.add(utcDayKey(s.createdAt));
+  }
+  const monthlyActivity = buildMonthlyActivityGrid(now, allCompletedDayKeys);
 
   const { achievements, unlockedCount: unlockedBadges } = buildUserAchievementsView(
     achievementDefs,
@@ -66,7 +75,7 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
       badges: unlockedBadges,
       badgesTotal: achievementDefs.length,
       monthlyChallengesSolved,
-      monthlyChallengeGoal: MONTHLY_CHALLENGE_GOAL,
+      monthlyChallengeGoal: utcDaysInMonth(now),
     },
     achievements,
     challengeHistory: user.submissions.map((s) => ({
@@ -82,5 +91,6 @@ export async function getUserProfileData(userId: string): Promise<UserProfile | 
       time: formatTime(s.timeTaken),
       rank: s.rank ?? undefined,
     })),
+    monthlyActivity,
   };
 }

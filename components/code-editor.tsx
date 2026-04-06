@@ -1,16 +1,34 @@
 "use client";
 
-import React from "react";
-
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useMemo } from "react";
+import type { editor } from "monaco-editor";
+import type { Monaco } from "@monaco-editor/react";
+import type { CodeLanguageId } from "@/lib/challenge-languages";
+import {
+  MONACO_THEME_FRAPPE,
+  registerCatppuccinFrappeTheme,
+} from "@/lib/monaco-catppuccin-frappe";
 import { cn } from "@/lib/utils";
 
+const Editor = dynamic(
+  () => import("@monaco-editor/react").then((m) => m.default),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[500px] items-center justify-center bg-secondary/20 font-code text-sm text-muted-foreground">
+        Editor wird geladen…
+      </div>
+    ),
+  }
+);
+
 interface CodeEditorProps {
-  /** Controlled value (preferred for language switching). */
   value?: string;
   defaultValue?: string;
-  /** Tab / window title (e.g. solution.ts). */
   fileName?: string;
+  /** Syntax-Highlighting / Sprachmodus (Monaco). */
+  language?: CodeLanguageId;
   onChange?: (value: string) => void;
   className?: string;
   readOnly?: boolean;
@@ -31,52 +49,86 @@ export function CodeEditor({
   value: controlledValue,
   defaultValue = defaultCode,
   fileName = "solution.js",
+  language = "javascript",
   onChange,
   className,
   readOnly = false,
 }: CodeEditorProps) {
-  const [internal, setInternal] = useState(defaultValue);
   const isControlled = controlledValue !== undefined;
-  const value = isControlled ? controlledValue : internal;
-  const lines = value.split("\n");
+  const value = isControlled ? controlledValue : defaultValue;
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    if (!isControlled) setInternal(newValue);
-    onChange?.(newValue);
-  };
+  const handleBeforeMount = useCallback((monaco: Monaco) => {
+    registerCatppuccinFrappeTheme(monaco);
+  }, []);
+
+  const handleMount = useCallback(
+    (_ed: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+      registerCatppuccinFrappeTheme(monaco);
+    },
+    []
+  );
+
+  const options = useMemo<editor.IStandaloneEditorConstructionOptions>(
+    () => ({
+      minimap: { enabled: false },
+      fontSize: 14,
+      lineHeight: 24,
+      fontFamily:
+        "var(--font-jetbrains-mono, ui-monospace), JetBrains Mono, monospace",
+      fontLigatures: false,
+      padding: { top: 16, bottom: 16 },
+      scrollBeyondLastLine: false,
+      renderLineHighlight: "line",
+      cursorBlinking: "smooth",
+      cursorSmoothCaretAnimation: "on",
+      readOnly,
+      wordWrap: "on",
+      tabSize: 2,
+      insertSpaces: true,
+      detectIndentation: false,
+      automaticLayout: true,
+      fixedOverflowWidgets: true,
+      glyphMargin: false,
+      folding: true,
+      lineNumbers: "on",
+      lineNumbersMinChars: 3,
+      scrollbar: {
+        verticalScrollbarSize: 10,
+        horizontalScrollbarSize: 10,
+      },
+      overviewRulerLanes: 0,
+      hideCursorInOverviewRuler: true,
+      overviewRulerBorder: false,
+    }),
+    [readOnly]
+  );
 
   return (
-    <div className={cn("pixel-box", className)}>
+    <div className={cn("pixel-box overflow-hidden", className)}>
       <div className="flex items-center gap-2 border-b border-border/50 bg-secondary/30 px-4 py-2">
         <div className="flex gap-1.5">
           <div className="h-3 w-3 rounded-full bg-rose-500/80" />
           <div className="h-3 w-3 rounded-full bg-amber-500/80" />
           <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
         </div>
-        <span className="text-xs text-muted-foreground font-code">{fileName}</span>
+        <span className="font-code text-xs text-muted-foreground">{fileName}</span>
       </div>
 
-      <div className="flex max-h-[500px] overflow-auto">
-        <div className="flex flex-col border-r border-border/30 bg-secondary/20 px-3 py-4 text-right font-code text-base text-muted-foreground select-none">
-          {lines.map((_, i) => (
-            <span key={i} className="leading-6">
-              {i + 1}
-            </span>
-          ))}
-        </div>
-
-        <textarea
-          value={value}
-          onChange={handleChange}
-          readOnly={readOnly}
-          spellCheck={false}
-          className={cn(
-            "flex-1 resize-none bg-transparent p-4 font-code text-xs leading-6 text-foreground outline-none",
-            "placeholder:text-muted-foreground/50",
-          )}
-          rows={Math.max(lines.length + 2, 8)}
-          placeholder="// Schreibe deinen Code hier..."
+      <div className="max-h-[500px] min-h-[320px] overflow-hidden">
+        <Editor
+          key={`${language}-${fileName}`}
+          height="500px"
+          theme={MONACO_THEME_FRAPPE}
+          language={language}
+          path={fileName}
+          value={isControlled ? value : undefined}
+          defaultValue={isControlled ? undefined : value}
+          onChange={(v) => {
+            if (v != null) onChange?.(v);
+          }}
+          beforeMount={handleBeforeMount}
+          onMount={handleMount}
+          options={options}
         />
       </div>
     </div>
