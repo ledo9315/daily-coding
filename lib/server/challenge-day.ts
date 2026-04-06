@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
 
 /**
- * Challenge für „heute“: zuerst Eintrag mit `date` am aktuellen UTC-Tag,
- * sonst Fallback auf die zuletzt aktive Challenge (z. B. frischer Seed / Dev).
+ * Prefer the challenge whose `date` is on the current UTC calendar day;
+ * otherwise the latest active challenge (e.g. fresh seed / dev).
  */
 export async function findDailyChallengeForApp() {
   const dayStart = startOfUtcDay(new Date());
