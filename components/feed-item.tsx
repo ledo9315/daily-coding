@@ -1,9 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Trophy, Zap, Bullseye } from "@nsmr/pixelart-react";
+import { Trophy, Zap, Bullseye, Script } from "@nsmr/pixelart-react";
 
-export type EventType = "level-up" | "milestone" | "badge-earned";
+export type EventType =
+  | "level-up"
+  | "milestone"
+  | "badge-earned"
+  | "challenge-solved";
 
 export interface FeedItemProps {
   user: {
@@ -46,6 +50,13 @@ export function FeedItem({ user, event }: FeedItemProps) {
           cardBorder: "",
           badge: "Abzeichen",
         };
+      case "challenge-solved":
+        return {
+          icon: Script,
+          color: "bg-sky-500/10 text-sky-500 border-sky-500/20",
+          cardBorder: "",
+          badge: "Challenge",
+        };
     }
   };
 
@@ -62,7 +73,10 @@ export function FeedItem({ user, event }: FeedItemProps) {
       <div className="p-6">
         <div className="flex gap-4">
           <Avatar className="h-12 w-12 border-2 border-border transition-colors">
-            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarImage
+              src={user.avatar ? user.avatar : undefined}
+              alt={user.name}
+            />
             <AvatarFallback>{user.initials}</AvatarFallback>
           </Avatar>
 

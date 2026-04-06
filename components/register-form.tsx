@@ -62,7 +62,7 @@ export function RegisterForm() {
       toast.success("Konto erstellt!", {
         description: "Du wurdest automatisch eingeloggt.",
       });
-      router.push("/dashboard");
+      router.push("/");
       router.refresh();
     } catch (err) {
       const desc =

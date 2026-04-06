@@ -3,18 +3,44 @@ import { prisma } from "@/lib/prisma";
 import { calculateLevel } from "@/lib/level";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 
-export async function GET() {
+const DEFAULT_LIMIT = 15;
+const MAX_LIMIT = 50;
+
+function parseLimit(raw: string | null): number {
+  if (!raw) return DEFAULT_LIMIT;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 1) return DEFAULT_LIMIT;
+  return Math.min(MAX_LIMIT, Math.floor(n));
+}
+
+function emailToUsername(email: string): string {
+  const local = email.split("@")[0]?.trim();
+  if (!local) return "@user";
+  return `@${local}`;
+}
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const cursor = searchParams.get("cursor")?.trim() || undefined;
+  const limit = parseLimit(searchParams.get("limit"));
+  const take = limit + 1;
+
   const submissions = await prisma.submission.findMany({
     where: { status: "completed" },
-    orderBy: { createdAt: "desc" },
-    take: 10,
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take,
+    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     include: {
       user: true,
       challenge: { select: { title: true, points: true } },
     },
   });
 
-  const userIds = [...new Set(submissions.map((s) => s.userId))];
+  const hasMore = submissions.length > limit;
+  const page = hasMore ? submissions.slice(0, limit) : submissions;
+  const nextCursor = hasMore && page.length > 0 ? page[page.length - 1].id : null;
+
+  const userIds = [...new Set(page.map((s) => s.userId))];
   const lifetimePoints = await getLifetimePointsByUserIds(userIds);
 
   const now = new Date();
@@ -27,19 +53,22 @@ export async function GET() {
     return `vor ${Math.floor(diffH / 24)} Tagen`;
   };
 
-  return NextResponse.json(
-    submissions.map((s) => ({
-      id: s.id,
-      user: {
-        name: s.user.name,
-        initials: s.user.initials,
-        avatar: s.user.avatar,
-        level: calculateLevel(lifetimePoints.get(s.userId) ?? 0),
-      },
-      action: "hat die Challenge gelöst",
-      challenge: s.challenge.title,
-      points: s.challenge.points,
-      time: formatRelativeTime(s.createdAt),
-    }))
-  );
+  const items = page.map((s) => ({
+    id: s.id,
+    kind: "challenge-solved" as const,
+    user: {
+      name: s.user.name,
+      initials: s.user.initials,
+      avatar: s.user.avatar,
+      level: calculateLevel(lifetimePoints.get(s.userId) ?? 0),
+    },
+    username: emailToUsername(s.user.email),
+    action: "hat die Challenge gelöst",
+    challenge: s.challenge.title,
+    points: s.challenge.points,
+    time: formatRelativeTime(s.createdAt),
+    createdAt: s.createdAt.toISOString(),
+  }));
+
+  return NextResponse.json({ items, nextCursor });
 }

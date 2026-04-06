@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import { Trophy, ArrowRight, Clock } from "@nsmr/pixelart-react";
+import { avatarImageSrc } from "@/lib/avatar-src";
 import { cn } from "@/lib/utils";
 
 interface RankingUser {
@@ -19,6 +20,8 @@ interface RankingPreviewCardProps {
   users: RankingUser[];
   href: string;
   showTime?: boolean;
+  /** Bei Tages-Ranking identische Challenge-Punkte — nur Zeit anzeigen. */
+  showPoints?: boolean;
 }
 
 const getRankIcon = (rank: number) => {
@@ -39,6 +42,7 @@ export function RankingPreviewCard({
   users,
   href,
   showTime = false,
+  showPoints = true,
 }: RankingPreviewCardProps) {
   return (
     <div className="pixel-box h-full">
@@ -55,6 +59,7 @@ export function RankingPreviewCard({
       <div className="p-2">
         {users.map((user) => {
           const rankIconComponent = getRankIcon(user.rank);
+          const avatarSrc = avatarImageSrc(user.avatar);
 
           return (
             <div
@@ -75,11 +80,16 @@ export function RankingPreviewCard({
               </div>
 
               <Avatar className="h-8 w-8 rounded-none border-2 border-border">
-                <AvatarImage
-                  src={user.avatar || "/placeholder.svg"}
-                  alt={user.name}
-                />
-                <AvatarFallback className="rounded-none text-xs bg-secondary">
+                {avatarSrc ? (
+                  <AvatarImage src={avatarSrc} alt={user.name} />
+                ) : null}
+                <AvatarFallback
+                  className={cn(
+                    "rounded-none text-[10px] font-sans font-semibold leading-none tracking-tight",
+                    "bg-gradient-to-b from-zinc-600 to-zinc-900 text-zinc-100",
+                    "ring-1 ring-inset ring-white/15",
+                  )}
+                >
                   {user.initials}
                 </AvatarFallback>
               </Avatar>
@@ -103,7 +113,7 @@ export function RankingPreviewCard({
                 )}
               </div>
 
-              <PointsChip points={user.points} size="sm" />
+              {showPoints && <PointsChip points={user.points} size="sm" />}
             </div>
           );
         })}

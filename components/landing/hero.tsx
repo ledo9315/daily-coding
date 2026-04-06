@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Code2, Trophy, Users } from "lucide-react";
+import { Code2, MessagesSquare, Trophy } from "lucide-react";
 import { Meteors } from "../ui/meteors";
 import Image from "next/image";
 import { BorderBeam } from "../ui/border-beam";
@@ -79,8 +79,8 @@ export function LandingHero() {
           variants={itemVariants}
           className="mx-auto max-w-2xl text-xl text-muted-foreground mb-10"
         >
-          Tritt gegen dein Team an, sammle XP und baue deinen Streak auf. Eine
-          tägliche Coding-Challenge, um dich fit zu halten.
+          Tägliche Challenges, XP und Streaks – plus Bestenliste und
+          Community-Feed. So bleibst du dran und siehst deinen Fortschritt.
         </motion.p>
 
         <motion.div
@@ -131,10 +131,10 @@ export function LandingHero() {
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <Users className="h-8 w-8 text-chart-4" />
-            <span className="font-heading text-lg">TEAM-BATTLE</span>
+            <MessagesSquare className="h-8 w-8 text-chart-4" />
+            <span className="font-heading text-lg">COMMUNITY</span>
             <span className="text-muted-foreground text-sm">
-              Miss dich mit Kollegen
+              Feed und Aktivität
             </span>
           </div>
         </motion.div>

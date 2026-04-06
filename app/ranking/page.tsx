@@ -62,7 +62,7 @@ export default function RankingPage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8">
           <h1 className="text-3xl font-pixel uppercase tracking-tight mb-2">
-            Ranking
+            Rangliste
           </h1>
           <EncryptedText
             text="Vergleiche dich mit anderen Entwicklern"
@@ -117,6 +117,7 @@ export default function RankingPage() {
                 </CardHeader>
                 <CardContent>
                   <TopThreePodium
+                    variant="time"
                     first={rankings.today[0]}
                     second={rankings.today[1]}
                     third={rankings.today[2]}
@@ -124,7 +125,7 @@ export default function RankingPage() {
                 </CardContent>
               </Card>
             )}
-            <RankingTable entries={currentRanking} showTime />
+            <RankingTable entries={currentRanking} showTime showPoints={false} />
           </TabsContent>
 
           <TabsContent value="week" className="space-y-8">

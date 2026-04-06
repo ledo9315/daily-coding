@@ -14,8 +14,8 @@ export function LandingFooter() {
             </span>
           </Link>
           <p className="text-sm text-muted-foreground">
-            Tägliche Coding-Challenges für Teams und Einzelpersonen. Optimiere
-            deine Skills.
+            Tägliche Coding-Challenges mit Streaks, Ranking und Community –
+            ideal, um Skills und Routine auszubauen.
           </p>
         </div>
 
@@ -33,8 +33,8 @@ export function LandingFooter() {
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-primary">
-                Teams
+              <Link href="#features" className="hover:text-primary">
+                Community
               </Link>
             </li>
             <li>

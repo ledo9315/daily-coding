@@ -11,7 +11,7 @@ import { ProgressBar } from "@/components/progress-bar";
 import { ChallengeHistory } from "@/components/challenge-history";
 import { MonthlyActivityView } from "@/components/monthly-activity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfileAvatarPicker } from "@/components/profile-avatar-picker";
 import {
   Trophy,
   Bullseye,
@@ -71,12 +71,11 @@ export default async function ProfilePage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border-4 border-zinc-700 rounded-none">
-              <AvatarImage src={profile.avatar} alt={profile.name} />
-              <AvatarFallback className="text-2xl rounded-none">
-                {profile.initials}
-              </AvatarFallback>
-            </Avatar>
+            <ProfileAvatarPicker
+              currentAvatar={profile.avatar}
+              initials={profile.initials}
+              name={profile.name}
+            />
             <div>
               <h1 className="text-2xl font-sans font-bold tracking-widest uppercase">
                 {profile.name}

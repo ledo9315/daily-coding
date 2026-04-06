@@ -342,24 +342,39 @@ describe("runTests", () => {
 
 describe("getCommunityFeed", () => {
   it("calls GET /api/community/feed", async () => {
-    mockOkResponse([]);
+    mockOkResponse({ items: [], nextCursor: null });
     await getCommunityFeed();
     expect(mockFetch).toHaveBeenCalledWith("/api/community/feed", expect.anything());
   });
 
-  it("returns feed items", async () => {
-    const feed = [
-      {
-        id: "f1",
-        user: { name: "Alice", initials: "A", avatar: "🐱", level: 3 },
-        action: "hat die Challenge gelöst",
-        challenge: "FizzBuzz",
-        points: 100,
-        time: "vor 5 Minuten",
-      },
-    ];
-    mockOkResponse(feed);
+  it("returns feed page with items and nextCursor", async () => {
+    const page = {
+      items: [
+        {
+          id: "f1",
+          kind: "challenge-solved" as const,
+          user: { name: "Alice", initials: "A", avatar: "🐱", level: 3 },
+          username: "@alice",
+          action: "hat die Challenge gelöst",
+          challenge: "FizzBuzz",
+          points: 100,
+          time: "vor 5 Minuten",
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      nextCursor: null,
+    };
+    mockOkResponse(page);
     const result = await getCommunityFeed();
-    expect(result).toEqual(feed);
+    expect(result).toEqual(page);
+  });
+
+  it("passes cursor and limit as query string", async () => {
+    mockOkResponse({ items: [], nextCursor: null });
+    await getCommunityFeed({ cursor: "sub-x", limit: 10 });
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/community/feed?cursor=sub-x&limit=10",
+      expect.anything(),
+    );
   });
 });

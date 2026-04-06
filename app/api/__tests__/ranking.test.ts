@@ -3,25 +3,26 @@ import { NextRequest } from "next/server";
 import { GET as getRankingHandler } from "../ranking/route";
 import { GET as getRankingPreviewHandler } from "../ranking/preview/route";
 
-// ─── Prisma mock ─────────────────────────────────────────────────────────────
+const mockGetLiveRanking = vi.fn();
+const mockGetLifetimePointsByUserIds = vi.fn();
 
-const mockRankingFindMany = vi.fn();
-const mockSubmissionFindMany = vi.fn();
+vi.mock("@/lib/server/ranking-live", () => ({
+  getLiveRanking: (...args: unknown[]) => mockGetLiveRanking(...args),
+}));
 
+vi.mock("@/lib/server/user-points", () => ({
+  getLifetimePointsByUserIds: (...args: unknown[]) =>
+    mockGetLifetimePointsByUserIds(...args),
+}));
+
+/** Verhindert Laden von `lib/prisma` (server-only) über `dashboard-data` im Preview-Handler. */
 vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    rankingEntry: {
-      findMany: (...args: unknown[]) => mockRankingFindMany(...args),
-    },
-    submission: {
-      findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
-    },
-  },
+  prisma: {},
 }));
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockSubmissionFindMany.mockResolvedValue([]);
+  mockGetLifetimePointsByUserIds.mockResolvedValue(new Map([["user-1", 0]]));
 });
 
 // ─── /api/ranking ─────────────────────────────────────────────────────────────
@@ -34,141 +35,175 @@ describe("GET /api/ranking", () => {
     return new NextRequest(url);
   }
 
-  const dbEntry = (overrides = {}) => ({
+  const liveRow = (overrides = {}) => ({
     userId: "user-1",
     rank: 1,
-    previousRank: null,
+    user: { id: "user-1", name: "Alice", initials: "AL", avatar: "🐱" },
+    timeSeconds: 222 as number | null,
     points: 500,
-    timeTaken: 222,
-    challengesSolved: 1,
-    user: { name: "Alice", initials: "AL", avatar: "🐱" },
+    challengesSolved: undefined as number | undefined,
     ...overrides,
   });
 
   it("returns 200 with mapped ranking entries for period=today", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([dbEntry()]);
+    mockGetLiveRanking.mockResolvedValueOnce([liveRow()]);
     const res = await getRankingHandler(makeRequest("today"));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toHaveLength(1);
-    expect(json[0]).toMatchObject({ rank: 1, name: "Alice", points: 500, time: "3:42" });
+    expect(json[0]).toMatchObject({
+      rank: 1,
+      name: "Alice",
+      points: 500,
+      time: "3:42",
+    });
     expect(json[0]).toHaveProperty("level", 1);
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
   });
 
   it("defaults to period=today when param is absent", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     const res = await getRankingHandler(makeRequest());
     expect(res.status).toBe(200);
-    expect(mockRankingFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
-    );
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
   });
 
   it("uses period=week when specified", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([
+      liveRow({
+        timeSeconds: null,
+        points: 1200,
+        challengesSolved: 5,
+      }),
+    ]);
     await getRankingHandler(makeRequest("week"));
-    expect(mockRankingFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ period: "week" }) })
-    );
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
   });
 
   it("uses period=month when specified", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("month"));
-    expect(mockRankingFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ period: "month" }) })
-    );
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("month");
   });
 
   it("falls back to today for an invalid period", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("invalid"));
-    expect(mockRankingFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
-    );
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
   });
 
-  it("omits undefined optional fields from the response", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([
-      dbEntry({ previousRank: null, timeTaken: null, challengesSolved: null }),
+  it("omits time for week and month responses", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([
+      liveRow({ timeSeconds: null, challengesSolved: 3 }),
     ]);
+    const resWeek = await getRankingHandler(makeRequest("week"));
+    expect((await resWeek.json())[0]).not.toHaveProperty("time");
+  });
+
+  it("includes challengesSolved for week/month when present", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([
+      liveRow({ timeSeconds: null, challengesSolved: 4, points: 800 }),
+    ]);
+    const res = await getRankingHandler(makeRequest("month"));
+    const row = (await res.json())[0];
+    expect(row.challengesSolved).toBe(4);
+    expect(row).not.toHaveProperty("time");
+  });
+
+  it("formats time for today when timeSeconds is null as '-' via formatTime", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([liveRow({ timeSeconds: null })]);
     const res = await getRankingHandler(makeRequest("today"));
     const json = await res.json();
-    expect(json[0].previousRank).toBeUndefined();
     expect(json[0].time).toBe("-");
-    expect(json[0].challengesSolved).toBeUndefined();
   });
 
-  it("formats timeTaken seconds as M:SS string", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([dbEntry({ timeTaken: 263 })]);
+  it("formats timeSeconds as M:SS for today", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([liveRow({ timeSeconds: 263 })]);
     const res = await getRankingHandler(makeRequest("today"));
     const json = await res.json();
     expect(json[0].time).toBe("4:23");
   });
 
   it("returns empty array when no entries exist", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     const res = await getRankingHandler(makeRequest("month"));
     const json = await res.json();
     expect(json).toEqual([]);
   });
 
   it("does not handle team period (falls back to today)", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("team"));
-    expect(mockRankingFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
-    );
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
   });
 });
 
 // ─── /api/ranking/preview ─────────────────────────────────────────────────────
 
 describe("GET /api/ranking/preview", () => {
-  const previewEntry = () => ({
+  const previewLiveRow = () => ({
     userId: "user-bob",
     rank: 1,
+    user: { id: "user-bob", name: "Bob", initials: "BO", avatar: "🐶" },
+    timeSeconds: 120,
     points: 300,
-    timeTaken: 120,
-    user: { name: "Bob", initials: "BO", avatar: "🐶" },
   });
 
   it("returns 200 with today preview", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([previewEntry()]);
+    mockGetLiveRanking.mockResolvedValueOnce([previewLiveRow()]);
+    mockGetLifetimePointsByUserIds.mockResolvedValueOnce(new Map([["user-bob", 0]]));
     const res = await getRankingPreviewHandler();
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toHaveProperty("today");
     expect(json.today).toHaveLength(1);
-    expect(json.today[0]).toMatchObject({ rank: 1, name: "Bob", points: 300, time: "2:00" });
+    expect(json.today[0]).toMatchObject({
+      rank: 1,
+      name: "Bob",
+      points: 300,
+      time: "2:00",
+    });
     expect(json.today[0]).toHaveProperty("level", 1);
   });
 
   it("does not include a team property", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([previewEntry()]);
+    mockGetLiveRanking.mockResolvedValueOnce([previewLiveRow()]);
     const res = await getRankingPreviewHandler();
     const json = await res.json();
     expect(json).not.toHaveProperty("team");
   });
 
-  it("queries with take: 5", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
-    await getRankingPreviewHandler();
-    expect(mockRankingFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 5 })
-    );
+  it("returns at most 5 entries when more exist", async () => {
+    const six = Array.from({ length: 6 }, (_, i) => ({
+      userId: `u-${i}`,
+      rank: i + 1,
+      user: {
+        id: `u-${i}`,
+        name: `User ${i}`,
+        initials: "U",
+        avatar: "🐱",
+      },
+      timeSeconds: 100 + i,
+      points: 50,
+    }));
+    mockGetLiveRanking.mockResolvedValueOnce(six);
+    mockGetLifetimePointsByUserIds.mockResolvedValue(new Map());
+    const res = await getRankingPreviewHandler();
+    const json = await res.json();
+    expect(json.today).toHaveLength(5);
   });
 
   it("returns empty today array when no entries", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     const res = await getRankingPreviewHandler();
     const json = await res.json();
     expect(json.today).toEqual([]);
   });
 
-  it("queries ranking + optional lifetime points only (no team)", async () => {
-    mockRankingFindMany.mockResolvedValueOnce([]);
+  it("queries live ranking + lifetime points", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingPreviewHandler();
-    expect(mockRankingFindMany).toHaveBeenCalledTimes(1);
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
+    expect(mockGetLifetimePointsByUserIds).toHaveBeenCalled();
   });
 });
