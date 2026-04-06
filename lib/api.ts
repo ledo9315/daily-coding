@@ -84,6 +84,17 @@ export interface ChallengeTestCase {
   time?: string;
 }
 
+/** Zusatzinfos für die Erfolgs-UI nach erfolgreicher Abgabe. */
+export interface SubmitCelebration {
+  timeTakenSeconds: number;
+  streak: number;
+  streakRecord: number;
+  /** Ø Lösezeit (Sek.) aller heutigen Abgaben zu dieser Challenge (UTC-Tag), nur mit timeTaken. */
+  avgSolveTimeTodaySeconds: number | null;
+  /** Anzahl abgeschlossener Abgaben zu dieser Challenge am heutigen UTC-Tag. */
+  completionsToday: number;
+}
+
 export interface DailyChallenge {
   id: string;
   title: string;
@@ -214,6 +225,7 @@ export function submitSolution(
     language?: CodeLanguageId;
     /** Ob Laufzeit/Kompilierung (Piston) erfolgreich war; bei Stub immer true. */
     runtimeOk?: boolean;
+    celebration?: SubmitCelebration;
   }> {
   const body: Record<string, unknown> = { code, language };
   if (typeof solveDurationSeconds === "number" && Number.isFinite(solveDurationSeconds)) {

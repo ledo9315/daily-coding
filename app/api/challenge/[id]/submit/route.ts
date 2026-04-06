@@ -113,24 +113,64 @@ export async function POST(
     },
   });
 
+  let celebration:
+    | {
+        timeTakenSeconds: number;
+        streak: number;
+        streakRecord: number;
+        avgSolveTimeTodaySeconds: number | null;
+        completionsToday: number;
+      }
+    | undefined;
+
   if (runtimeOk) {
     const newStreak = await computeConsecutiveStreakDays(userId);
     const u = await prisma.user.findUnique({
       where: { id: userId },
       select: { streakRecord: true },
     });
-    await prisma.user.update({
+    const updated = await prisma.user.update({
       where: { id: userId },
       data: {
         streak: newStreak,
         streakRecord: Math.max(u?.streakRecord ?? 0, newStreak),
       },
+      select: { streak: true, streakRecord: true },
     });
+
+    const [avgAgg, completionsToday] = await Promise.all([
+      prisma.submission.aggregate({
+        where: {
+          challengeId,
+          status: "completed",
+          createdAt: { gte: dayStart, lt: dayEnd },
+          timeTaken: { not: null },
+        },
+        _avg: { timeTaken: true },
+      }),
+      prisma.submission.count({
+        where: {
+          challengeId,
+          status: "completed",
+          createdAt: { gte: dayStart, lt: dayEnd },
+        },
+      }),
+    ]);
+
+    const avg = avgAgg._avg.timeTaken;
+    celebration = {
+      timeTakenSeconds: timeTakenSeconds ?? 0,
+      streak: updated.streak,
+      streakRecord: updated.streakRecord,
+      avgSolveTimeTodaySeconds: avg != null ? Math.round(avg) : null,
+      completionsToday,
+    };
   }
 
   return NextResponse.json({
     success: runtimeOk,
     testCases: testResults,
     language,
+    ...(celebration ? { celebration } : {}),
   });
 }

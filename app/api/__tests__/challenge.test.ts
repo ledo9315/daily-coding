@@ -24,6 +24,8 @@ const mockUserFindUnique = vi.fn();
 const mockUserUpdate = vi.fn();
 const mockSubmissionFindFirst = vi.fn();
 const mockSubmissionFindMany = vi.fn();
+const mockSubmissionAggregate = vi.fn();
+const mockSubmissionCount = vi.fn();
 const mockCreate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -40,6 +42,8 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
       create: (...args: unknown[]) => mockCreate(...args),
+      aggregate: (...args: unknown[]) => mockSubmissionAggregate(...args),
+      count: (...args: unknown[]) => mockSubmissionCount(...args),
     },
   },
 }));
@@ -49,7 +53,9 @@ beforeEach(() => {
   mockUserFindUnique.mockResolvedValue({ id: "user-test", streakRecord: 0 });
   mockSubmissionFindFirst.mockResolvedValue(null);
   mockSubmissionFindMany.mockResolvedValue([{ createdAt: new Date() }]);
-  mockUserUpdate.mockResolvedValue({});
+  mockSubmissionAggregate.mockResolvedValue({ _avg: { timeTaken: 80 } });
+  mockSubmissionCount.mockResolvedValue(3);
+  mockUserUpdate.mockResolvedValue({ streak: 1, streakRecord: 1 });
   mockAuth.mockResolvedValue(null);
 });
 
@@ -427,5 +433,25 @@ describe("POST /api/challenge/[id]/submit", () => {
     const json = await res.json();
     const statuses = json.testCases.map((tc: { status: string }) => tc.status);
     expect(statuses.every((s: string) => s === "passed")).toBe(true);
+  });
+
+  it("returns celebration payload with streak and community stats on success", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockCreate.mockResolvedValueOnce({});
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.celebration).toBeDefined();
+    expect(json.celebration).toMatchObject({
+      streak: 1,
+      streakRecord: 1,
+      completionsToday: 3,
+      avgSolveTimeTodaySeconds: 80,
+    });
+    expect(typeof json.celebration.timeTakenSeconds).toBe("number");
+    expect(mockSubmissionAggregate).toHaveBeenCalled();
+    expect(mockSubmissionCount).toHaveBeenCalled();
   });
 });
