@@ -6,7 +6,7 @@ export async function GET() {
   const today = new Date("2026-04-05");
 
   const todayEntries = await prisma.rankingEntry.findMany({
-    where: { period: "today", periodDate: today, userId: { not: null } },
+    where: { period: "today", periodDate: today },
     orderBy: { rank: "asc" },
     take: 5,
     include: { user: true },

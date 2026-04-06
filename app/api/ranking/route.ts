@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     : "today";
 
   const entries = await prisma.rankingEntry.findMany({
-    where: { period: selectedPeriod, periodDate: today, userId: { not: null } },
+    where: { period: selectedPeriod, periodDate: today },
     orderBy: { rank: "asc" },
     include: { user: true },
   });
