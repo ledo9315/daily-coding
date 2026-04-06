@@ -97,6 +97,7 @@ describe("authorizeCredentials", () => {
       name: "Max",
       avatar: "/avatar.png",
       passwordHash: "hashed",
+      role: "user",
     });
     mockCompare.mockResolvedValueOnce(true);
     const result = await authorizeCredentials({
@@ -108,6 +109,7 @@ describe("authorizeCredentials", () => {
       name: "Max",
       email: "max@example.com",
       image: "/avatar.png",
+      role: "user",
     });
   });
 });

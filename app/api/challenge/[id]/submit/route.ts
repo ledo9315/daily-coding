@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
 import { runChallengeTests } from "@/lib/server/challenge-execution";
+import { startOfUtcDay } from "@/lib/server/ranking-period";
 
 export async function POST(
   request: NextRequest,
@@ -44,6 +45,29 @@ export async function POST(
     return NextResponse.json(
       { error: "Ungültige oder nicht unterstützte Sprache für diese Challenge." },
       { status: 400 }
+    );
+  }
+
+  const dayStart = startOfUtcDay(new Date());
+  const dayEnd = new Date(dayStart);
+  dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+  const alreadyToday = await prisma.submission.findFirst({
+    where: {
+      userId,
+      challengeId,
+      createdAt: { gte: dayStart, lt: dayEnd },
+    },
+    select: { id: true },
+  });
+
+  if (alreadyToday) {
+    return NextResponse.json(
+      {
+        error:
+          "Du hast diese Challenge heute (UTC) bereits abgegeben. Eine erneute Abgabe ist erst morgen möglich.",
+      },
+      { status: 409 },
     );
   }
 

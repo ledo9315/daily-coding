@@ -49,10 +49,13 @@ export default function ChallengePage() {
   const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
   const [language, setLanguage] = useState<CodeLanguageId | null>(null);
   const [sources, setSources] = useState<Partial<Record<CodeLanguageId, string>>>({});
-  /** none = noch offen; success = eingereicht und Tests ok; failed = eingereicht, Tests nicht ok */
-  const [submitOutcome, setSubmitOutcome] = useState<"none" | "success" | "failed">(
-    "none"
-  );
+  /**
+   * none = noch offen; success = eingereicht und Tests ok; failed = eingereicht, Tests nicht ok;
+   * pending = Submission noch ausstehend (selten).
+   */
+  const [submitOutcome, setSubmitOutcome] = useState<
+    "none" | "success" | "failed" | "pending"
+  >("none");
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +72,21 @@ export default function ChallengePage() {
         setTestCases(data.testCases as TestCase[]);
         setLanguage(data.defaultLanguage);
         setSources({ ...data.starterCodes });
+        if (data.todaySubmission) {
+          const { status, submittedAt } = data.todaySubmission;
+          if (status === "completed") setSubmitOutcome("success");
+          else if (status === "failed") setSubmitOutcome("failed");
+          else setSubmitOutcome("pending");
+          setSubmittedAtLabel(
+            new Date(submittedAt).toLocaleTimeString("de-DE", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          );
+        } else {
+          setSubmitOutcome("none");
+          setSubmittedAtLabel(undefined);
+        }
       })
       .catch((e) => {
         setChallenge(null);
@@ -192,7 +210,7 @@ export default function ChallengePage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl font-pixel uppercase tracking-tight">
                 {challenge.title}
               </h1>
@@ -210,6 +228,16 @@ export default function ChallengePage() {
             <CountdownTimer />
           </div>
         </div>
+
+        {isSubmitLocked ? (
+          <p
+            className="mb-6 text-sm text-muted-foreground border-l-2 border-primary/60 pl-3 py-1 max-w-2xl"
+            role="status"
+          >
+            Du hast für diese Daily Challenge heute (UTC) bereits eine Lösung abgegeben. Testen
+            und erneutes Einreichen sind bis morgen (UTC) nicht möglich.
+          </p>
+        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="space-y-6">
@@ -271,7 +299,7 @@ export default function ChallengePage() {
                     >
                       <SelectTrigger
                         size="sm"
-                        className="rounded-none w-[180px] font-sans"
+                        className="rounded-none w-[180px] font-sans disabled:opacity-40"
                       >
                         <SelectValue placeholder="Sprache" />
                       </SelectTrigger>
@@ -288,7 +316,7 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || isSubmitLocked || !language}
-                    className="gap-2 bg-transparent rounded-none cursor-pointer"
+                    className="gap-2 bg-transparent rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />
                     {isRunning ? "Läuft..." : "Test ausführen"}
@@ -315,7 +343,9 @@ export default function ChallengePage() {
                   ? "submitted"
                   : submitOutcome === "failed"
                     ? "failed"
-                    : "not-submitted"
+                    : submitOutcome === "pending"
+                      ? "pending"
+                      : "not-submitted"
               }
               submittedAt={submittedAtLabel}
             />
@@ -330,15 +360,15 @@ export default function ChallengePage() {
                   Achtung
                 </AlertTitle>
                 <AlertDescription className="text-sm">
-                  Du kannst deine Lösung nur einmal final abgeben. Stelle
-                  sicher, dass alle Tests bestanden sind.
+                  Pro Kalendertag (UTC) kannst du nur eine finale Abgabe machen. Stelle
+                  sicher, dass alle Tests bestanden sind, bevor du einreichst.
                 </AlertDescription>
               </Alert>
             )}
 
             <Button
               size="lg"
-              className="w-full gap-2 cursor-pointer rounded-none"
+              className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={handleSubmit}
               disabled={isSubmitLocked || !language || isSubmitting}
             >

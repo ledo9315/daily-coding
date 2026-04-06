@@ -78,4 +78,12 @@ describe("middleware", () => {
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("callbackUrl=%2Fchallenge");
   });
+
+  it("allows /admin when token exists (Admin-Rechte prüft die App per DB)", async () => {
+    mockGetToken.mockResolvedValueOnce({ sub: "u1", role: "user" });
+    const res = await middleware(
+      req("http://localhost:3000/admin/challenges/new"),
+    );
+    expect(res.headers.get("location")).toBeNull();
+  });
 });

@@ -11,11 +11,17 @@ vi.mock("@/lib/auth-session", () => ({
   getSessionUserId: vi.fn().mockResolvedValue({ userId: "user-test" }),
 }));
 
+const mockAuth = vi.fn();
+vi.mock("@/auth", () => ({
+  auth: () => mockAuth(),
+}));
+
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindFirst = vi.fn();
 const mockFindUniqueChallenge = vi.fn();
 const mockUserFindUnique = vi.fn();
+const mockSubmissionFindFirst = vi.fn();
 const mockCreate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -28,6 +34,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: (...args: unknown[]) => mockFindUniqueChallenge(...args),
     },
     submission: {
+      findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
       create: (...args: unknown[]) => mockCreate(...args),
     },
   },
@@ -36,6 +43,8 @@ vi.mock("@/lib/prisma", () => ({
 beforeEach(() => {
   vi.clearAllMocks();
   mockUserFindUnique.mockResolvedValue({ id: "user-test" });
+  mockSubmissionFindFirst.mockResolvedValue(null);
+  mockAuth.mockResolvedValue(null);
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -78,6 +87,7 @@ describe("GET /api/challenge/daily", () => {
       hint: "Use a hash map",
       defaultLanguage: "javascript",
       supportedLanguages: ["javascript", "typescript", "python"],
+      todaySubmission: null,
     });
     expect(json.starterCodes).toMatchObject({
       javascript: "function twoSum(nums, target) {}",
@@ -124,6 +134,54 @@ describe("GET /api/challenge/daily", () => {
       orderBy: { date: "desc" },
       include: { category: true },
     });
+  });
+
+  it("does not query submissions when unauthenticated", async () => {
+    mockAuth.mockResolvedValueOnce(null);
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    await getDailyHandler();
+    expect(mockSubmissionFindFirst).not.toHaveBeenCalled();
+  });
+
+  it("returns todaySubmission when logged-in user already submitted today", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test", email: "t@test.com" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockSubmissionFindFirst.mockResolvedValueOnce({
+      status: "completed",
+      createdAt: new Date("2026-04-06T15:00:00.000Z"),
+    });
+    const res = await getDailyHandler();
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.todaySubmission).toEqual({
+      status: "completed",
+      submittedAt: "2026-04-06T15:00:00.000Z",
+    });
+  });
+
+  it("returns failed todaySubmission when last submission failed", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockSubmissionFindFirst.mockResolvedValueOnce({
+      status: "failed",
+      createdAt: new Date("2026-04-06T12:30:00.000Z"),
+    });
+    const res = await getDailyHandler();
+    const json = await res.json();
+    expect(json.todaySubmission).toEqual({
+      status: "failed",
+      submittedAt: "2026-04-06T12:30:00.000Z",
+    });
+  });
+
+  it("returns todaySubmission null when authenticated but no submission today", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockSubmissionFindFirst.mockResolvedValueOnce(null);
+    const res = await getDailyHandler();
+    const json = await res.json();
+    expect(json.todaySubmission).toBeNull();
+    expect(mockSubmissionFindFirst).toHaveBeenCalled();
   });
 });
 
@@ -273,6 +331,18 @@ describe("POST /api/challenge/[id]/submit", () => {
       params: Promise.resolve({ id: "ch-1" }),
     });
     expect(res.status).toBe(401);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("returns 409 when already submitted today (UTC)", async () => {
+    mockSubmissionFindFirst.mockResolvedValueOnce({ id: "existing-sub" });
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(409);
+    const json = await res.json();
+    expect(json.error).toMatch(/heute \(UTC\) bereits/);
     expect(mockCreate).not.toHaveBeenCalled();
   });
 

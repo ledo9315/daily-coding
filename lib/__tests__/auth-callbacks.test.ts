@@ -8,9 +8,10 @@ describe("authJwtCallback", () => {
     const token = {} as JWT;
     const out = authJwtCallback({
       token,
-      user: { id: "uid-1", name: "N", email: "e@e.de" },
+      user: { id: "uid-1", name: "N", email: "e@e.de", role: "admin" },
     });
     expect(out.id).toBe("uid-1");
+    expect(out.role).toBe("admin");
   });
 
   it("returns token unchanged when user is absent", () => {
@@ -24,19 +25,21 @@ describe("authJwtCallback", () => {
 describe("authSessionCallback", () => {
   it("sets session.user.id from token.id", () => {
     const session = {
-      user: { name: "N", email: "e@e.de", image: null },
+      user: { name: "N", email: "e@e.de", image: null, role: "user" as const },
     } as Session;
-    const token = { id: "jwt-user" } as JWT;
+    const token = { id: "jwt-user", role: "admin" } as JWT;
     const out = authSessionCallback({ session, token });
     expect(out.user.id).toBe("jwt-user");
+    expect(out.user.role).toBe("admin");
   });
 
   it("leaves session user id unset when token has no id", () => {
     const session = {
-      user: { name: "N", email: "e@e.de", id: "old" },
+      user: { name: "N", email: "e@e.de", id: "old", role: "user" as const },
     } as Session;
     const token = {} as JWT;
     const out = authSessionCallback({ session, token });
     expect(out.user.id).toBe("old");
+    expect(out.user.role).toBe("user");
   });
 });

@@ -56,11 +56,13 @@ export function Header() {
   const { data: session, status } = useSession();
   const [streak, setStreak] = useState<number | null>(null);
   const [level, setLevel] = useState<number | null>(null);
+  const [isAdminFromDb, setIsAdminFromDb] = useState(false);
 
   useEffect(() => {
     if (status !== "authenticated") {
       setStreak(null);
       setLevel(null);
+      setIsAdminFromDb(false);
       return;
     }
     let cancelled = false;
@@ -70,6 +72,13 @@ export function Header() {
         if (cancelled || !data) return;
         if (typeof data.streak === "number") setStreak(data.streak);
         if (typeof data.level === "number") setLevel(data.level);
+      })
+      .catch(() => {});
+    fetch("/api/user/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { role?: string } | null) => {
+        if (cancelled || !data) return;
+        setIsAdminFromDb(data.role === "admin");
       })
       .catch(() => {});
     return () => {
@@ -179,6 +188,17 @@ export function Header() {
                       PROFIL
                     </Link>
                   </DropdownMenuItem>
+                  {isAdminFromDb && (
+                    <DropdownMenuItem asChild className="rounded-none text-lg">
+                      <Link
+                        href="/admin/challenges"
+                        className="cursor-pointer text-primary"
+                      >
+                        <Tournament className="mr-2 h-5 w-5" />
+                        ADMIN: CHALLENGES
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild className="rounded-none text-lg">
                     <Link href="/settings" className="cursor-pointer">
                       <Sliders className="mr-2 h-5 w-5" />

@@ -34,8 +34,29 @@ async function main() {
 
   const devPassword = process.env.SEED_DEV_PASSWORD ?? "DailyDev2024!";
   const devPasswordHash = await bcrypt.hash(devPassword, 12);
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? devPassword;
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
 
   // ─── Users ───────────────────────────────────────────────────────────────────
+
+  await prisma.user.upsert({
+    where: { email: "admin@dailydev.local" },
+    update: {
+      passwordHash: adminPasswordHash,
+      role: "admin",
+    },
+    create: {
+      id: "user-admin",
+      name: "Admin",
+      initials: "AD",
+      avatar: "/user/minipix5.png",
+      email: "admin@dailydev.local",
+      passwordHash: adminPasswordHash,
+      role: "admin",
+      streak: 0,
+      streakRecord: 0,
+    },
+  });
 
   const anna = await prisma.user.upsert({
     where: { email: "anna.schmidt@company.com" },

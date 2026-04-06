@@ -33,10 +33,12 @@ function mockOkResponse(data: unknown) {
   });
 }
 
-function mockErrorResponse(status: number) {
+function mockErrorResponse(status: number, body?: Record<string, unknown>) {
+  const raw = body !== undefined ? JSON.stringify(body) : "{}";
   mockFetch.mockResolvedValueOnce({
     ok: false,
     status,
+    text: async () => raw,
   });
 }
 
@@ -86,6 +88,15 @@ describe("apiFetch error handling", () => {
   it("includes the path in the error message", async () => {
     mockErrorResponse(404);
     await expect(getRanking("today")).rejects.toThrow("/api/ranking");
+  });
+
+  it("uses server JSON `error` string when present", async () => {
+    mockErrorResponse(409, {
+      error: "Already submitted today (UTC).",
+    });
+    await expect(submitSolution("ch-1", "code", "javascript")).rejects.toThrow(
+      "Already submitted today (UTC)."
+    );
   });
 });
 
@@ -243,6 +254,7 @@ describe("getDailyChallenge", () => {
         python: "def fizz_buzz(n):\n    pass",
       },
       starterCode: "function fizzBuzz(n) {}",
+      todaySubmission: null,
     };
     mockOkResponse(challenge);
     const result = await getDailyChallenge();

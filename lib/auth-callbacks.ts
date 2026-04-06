@@ -13,6 +13,10 @@ export function authJwtCallback({
 }): JWT {
   if (user) {
     token.id = user.id;
+    const u = user as { role?: string };
+    if (typeof u.role === "string") {
+      token.role = u.role;
+    }
   }
   return token;
 }
@@ -30,5 +34,9 @@ export function authSessionCallback({
   if (token.id) {
     session.user.id = token.id as string;
   }
+  session.user.role =
+    typeof token.role === "string" && (token.role === "admin" || token.role === "user")
+      ? token.role
+      : "user";
   return session;
 }
