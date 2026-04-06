@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
+import {
+  normalizeStarterCodes,
+  normalizeSupportedLanguages,
+} from "@/lib/challenge-languages";
+import { stripTestCaseSecretsForClient } from "@/lib/server/public-challenge";
 
 export async function GET() {
   const challenge = await findDailyChallengeForApp();
@@ -7,6 +12,16 @@ export async function GET() {
   if (!challenge) {
     return NextResponse.json({ error: "No active challenge" }, { status: 404 });
   }
+
+  const supportedLanguages = normalizeSupportedLanguages(
+    challenge.supportedLanguages as unknown as string[]
+  );
+  const starterCodes = normalizeStarterCodes(
+    challenge.starterCodes,
+    supportedLanguages,
+    challenge.starterCode
+  );
+  const defaultLanguage = supportedLanguages[0];
 
   return NextResponse.json({
     id: challenge.id,
@@ -17,7 +32,11 @@ export async function GET() {
     category: challenge.category.name,
     hint: challenge.hint ?? "",
     examples: challenge.examples,
-    testCases: challenge.testCases,
-    starterCode: challenge.starterCode ?? "",
+    testCases: stripTestCaseSecretsForClient(challenge.testCases),
+    supportedLanguages,
+    defaultLanguage,
+    starterCodes,
+    /** @deprecated Use starterCodes + defaultLanguage */
+    starterCode: starterCodes[defaultLanguage] ?? "",
   });
 }

@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
 import { StatsCard } from "@/components/stats-card";
+import type { CSSProperties } from "react";
 import { Zap, Bullseye, Trophy } from "@nsmr/pixelart-react";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import {
@@ -24,6 +25,9 @@ export default async function DashboardPage() {
     getTodayChallengeSummary(),
     getUserStatsData(userId),
   ]);
+  if (!userStats) {
+    redirect("/api/auth/signout?callbackUrl=/login");
+  }
   if (!todayChallenge) notFound();
 
   return (
@@ -65,7 +69,14 @@ export default async function DashboardPage() {
           />
         </div>
 
-        <div className="mb-8" style={{ "--primary": "var(--chart-5)" } as any}>
+        <div
+          className="mb-8"
+          style={
+            { "--primary": "var(--chart-5)" } as CSSProperties & {
+              "--primary": string;
+            }
+          }
+        >
           <TodaysChallengeCard
             title={todayChallenge.title}
             description={todayChallenge.description}

@@ -22,7 +22,6 @@ import {
   Clock,
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { getUserProfileData } from "@/lib/server/profile-data";
 import type { Achievement } from "@/lib/api";
 
@@ -43,6 +42,9 @@ export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
   const profile = await getUserProfileData(session.user.id);
+  if (!profile) {
+    redirect("/api/auth/signout?callbackUrl=/login");
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">

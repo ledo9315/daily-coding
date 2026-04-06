@@ -1,5 +1,9 @@
 // API abstraction layer for daily coding challenge platform
 
+import type { CodeLanguageId, StarterCodesMap } from "@/lib/challenge-languages";
+
+export type { CodeLanguageId, StarterCodesMap };
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface RankingEntry {
@@ -86,6 +90,13 @@ export interface DailyChallenge {
   hint: string;
   examples: Array<{ input: string; output: string }>;
   testCases: ChallengeTestCase[];
+  /** Languages accepted for this challenge (run + submit). */
+  supportedLanguages: CodeLanguageId[];
+  /** Suggested starting language from API. */
+  defaultLanguage: CodeLanguageId;
+  /** Starter template per language. */
+  starterCodes: StarterCodesMap;
+  /** Single-string fallback (same as starterCodes[defaultLanguage]). */
   starterCode: string;
 }
 
@@ -171,21 +182,34 @@ export function getDailyChallenge(): Promise<DailyChallenge> {
 
 export function submitSolution(
   challengeId: string,
-  code: string
-): Promise<{ success: boolean; testCases: ChallengeTestCase[] }> {
+  code: string,
+  language: CodeLanguageId
+): Promise<{
+    success: boolean;
+    testCases: ChallengeTestCase[];
+    language?: CodeLanguageId;
+    /** Ob Laufzeit/Kompilierung (Piston) erfolgreich war; bei Stub immer true. */
+    runtimeOk?: boolean;
+  }> {
   return apiFetch(`/api/challenge/${challengeId}/submit`, {
     method: "POST",
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, language }),
   });
 }
 
 export function runTests(
   challengeId: string,
-  code: string
-): Promise<{ testCases: ChallengeTestCase[] }> {
+  code: string,
+  language: CodeLanguageId
+): Promise<{
+    testCases: ChallengeTestCase[];
+    language?: CodeLanguageId;
+    /** Ob Laufzeit/Kompilierung erfolgreich; bei Stub immer true. */
+    runtimeOk?: boolean;
+  }> {
   return apiFetch(`/api/challenge/${challengeId}/run`, {
     method: "POST",
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, language }),
   });
 }
 

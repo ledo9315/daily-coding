@@ -21,5 +21,18 @@ export default tseslint.config(
       "no-unused-vars": "off",
       "prefer-const": "warn",
     },
+  },
+  {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        AbortSignal: "readonly",
+        console: "readonly",
+        fetch: "readonly",
+        process: "readonly",
+      },
+    },
   }
 );

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { FlickeringGrid } from "../ui/flickering-grid";
 import { motion } from "framer-motion";
 
 export function LandingCTA() {

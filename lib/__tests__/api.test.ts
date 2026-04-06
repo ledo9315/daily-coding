@@ -235,6 +235,13 @@ describe("getDailyChallenge", () => {
       hint: "Use modulo",
       examples: [{ input: "15", output: "FizzBuzz" }],
       testCases: [],
+      supportedLanguages: ["javascript", "typescript", "python"] as const,
+      defaultLanguage: "javascript" as const,
+      starterCodes: {
+        javascript: "function fizzBuzz(n) {}",
+        typescript: "function fizzBuzz(n: number): string[] {}",
+        python: "def fizz_buzz(n):\n    pass",
+      },
       starterCode: "function fizzBuzz(n) {}",
     };
     mockOkResponse(challenge);
@@ -246,14 +253,17 @@ describe("getDailyChallenge", () => {
 // ─── submitSolution ───────────────────────────────────────────────────────────
 
 describe("submitSolution", () => {
-  it("calls POST /api/challenge/:id/submit with code in body", async () => {
+  it("calls POST /api/challenge/:id/submit with code and language in body", async () => {
     mockOkResponse({ success: true, testCases: [] });
-    await submitSolution("ch-1", "function solve() {}");
+    await submitSolution("ch-1", "function solve() {}", "javascript");
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/challenge/ch-1/submit",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ code: "function solve() {}" }),
+        body: JSON.stringify({
+          code: "function solve() {}",
+          language: "javascript",
+        }),
       })
     );
   });
@@ -261,27 +271,30 @@ describe("submitSolution", () => {
   it("returns success and test cases", async () => {
     const response = { success: true, testCases: [{ id: 1, name: "T1", status: "passed" as const }] };
     mockOkResponse(response);
-    const result = await submitSolution("ch-1", "code");
+    const result = await submitSolution("ch-1", "code", "python");
     expect(result).toEqual(response);
   });
 
   it("propagates API errors", async () => {
     mockErrorResponse(404);
-    await expect(submitSolution("nonexistent", "code")).rejects.toThrow("API error 404");
+    await expect(submitSolution("nonexistent", "code", "javascript")).rejects.toThrow("API error 404");
   });
 });
 
 // ─── runTests ─────────────────────────────────────────────────────────────────
 
 describe("runTests", () => {
-  it("calls POST /api/challenge/:id/run with code in body", async () => {
+  it("calls POST /api/challenge/:id/run with code and language in body", async () => {
     mockOkResponse({ testCases: [] });
-    await runTests("ch-2", "console.log('hi')");
+    await runTests("ch-2", "console.log('hi')", "typescript");
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/challenge/ch-2/run",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ code: "console.log('hi')" }),
+        body: JSON.stringify({
+          code: "console.log('hi')",
+          language: "typescript",
+        }),
       })
     );
   });
@@ -289,7 +302,7 @@ describe("runTests", () => {
   it("returns test cases", async () => {
     const response = { testCases: [{ id: 1, name: "T1", status: "passed" as const, time: "5ms" }] };
     mockOkResponse(response);
-    const result = await runTests("ch-2", "code");
+    const result = await runTests("ch-2", "code", "javascript");
     expect(result).toEqual(response);
   });
 });

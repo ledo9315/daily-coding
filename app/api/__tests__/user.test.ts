@@ -10,18 +10,18 @@ vi.mock("@/lib/auth-session", () => ({
 
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
-const mockFindUniqueOrThrow = vi.fn();
-const mockFindUnique = vi.fn();
+const mockUserFindUnique = vi.fn();
+const mockRankingFindUnique = vi.fn();
 const mockSubmissionFindMany = vi.fn();
 const mockUserAchievementCount = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findUniqueOrThrow: (...args: unknown[]) => mockFindUniqueOrThrow(...args),
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
     },
     rankingEntry: {
-      findUnique: (...args: unknown[]) => mockFindUnique(...args),
+      findUnique: (...args: unknown[]) => mockRankingFindUnique(...args),
     },
     submission: {
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
@@ -55,9 +55,17 @@ const baseUser = {
 // ─── /api/user/stats ──────────────────────────────────────────────────────────
 
 describe("GET /api/user/stats", () => {
+  it("returns 401 when user id is not in database", async () => {
+    mockUserFindUnique.mockResolvedValueOnce(null);
+    const res = await getUserStatsHandler();
+    expect(res.status).toBe(401);
+    const json = await res.json();
+    expect(json).toHaveProperty("error");
+  });
+
   it("returns 200 with user stats", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce({ rank: 2 });
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce({ rank: 2 });
     mockSubmissionFindMany.mockResolvedValueOnce([
       { challenge: { points: 100 } },
       { challenge: { points: 150 } },
@@ -79,24 +87,24 @@ describe("GET /api/user/stats", () => {
   });
 
   it("includes rank from today's ranking entry", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce({ rank: 3 });
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce({ rank: 3 });
     const res = await getUserStatsHandler();
     const json = await res.json();
     expect(json.rank).toBe("#3");
   });
 
   it("returns #- rank when no ranking entry exists for today", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserStatsHandler();
     const json = await res.json();
     expect(json.rank).toBe("#-");
   });
 
   it("calculates points from completed submissions and formats with de-DE locale", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([
       { challenge: { points: 1000 } },
       { challenge: { points: 500 } },
@@ -107,8 +115,8 @@ describe("GET /api/user/stats", () => {
   });
 
   it("returns totalSolved equal to number of completed submissions", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([
       { challenge: { points: 100 } },
       { challenge: { points: 100 } },
@@ -120,8 +128,8 @@ describe("GET /api/user/stats", () => {
   });
 
   it("returns points=0 and totalSolved=0 when no submissions", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([]);
     const res = await getUserStatsHandler();
     const json = await res.json();
@@ -130,33 +138,40 @@ describe("GET /api/user/stats", () => {
   });
 
   it("always returns badgesTotal=6", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserStatsHandler();
     const json = await res.json();
     expect(json.badgesTotal).toBe(6);
   });
 
   it("does not include teamRank or teamName in response", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserStatsHandler();
     const json = await res.json();
     expect(json).not.toHaveProperty("teamRank");
     expect(json).not.toHaveProperty("teamName");
   });
 
-  it("only calls findUnique once (for ranking, no team query)", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce(baseUser);
-    mockFindUnique.mockResolvedValueOnce(null);
+  it("loads user then ranking (one user + one ranking query)", async () => {
+    mockUserFindUnique.mockResolvedValueOnce(baseUser);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     await getUserStatsHandler();
-    expect(mockFindUnique).toHaveBeenCalledTimes(1);
+    expect(mockUserFindUnique).toHaveBeenCalledTimes(1);
+    expect(mockRankingFindUnique).toHaveBeenCalledTimes(1);
   });
 });
 
 // ─── /api/user/profile ───────────────────────────────────────────────────────
 
 describe("GET /api/user/profile", () => {
+  it("returns 401 when user id is not in database", async () => {
+    mockUserFindUnique.mockResolvedValueOnce(null);
+    const res = await getUserProfileHandler();
+    expect(res.status).toBe(401);
+  });
+
   const submission = {
     id: "sub-1",
     status: "completed",
@@ -186,8 +201,8 @@ describe("GET /api/user/profile", () => {
   };
 
   it("returns 200 with user profile", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -198,16 +213,16 @@ describe("GET /api/user/profile", () => {
   });
 
   it("uppercases the user name", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.name).toBe("MAX MUSTERMANN");
   });
 
   it("does not include team in response", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json).not.toHaveProperty("team");
@@ -216,8 +231,8 @@ describe("GET /api/user/profile", () => {
   });
 
   it("maps achievement fields correctly", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [achievement], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [achievement], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.achievements).toHaveLength(1);
@@ -231,8 +246,8 @@ describe("GET /api/user/profile", () => {
   });
 
   it("maps submission history correctly", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [submission] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [submission] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.challengeHistory).toHaveLength(1);
@@ -246,40 +261,40 @@ describe("GET /api/user/profile", () => {
   });
 
   it("formats timeTaken as M:SS string", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({
+    mockUserFindUnique.mockResolvedValueOnce({
       ...baseUser,
       achievements: [],
       submissions: [{ ...submission, timeTaken: 185 }],
     });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.challengeHistory[0].time).toBe("3:05");
   });
 
   it("formats null timeTaken as '-'", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({
+    mockUserFindUnique.mockResolvedValueOnce({
       ...baseUser,
       achievements: [],
       submissions: [{ ...submission, timeTaken: null }],
     });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.challengeHistory[0].time).toBe("-");
   });
 
   it("returns #- rank in stats when no today ranking entry", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.stats.rank).toBe("#-");
   });
 
   it("calculates points and totalSolved live from submissions", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     mockSubmissionFindMany.mockResolvedValueOnce([
       { challenge: { points: 150 } },
       { challenge: { points: 100 } },
@@ -291,8 +306,8 @@ describe("GET /api/user/profile", () => {
   });
 
   it("calculates badges live from unlocked achievements", async () => {
-    mockFindUniqueOrThrow.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
-    mockFindUnique.mockResolvedValueOnce(null);
+    mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
+    mockRankingFindUnique.mockResolvedValueOnce(null);
     mockUserAchievementCount.mockResolvedValueOnce(4);
     const res = await getUserProfileHandler();
     const json = await res.json();

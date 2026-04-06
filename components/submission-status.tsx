@@ -1,7 +1,7 @@
 import { CheckboxOn, Clock, WarningBox } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
-type Status = "not-submitted" | "submitted" | "pending";
+type Status = "not-submitted" | "submitted" | "pending" | "failed";
 
 interface SubmissionStatusProps {
   status: Status;
@@ -36,6 +36,12 @@ const statusConfig: Record<
     description: "Deine Lösung wird gerade überprüft",
     className: "border-amber-500/30 bg-amber-500/10 text-amber-500",
   },
+  failed: {
+    icon: WarningBox,
+    label: "Abgabe nicht bestanden",
+    description: "Die Tests waren nicht vollständig erfolgreich",
+    className: "border-destructive/40 bg-destructive/10 text-destructive",
+  },
 };
 
 export function SubmissionStatus({
@@ -44,7 +50,7 @@ export function SubmissionStatus({
   className,
 }: SubmissionStatusProps) {
   const config = statusConfig[status];
-  const StatusIcon = config.icon;
+  const Icon = config.icon;
 
   return (
     <div
@@ -54,6 +60,7 @@ export function SubmissionStatus({
         className,
       )}
     >
+      <Icon className="h-8 w-8 shrink-0 text-current opacity-90" aria-hidden />
       <div>
         <p className="font-medium">{config.label}</p>
         <p className="text-sm opacity-80">

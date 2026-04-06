@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { CodeLanguage } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
-import type { ChallengeTestCase } from "@/lib/api";
+import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
+import { runChallengeTests } from "@/lib/server/challenge-execution";
 
 export async function POST(
   request: NextRequest,
@@ -11,32 +13,61 @@ export async function POST(
   if (result.error) return result.error;
   const { userId } = result;
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+  if (!dbUser) {
+    return NextResponse.json(
+      {
+        error:
+          "Dein Login passt nicht zur Datenbank (z. B. nach migrate/seed). Bitte abmelden und erneut anmelden.",
+      },
+      { status: 401 }
+    );
+  }
+
   const { id: challengeId } = await params;
-  const body = await request.json();
-  const code: string = body.code ?? "";
+  const body = await request.json().catch(() => ({}));
+  const code: string = typeof body.code === "string" ? body.code : "";
 
   const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
   if (!challenge) {
     return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
   }
 
-  const testResults: ChallengeTestCase[] = [
-    { id: 1, name: "Test Case 1: Einfaches Array", status: "passed", time: "12ms" },
-    { id: 2, name: "Test Case 2: Leeres Array", status: "passed", time: "8ms" },
-    { id: 3, name: "Test Case 3: Negative Zahlen", status: "passed", time: "10ms" },
-    { id: 4, name: "Test Case 4: Großes Array", status: "passed", time: "45ms" },
-    { id: 5, name: "Test Case 5: Edge Cases", status: "passed", time: "5ms" },
-  ];
+  const allowed = normalizeSupportedLanguages(
+    challenge.supportedLanguages as unknown as string[]
+  );
+  const language = parseCodeLanguage(body.language, allowed);
+  if (!language) {
+    return NextResponse.json(
+      { error: "Ungültige oder nicht unterstützte Sprache für diese Challenge." },
+      { status: 400 }
+    );
+  }
+
+  const { testCases: testResults, runtimeOk } = await runChallengeTests(
+    challenge,
+    code,
+    language,
+    "submit"
+  );
 
   await prisma.submission.create({
     data: {
       userId,
       challengeId,
       code,
-      status: "completed",
+      language: language as CodeLanguage,
+      status: runtimeOk ? "completed" : "failed",
       testResults: testResults as unknown as Parameters<typeof prisma.submission.create>[0]["data"]["testResults"],
     },
   });
 
-  return NextResponse.json({ success: true, testCases: testResults });
+  return NextResponse.json({
+    success: runtimeOk,
+    testCases: testResults,
+    language,
+  });
 }

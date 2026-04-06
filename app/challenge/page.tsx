@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/header";
 import { CodeEditor } from "@/components/code-editor";
 import { TestResults, type TestCase } from "@/components/test-results";
@@ -26,39 +24,150 @@ import {
   Lightbulb,
   BookOpen,
 } from "@nsmr/pixelart-react";
-import { ConfettiButton } from "@/components/ui/confetti";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { getDailyChallenge, runTests, submitSolution, type DailyChallenge } from "@/lib/api";
+import { toast } from "sonner";
+import {
+  getDailyChallenge,
+  runTests,
+  submitSolution,
+  type CodeLanguageId,
+  type DailyChallenge,
+} from "@/lib/api";
+import { languageFileName, languageLabel } from "@/lib/challenge-languages";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ChallengePage() {
   const [challenge, setChallenge] = useState<DailyChallenge | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
+  const [language, setLanguage] = useState<CodeLanguageId | null>(null);
+  const [sources, setSources] = useState<Partial<Record<CodeLanguageId, string>>>({});
+  /** none = noch offen; success = eingereicht und Tests ok; failed = eingereicht, Tests nicht ok */
+  const [submitOutcome, setSubmitOutcome] = useState<"none" | "success" | "failed">(
+    "none"
+  );
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
 
-  useEffect(() => {
-    getDailyChallenge().then((data) => {
-      setChallenge(data);
-      setTestCases(data.testCases as TestCase[]);
-    });
+  const isSubmitLocked = submitOutcome !== "none";
+
+  const loadChallenge = useCallback(() => {
+    setLoadError(null);
+    setIsLoadingChallenge(true);
+    getDailyChallenge()
+      .then((data) => {
+        setChallenge(data);
+        setTestCases(data.testCases as TestCase[]);
+        setLanguage(data.defaultLanguage);
+        setSources({ ...data.starterCodes });
+      })
+      .catch((e) => {
+        setChallenge(null);
+        const msg =
+          e instanceof Error ? e.message : "Challenge konnte nicht geladen werden.";
+        setLoadError(msg);
+        toast.error("Daily Challenge", { description: msg });
+      })
+      .finally(() => setIsLoadingChallenge(false));
   }, []);
 
+  useEffect(() => {
+    loadChallenge();
+  }, [loadChallenge]);
+
+  const currentCode =
+    language != null ? (sources[language] ?? "") : "";
+
+  const setCurrentCode = (next: string) => {
+    if (!language) return;
+    setSources((prev) => ({ ...prev, [language]: next }));
+  };
+
   const handleRunTests = async () => {
-    if (!challenge) return;
+    if (!challenge || !language) return;
     setIsRunning(true);
-    const result = await runTests(challenge.id, "");
-    setTestCases(result.testCases as TestCase[]);
-    setIsRunning(false);
+    try {
+      const result = await runTests(challenge.id, currentCode, language);
+      setTestCases(result.testCases as TestCase[]);
+      if (result.runtimeOk === false) {
+        toast.message("Tests ausgeführt", {
+          description: "Mindestens ein Test ist fehlgeschlagen.",
+        });
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Unbekannter Fehler";
+      toast.error("Testlauf fehlgeschlagen", { description: msg });
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleSubmit = async () => {
-    if (!challenge) return;
-    await submitSolution(challenge.id, "");
-    setIsSubmitted(true);
+    if (!challenge || !language || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const result = await submitSolution(challenge.id, currentCode, language);
+      setTestCases(result.testCases as TestCase[]);
+      setSubmittedAtLabel(
+        new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
+      );
+      if (result.success) {
+        setSubmitOutcome("success");
+        toast.success("Lösung eingereicht", {
+          description: "Alle Tests wurden bestanden.",
+        });
+      } else {
+        setSubmitOutcome("failed");
+        toast.error("Abgabe nicht bestanden", {
+          description: "Mindestens ein Test ist fehlgeschlagen oder die Ausführung war fehlerhaft.",
+        });
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Unbekannter Fehler";
+      toast.error("Einreichen fehlgeschlagen", { description: msg });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (!challenge) return null;
+  if (isLoadingChallenge) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-4">
+        <Header />
+        <p className="text-muted-foreground">Challenge wird geladen…</p>
+      </div>
+    );
+  }
+
+  if (loadError || !challenge) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-lg px-4 py-16 space-y-4">
+          <Alert variant="destructive" className="rounded-none">
+            <AlertIcon className="h-4 w-4" fill="currentColor" />
+            <AlertTitle>Keine Challenge</AlertTitle>
+            <AlertDescription>
+              {loadError ??
+                "Es ist keine aktive Aufgabe verfügbar. Bitte Datenbank prüfen (migrate + seed) oder später erneut versuchen."}
+            </AlertDescription>
+          </Alert>
+          <Button variant="outline" className="rounded-none" onClick={loadChallenge}>
+            Erneut laden
+          </Button>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -151,13 +260,34 @@ export default function ChallengePage() {
             </Card>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-semibold">Code Editor</h2>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {language && challenge.supportedLanguages.length > 1 ? (
+                    <Select
+                      value={language}
+                      onValueChange={(v) => setLanguage(v as CodeLanguageId)}
+                      disabled={isSubmitLocked}
+                    >
+                      <SelectTrigger
+                        size="sm"
+                        className="rounded-none w-[180px] font-sans"
+                      >
+                        <SelectValue placeholder="Sprache" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-none">
+                        {challenge.supportedLanguages.map((id) => (
+                          <SelectItem key={id} value={id}>
+                            {languageLabel(id)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : null}
                   <Button
                     variant="outline"
                     onClick={handleRunTests}
-                    disabled={isRunning || isSubmitted}
+                    disabled={isRunning || isSubmitLocked || !language}
                     className="gap-2 bg-transparent rounded-none cursor-pointer"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />
@@ -166,20 +296,31 @@ export default function ChallengePage() {
                 </div>
               </div>
 
-              <CodeEditor
-                readOnly={isSubmitted}
-                className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50"
-              />
+              {language ? (
+                <CodeEditor
+                  value={currentCode}
+                  onChange={setCurrentCode}
+                  fileName={languageFileName(language)}
+                  readOnly={isSubmitLocked}
+                  className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50"
+                />
+              ) : null}
             </div>
           </div>
 
           <div className="space-y-6">
             <SubmissionStatus
-              status={isSubmitted ? "submitted" : "not-submitted"}
-              submittedAt={isSubmitted ? "14:32" : undefined}
+              status={
+                submitOutcome === "success"
+                  ? "submitted"
+                  : submitOutcome === "failed"
+                    ? "failed"
+                    : "not-submitted"
+              }
+              submittedAt={submittedAtLabel}
             />
 
-            {!isSubmitted && (
+            {!isSubmitLocked && (
               <Alert
                 variant="destructive"
                 className="border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none"
@@ -199,10 +340,14 @@ export default function ChallengePage() {
               size="lg"
               className="w-full gap-2 cursor-pointer rounded-none"
               onClick={handleSubmit}
-              disabled={isSubmitted}
+              disabled={isSubmitLocked || !language || isSubmitting}
             >
               <ArrowRight className="h-4 w-4" fill="currentColor" />
-              {isSubmitted ? "Bereits abgegeben" : "Final abgeben"}
+              {isSubmitLocked
+                ? "Bereits abgegeben"
+                : isSubmitting
+                  ? "Wird gesendet…"
+                  : "Final abgeben"}
             </Button>
 
             <TestResults testCases={testCases} />
