@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { VT323, Press_Start_2P, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 
@@ -56,7 +57,9 @@ export default function RootLayout({
       className={`${vt323.variable} ${pressStart.variable} ${jetbrainsMono.variable}`}
     >
       <body className="font-sans antialiased">
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
         <Analytics />
       </body>
     </html>

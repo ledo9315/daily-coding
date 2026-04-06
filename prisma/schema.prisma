@@ -46,6 +46,8 @@ model User {
   initials     String
   avatar       String
   email        String       @unique
+  passwordHash String?
+
   streak       Int          @default(0)
   streakRecord Int          @default(0)
   submissions    Submission[]

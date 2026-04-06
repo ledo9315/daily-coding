@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { formatTime } from "@/lib/format";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import type { RankingEntry, TodayChallenge, UserStats } from "@/lib/api";
-import { CURRENT_USER_ID } from "@/lib/server/app-config";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
@@ -48,24 +47,24 @@ export async function getDashboardRankingPreviewData(): Promise<{
   };
 }
 
-export async function getUserStatsData(): Promise<UserStats> {
+export async function getUserStatsData(userId: string): Promise<UserStats> {
   const [user, todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
-    prisma.user.findUniqueOrThrow({ where: { id: CURRENT_USER_ID } }),
+    prisma.user.findUniqueOrThrow({ where: { id: userId } }),
     prisma.rankingEntry.findUnique({
       where: {
         userId_period_periodDate: {
-          userId: CURRENT_USER_ID,
+          userId: userId,
           period: "today",
           periodDate: getPeriodDateForRanking("today"),
         },
       },
     }),
     prisma.submission.findMany({
-      where: { userId: CURRENT_USER_ID, status: "completed" },
+      where: { userId: userId, status: "completed" },
       include: { challenge: { select: { points: true } } },
     }),
     prisma.userAchievement.count({
-      where: { userId: CURRENT_USER_ID, unlockedAt: { not: null } },
+      where: { userId: userId, unlockedAt: { not: null } },
     }),
   ]);
 

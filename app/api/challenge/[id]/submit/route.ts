@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSessionUserId } from "@/lib/auth-session";
 import type { ChallengeTestCase } from "@/lib/api";
-import { CURRENT_USER_ID } from "@/lib/server/app-config";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const result = await getSessionUserId();
+  if (result.error) return result.error;
+  const { userId } = result;
+
   const { id: challengeId } = await params;
   const body = await request.json();
   const code: string = body.code ?? "";
@@ -16,7 +20,6 @@ export async function POST(
     return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
   }
 
-  // Stub: simulate test execution
   const testResults: ChallengeTestCase[] = [
     { id: 1, name: "Test Case 1: Einfaches Array", status: "passed", time: "12ms" },
     { id: 2, name: "Test Case 2: Leeres Array", status: "passed", time: "8ms" },
@@ -27,7 +30,7 @@ export async function POST(
 
   await prisma.submission.create({
     data: {
-      userId: CURRENT_USER_ID,
+      userId,
       challengeId,
       code,
       status: "completed",
