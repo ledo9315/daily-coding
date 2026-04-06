@@ -236,7 +236,13 @@ export default function ChallengePage() {
                 "Es ist keine aktive Aufgabe verfügbar. Bitte Datenbank prüfen (migrate + seed) oder später erneut versuchen."}
             </AlertDescription>
           </Alert>
-          <Button variant="outline" className="rounded-none" onClick={loadChallenge}>
+          <Button
+            variant="outline"
+            className="rounded-none"
+            onClick={() => {
+              loadChallenge();
+            }}
+          >
             Erneut laden
           </Button>
         </main>
