@@ -3,6 +3,25 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Wie Next.js: zuerst .env, dann .env.local (überschreibt) — sonst fehlt DATABASE_URL oft nur bei `prisma migrate`.
+loadEnv({ path: resolve(process.cwd(), ".env") });
+loadEnv({ path: resolve(process.cwd(), ".env.local"), override: true });
+
+// `prisma generate` (u. a. im postinstall) braucht keine laufende DB, nur eine gültige URL.
+// In GitHub Actions ist oft keine .env vorhanden; CI ist dort gesetzt.
+const placeholderForGenerateOnly =
+  "postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder";
+
+const databaseUrl =
+  process.env["DATABASE_URL"]?.trim() ||
+  (process.env["CI"] === "true" ? placeholderForGenerateOnly : undefined);
+
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL ist nicht gesetzt. Lege .env oder .env.local an (siehe .env.example) und starte z. B. Docker-Postgres."
+  );
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
