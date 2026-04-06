@@ -30,9 +30,9 @@ describe("GET /api/ranking", () => {
     rank: 1,
     previousRank: null,
     points: 500,
-    timeTaken: "3:42",
+    timeTaken: 222,
     challengesSolved: 1,
-    user: { name: "Alice", initials: "AL", avatar: "🐱", level: 5 },
+    user: { name: "Alice", initials: "AL", avatar: "🐱" },
     ...overrides,
   });
 
@@ -83,8 +83,15 @@ describe("GET /api/ranking", () => {
     const res = await getRankingHandler(makeRequest("today"));
     const json = await res.json();
     expect(json[0].previousRank).toBeUndefined();
-    expect(json[0].time).toBeUndefined();
+    expect(json[0].time).toBe("-");
     expect(json[0].challengesSolved).toBeUndefined();
+  });
+
+  it("formats timeTaken seconds as M:SS string", async () => {
+    mockFindMany.mockResolvedValueOnce([dbEntry({ timeTaken: 263 })]);
+    const res = await getRankingHandler(makeRequest("today"));
+    const json = await res.json();
+    expect(json[0].time).toBe("4:23");
   });
 
   it("returns empty array when no entries exist", async () => {
@@ -109,8 +116,8 @@ describe("GET /api/ranking/preview", () => {
   const dbEntry = () => ({
     rank: 1,
     points: 300,
-    timeTaken: "2:00",
-    user: { name: "Bob", initials: "BO", avatar: "🐶", level: 3 },
+    timeTaken: 120,
+    user: { name: "Bob", initials: "BO", avatar: "🐶" },
   });
 
   it("returns 200 with today preview", async () => {
@@ -120,7 +127,7 @@ describe("GET /api/ranking/preview", () => {
     const json = await res.json();
     expect(json).toHaveProperty("today");
     expect(json.today).toHaveLength(1);
-    expect(json.today[0]).toMatchObject({ rank: 1, name: "Bob", points: 300 });
+    expect(json.today[0]).toMatchObject({ rank: 1, name: "Bob", points: 300, time: "2:00" });
   });
 
   it("does not include a team property", async () => {

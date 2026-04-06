@@ -35,7 +35,8 @@ const activeChallenge = {
   description: "Find two numbers that add up to target",
   difficulty: "medium" as const,
   points: 200,
-  category: "Arrays • Algorithms",
+  categoryId: "cat-arrays",
+  category: { id: "cat-arrays", name: "Arrays", createdAt: new Date() },
   hint: "Use a hash map",
   examples: [{ input: "[2,7,11,15], 9", output: "[0,1]" }],
   testCases: [{ id: 1, name: "T1", status: "pending" }],
@@ -90,6 +91,7 @@ describe("GET /api/challenge/daily", () => {
       expect.objectContaining({
         where: { isActive: true },
         orderBy: { date: "desc" },
+        include: { category: true },
       })
     );
   });
@@ -121,8 +123,11 @@ describe("GET /api/challenge/today", () => {
     expect(json.points).toBe(200);
   });
 
-  it("strips ' •...' suffix from category", async () => {
-    mockFindFirst.mockResolvedValueOnce({ ...activeChallenge, category: "Graphs • Hard" });
+  it("returns uppercased category name", async () => {
+    mockFindFirst.mockResolvedValueOnce({
+      ...activeChallenge,
+      category: { id: "cat-graphs", name: "Graphs", createdAt: new Date() },
+    });
     const res = await getTodayHandler();
     const json = await res.json();
     expect(json.category).toBe("GRAPHS");

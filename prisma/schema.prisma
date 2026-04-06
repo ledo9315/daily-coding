@@ -12,12 +12,6 @@ datasource db {
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
-enum UserStatus {
-  active
-  invited
-  inactive
-}
-
 enum Difficulty {
   easy
   medium
@@ -37,6 +31,13 @@ enum RankingPeriod {
   month
 }
 
+enum AchievementRarity {
+  common
+  rare
+  epic
+  legendary
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -45,34 +46,41 @@ model User {
   initials     String
   avatar       String
   email        String       @unique
-  role         String       @default("Mitglied")
-  status       UserStatus   @default(active)
-  department   String?
-  joinDate     DateTime?
-  level        Int          @default(1)
-  points       Int          @default(0)
   streak       Int          @default(0)
   streakRecord Int          @default(0)
-  totalSolved  Int          @default(0)
-  badges       Int          @default(0)
-  submissions  Submission[]
-  achievements Achievement[]
+  submissions    Submission[]
+  achievements   UserAchievement[]
   rankingEntries RankingEntry[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
 
-model Achievement {
-  id          String   @id @default(cuid())
-  userId      String
-  title       String
-  description String
-  iconKey     String
-  unlocked    Boolean  @default(false)
-  rarity      String   @default("common")
-  unlockedAt  DateTime?
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
+model AchievementDef {
+  id           String            @id @default(cuid())
+  title        String
+  description  String
+  iconKey      String
+  rarity       AchievementRarity @default(common)
+  userProgress UserAchievement[]
+  createdAt    DateTime          @default(now())
+}
+
+model UserAchievement {
+  userId        String
+  achievementId String
+  unlockedAt    DateTime?
+  user          User           @relation(fields: [userId], references: [id])
+  achievement   AchievementDef @relation(fields: [achievementId], references: [id])
+  createdAt     DateTime       @default(now())
+
+  @@id([userId, achievementId])
+}
+
+model Category {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  challenges Challenge[]
+  createdAt  DateTime    @default(now())
 }
 
 model Challenge {
@@ -81,7 +89,8 @@ model Challenge {
   description String
   difficulty  Difficulty
   points      Int
-  category    String
+  categoryId  String
+  category    Category     @relation(fields: [categoryId], references: [id])
   hint        String?
   examples    Json         @default("[]")
   testCases   Json         @default("[]")
@@ -105,6 +114,7 @@ model Submission {
   user        User             @relation(fields: [userId], references: [id])
   challenge   Challenge        @relation(fields: [challengeId], references: [id])
   createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model RankingEntry {
@@ -114,10 +124,10 @@ model RankingEntry {
   previousRank     Int?
   points           Int
   challengesSolved Int?
-  timeTaken        String?
+  timeTaken        Int?
   periodDate       DateTime
-  userId           String?
-  user             User?         @relation(fields: [userId], references: [id])
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
   createdAt        DateTime      @default(now())
 
   @@unique([userId, period, periodDate])

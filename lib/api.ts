@@ -106,7 +106,11 @@ export interface CommunityFeedItem {
 // ─── Internal fetch helper ────────────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
+  const base =
+    typeof window === "undefined"
+      ? (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000")
+      : "";
+  const res = await fetch(`${base}${path}`, {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
