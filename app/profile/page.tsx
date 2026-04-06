@@ -21,7 +21,8 @@ import {
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { getUserProfile, type Achievement } from "@/lib/api";
+import { getUserProfileData } from "@/lib/server/profile-data";
+import type { Achievement } from "@/lib/api";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Check,
@@ -37,7 +38,7 @@ function resolveIcon(iconKey: string): React.ComponentType<{ className?: string 
 }
 
 export default async function ProfilePage() {
-  const profile = await getUserProfile();
+  const profile = await getUserProfileData();
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">

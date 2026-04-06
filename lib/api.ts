@@ -10,7 +10,7 @@ export interface RankingEntry {
   points: number;
   time?: string;
   avatar: string;
-  level: number;
+  level?: number;
   challengesSolved?: number;
 }
 
@@ -49,7 +49,7 @@ export interface ChallengeHistoryEntry {
   title: string;
   date: string;
   difficulty: "easy" | "medium" | "hard";
-  status: "completed" | "failed" | "skipped";
+  status: "pending" | "completed" | "failed" | "skipped";
   points: number;
   time: string;
   rank?: number;
