@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
@@ -16,10 +17,14 @@ import {
 } from "@/lib/server/dashboard-data";
 
 export default async function DashboardPage() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+  const userId = session.user.id;
+
   const [rankingPreview, todayChallenge, userStats] = await Promise.all([
     getDashboardRankingPreviewData(),
     getTodayChallengeSummary(),
-    getUserStatsData(),
+    getUserStatsData(userId),
   ]);
   if (!todayChallenge) notFound();
 

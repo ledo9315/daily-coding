@@ -5,6 +5,12 @@ import { GET as getTodayHandler } from "../challenge/today/route";
 import { POST as runTestsHandler } from "../challenge/[id]/run/route";
 import { POST as submitHandler } from "../challenge/[id]/submit/route";
 
+// ─── Auth session mock ────────────────────────────────────────────────────────
+
+vi.mock("@/lib/auth-session", () => ({
+  getSessionUserId: vi.fn().mockResolvedValue({ userId: "user-test" }),
+}));
+
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindFirst = vi.fn();

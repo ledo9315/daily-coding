@@ -6,6 +6,7 @@ import {
   startOfUtcMonth,
 } from "../lib/server/ranking-period";
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 
 function addUtcDays(d: Date, delta: number): Date {
   const x = new Date(d);
@@ -21,17 +22,21 @@ async function main() {
   const rankingWeekStart = startOfUtcWeek(anchor);
   const rankingMonthStart = startOfUtcMonth(anchor);
 
+  const devPassword = process.env.SEED_DEV_PASSWORD ?? "DailyDev2024!";
+  const devPasswordHash = await bcrypt.hash(devPassword, 12);
+
   // ─── Users ───────────────────────────────────────────────────────────────────
 
   const anna = await prisma.user.upsert({
     where: { email: "anna.schmidt@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-anna",
       name: "Anna Schmidt",
       initials: "AS",
       avatar: "/user/chibi1.png",
       email: "anna.schmidt@company.com",
+      passwordHash: devPasswordHash,
       streak: 5,
       streakRecord: 28,
     },
@@ -39,13 +44,14 @@ async function main() {
 
   const tom = await prisma.user.upsert({
     where: { email: "tom.weber@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-tom",
       name: "Tom Weber",
       initials: "TW",
       avatar: "/user/chibi2.png",
       email: "tom.weber@company.com",
+      passwordHash: devPasswordHash,
       streak: 7,
       streakRecord: 30,
     },
@@ -53,13 +59,14 @@ async function main() {
 
   const max = await prisma.user.upsert({
     where: { email: "max.mustermann@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-max",
       name: "Max Mustermann",
       initials: "MM",
       avatar: "/user/minipix5.png",
       email: "max.mustermann@company.com",
+      passwordHash: devPasswordHash,
       streak: 12,
       streakRecord: 28,
     },
@@ -67,13 +74,14 @@ async function main() {
 
   const lisa = await prisma.user.upsert({
     where: { email: "lisa.mueller@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-lisa",
       name: "Lisa Müller",
       initials: "LM",
       avatar: "/user/chibi3.png",
       email: "lisa.mueller@company.com",
+      passwordHash: devPasswordHash,
       streak: 3,
       streakRecord: 20,
     },
@@ -81,13 +89,14 @@ async function main() {
 
   const sarah = await prisma.user.upsert({
     where: { email: "sarah.klein@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-sarah",
       name: "Sarah Klein",
       initials: "SK",
       avatar: "/user/minipix4.png",
       email: "sarah.klein@company.com",
+      passwordHash: devPasswordHash,
       streak: 0,
       streakRecord: 15,
     },
@@ -95,13 +104,14 @@ async function main() {
 
   const jan = await prisma.user.upsert({
     where: { email: "jan.becker@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-jan",
       name: "Jan Becker",
       initials: "JB",
       avatar: "/user/minipix2.png",
       email: "jan.becker@company.com",
+      passwordHash: devPasswordHash,
       streak: 2,
       streakRecord: 18,
     },
@@ -109,13 +119,14 @@ async function main() {
 
   const julia = await prisma.user.upsert({
     where: { email: "julia.fischer@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-julia",
       name: "Julia Fischer",
       initials: "JF",
       avatar: "/user/minipix6.png",
       email: "julia.fischer@company.com",
+      passwordHash: devPasswordHash,
       streak: 4,
       streakRecord: 14,
     },
@@ -123,13 +134,14 @@ async function main() {
 
   const peter = await prisma.user.upsert({
     where: { email: "peter.hoffmann@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-peter",
       name: "Peter Hoffmann",
       initials: "PH",
       avatar: "/user/pony2.png",
       email: "peter.hoffmann@company.com",
+      passwordHash: devPasswordHash,
       streak: 1,
       streakRecord: 10,
     },
@@ -137,13 +149,14 @@ async function main() {
 
   const maria = await prisma.user.upsert({
     where: { email: "maria.wagner@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-maria",
       name: "Maria Wagner",
       initials: "MW",
       avatar: "/user/pony3.png",
       email: "maria.wagner@company.com",
+      passwordHash: devPasswordHash,
       streak: 2,
       streakRecord: 12,
     },
@@ -151,13 +164,14 @@ async function main() {
 
   const david = await prisma.user.upsert({
     where: { email: "david.schulz@company.com" },
-    update: {},
+    update: { passwordHash: devPasswordHash },
     create: {
       id: "user-david",
       name: "David Schulz",
       initials: "DS",
       avatar: "/user/pony4.png",
       email: "david.schulz@company.com",
+      passwordHash: devPasswordHash,
       streak: 3,
       streakRecord: 9,
     },

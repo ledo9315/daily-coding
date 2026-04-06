@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET as getUserStatsHandler } from "../user/stats/route";
 import { GET as getUserProfileHandler } from "../user/profile/route";
 
+// ─── Auth session mock ────────────────────────────────────────────────────────
+
+vi.mock("@/lib/auth-session", () => ({
+  getSessionUserId: vi.fn().mockResolvedValue({ userId: "user-max" }),
+}));
+
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindUniqueOrThrow = vi.fn();
