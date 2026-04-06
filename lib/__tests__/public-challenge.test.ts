@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { stripTestCaseSecretsForClient } from "@/lib/server/public-challenge";
 
 describe("stripTestCaseSecretsForClient", () => {
-  it("entfernt expected, lässt Rest stehen, setzt status=pending", () => {
+  it("strips expected, keeps the rest, sets status=pending", () => {
     const out = stripTestCaseSecretsForClient([
       { id: 1, name: "A", input: "[1]", expected: "[1]" },
     ]);

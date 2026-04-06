@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { USER_STATS_CHANGED_EVENT } from "@/lib/user-stats-events";
 import {
   Home,
   Trophy,
@@ -66,25 +67,32 @@ export function Header() {
       return;
     }
     let cancelled = false;
-    fetch("/api/user/stats")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (cancelled || !data) return;
-        if (typeof data.streak === "number") setStreak(data.streak);
-        if (typeof data.level === "number") setLevel(data.level);
-      })
-      .catch(() => {});
-    fetch("/api/user/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { role?: string } | null) => {
-        if (cancelled || !data) return;
-        setIsAdminFromDb(data.role === "admin");
-      })
-      .catch(() => {});
+
+    function loadHeaderStats() {
+      fetch("/api/user/stats")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (cancelled || !data) return;
+          if (typeof data.streak === "number") setStreak(data.streak);
+          if (typeof data.level === "number") setLevel(data.level);
+        })
+        .catch(() => {});
+      fetch("/api/user/me")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data: { role?: string } | null) => {
+          if (cancelled || !data) return;
+          setIsAdminFromDb(data.role === "admin");
+        })
+        .catch(() => {});
+    }
+
+    loadHeaderStats();
+    window.addEventListener(USER_STATS_CHANGED_EVENT, loadHeaderStats);
     return () => {
       cancelled = true;
+      window.removeEventListener(USER_STATS_CHANGED_EVENT, loadHeaderStats);
     };
-  }, [status]);
+  }, [status, pathname]);
 
   const user = session?.user;
   const displayName = user?.name?.toUpperCase() ?? "";

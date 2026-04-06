@@ -49,26 +49,26 @@ describe("getServerApiBaseUrl", () => {
     vi.unstubAllEnvs();
   });
 
-  it("trimmt NEXT_PUBLIC_APP_URL und hat Vorrang vor VERCEL_URL", () => {
+  it("trims NEXT_PUBLIC_APP_URL and takes precedence over VERCEL_URL", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.example.com/");
     vi.stubEnv("VERCEL_URL", "ignore.vercel.app");
     expect(getServerApiBaseUrl()).toBe("https://app.example.com");
   });
 
-  it("nutzt https://VERCEL_URL wenn kein NEXT_PUBLIC_APP_URL", () => {
+  it("uses https://VERCEL_URL when NEXT_PUBLIC_APP_URL is unset", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
     vi.stubEnv("VERCEL_URL", "my-project.vercel.app");
     expect(getServerApiBaseUrl()).toBe("https://my-project.vercel.app");
   });
 
-  it("nutzt NEXTAUTH_URL als Fallback", () => {
+  it("falls back to NEXTAUTH_URL", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
     vi.stubEnv("VERCEL_URL", "");
     vi.stubEnv("NEXTAUTH_URL", "https://auth.site/");
     expect(getServerApiBaseUrl()).toBe("https://auth.site");
   });
 
-  it("fällt auf localhost mit PORT zurück", () => {
+  it("falls back to localhost with PORT", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
     vi.stubEnv("VERCEL_URL", "");
     vi.stubEnv("NEXTAUTH_URL", "");
@@ -207,6 +207,8 @@ describe("getUserStats", () => {
       levelMax: 3000,
       badges: 3,
       badgesTotal: 6,
+      monthlyChallengesSolved: 5,
+      monthlyChallengeGoal: 30,
     };
     mockOkResponse(stats);
     const result = await getUserStats();
@@ -275,6 +277,22 @@ describe("submitSolution", () => {
         body: JSON.stringify({
           code: "function solve() {}",
           language: "javascript",
+        }),
+      })
+    );
+  });
+
+  it("includes solveDurationSeconds in submit body when provided", async () => {
+    mockOkResponse({ success: true, testCases: [] });
+    await submitSolution("ch-1", "x", "javascript", 90);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/challenge/ch-1/submit",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          code: "x",
+          language: "javascript",
+          solveDurationSeconds: 90,
         }),
       })
     );

@@ -166,7 +166,7 @@ describe("GET /api/ranking/preview", () => {
     expect(json.today).toEqual([]);
   });
 
-  it("fragt nur Ranking + optional Lifetime-Punkte (kein Team)", async () => {
+  it("queries ranking + optional lifetime points only (no team)", async () => {
     mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingPreviewHandler();
     expect(mockRankingFindMany).toHaveBeenCalledTimes(1);

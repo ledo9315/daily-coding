@@ -5,6 +5,8 @@ import type { RankingEntry, TodayChallenge, UserStats } from "@/lib/api";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
+import { buildUserAchievementsView } from "@/lib/server/achievements";
+import { MONTHLY_CHALLENGE_GOAL, countSubmissionsInUtcMonth } from "@/lib/monthly-challenge-goal";
 
 export async function getTodayChallengeSummary(): Promise<TodayChallenge | null> {
   const challenge = await findDailyChallengeForApp();
@@ -51,28 +53,35 @@ export async function getUserStatsData(userId: string): Promise<UserStats | null
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return null;
 
-  const [todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
-    prisma.rankingEntry.findUnique({
-      where: {
-        userId_period_periodDate: {
-          userId: userId,
-          period: "today",
-          periodDate: getPeriodDateForRanking("today"),
+  const [todayRank, completedSubmissions, achievementDefs, userAchievements] =
+    await Promise.all([
+      prisma.rankingEntry.findUnique({
+        where: {
+          userId_period_periodDate: {
+            userId: userId,
+            period: "today",
+            periodDate: getPeriodDateForRanking("today"),
+          },
         },
-      },
-    }),
-    prisma.submission.findMany({
-      where: { userId: userId, status: "completed" },
-      include: { challenge: { select: { points: true } } },
-    }),
-    prisma.userAchievement.count({
-      where: { userId: userId, unlockedAt: { not: null } },
-    }),
-  ]);
+      }),
+      prisma.submission.findMany({
+        where: { userId: userId, status: "completed" },
+        include: { challenge: { select: { points: true } } },
+      }),
+      prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
+      prisma.userAchievement.findMany({ where: { userId } }),
+    ]);
+
+  const { unlockedCount: unlockedBadges } = buildUserAchievementsView(
+    achievementDefs,
+    userAchievements,
+    completedSubmissions
+  );
 
   const points = completedSubmissions.reduce((sum, s) => sum + s.challenge.points, 0);
   const totalSolved = completedSubmissions.length;
   const level = calculateLevel(points);
+  const monthlyChallengesSolved = countSubmissionsInUtcMonth(completedSubmissions);
 
   return {
     rank: todayRank ? `#${todayRank.rank}` : "#-",
@@ -83,6 +92,8 @@ export async function getUserStatsData(userId: string): Promise<UserStats | null
     level,
     levelMax: nextLevelThreshold(level),
     badges: unlockedBadges,
-    badgesTotal: 6,
+    badgesTotal: achievementDefs.length,
+    monthlyChallengesSolved,
+    monthlyChallengeGoal: MONTHLY_CHALLENGE_GOAL,
   };
 }

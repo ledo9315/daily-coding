@@ -23,6 +23,7 @@ import {
 } from "@nsmr/pixelart-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { getUserProfileData } from "@/lib/server/profile-data";
+import { levelTitleDe } from "@/lib/level";
 import type { Achievement } from "@/lib/api";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -93,7 +94,14 @@ export default async function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
-              <StatsCard title="LEVEL" value={profile.stats.rank} icon={Trophy} />
+              <StatsCard
+                title="LEVEL"
+                value={profile.stats.level}
+                description={
+                  profile.stats.rank !== "#-" ? `Heute ${profile.stats.rank}` : undefined
+                }
+                icon={Trophy}
+              />
               <StatsCard title="GELÖST" value={String(profile.stats.totalSolved)} icon={Bullseye} />
               <StatsCard title="REKORD" value={String(profile.stats.streakRecord)} icon={Zap} />
               <StatsCard title="BADGES" value={`${profile.stats.badges}/${profile.stats.badgesTotal}`} icon={Trophy} />
@@ -108,15 +116,15 @@ export default async function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <ProgressBar
-                  label={`Level ${profile.stats.level} - Code Ninja`}
+                  label={`Level ${profile.stats.level} – ${levelTitleDe(profile.stats.level)}`}
                   value={parseInt(profile.stats.points.replace(".", ""), 10)}
                   max={profile.stats.levelMax}
                   variant="default"
                 />
                 <ProgressBar
                   label="Monatsziel: Challenges"
-                  value={22}
-                  max={30}
+                  value={profile.stats.monthlyChallengesSolved}
+                  max={profile.stats.monthlyChallengeGoal}
                   variant="success"
                 />
                 <ProgressBar

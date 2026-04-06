@@ -36,6 +36,10 @@ export interface UserStats {
   levelMax: number;
   badges: number;
   badgesTotal: number;
+  /** Abgeschlossene Challenges im laufenden UTC-Monat (siehe `monthlyChallengeGoal`). */
+  monthlyChallengesSolved: number;
+  /** Festes Soll für den Monats-Fortschrittsbalken (z. B. 30 Challenges). */
+  monthlyChallengeGoal: number;
 }
 
 export interface Achievement {
@@ -201,7 +205,9 @@ export function getDailyChallenge(): Promise<DailyChallenge> {
 export function submitSolution(
   challengeId: string,
   code: string,
-  language: CodeLanguageId
+  language: CodeLanguageId,
+  /** Wandzeit seit Challenge-Anzeige (Sekunden); optional, sonst Fallback Server. */
+  solveDurationSeconds?: number
 ): Promise<{
     success: boolean;
     testCases: ChallengeTestCase[];
@@ -209,9 +215,13 @@ export function submitSolution(
     /** Ob Laufzeit/Kompilierung (Piston) erfolgreich war; bei Stub immer true. */
     runtimeOk?: boolean;
   }> {
+  const body: Record<string, unknown> = { code, language };
+  if (typeof solveDurationSeconds === "number" && Number.isFinite(solveDurationSeconds)) {
+    body.solveDurationSeconds = Math.max(0, Math.floor(solveDurationSeconds));
+  }
   return apiFetch(`/api/challenge/${challengeId}/submit`, {
     method: "POST",
-    body: JSON.stringify({ code, language }),
+    body: JSON.stringify(body),
   });
 }
 
