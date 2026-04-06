@@ -4,7 +4,8 @@ import { VT323, Press_Start_2P, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const vt323 = VT323({
   weight: "400",
@@ -57,9 +58,12 @@ export default function RootLayout({
       className={`${vt323.variable} ${pressStart.variable} ${jetbrainsMono.variable}`}
     >
       <body className="font-sans antialiased">
-        <SessionProvider>
-          {children}
-        </SessionProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <SessionProvider>
+            {children}
+          </SessionProvider>
+          <Toaster />
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

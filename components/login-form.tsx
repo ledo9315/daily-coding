@@ -55,7 +55,7 @@ export function LoginForm() {
             placeholder="name@firma.de"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            
             className="bg-background pl-9"
           />
           <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -77,7 +77,7 @@ export function LoginForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            
             className="bg-background pl-9"
           />
           <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

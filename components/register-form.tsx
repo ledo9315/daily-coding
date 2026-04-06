@@ -16,46 +16,64 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setFormError(null);
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    if (!res.ok) {
-      const data = await res.json();
+      let message = "Unbekannter Fehler.";
+      try {
+        const data = (await res.json()) as { error?: string };
+        if (data?.error) message = data.error;
+      } catch {
+        /* keine JSON-Antwort (z. B. 500 HTML) */
+      }
+
+      if (!res.ok) {
+        setFormError(message);
+        toast.error("Registrierung fehlgeschlagen", { description: message });
+        return;
+      }
+
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Anmeldung fehlgeschlagen", {
+          description:
+            "Konto erstellt, aber Anmeldung fehlgeschlagen. Bitte einloggen.",
+        });
+        router.push("/login");
+        return;
+      }
+
+      toast.success("Konto erstellt!", {
+        description: "Du wurdest automatisch eingeloggt.",
+      });
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err) {
+      const desc =
+        err instanceof Error ? err.message : "Netzwerk- oder Serverfehler.";
+      setFormError(desc);
       toast.error("Registrierung fehlgeschlagen", {
-        description: data.error ?? "Unbekannter Fehler.",
+        description: desc,
       });
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Auto sign-in after registration
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      toast.error("Anmeldung fehlgeschlagen", {
-        description: "Konto erstellt, aber Anmeldung fehlgeschlagen. Bitte einloggen.",
-      });
-      router.push("/login");
-      return;
-    }
-
-    toast.success("Konto erstellt!", {
-      description: "Du wurdest automatisch eingeloggt.",
-    });
-    router.push("/dashboard");
-    router.refresh();
   };
 
   return (
@@ -69,7 +87,7 @@ export function RegisterForm() {
             placeholder="Max Mustermann"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+            
             className="bg-background pl-9"
           />
           <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -84,7 +102,7 @@ export function RegisterForm() {
             placeholder="name@firma.de"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            
             className="bg-background pl-9"
           />
           <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -99,13 +117,21 @@ export function RegisterForm() {
             placeholder="Mindestens 8 Zeichen"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
             minLength={8}
             className="bg-background pl-9"
           />
           <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         </div>
       </div>
+
+      {formError ? (
+        <p
+          role="alert"
+          className="text-sm text-destructive font-medium rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2"
+        >
+          {formError}
+        </p>
+      ) : null}
 
       <Button
         type="submit"
