@@ -1,8 +1,10 @@
 // API abstraction layer for daily coding challenge platform
 
 import type { CodeLanguageId, StarterCodesMap } from "@/lib/challenge-languages";
+import type { MonthlyActivity } from "@/lib/monthly-activity";
 
 export type { CodeLanguageId, StarterCodesMap };
+export type { MonthlyActivity, MonthlyActivityDayCell } from "@/lib/monthly-activity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -38,7 +40,7 @@ export interface UserStats {
   badgesTotal: number;
   /** Abgeschlossene Challenges im laufenden UTC-Monat (siehe `monthlyChallengeGoal`). */
   monthlyChallengesSolved: number;
-  /** Festes Soll für den Monats-Fortschrittsbalken (z.B. 30 Challenges). */
+  /** Soll = Anzahl Tage im laufenden UTC-Monat (ein Challenge-Ziel pro Kalendertag). */
   monthlyChallengeGoal: number;
 }
 
@@ -72,6 +74,8 @@ export interface UserProfile {
   stats: UserStats;
   achievements: Achievement[];
   challengeHistory: ChallengeHistoryEntry[];
+  /** UTC-Monatskalender: Abschlüsse pro Tag + Markierung der laufenden Streak-Serie. */
+  monthlyActivity: MonthlyActivity;
 }
 
 export interface ChallengeTestCase {

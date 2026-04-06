@@ -1,8 +1,9 @@
-/**
- * Monatsziel: Anzahl erfolgreich abgeschlossener Challenges im **laufenden UTC-Kalendermonat**
- * im Verhältnis zu diesem festen Ziel (Gamification-Fortschrittsbalken).
- */
-export const MONTHLY_CHALLENGE_GOAL = 30;
+/** Anzahl Kalendertage im UTC-Monat von `now` (für den Monats-Fortschrittsbalken). */
+export function utcDaysInMonth(now: Date = new Date()): number {
+  const y = now.getUTCFullYear();
+  const m = now.getUTCMonth();
+  return new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+}
 
 /** Zählt Einträge, deren `createdAt` in den UTC-Monat von `now` fällt. */
 export function countSubmissionsInUtcMonth(

@@ -10,15 +10,23 @@ export function utcDayKey(d: Date): string {
  * Anzahl aufeinanderfolgender UTC-Tage endend bei `dayStartUtc`, an denen ein Eintrag in
  * `completedDays` liegt (Menge von `utcDayKey`).
  */
+/** Alle `utcDayKey`-Tage der laufenden Serie rückwärts ab `dayStartUtc` (inkl. Starttag). */
+export function currentStreakDayKeys(
+  dayStartUtc: Date,
+  completedDays: Set<string>
+): Set<string> {
+  const keys = new Set<string>();
+  const cursor = new Date(dayStartUtc);
+  while (completedDays.has(utcDayKey(cursor))) {
+    keys.add(utcDayKey(cursor));
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+  return keys;
+}
+
 export function consecutiveStreakFromCompletedDaySet(
   dayStartUtc: Date,
   completedDays: Set<string>
 ): number {
-  let streak = 0;
-  const cursor = new Date(dayStartUtc);
-  while (completedDays.has(utcDayKey(cursor))) {
-    streak++;
-    cursor.setUTCDate(cursor.getUTCDate() - 1);
-  }
-  return streak;
+  return currentStreakDayKeys(dayStartUtc, completedDays).size;
 }

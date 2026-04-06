@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@monaco-editor/react": "^4.7.0",
     "@nsmr/pixelart-react": "^2.0.0",
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
@@ -68,6 +69,7 @@
     "framer-motion": "^12.29.2",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
+    "monaco-editor": "^0.55.1",
     "motion": "^12.29.2",
     "next": "16.0.10",
     "next-auth": "5.0.0-beta.30",

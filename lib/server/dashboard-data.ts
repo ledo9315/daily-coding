@@ -6,7 +6,7 @@ import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
-import { MONTHLY_CHALLENGE_GOAL, countSubmissionsInUtcMonth } from "@/lib/monthly-challenge-goal";
+import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 
 export async function getTodayChallengeSummary(): Promise<TodayChallenge | null> {
   const challenge = await findDailyChallengeForApp();
@@ -94,6 +94,6 @@ export async function getUserStatsData(userId: string): Promise<UserStats | null
     badges: unlockedBadges,
     badgesTotal: achievementDefs.length,
     monthlyChallengesSolved,
-    monthlyChallengeGoal: MONTHLY_CHALLENGE_GOAL,
+    monthlyChallengeGoal: utcDaysInMonth(),
   };
 }

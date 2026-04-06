@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 import {
   getServerApiBaseUrl,
   getRanking,
@@ -208,7 +209,7 @@ describe("getUserStats", () => {
       badges: 3,
       badgesTotal: 6,
       monthlyChallengesSolved: 5,
-      monthlyChallengeGoal: 30,
+      monthlyChallengeGoal: utcDaysInMonth(),
     };
     mockOkResponse(stats);
     const result = await getUserStats();
