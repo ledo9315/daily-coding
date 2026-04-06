@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { calculateLevel } from "@/lib/level";
+import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 
 export async function GET() {
   const submissions = await prisma.submission.findMany({
@@ -12,8 +14,11 @@ export async function GET() {
     },
   });
 
+  const userIds = [...new Set(submissions.map((s) => s.userId))];
+  const lifetimePoints = await getLifetimePointsByUserIds(userIds);
+
   const now = new Date();
-  const formatTime = (date: Date) => {
+  const formatRelativeTime = (date: Date) => {
     const diffMs = now.getTime() - date.getTime();
     const diffMin = Math.floor(diffMs / 60000);
     if (diffMin < 60) return `vor ${diffMin} Minuten`;
@@ -23,18 +28,18 @@ export async function GET() {
   };
 
   return NextResponse.json(
-    submissions.map((s: any) => ({
+    submissions.map((s) => ({
       id: s.id,
       user: {
         name: s.user.name,
         initials: s.user.initials,
         avatar: s.user.avatar,
-        level: s.user.level,
+        level: calculateLevel(lifetimePoints.get(s.userId) ?? 0),
       },
       action: "hat die Challenge gelöst",
       challenge: s.challenge.title,
       points: s.challenge.points,
-      time: formatTime(s.createdAt),
+      time: formatRelativeTime(s.createdAt),
     }))
   );
 }

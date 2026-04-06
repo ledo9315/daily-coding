@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 
 export async function GET() {
-  const challenge = await prisma.challenge.findFirst({
-    where: { isActive: true },
-    orderBy: { date: "desc" },
-    include: { category: true },
-  });
+  const challenge = await findDailyChallengeForApp();
 
   if (!challenge) {
     return NextResponse.json({ error: "No active challenge" }, { status: 404 });

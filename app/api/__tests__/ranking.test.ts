@@ -5,15 +5,23 @@ import { GET as getRankingPreviewHandler } from "../ranking/preview/route";
 
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
-const mockFindMany = vi.fn();
+const mockRankingFindMany = vi.fn();
+const mockSubmissionFindMany = vi.fn();
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    rankingEntry: { findMany: (...args: unknown[]) => mockFindMany(...args) },
+    rankingEntry: {
+      findMany: (...args: unknown[]) => mockRankingFindMany(...args),
+    },
+    submission: {
+      findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
+    },
   },
 }));
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockSubmissionFindMany.mockResolvedValue([]);
 });
 
 // ─── /api/ranking ─────────────────────────────────────────────────────────────
@@ -27,6 +35,7 @@ describe("GET /api/ranking", () => {
   }
 
   const dbEntry = (overrides = {}) => ({
+    userId: "user-1",
     rank: 1,
     previousRank: null,
     points: 500,
@@ -37,49 +46,52 @@ describe("GET /api/ranking", () => {
   });
 
   it("returns 200 with mapped ranking entries for period=today", async () => {
-    mockFindMany.mockResolvedValueOnce([dbEntry()]);
+    mockRankingFindMany.mockResolvedValueOnce([dbEntry()]);
     const res = await getRankingHandler(makeRequest("today"));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toHaveLength(1);
     expect(json[0]).toMatchObject({ rank: 1, name: "Alice", points: 500, time: "3:42" });
+    expect(json[0]).toHaveProperty("level", 1);
   });
 
   it("defaults to period=today when param is absent", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     const res = await getRankingHandler(makeRequest());
     expect(res.status).toBe(200);
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockRankingFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
     );
   });
 
   it("uses period=week when specified", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("week"));
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockRankingFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ period: "week" }) })
     );
   });
 
   it("uses period=month when specified", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("month"));
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockRankingFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ period: "month" }) })
     );
   });
 
   it("falls back to today for an invalid period", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("invalid"));
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockRankingFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
     );
   });
 
   it("omits undefined optional fields from the response", async () => {
-    mockFindMany.mockResolvedValueOnce([dbEntry({ previousRank: null, timeTaken: null, challengesSolved: null })]);
+    mockRankingFindMany.mockResolvedValueOnce([
+      dbEntry({ previousRank: null, timeTaken: null, challengesSolved: null }),
+    ]);
     const res = await getRankingHandler(makeRequest("today"));
     const json = await res.json();
     expect(json[0].previousRank).toBeUndefined();
@@ -88,23 +100,23 @@ describe("GET /api/ranking", () => {
   });
 
   it("formats timeTaken seconds as M:SS string", async () => {
-    mockFindMany.mockResolvedValueOnce([dbEntry({ timeTaken: 263 })]);
+    mockRankingFindMany.mockResolvedValueOnce([dbEntry({ timeTaken: 263 })]);
     const res = await getRankingHandler(makeRequest("today"));
     const json = await res.json();
     expect(json[0].time).toBe("4:23");
   });
 
   it("returns empty array when no entries exist", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     const res = await getRankingHandler(makeRequest("month"));
     const json = await res.json();
     expect(json).toEqual([]);
   });
 
   it("does not handle team period (falls back to today)", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("team"));
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockRankingFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ period: "today" }) })
     );
   });
@@ -113,7 +125,8 @@ describe("GET /api/ranking", () => {
 // ─── /api/ranking/preview ─────────────────────────────────────────────────────
 
 describe("GET /api/ranking/preview", () => {
-  const dbEntry = () => ({
+  const previewEntry = () => ({
+    userId: "user-bob",
     rank: 1,
     points: 300,
     timeTaken: 120,
@@ -121,40 +134,41 @@ describe("GET /api/ranking/preview", () => {
   });
 
   it("returns 200 with today preview", async () => {
-    mockFindMany.mockResolvedValueOnce([dbEntry()]);
+    mockRankingFindMany.mockResolvedValueOnce([previewEntry()]);
     const res = await getRankingPreviewHandler();
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toHaveProperty("today");
     expect(json.today).toHaveLength(1);
     expect(json.today[0]).toMatchObject({ rank: 1, name: "Bob", points: 300, time: "2:00" });
+    expect(json.today[0]).toHaveProperty("level", 1);
   });
 
   it("does not include a team property", async () => {
-    mockFindMany.mockResolvedValueOnce([dbEntry()]);
+    mockRankingFindMany.mockResolvedValueOnce([previewEntry()]);
     const res = await getRankingPreviewHandler();
     const json = await res.json();
     expect(json).not.toHaveProperty("team");
   });
 
   it("queries with take: 5", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingPreviewHandler();
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockRankingFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ take: 5 })
     );
   });
 
   it("returns empty today array when no entries", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+    mockRankingFindMany.mockResolvedValueOnce([]);
     const res = await getRankingPreviewHandler();
     const json = await res.json();
     expect(json.today).toEqual([]);
   });
 
-  it("only calls findMany once (no team query)", async () => {
-    mockFindMany.mockResolvedValueOnce([]);
+  it("fragt nur Ranking + optional Lifetime-Punkte (kein Team)", async () => {
+    mockRankingFindMany.mockResolvedValueOnce([]);
     await getRankingPreviewHandler();
-    expect(mockFindMany).toHaveBeenCalledTimes(1);
+    expect(mockRankingFindMany).toHaveBeenCalledTimes(1);
   });
 });
