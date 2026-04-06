@@ -17,16 +17,8 @@ async function main() {
       initials: "AS",
       avatar: "/user/chibi1.png",
       email: "anna.schmidt@company.com",
-      role: "Administrator",
-      status: "active",
-      department: "Frontend",
-      joinDate: new Date("2024-01-01"),
-      level: 15,
-      points: 3450,
       streak: 5,
       streakRecord: 28,
-      totalSolved: 28,
-      badges: 5,
     },
   });
 
@@ -39,16 +31,8 @@ async function main() {
       initials: "TW",
       avatar: "/user/chibi2.png",
       email: "tom.weber@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "Backend",
-      joinDate: new Date("2024-02-15"),
-      level: 14,
-      points: 3280,
       streak: 7,
       streakRecord: 30,
-      totalSolved: 27,
-      badges: 4,
     },
   });
 
@@ -61,15 +45,8 @@ async function main() {
       initials: "MM",
       avatar: "/user/minipix5.png",
       email: "max.mustermann@company.com",
-      role: "Mitglied",
-      status: "invited",
-      department: "Frontend",
-      level: 12,
-      points: 2450,
       streak: 12,
       streakRecord: 28,
-      totalSolved: 47,
-      badges: 4,
     },
   });
 
@@ -82,16 +59,8 @@ async function main() {
       initials: "LM",
       avatar: "/user/chibi3.png",
       email: "lisa.mueller@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "Design",
-      joinDate: new Date("2024-03-03"),
-      level: 13,
-      points: 3100,
       streak: 3,
       streakRecord: 20,
-      totalSolved: 26,
-      badges: 3,
     },
   });
 
@@ -104,16 +73,8 @@ async function main() {
       initials: "SK",
       avatar: "/user/minipix4.png",
       email: "sarah.klein@company.com",
-      role: "Beobachter",
-      status: "inactive",
-      department: "Marketing",
-      joinDate: new Date("2024-01-01"),
-      level: 11,
-      points: 2650,
       streak: 0,
       streakRecord: 15,
-      totalSolved: 22,
-      badges: 2,
     },
   });
 
@@ -126,15 +87,8 @@ async function main() {
       initials: "JB",
       avatar: "/user/minipix2.png",
       email: "jan.becker@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "DevOps",
-      level: 12,
-      points: 2800,
       streak: 2,
       streakRecord: 18,
-      totalSolved: 23,
-      badges: 3,
     },
   });
 
@@ -147,15 +101,8 @@ async function main() {
       initials: "JF",
       avatar: "/user/minipix6.png",
       email: "julia.fischer@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "Backend",
-      level: 10,
-      points: 2500,
       streak: 4,
       streakRecord: 14,
-      totalSolved: 21,
-      badges: 2,
     },
   });
 
@@ -168,15 +115,8 @@ async function main() {
       initials: "PH",
       avatar: "/user/pony2.png",
       email: "peter.hoffmann@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "QA",
-      level: 9,
-      points: 2350,
       streak: 1,
       streakRecord: 10,
-      totalSolved: 20,
-      badges: 2,
     },
   });
 
@@ -189,15 +129,8 @@ async function main() {
       initials: "MW",
       avatar: "/user/pony3.png",
       email: "maria.wagner@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "DevOps",
-      level: 9,
-      points: 2200,
       streak: 2,
       streakRecord: 12,
-      totalSolved: 19,
-      badges: 2,
     },
   });
 
@@ -210,34 +143,69 @@ async function main() {
       initials: "DS",
       avatar: "/user/pony4.png",
       email: "david.schulz@company.com",
-      role: "Mitglied",
-      status: "active",
-      department: "Mobile",
-      level: 8,
-      points: 2050,
       streak: 3,
       streakRecord: 9,
-      totalSolved: 18,
-      badges: 1,
     },
   });
 
-  // ─── Achievements for Max (current user) ─────────────────────────────────────
+  // ─── Categories ──────────────────────────────────────────────────────────────
+
+  const catAlgorithmen = await prisma.category.upsert({
+    where: { id: "cat-algorithmen" },
+    update: {},
+    create: { id: "cat-algorithmen", name: "Algorithmen" },
+  });
+  const catBaeume = await prisma.category.upsert({
+    where: { id: "cat-baeume" },
+    update: {},
+    create: { id: "cat-baeume", name: "Bäume" },
+  });
+  const catDatenstrukturen = await prisma.category.upsert({
+    where: { id: "cat-datenstrukturen" },
+    update: {},
+    create: { id: "cat-datenstrukturen", name: "Datenstrukturen" },
+  });
+  const catStrings = await prisma.category.upsert({
+    where: { id: "cat-strings" },
+    update: {},
+    create: { id: "cat-strings", name: "Strings" },
+  });
+
+  // ─── Achievement Definitions (global) ────────────────────────────────────────
 
   const achievementDefs = [
-    { id: "ach-1", title: "Erste Schritte", description: "Erste Challenge abgeschlossen", iconKey: "Check", unlocked: true, rarity: "common", unlockedAt: new Date("2026-01-15") },
-    { id: "ach-2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht", iconKey: "CalendarWeek", unlocked: true, rarity: "rare", unlockedAt: new Date("2026-01-22") },
-    { id: "ach-3", title: "Blitzschnell", description: "Challenge in unter 3 Minuten gelöst", iconKey: "Clock", unlocked: true, rarity: "rare", unlockedAt: new Date("2026-01-25") },
-    { id: "ach-4", title: "Code-Meister", description: "10 schwere Challenges gelöst", iconKey: "Trophy", unlocked: true, rarity: "epic", unlockedAt: new Date("2026-01-28") },
-    { id: "ach-5", title: "Unaufhaltsam", description: "30 Tage Streak erreicht", iconKey: "Zap", unlocked: false, rarity: "legendary" },
-    { id: "ach-6", title: "Perfektionist", description: "20 Challenges ohne Fehler", iconKey: "Bullseye", unlocked: false, rarity: "epic" },
+    { id: "ach-1", title: "Erste Schritte",    description: "Erste Challenge abgeschlossen",        iconKey: "Check",        rarity: "common"    as const },
+    { id: "ach-2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht",               iconKey: "CalendarWeek", rarity: "rare"      as const },
+    { id: "ach-3", title: "Blitzschnell",      description: "Challenge in unter 3 Minuten gelöst", iconKey: "Clock",        rarity: "rare"      as const },
+    { id: "ach-4", title: "Code-Meister",      description: "10 schwere Challenges gelöst",         iconKey: "Trophy",       rarity: "epic"      as const },
+    { id: "ach-5", title: "Unaufhaltsam",      description: "30 Tage Streak erreicht",              iconKey: "Zap",          rarity: "legendary" as const },
+    { id: "ach-6", title: "Perfektionist",     description: "20 Challenges ohne Fehler",            iconKey: "Bullseye",     rarity: "epic"      as const },
   ];
 
-  for (const ach of achievementDefs) {
-    await prisma.achievement.upsert({
-      where: { id: ach.id },
+  for (const def of achievementDefs) {
+    await prisma.achievementDef.upsert({
+      where: { id: def.id },
       update: {},
-      create: { ...ach, userId: max.id },
+      create: def,
+    });
+  }
+
+  // ─── User Achievements ────────────────────────────────────────────────────────
+
+  const userAchievements = [
+    { userId: max.id, achievementId: "ach-1", unlockedAt: new Date("2026-01-15") },
+    { userId: max.id, achievementId: "ach-2", unlockedAt: new Date("2026-01-22") },
+    { userId: max.id, achievementId: "ach-3", unlockedAt: new Date("2026-01-25") },
+    { userId: max.id, achievementId: "ach-4", unlockedAt: new Date("2026-01-28") },
+    { userId: max.id, achievementId: "ach-5", unlockedAt: null },
+    { userId: max.id, achievementId: "ach-6", unlockedAt: null },
+  ];
+
+  for (const ua of userAchievements) {
+    await prisma.userAchievement.upsert({
+      where: { userId_achievementId: { userId: ua.userId, achievementId: ua.achievementId } },
+      update: {},
+      create: ua,
     });
   }
 
@@ -252,7 +220,7 @@ async function main() {
       description: "Implementiere eine Funktion transformArray(arr), die ein Array von Zahlen nimmt und ein neues Array zurückgibt, bei dem jedes Element die kumulative Summe aller vorherigen Elemente (inklusive sich selbst) enthält.",
       difficulty: "medium",
       points: 150,
-      category: "Algorithmen • Tag 47",
+      categoryId: catAlgorithmen.id,
       hint: "Versuche die Lösung mit O(n) Zeitkomplexität und O(1) zusätzlichem Speicher zu implementieren.",
       examples: [
         { input: "[1, 2, 3, 4, 5]", output: "[1, 3, 6, 10, 15]" },
@@ -280,7 +248,7 @@ async function main() {
       description: "Implementiere eine effiziente binäre Suche.",
       difficulty: "easy",
       points: 120,
-      category: "Algorithmen • Tag 46",
+      categoryId: catAlgorithmen.id,
       hint: "Teile das Array in der Mitte.",
       examples: [{ input: "[1,3,5,7,9], target=5", output: "2" }],
       testCases: [
@@ -302,7 +270,7 @@ async function main() {
       description: "Kehre einen String um.",
       difficulty: "easy",
       points: 100,
-      category: "Strings • Tag 45",
+      categoryId: catStrings.id,
       hint: "Nutze einen zwei-Zeiger-Ansatz.",
       examples: [{ input: '"hello"', output: '"olleh"' }],
       testCases: [
@@ -324,7 +292,7 @@ async function main() {
       description: "Implementiere eine einfache Hash Map.",
       difficulty: "medium",
       points: 150,
-      category: "Datenstrukturen • Tag 44",
+      categoryId: catDatenstrukturen.id,
       examples: [],
       testCases: [],
       starterCode: "class HashMap {\n  // Your solution here\n}",
@@ -342,7 +310,7 @@ async function main() {
       description: "Löse eine Fibonacci-Berechnung rekursiv.",
       difficulty: "easy",
       points: 100,
-      category: "Algorithmen • Tag 43",
+      categoryId: catAlgorithmen.id,
       examples: [{ input: "5", output: "5" }],
       testCases: [],
       starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
@@ -360,7 +328,7 @@ async function main() {
       description: "Traversiere einen binären Baum in-order.",
       difficulty: "hard",
       points: 200,
-      category: "Bäume • Tag 42",
+      categoryId: catBaeume.id,
       examples: [],
       testCases: [],
       starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
@@ -400,16 +368,16 @@ async function main() {
   const today = new Date("2026-04-05");
 
   const todayRankings = [
-    { userId: anna.id, rank: 1, previousRank: 1, points: 150, timeTaken: "4:23" },
-    { userId: tom.id, rank: 2, previousRank: 4, points: 145, timeTaken: "5:12" },
-    { userId: lisa.id, rank: 3, previousRank: 2, points: 140, timeTaken: "5:45" },
-    { userId: jan.id, rank: 4, previousRank: 3, points: 130, timeTaken: "6:02" },
-    { userId: sarah.id, rank: 5, previousRank: 7, points: 125, timeTaken: "6:30" },
-    { userId: max.id, rank: 6, previousRank: 5, points: 120, timeTaken: "7:15" },
-    { userId: julia.id, rank: 7, previousRank: 8, points: 115, timeTaken: "7:45" },
-    { userId: peter.id, rank: 8, previousRank: 6, points: 110, timeTaken: "8:20" },
-    { userId: maria.id, rank: 9, previousRank: 9, points: 105, timeTaken: "8:55" },
-    { userId: david.id, rank: 10, previousRank: 12, points: 100, timeTaken: "9:30" },
+    { userId: anna.id, rank: 1, previousRank: 1, points: 150, timeTaken: 263 },
+    { userId: tom.id, rank: 2, previousRank: 4, points: 145, timeTaken: 312 },
+    { userId: lisa.id, rank: 3, previousRank: 2, points: 140, timeTaken: 345 },
+    { userId: jan.id, rank: 4, previousRank: 3, points: 130, timeTaken: 362 },
+    { userId: sarah.id, rank: 5, previousRank: 7, points: 125, timeTaken: 390 },
+    { userId: max.id, rank: 6, previousRank: 5, points: 120, timeTaken: 435 },
+    { userId: julia.id, rank: 7, previousRank: 8, points: 115, timeTaken: 465 },
+    { userId: peter.id, rank: 8, previousRank: 6, points: 110, timeTaken: 500 },
+    { userId: maria.id, rank: 9, previousRank: 9, points: 105, timeTaken: 535 },
+    { userId: david.id, rank: 10, previousRank: 12, points: 100, timeTaken: 570 },
   ];
 
   for (const entry of todayRankings) {

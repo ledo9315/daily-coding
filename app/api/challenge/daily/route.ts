@@ -5,6 +5,7 @@ export async function GET() {
   const challenge = await prisma.challenge.findFirst({
     where: { isActive: true },
     orderBy: { date: "desc" },
+    include: { category: true },
   });
 
   if (!challenge) {
@@ -17,7 +18,7 @@ export async function GET() {
     description: challenge.description,
     difficulty: challenge.difficulty,
     points: challenge.points,
-    category: challenge.category,
+    category: challenge.category.name,
     hint: challenge.hint ?? "",
     examples: challenge.examples,
     testCases: challenge.testCases,

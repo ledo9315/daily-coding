@@ -5,7 +5,6 @@ import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
 import { StatsCard } from "@/components/stats-card";
 import { Zap, Bullseye, Trophy } from "@nsmr/pixelart-react";
-import { Meteors } from "@/components/ui/meteors";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import {
   getDashboardRankingPreview,

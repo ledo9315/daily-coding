@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { formatTime } from "@/lib/format";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -22,12 +23,11 @@ export async function GET(request: NextRequest) {
     entries.map((e: any) => ({
       rank: e.rank,
       previousRank: e.previousRank ?? undefined,
-      name: e.user!.name,
-      initials: e.user!.initials,
+      name: e.user.name,
+      initials: e.user.initials,
       points: e.points,
-      time: e.timeTaken ?? undefined,
-      avatar: e.user!.avatar,
-      level: e.user!.level,
+      time: formatTime(e.timeTaken),
+      avatar: e.user.avatar,
       challengesSolved: e.challengesSolved ?? undefined,
     }))
   );
