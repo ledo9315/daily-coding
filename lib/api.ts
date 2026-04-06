@@ -98,6 +98,14 @@ export interface DailyChallenge {
   starterCodes: StarterCodesMap;
   /** Single-string fallback (same as starterCodes[defaultLanguage]). */
   starterCode: string;
+  /**
+   * Wenn eingeloggt und für diese Challenge heute (UTC) bereits eine Submission existiert.
+   * Sonst null (auch wenn nicht eingeloggt).
+   */
+  todaySubmission: {
+    status: "completed" | "failed" | "pending";
+    submittedAt: string;
+  } | null;
 }
 
 export interface CommunityFeedItem {
@@ -139,7 +147,17 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
   if (!res.ok) {
-    throw new Error(`API error ${res.status}: ${path}`);
+    const raw = await res.text();
+    let message = `API error ${res.status}: ${path}`;
+    try {
+      const parsed = JSON.parse(raw) as { error?: unknown };
+      if (typeof parsed.error === "string" && parsed.error.length > 0) {
+        message = parsed.error;
+      }
+    } catch {
+      /* Body ist kein JSON — Fallback bleibt */
+    }
+    throw new Error(message);
   }
   return res.json() as Promise<T>;
 }

@@ -38,6 +38,11 @@ enum AchievementRarity {
   legendary
 }
 
+enum UserRole {
+  user
+  admin
+}
+
 /// Programming languages available for daily challenges (extend as runners are added).
 enum CodeLanguage {
   javascript
@@ -54,6 +59,7 @@ model User {
   avatar       String
   email        String       @unique
   passwordHash String?
+  role         UserRole     @default(user)
 
   streak       Int          @default(0)
   streakRecord Int          @default(0)

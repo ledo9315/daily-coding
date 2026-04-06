@@ -3,13 +3,19 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const PROTECTED_PATHS = ["/dashboard", "/profile", "/challenge", "/ranking"];
+const ADMIN_PREFIX = "/admin";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isProtected = PROTECTED_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(path + "/")
-  );
+  const isAdminPath =
+    pathname === ADMIN_PREFIX || pathname.startsWith(ADMIN_PREFIX + "/");
+
+  const isProtected =
+    isAdminPath ||
+    PROTECTED_PATHS.some(
+      (path) => pathname === path || pathname.startsWith(path + "/")
+    );
 
   if (!isProtected) return NextResponse.next();
 
@@ -33,11 +39,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Admin-Rechte: nicht per JWT (nach DB-Änderung veraltet), sondern in
+  // requireAdminPage / requireAdminApi per Datenbank prüfen.
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
+    "/admin",
+    "/admin/:path*",
     "/dashboard/:path*",
     "/profile/:path*",
     "/challenge",

@@ -11,6 +11,7 @@ export async function authorizeCredentials(
   name: string | null;
   email: string | null;
   image: string | null;
+  role: "user" | "admin";
 } | null> {
   const email = credentials?.email as string | undefined;
   const password = credentials?.password as string | undefined;
@@ -23,10 +24,13 @@ export async function authorizeCredentials(
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) return null;
 
+  const role: "user" | "admin" = user.role === "admin" ? "admin" : "user";
+
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     image: user.avatar,
+    role,
   };
 }
