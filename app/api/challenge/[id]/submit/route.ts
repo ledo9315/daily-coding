@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { ChallengeTestCase } from "@/lib/api";
-
-const CURRENT_USER_ID = "user-max";
+import { CURRENT_USER_ID } from "@/lib/server/app-config";
 
 export async function POST(
   request: NextRequest,

@@ -2,14 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { formatTime } from "@/lib/format";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import type { RankingEntry, TodayChallenge, UserStats } from "@/lib/api";
-import { CURRENT_USER_ID, DEMO_PERIOD_DATE } from "@/lib/server/app-config";
+import { CURRENT_USER_ID } from "@/lib/server/app-config";
+import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
+import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
+import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 
 export async function getTodayChallengeSummary(): Promise<TodayChallenge | null> {
-  const challenge = await prisma.challenge.findFirst({
-    where: { isActive: true },
-    orderBy: { date: "desc" },
-    include: { category: true },
-  });
+  const challenge = await findDailyChallengeForApp();
 
   if (!challenge) return null;
 
@@ -25,12 +24,16 @@ export async function getTodayChallengeSummary(): Promise<TodayChallenge | null>
 export async function getDashboardRankingPreviewData(): Promise<{
   today: RankingEntry[];
 }> {
+  const periodDate = getPeriodDateForRanking("today");
   const todayEntries = await prisma.rankingEntry.findMany({
-    where: { period: "today", periodDate: DEMO_PERIOD_DATE },
+    where: { period: "today", periodDate },
     orderBy: { rank: "asc" },
     take: 5,
     include: { user: true },
   });
+
+  const userIds = todayEntries.map((e) => e.userId);
+  const lifetimePoints = await getLifetimePointsByUserIds(userIds);
 
   return {
     today: todayEntries.map((e) => ({
@@ -40,6 +43,7 @@ export async function getDashboardRankingPreviewData(): Promise<{
       points: e.points,
       time: formatTime(e.timeTaken),
       avatar: e.user.avatar,
+      level: calculateLevel(lifetimePoints.get(e.userId) ?? 0),
     })),
   };
 }
@@ -52,7 +56,7 @@ export async function getUserStatsData(): Promise<UserStats> {
         userId_period_periodDate: {
           userId: CURRENT_USER_ID,
           period: "today",
-          periodDate: DEMO_PERIOD_DATE,
+          periodDate: getPeriodDateForRanking("today"),
         },
       },
     }),

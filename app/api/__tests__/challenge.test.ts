@@ -62,8 +62,8 @@ describe("GET /api/challenge/daily", () => {
     });
   });
 
-  it("returns 404 when no active challenge exists", async () => {
-    mockFindFirst.mockResolvedValueOnce(null);
+  it("returns 404 when no challenge for today and no active fallback", async () => {
+    mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
     const res = await getDailyHandler();
     expect(res.status).toBe(404);
     const json = await res.json();
@@ -84,16 +84,19 @@ describe("GET /api/challenge/daily", () => {
     expect(json.starterCode).toBe("");
   });
 
-  it("queries for the most recently dated active challenge", async () => {
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+  it("versucht zuerst Challenge am UTC-Tag, dann aktiven Fallback", async () => {
+    mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(activeChallenge);
     await getDailyHandler();
-    expect(mockFindFirst).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { isActive: true },
-        orderBy: { date: "desc" },
-        include: { category: true },
-      })
-    );
+    expect(mockFindFirst).toHaveBeenCalledTimes(2);
+    expect(mockFindFirst.mock.calls[0][0]).toMatchObject({
+      where: { date: { gte: expect.any(Date), lt: expect.any(Date) } },
+      include: { category: true },
+    });
+    expect(mockFindFirst.mock.calls[1][0]).toMatchObject({
+      where: { isActive: true },
+      orderBy: { date: "desc" },
+      include: { category: true },
+    });
   });
 });
 
@@ -109,8 +112,8 @@ describe("GET /api/challenge/today", () => {
     expect(json.category).toBe("ARRAYS");
   });
 
-  it("returns 404 when no active challenge exists", async () => {
-    mockFindFirst.mockResolvedValueOnce(null);
+  it("returns 404 when no challenge for today and no active fallback", async () => {
+    mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
     const res = await getTodayHandler();
     expect(res.status).toBe(404);
   });

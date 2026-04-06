@@ -1,11 +1,26 @@
 import { PrismaClient } from "../lib/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import {
+  startOfUtcDay,
+  startOfUtcWeek,
+  startOfUtcMonth,
+} from "../lib/server/ranking-period";
 import "dotenv/config";
+
+function addUtcDays(d: Date, delta: number): Date {
+  const x = new Date(d);
+  x.setUTCDate(x.getUTCDate() + delta);
+  return x;
+}
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const anchor = startOfUtcDay(new Date());
+  const rankingWeekStart = startOfUtcWeek(anchor);
+  const rankingMonthStart = startOfUtcMonth(anchor);
+
   // ─── Users ───────────────────────────────────────────────────────────────────
 
   const anna = await prisma.user.upsert({
@@ -235,7 +250,7 @@ async function main() {
       ],
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
       isActive: true,
-      date: new Date("2026-04-05"),
+      date: anchor,
     },
   });
 
@@ -257,7 +272,7 @@ async function main() {
       ],
       starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
       isActive: false,
-      date: new Date("2026-04-04"),
+      date: addUtcDays(anchor, -1),
     },
   });
 
@@ -279,7 +294,7 @@ async function main() {
       ],
       starterCode: "function reverseString(s) {\n  // Your solution here\n}",
       isActive: false,
-      date: new Date("2026-04-03"),
+      date: addUtcDays(anchor, -2),
     },
   });
 
@@ -297,7 +312,7 @@ async function main() {
       testCases: [],
       starterCode: "class HashMap {\n  // Your solution here\n}",
       isActive: false,
-      date: new Date("2026-04-02"),
+      date: addUtcDays(anchor, -3),
     },
   });
 
@@ -315,7 +330,7 @@ async function main() {
       testCases: [],
       starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
       isActive: false,
-      date: new Date("2026-04-01"),
+      date: addUtcDays(anchor, -4),
     },
   });
 
@@ -333,7 +348,7 @@ async function main() {
       testCases: [],
       starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
       isActive: false,
-      date: new Date("2026-03-31"),
+      date: addUtcDays(anchor, -5),
     },
   });
 
@@ -365,7 +380,7 @@ async function main() {
 
   // ─── Ranking Entries (today) ──────────────────────────────────────────────────
 
-  const today = new Date("2026-04-05");
+  const today = anchor;
 
   const todayRankings = [
     { userId: anna.id, rank: 1, previousRank: 1, points: 150, timeTaken: 263 },
@@ -389,7 +404,7 @@ async function main() {
   }
 
   // Weekly rankings
-  const weekDate = new Date("2026-04-05");
+  const weekDate = rankingWeekStart;
   const weeklyRankings = [
     { userId: tom.id, rank: 1, previousRank: 2, points: 890, challengesSolved: 7 },
     { userId: anna.id, rank: 2, previousRank: 1, points: 875, challengesSolved: 7 },
@@ -412,7 +427,7 @@ async function main() {
   }
 
   // Monthly rankings
-  const monthDate = new Date("2026-04-05");
+  const monthDate = rankingMonthStart;
   const monthlyRankings = [
     { userId: anna.id, rank: 1, previousRank: 1, points: 3450, challengesSolved: 28 },
     { userId: tom.id, rank: 2, previousRank: 3, points: 3280, challengesSolved: 27 },

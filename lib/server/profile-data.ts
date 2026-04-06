@@ -2,7 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import { formatTime, formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
-import { CURRENT_USER_ID, DEMO_PERIOD_DATE } from "@/lib/server/app-config";
+import { CURRENT_USER_ID } from "@/lib/server/app-config";
+import { getPeriodDateForRanking } from "@/lib/server/ranking-period";
 
 export async function getUserProfileData(): Promise<UserProfile> {
   const [user, todayRank, completedSubmissions, unlockedBadges] = await Promise.all([
@@ -22,7 +23,7 @@ export async function getUserProfileData(): Promise<UserProfile> {
         userId_period_periodDate: {
           userId: CURRENT_USER_ID,
           period: "today",
-          periodDate: DEMO_PERIOD_DATE,
+          periodDate: getPeriodDateForRanking("today"),
         },
       },
     }),
@@ -70,7 +71,10 @@ export async function getUserProfileData(): Promise<UserProfile> {
       title: s.challenge.title,
       date: formatDate(s.createdAt),
       difficulty: s.challenge.difficulty,
-      status: s.status,
+      status:
+        s.status === "completed" || s.status === "failed" || s.status === "skipped"
+          ? s.status
+          : "skipped",
       points: s.challenge.points,
       time: formatTime(s.timeTaken),
       rank: s.rank ?? undefined,

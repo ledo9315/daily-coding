@@ -46,6 +46,22 @@ jobs:
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U ci -d ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=8
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -57,7 +73,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec prisma generate
-      - run: pnpm exec vitest run --passWithNoTests
+      - run: pnpm exec prisma migrate deploy
+      - run: pnpm test
 
   build:
     name: Build
