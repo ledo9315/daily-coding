@@ -40,12 +40,14 @@ const validBody = {
       javascript: "f",
       typescript: "f",
       python: "f",
+      php: "f",
     },
   },
   starterCodes: {
     javascript: "j",
     typescript: "t",
     python: "p",
+    php: "x",
   },
 };
 

@@ -46,9 +46,14 @@ const patchBody = {
   examples: [],
   testCases: [{ name: "t", input: "1", expected: "1" }],
   evaluationConfig: {
-    callableByLanguage: { javascript: "f", typescript: "f", python: "f" },
+    callableByLanguage: {
+      javascript: "f",
+      typescript: "f",
+      python: "f",
+      php: "f",
+    },
   },
-  starterCodes: { javascript: "j", typescript: "t", python: "p" },
+  starterCodes: { javascript: "j", typescript: "t", python: "p", php: "x" },
   dateIso: null,
 };
 

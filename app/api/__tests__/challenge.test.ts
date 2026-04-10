@@ -73,11 +73,12 @@ const activeChallenge = {
   examples: [{ input: "[2,7,11,15], 9", output: "[0,1]" }],
   testCases: [{ id: 1, name: "T1", status: "pending" }],
   starterCode: "function twoSum(nums, target) {}",
-  supportedLanguages: ["javascript", "typescript", "python"] as const,
+  supportedLanguages: ["javascript", "typescript", "python", "php"] as const,
   starterCodes: {
     javascript: "function twoSum(nums, target) {}",
     typescript: "function twoSum(nums: number[], target: number): number[] {}",
     python: "def two_sum(nums, target):\n    pass",
+    php: "<?php\n\nfunction twoSum($nums, $target) {\n}\n",
   },
   isActive: true,
   date: new Date("2026-04-05"),
@@ -98,7 +99,7 @@ describe("GET /api/challenge/daily", () => {
       points: 200,
       hint: "Use a hash map",
       defaultLanguage: "javascript",
-      supportedLanguages: ["javascript", "typescript", "python"],
+      supportedLanguages: ["javascript", "typescript", "python", "php"],
       todaySubmission: null,
     });
     expect(json.starterCodes).toMatchObject({

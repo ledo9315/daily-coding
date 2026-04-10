@@ -109,7 +109,7 @@ export function RankingTable({
                 Rang
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground min-w-0">
-                Entwickler
+                Nutzer
               </th>
               {showTime && (
                 <th

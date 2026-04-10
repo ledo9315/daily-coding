@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
   const supported =
     data.supportedLanguages?.length ? data.supportedLanguages : (
-      ["javascript", "typescript", "python"] as const
+      ["javascript", "typescript", "python", "php"] as const
     );
 
   try {

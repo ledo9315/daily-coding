@@ -7,7 +7,7 @@ import {
 } from "@/lib/challenge-languages";
 
 describe("parseCodeLanguage", () => {
-  const allowed = ["javascript", "typescript", "python"] as const;
+  const allowed = ["javascript", "typescript", "python", "php"] as const;
 
   it("defaults to first allowed when missing", () => {
     expect(parseCodeLanguage(undefined, allowed)).toBe("javascript");
@@ -57,5 +57,6 @@ describe("languageFileName", () => {
   it("maps to file names", () => {
     expect(languageFileName("javascript")).toBe("solution.js");
     expect(languageFileName("python")).toBe("main.py");
+    expect(languageFileName("php")).toBe("main.php");
   });
 });

@@ -50,6 +50,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { X } from "lucide-react";
 
 /** Abstand für stillen API-Check (neuer UTC-Tag / neue Challenge). */
 const CHALLENGE_POLL_MS = 60_000;
@@ -74,6 +75,7 @@ export default function ChallengePage() {
   const [testRunCount, setTestRunCount] = useState(0);
   const [celebrationOpen, setCelebrationOpen] = useState(false);
   const [celebration, setCelebration] = useState<SubmitCelebration | null>(null);
+  const [submitWarningDismissed, setSubmitWarningDismissed] = useState(false);
 
   const isSubmitLocked = submitOutcome !== "none";
 
@@ -138,6 +140,10 @@ export default function ChallengePage() {
 
   useEffect(() => {
     setTestRunCount(0);
+  }, [challenge?.id]);
+
+  useEffect(() => {
+    setSubmitWarningDismissed(false);
   }, [challenge?.id]);
 
   useEffect(() => {
@@ -280,6 +286,7 @@ export default function ChallengePage() {
           celebration={celebration}
           testRunsBeforeSubmit={testRunCount}
           pointsEarned={challenge.points}
+          testCases={testCases}
         />
       ) : null}
 
@@ -427,11 +434,21 @@ export default function ChallengePage() {
               submittedAt={submittedAtLabel}
             />
 
-            {!isSubmitLocked && (
+            {!isSubmitLocked && !submitWarningDismissed && (
               <Alert
                 variant="destructive"
-                className="border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none"
+                className="relative border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none pr-12"
               >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1 h-8 w-8 rounded-none text-muted-foreground hover:text-foreground hover:bg-amber-500/20"
+                  onClick={() => setSubmitWarningDismissed(true)}
+                  aria-label="Hinweis schließen"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
                 <AlertIcon className="h-4 w-4" fill="currentColor" />
                 <AlertTitle className="text-lg leading-none mb-2">
                   Achtung

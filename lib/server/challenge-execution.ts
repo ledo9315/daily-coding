@@ -2,7 +2,11 @@ import type { ChallengeTestCase } from "@/lib/api";
 import type { CodeLanguageId } from "@/lib/challenge-languages";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { isCodeExecutionEnabled } from "@/lib/server/code-execution-flag";
-import { buildWrappedProgram, outputsMatch } from "@/lib/server/io-harness";
+import {
+  buildWrappedProgram,
+  extractIoProgramOutput,
+  outputsMatch,
+} from "@/lib/server/io-harness";
 import { executeWithPiston } from "@/lib/server/piston-runner";
 import { stubRunResults, stubSubmitPassedResults } from "@/lib/server/challenge-run-stub";
 
@@ -158,7 +162,8 @@ async function runPistonIoCases(
       continue;
     }
 
-    const out = piston.stdout.trim();
+    const out = extractIoProgramOutput(piston.stdout);
+    const outDisplay = out.slice(0, 2000);
     if (!outputsMatch(out, tc.expected)) {
       allPassed = false;
       results.push({
@@ -167,7 +172,7 @@ async function runPistonIoCases(
         status: "failed",
         input: tc.input,
         expected: tc.expected,
-        actual: out.slice(0, 2000),
+        actual: outDisplay,
         time: timeStr,
       });
     } else {
@@ -177,6 +182,7 @@ async function runPistonIoCases(
         status: "passed",
         input: tc.input,
         expected: tc.expected,
+        actual: outDisplay,
         time: timeStr,
       });
     }

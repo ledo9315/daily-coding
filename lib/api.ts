@@ -142,6 +142,11 @@ export interface CommunityFeedItem {
   points: number;
   time: string;
   createdAt: string;
+  /** Gesetzt, wenn diese Abgabe einen Levelaufstieg ausgelöst hat. */
+  levelUp?: {
+    previousLevel: number;
+    newLevel: number;
+  };
 }
 
 export interface CommunityFeedPage {

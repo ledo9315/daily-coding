@@ -28,9 +28,11 @@ export type ChallengeFormInitial = {
   fnJs: string;
   fnTs: string;
   fnPy: string;
+  fnPhp: string;
   starterJs: string;
   starterTs: string;
   starterPy: string;
+  starterPhp: string;
   isActive: boolean;
   dateLocal: string;
 };
@@ -61,9 +63,11 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     fnJs: typeof cbl?.javascript === "string" ? cbl.javascript : "solve",
     fnTs: typeof cbl?.typescript === "string" ? cbl.typescript : "solve",
     fnPy: typeof cbl?.python === "string" ? cbl.python : "solve",
+    fnPhp: typeof cbl?.php === "string" ? cbl.php : "solve",
     starterJs: starters.javascript ?? "",
     starterTs: starters.typescript ?? "",
     starterPy: starters.python ?? "",
+    starterPhp: starters.php ?? "",
     isActive: ch.isActive,
     dateLocal: ch.date ? formatDatetimeLocal(new Date(ch.date)) : "",
   };

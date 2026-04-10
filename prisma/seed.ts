@@ -271,7 +271,7 @@ async function main() {
 
   // ─── Challenges ───────────────────────────────────────────────────────────────
 
-  const supportedLangs = ["javascript", "typescript", "python"] as const;
+  const supportedLangs = ["javascript", "typescript", "python", "php"] as const;
 
   const challengeToday = await prisma.challenge.upsert({
     where: { id: "challenge-array-manipulation" },
@@ -282,6 +282,7 @@ async function main() {
           javascript: "transformArray",
           typescript: "transformArray",
           python: "transform_array",
+          php: "transformArray",
         },
       },
       testCases: [
@@ -312,6 +313,7 @@ async function main() {
           "function transformArray(arr: number[]): number[] {\n  // Your solution here\n  return arr;\n}",
         python:
           "def transform_array(arr):\n    # Your solution here\n    pass\n",
+        php: "<?php\n\nfunction transformArray($arr) {\n    // Your solution here\n}\n",
       },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
     },
@@ -332,6 +334,7 @@ async function main() {
           javascript: "transformArray",
           typescript: "transformArray",
           python: "transform_array",
+          php: "transformArray",
         },
       },
       testCases: [
@@ -363,6 +366,7 @@ async function main() {
           "function transformArray(arr: number[]): number[] {\n  // Your solution here\n  return arr;\n}",
         python:
           "def transform_array(arr):\n    # Your solution here\n    pass\n",
+        php: "<?php\n\nfunction transformArray($arr) {\n    // Your solution here\n}\n",
       },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
       isActive: true,
@@ -380,6 +384,7 @@ async function main() {
           "function binarySearch(arr: number[], target: number): number {\n  // Your solution here\n  return -1;\n}",
         python:
           "def binary_search(arr, target):\n    # Your solution here\n    return -1\n",
+        php: "<?php\n\nfunction binarySearch($arr, $target) {\n    // Your solution here\n    return -1;\n}\n",
       },
       starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
     },
@@ -403,6 +408,7 @@ async function main() {
           "function binarySearch(arr: number[], target: number): number {\n  // Your solution here\n  return -1;\n}",
         python:
           "def binary_search(arr, target):\n    # Your solution here\n    return -1\n",
+        php: "<?php\n\nfunction binarySearch($arr, $target) {\n    // Your solution here\n    return -1;\n}\n",
       },
       starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
       isActive: false,
@@ -420,6 +426,7 @@ async function main() {
           "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
         python:
           "def reverse_string(s: str):\n    # Your solution here\n    return s\n",
+        php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
       },
       starterCode: "function reverseString(s) {\n  // Your solution here\n}",
     },
@@ -443,6 +450,7 @@ async function main() {
           "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
         python:
           "def reverse_string(s: str):\n    # Your solution here\n    return s\n",
+        php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
       },
       starterCode: "function reverseString(s) {\n  // Your solution here\n}",
       isActive: false,
@@ -458,6 +466,7 @@ async function main() {
         javascript: "class HashMap {\n  // Your solution here\n}",
         typescript: "class HashMap {\n  // Your solution here\n}",
         python: "class HashMap:\n    # Your solution here\n    pass\n",
+        php: "<?php\n\nclass HashMap {\n    // Your solution here\n}\n",
       },
       starterCode: "class HashMap {\n  // Your solution here\n}",
     },
@@ -475,6 +484,7 @@ async function main() {
         javascript: "class HashMap {\n  // Your solution here\n}",
         typescript: "class HashMap {\n  // Your solution here\n}",
         python: "class HashMap:\n    # Your solution here\n    pass\n",
+        php: "<?php\n\nclass HashMap {\n    // Your solution here\n}\n",
       },
       starterCode: "class HashMap {\n  // Your solution here\n}",
       isActive: false,
@@ -492,6 +502,7 @@ async function main() {
           "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
         python:
           "def fibonacci(n: int) -> int:\n    # Your solution here\n    return 0\n",
+        php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
       },
       starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
     },
@@ -511,6 +522,7 @@ async function main() {
           "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
         python:
           "def fibonacci(n: int) -> int:\n    # Your solution here\n    return 0\n",
+        php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
       },
       starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
       isActive: false,
@@ -528,6 +540,7 @@ async function main() {
           "function inorderTraversal(root: TreeNode | null): number[] {\n  // Your solution here\n  return [];\n}",
         python:
           "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
+        php: "<?php\n\nfunction inorderTraversal($root) {\n    // Your solution here\n    return [];\n}\n",
       },
       starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
     },
@@ -547,6 +560,7 @@ async function main() {
           "function inorderTraversal(root: TreeNode | null): number[] {\n  // Your solution here\n  return [];\n}",
         python:
           "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
+        php: "<?php\n\nfunction inorderTraversal($root) {\n    // Your solution here\n    return [];\n}\n",
       },
       starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
       isActive: false,

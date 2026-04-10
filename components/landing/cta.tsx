@@ -24,7 +24,7 @@ export function LandingCTA() {
             BEREIT, DEINE SKILLS ZU DEBUGGEN?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Schließe dich anderen Entwicklern an und löse tägliche Challenges.
+            Schließe dich anderen Nutzern an und löse tägliche Challenges.
             Kostenlos für Einzelpersonen.
           </p>
 
