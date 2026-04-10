@@ -1,5 +1,5 @@
 /** Supported programming languages (must match Prisma enum `CodeLanguage`). */
-export const CODE_LANGUAGES = ["javascript", "typescript", "python"] as const;
+export const CODE_LANGUAGES = ["javascript", "typescript", "python", "php"] as const;
 export type CodeLanguageId = (typeof CODE_LANGUAGES)[number];
 
 /** Per-language starters returned for a challenge (keys ⊆ CodeLanguageId). */
@@ -9,12 +9,14 @@ const LABELS: Record<CodeLanguageId, string> = {
   javascript: "JavaScript",
   typescript: "TypeScript",
   python: "Python",
+  php: "PHP",
 };
 
 const FILENAMES: Record<CodeLanguageId, string> = {
   javascript: "solution.js",
   typescript: "solution.ts",
   python: "main.py",
+  php: "main.php",
 };
 
 export function languageLabel(lang: CodeLanguageId): string {
@@ -31,6 +33,8 @@ function fallbackStarter(lang: CodeLanguageId): string {
       return "# Implement your solution\ndef solve():\n    pass\n";
     case "typescript":
       return "// Implement your solution\n";
+    case "php":
+      return "<?php\n\n// Implement your solution\nfunction solve($data) {\n}\n";
     default:
       return "// Implement your solution\n";
   }

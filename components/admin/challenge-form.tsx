@@ -59,6 +59,7 @@ export function AdminChallengeForm({
   const [fnJs, setFnJs] = useState(initial?.fnJs ?? "solve");
   const [fnTs, setFnTs] = useState(initial?.fnTs ?? "solve");
   const [fnPy, setFnPy] = useState(initial?.fnPy ?? "solve");
+  const [fnPhp, setFnPhp] = useState(initial?.fnPhp ?? "solve");
   const [starterJs, setStarterJs] = useState(
     initial?.starterJs ??
       "function solve(arr) {\n  // …\n  return arr;\n}",
@@ -69,6 +70,10 @@ export function AdminChallengeForm({
   );
   const [starterPy, setStarterPy] = useState(
     initial?.starterPy ?? "def solve(arr):\n    # …\n    pass\n",
+  );
+  const [starterPhp, setStarterPhp] = useState(
+    initial?.starterPhp ??
+      "<?php\n\nfunction solve($arr) {\n    // …\n}\n",
   );
   const [isActive, setIsActive] = useState(initial?.isActive ?? false);
   const [dateLocal, setDateLocal] = useState(initial?.dateLocal ?? "");
@@ -109,14 +114,16 @@ export function AdminChallengeForm({
           javascript: fnJs.trim(),
           typescript: fnTs.trim(),
           python: fnPy.trim(),
+          php: fnPhp.trim(),
         },
       },
       starterCodes: {
         javascript: starterJs,
         typescript: starterTs,
         python: starterPy,
+        php: starterPhp,
       },
-      supportedLanguages: ["javascript", "typescript", "python"] as const,
+      supportedLanguages: ["javascript", "typescript", "python", "php"] as const,
       isActive,
       dateIso: dateLocal ? new Date(dateLocal).toISOString() : null,
     };
@@ -303,7 +310,7 @@ export function AdminChallengeForm({
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-2">
           <Label htmlFor="fjs">Funktionsname JS</Label>
           <Input
@@ -328,6 +335,15 @@ export function AdminChallengeForm({
             id="fpy"
             value={fnPy}
             onChange={(e) => setFnPy(e.target.value)}
+            className="rounded-none font-mono text-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="fphp">Funktionsname PHP</Label>
+          <Input
+            id="fphp"
+            value={fnPhp}
+            onChange={(e) => setFnPhp(e.target.value)}
             className="rounded-none font-mono text-sm"
           />
         </div>
@@ -356,6 +372,14 @@ export function AdminChallengeForm({
           <Textarea
             value={starterPy}
             onChange={(e) => setStarterPy(e.target.value)}
+            className="rounded-none font-mono text-xs min-h-[100px]"
+          />
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">PHP</p>
+          <Textarea
+            value={starterPhp}
+            onChange={(e) => setStarterPhp(e.target.value)}
             className="rounded-none font-mono text-xs min-h-[100px]"
           />
         </div>

@@ -95,24 +95,43 @@ export function TestResults({ testCases, className }: TestResultsProps) {
                 )}
               </div>
 
-              {st === "failed" && (
-                <div className="mt-3 space-y-2 rounded-lg bg-rose-500/5 p-3 font-mono text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Input: </span>
-                    <span>{testCase.input}</span>
+              {testCase.input != null &&
+                testCase.expected != null &&
+                (st === "failed" || st === "passed") && (
+                  <div
+                    className={cn(
+                      "mt-3 space-y-2 rounded-lg p-3 font-mono text-sm break-all",
+                      st === "failed"
+                        ? "bg-rose-500/5"
+                        : "bg-emerald-500/5 border border-emerald-500/15",
+                    )}
+                  >
+                    <div>
+                      <span className="text-muted-foreground">Input: </span>
+                      <span>{testCase.input}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Erwartet: </span>
+                      <span className="text-emerald-500">
+                        {testCase.expected}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Erhalten: </span>
+                      <span
+                        className={
+                          st === "failed"
+                            ? "text-rose-500"
+                            : "text-emerald-400"
+                        }
+                      >
+                        {testCase.actual != null && testCase.actual !== ""
+                          ? String(testCase.actual)
+                          : "—"}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Erwartet: </span>
-                    <span className="text-emerald-500">
-                      {testCase.expected}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Erhalten: </span>
-                    <span className="text-rose-500">{testCase.actual}</span>
-                  </div>
-                </div>
-              )}
+                )}
             </div>
           );
         })}

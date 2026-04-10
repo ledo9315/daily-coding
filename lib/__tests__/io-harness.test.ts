@@ -1,5 +1,20 @@
 import { describe, it, expect } from "vitest";
-import { outputsMatch, buildWrappedProgram } from "@/lib/server/io-harness";
+import {
+  outputsMatch,
+  buildWrappedProgram,
+  extractIoProgramOutput,
+} from "@/lib/server/io-harness";
+
+describe("extractIoProgramOutput", () => {
+  it("returns full string when it is valid JSON", () => {
+    expect(extractIoProgramOutput('  [1,3,6]  ')).toBe("[1,3,6]");
+  });
+
+  it("uses last line when PHP noise precedes JSON", () => {
+    const raw = "Notice: something\n[1,3,6,10,15]\n";
+    expect(extractIoProgramOutput(raw)).toBe("[1,3,6,10,15]");
+  });
+});
 
 describe("outputsMatch", () => {
   it("trims whitespace", () => {
@@ -28,5 +43,16 @@ describe("buildWrappedProgram", () => {
     expect(src).toContain("def g(x):");
     expect(src).toContain("json.loads(_raw)");
     expect(src).toContain("g(_data)");
+  });
+
+  it("PHP: invokes callable with json_decode and echo", () => {
+    const src = buildWrappedProgram(
+      "php",
+      "<?php\nfunction h($d) { return $d; }",
+      "h",
+    );
+    expect(src).toContain("function h($d)");
+    expect(src).toContain("json_decode($__raw, true)");
+    expect(src).toContain("h($__data)");
   });
 });

@@ -17,6 +17,36 @@ export function outputsMatch(actual: string, expected: string): boolean {
 }
 
 /**
+ * Rohes stdout von Piston (z. B. PHP-Notices vor der JSON-Zeile) auf die nutzbare JSON-Ausgabe reduzieren.
+ */
+export function extractIoProgramOutput(raw: string): string {
+  const t = raw.trim();
+  if (!t) return t;
+
+  const tryParse = (s: string): string | null => {
+    try {
+      JSON.parse(s);
+      return s;
+    } catch {
+      return null;
+    }
+  };
+
+  const whole = tryParse(t);
+  if (whole != null) return whole;
+
+  const lines = t.split(/\r?\n/u);
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i]!.trim();
+    if (!line) continue;
+    const parsed = tryParse(line);
+    if (parsed != null) return parsed;
+  }
+
+  return t;
+}
+
+/**
  * User-Code zu einem vollständigen Programm: liest eine JSON-Zeile von stdin, ruft callable(data), schreibt JSON.stringify(result) nach stdout.
  */
 export function buildWrappedProgram(
@@ -53,6 +83,16 @@ _data = json.loads(_raw)
 _result = ${callable}(_data)
 sys.stdout.write(json.dumps(_result))
 `;
+    case "php": {
+      const body = /^<\?php\b/m.test(trimmed) ? trimmed : `<?php\n\n${trimmed}`;
+      return `${body}
+
+$__raw = trim(stream_get_contents(STDIN));
+$__data = json_decode($__raw, true);
+$__result = ${callable}($__data);
+echo json_encode($__result, JSON_UNESCAPED_UNICODE);
+`;
+    }
     default: {
       const _exhaustive: never = language;
       return _exhaustive;

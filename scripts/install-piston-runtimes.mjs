@@ -20,6 +20,7 @@ const RUNTIME_INSTALL = [
   { app: "javascript", pkg: "node" },
   { app: "typescript", pkg: "typescript" },
   { app: "python", pkg: "python" },
+  { app: "php", pkg: "php" },
 ];
 
 /** Grober semver-Vergleich (höhere Version zuerst bei aufsteigendem sort) */

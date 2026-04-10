@@ -81,7 +81,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
   const supported =
     data.supportedLanguages?.length ? data.supportedLanguages : (
-      ["javascript", "typescript", "python"] as const
+      ["javascript", "typescript", "python", "php"] as const
     );
 
   try {

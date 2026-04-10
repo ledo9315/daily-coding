@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import type { SubmitCelebration } from "@/lib/api";
 import { formatTime } from "@/lib/format";
 import { Trophy, Zap } from "@nsmr/pixelart-react";
+import { TestResults, type TestCase } from "@/components/test-results";
 
 /** Eigener Fullscreen-Canvas per `confetti.create` — zuverlässiger als der globale Default-Canvas (Stacking in Next/Radix). */
 const CONFETTI_LAYER_Z = 10050;
@@ -78,6 +79,7 @@ export function ChallengeSuccessModal({
   celebration,
   testRunsBeforeSubmit,
   pointsEarned,
+  testCases,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -85,6 +87,8 @@ export function ChallengeSuccessModal({
   /** Anzahl Klicks auf „Test ausführen“ vor der finalen Abgabe. */
   testRunsBeforeSubmit: number;
   pointsEarned: number;
+  /** Optional: gleiche Testdetails wie in der Seitenleiste (Input / Erwartet / Erhalten). */
+  testCases?: TestCase[];
 }) {
   const [confettiCanvas, setConfettiCanvas] = useState<HTMLCanvasElement | null>(null);
   useFullscreenConfetti(Boolean(open && celebration), confettiCanvas);
@@ -175,6 +179,17 @@ export function ChallengeSuccessModal({
                 {streakLine}
               </p>
             </div>
+
+            {testCases && testCases.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Testübersicht
+                </p>
+                <div className="max-h-[min(45vh,320px)] overflow-y-auto rounded-none border border-border bg-card/80">
+                  <TestResults testCases={testCases} className="border-0 shadow-none" />
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <DialogFooter className="sm:justify-center pt-2">

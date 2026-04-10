@@ -68,7 +68,7 @@ export default async function DashboardPage() {
           <StatsCard
             title="DEIN RANG"
             value={userStats.rank}
-            description="von 156 Entwicklern"
+            description="von 156 Nutzern"
             icon={Trophy}
             trend={{ value: 3, label: "seit letzter Woche" }}
           />

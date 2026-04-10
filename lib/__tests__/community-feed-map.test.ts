@@ -28,4 +28,17 @@ describe("communityFeedItemToFeedItem", () => {
     );
     expect(props.user.username).toBe("@alice");
   });
+
+  it("maps level-up to event type level-up with combined description", () => {
+    const props = communityFeedItemToFeedItem({
+      ...base,
+      levelUp: { previousLevel: 3, newLevel: 4 },
+    });
+    expect(props.event.type).toBe("level-up");
+    expect(props.event.title).toBe("Challenge gelöst & Level-Aufstieg");
+    expect(props.event.description).toContain("Two Sum");
+    expect(props.event.description).toContain("Stufe 3");
+    expect(props.event.description).toContain("Stufe 4");
+    expect(props.event.description).toContain("Experte");
+  });
 });

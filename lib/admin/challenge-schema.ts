@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { CODE_LANGUAGES } from "@/lib/challenge-languages";
+
+const codeLanguageZ = z.enum(CODE_LANGUAGES);
 
 /** Payload vom Admin-Formular / API zum Anlegen einer Challenge. */
 export const adminCreateChallengeSchema = z.object({
@@ -35,16 +38,16 @@ export const adminCreateChallengeSchema = z.object({
       javascript: z.string().min(1),
       typescript: z.string().min(1),
       python: z.string().min(1),
+      php: z.string().min(1),
     }),
   }),
   starterCodes: z.object({
     javascript: z.string(),
     typescript: z.string(),
     python: z.string(),
+    php: z.string(),
   }),
-  supportedLanguages: z
-    .array(z.enum(["javascript", "typescript", "python"]))
-    .optional(),
+  supportedLanguages: z.array(codeLanguageZ).optional(),
   isActive: z.boolean().optional(),
   /** z. B. Wert von `datetime-local` oder leer → kein Daily-Datum */
   dateIso: z.string().optional().nullable(),

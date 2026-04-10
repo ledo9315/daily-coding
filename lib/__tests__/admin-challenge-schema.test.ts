@@ -16,12 +16,14 @@ describe("adminCreateChallengeSchema", () => {
         javascript: "fn",
         typescript: "fn",
         python: "fn",
+        php: "fn",
       },
     },
     starterCodes: {
       javascript: "js",
       typescript: "ts",
       python: "py",
+      php: "p",
     },
   };
 

@@ -207,11 +207,14 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem asChild className="rounded-none text-lg">
-                    <Link href="/settings" className="cursor-pointer">
-                      <Sliders className="mr-2 h-5 w-5" />
-                      EINSTELLUNGEN
-                    </Link>
+                  <DropdownMenuItem
+                    disabled
+                    title="Demnächst verfügbar"
+                    className="rounded-none text-lg text-muted-foreground cursor-not-allowed"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Sliders className="mr-2 h-5 w-5" />
+                    EINSTELLUNGEN
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border" />
                   <DropdownMenuItem

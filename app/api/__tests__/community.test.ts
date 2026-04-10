@@ -42,12 +42,26 @@ describe("GET /api/community/feed", () => {
     ...overrides,
   });
 
+  /** Chronologische Submissions für Lifetime + Level-Up (IDs müssen zur Seitenzeile passen). */
   function withLifetimePoints(submission: ReturnType<typeof makeSubmission>) {
     mockFindMany
       .mockResolvedValueOnce([submission])
       .mockResolvedValueOnce([
-        { userId: submission.userId, challenge: { points: 400 } },
-        { userId: submission.userId, challenge: { points: 400 } },
+        {
+          id: "sub-p1",
+          userId: submission.userId,
+          challenge: { points: 300 },
+        },
+        {
+          id: "sub-p2",
+          userId: submission.userId,
+          challenge: { points: 300 },
+        },
+        {
+          id: submission.id,
+          userId: submission.userId,
+          challenge: { points: submission.challenge.points },
+        },
       ]);
   }
 
@@ -76,6 +90,7 @@ describe("GET /api/community/feed", () => {
       action: "hat die Challenge gelöst",
       challenge: "Two Sum",
       points: 200,
+      levelUp: { previousLevel: 3, newLevel: 4 },
     });
     expect(json.items[0].createdAt).toBeDefined();
   });
@@ -182,6 +197,7 @@ describe("GET /api/community/feed", () => {
       .mockResolvedValueOnce(rows)
       .mockResolvedValueOnce(
         rows.slice(0, 15).map((r) => ({
+          id: r.id,
           userId: r.userId,
           challenge: { points: 100 },
         })),

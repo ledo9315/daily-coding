@@ -65,7 +65,7 @@ export default function RankingPage() {
             Rangliste
           </h1>
           <EncryptedText
-            text="Vergleiche dich mit anderen Entwicklern"
+            text="Vergleiche dich mit anderen Nutzern"
             revealDelayMs={20}
             className="text-xl text-muted-foreground uppercase tracking-wide"
           />

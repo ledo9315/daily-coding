@@ -48,6 +48,7 @@ enum CodeLanguage {
   javascript
   typescript
   python
+  php
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -109,12 +110,12 @@ model Challenge {
   hint        String?
   examples    Json         @default("[]")
   testCases   Json         @default("[]")
-  /// Optional: { "callableByLanguage": { "javascript": "fn", "typescript": "fn", "python": "sn_fn" } } für stdin/stdout-Auswertung
+  /// Optional: { "callableByLanguage": { "javascript": "fn", "typescript": "fn", "python": "sn_fn", "php": "fn" } } für stdin/stdout-Auswertung
   evaluationConfig Json?
   /// @deprecated Prefer starterCodes; kept for seeds / legacy rows.
   starterCode String?
   /// All languages users may submit in for this challenge.
-  supportedLanguages CodeLanguage[] @default([javascript, typescript, python])
+  supportedLanguages CodeLanguage[] @default([javascript, typescript, python, php])
   /// Map language id → starter template (JSON object).
   starterCodes Json @default("{}")
   isActive    Boolean      @default(false)

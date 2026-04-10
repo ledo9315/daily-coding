@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { calculateLevel } from "@/lib/level";
-import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
+import { computeLevelUpBySubmissionId } from "@/lib/server/community-feed-level";
 
 const DEFAULT_LIMIT = 15;
 const MAX_LIMIT = 50;
@@ -41,7 +41,36 @@ export async function GET(req: Request) {
   const nextCursor = hasMore && page.length > 0 ? page[page.length - 1].id : null;
 
   const userIds = [...new Set(page.map((s) => s.userId))];
-  const lifetimePoints = await getLifetimePointsByUserIds(userIds);
+
+  const orderedSubs =
+    userIds.length === 0
+      ? []
+      : await prisma.submission.findMany({
+          where: { userId: { in: userIds }, status: "completed" },
+          orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+          select: {
+            id: true,
+            userId: true,
+            challenge: { select: { points: true } },
+          },
+        });
+
+  const lifetimePoints = new Map<string, number>();
+  for (const r of orderedSubs) {
+    lifetimePoints.set(
+      r.userId,
+      (lifetimePoints.get(r.userId) ?? 0) + r.challenge.points,
+    );
+  }
+
+  const levelUpMap = computeLevelUpBySubmissionId(
+    page.map((s) => ({
+      id: s.id,
+      userId: s.userId,
+      challenge: { points: s.challenge.points },
+    })),
+    orderedSubs,
+  );
 
   const now = new Date();
   const formatRelativeTime = (date: Date) => {
@@ -53,22 +82,33 @@ export async function GET(req: Request) {
     return `vor ${Math.floor(diffH / 24)} Tagen`;
   };
 
-  const items = page.map((s) => ({
-    id: s.id,
-    kind: "challenge-solved" as const,
-    user: {
-      name: s.user.name,
-      initials: s.user.initials,
-      avatar: s.user.avatar,
-      level: calculateLevel(lifetimePoints.get(s.userId) ?? 0),
-    },
-    username: emailToUsername(s.user.email),
-    action: "hat die Challenge gelöst",
-    challenge: s.challenge.title,
-    points: s.challenge.points,
-    time: formatRelativeTime(s.createdAt),
-    createdAt: s.createdAt.toISOString(),
-  }));
+  const items = page.map((s) => {
+    const lu = levelUpMap.get(s.id);
+    return {
+      id: s.id,
+      kind: "challenge-solved" as const,
+      user: {
+        name: s.user.name,
+        initials: s.user.initials,
+        avatar: s.user.avatar,
+        level: calculateLevel(lifetimePoints.get(s.userId) ?? 0),
+      },
+      username: emailToUsername(s.user.email),
+      action: "hat die Challenge gelöst",
+      challenge: s.challenge.title,
+      points: s.challenge.points,
+      time: formatRelativeTime(s.createdAt),
+      createdAt: s.createdAt.toISOString(),
+      ...(lu
+        ? {
+            levelUp: {
+              previousLevel: lu.previousLevel,
+              newLevel: lu.newLevel,
+            },
+          }
+        : {}),
+    };
+  });
 
   return NextResponse.json({ items, nextCursor });
 }

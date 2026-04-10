@@ -92,6 +92,10 @@ function pickVersion(
     );
     if (py) return py;
   }
+  if (language === "php") {
+    const ph = runtimes.find((r) => r.language === "php");
+    if (ph) return ph;
+  }
   const fallback = runtimes.find((r) => r.language === language);
   if (!fallback) {
     throw new Error(`Piston: no runtime for ${language}`);
@@ -105,6 +109,8 @@ function fileForLanguage(language: CodeLanguageId, code: string) {
       return { name: "main.ts", content: code };
     case "python":
       return { name: "main.py", content: code };
+    case "php":
+      return { name: "main.php", content: code };
     default:
       return { name: "main.js", content: code };
   }
@@ -136,7 +142,7 @@ export async function executeWithPiston(
       exitCode: -1,
       stdout: "",
       stderr:
-        "Piston meldet keine Laufzeiten. Nach Start des Containers: pnpm piston:install (javascript, typescript, python).",
+        "Piston meldet keine Laufzeiten. Nach Start des Containers: pnpm piston:install (javascript, typescript, python, php).",
       compileStderr: "",
       durationMs: 0,
     };
