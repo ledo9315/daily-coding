@@ -110,6 +110,69 @@ describe("authorizeCredentials", () => {
       email: "max@example.com",
       image: "/avatar.png",
       role: "user",
+      rememberMe: false,
     });
+  });
+
+  it("returns null when emailVerified is false and REQUIRE_EMAIL_VERIFICATION is true", async () => {
+    const original = process.env.REQUIRE_EMAIL_VERIFICATION;
+    process.env.REQUIRE_EMAIL_VERIFICATION = "true";
+
+    mockFindUnique.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.de",
+      name: "A",
+      avatar: "",
+      passwordHash: "hashed",
+      role: "user",
+      emailVerified: false,
+    });
+    mockCompare.mockResolvedValueOnce(true);
+
+    const result = await authorizeCredentials({ email: "a@b.de", password: "secret1234" });
+    expect(result).toBeNull();
+
+    process.env.REQUIRE_EMAIL_VERIFICATION = original;
+  });
+
+  it("returns user when emailVerified is false but REQUIRE_EMAIL_VERIFICATION is false", async () => {
+    const original = process.env.REQUIRE_EMAIL_VERIFICATION;
+    process.env.REQUIRE_EMAIL_VERIFICATION = "false";
+
+    mockFindUnique.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.de",
+      name: "A",
+      avatar: "",
+      passwordHash: "hashed",
+      role: "user",
+      emailVerified: false,
+    });
+    mockCompare.mockResolvedValueOnce(true);
+
+    const result = await authorizeCredentials({ email: "a@b.de", password: "secret1234" });
+    expect(result).not.toBeNull();
+
+    process.env.REQUIRE_EMAIL_VERIFICATION = original;
+  });
+
+  it("passes rememberMe=true through to the returned user object", async () => {
+    mockFindUnique.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.de",
+      name: "A",
+      avatar: "",
+      passwordHash: "hashed",
+      role: "user",
+      emailVerified: true,
+    });
+    mockCompare.mockResolvedValueOnce(true);
+
+    const result = await authorizeCredentials({
+      email: "a@b.de",
+      password: "secret1234",
+      rememberMe: "true",
+    });
+    expect((result as { rememberMe?: boolean } | null)?.rememberMe).toBe(true);
   });
 });
