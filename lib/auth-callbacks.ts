@@ -1,9 +1,6 @@
 import type { JWT } from "next-auth/jwt";
 import type { Session, User } from "next-auth";
 
-/**
- * NextAuth JWT callback (unit-tested).
- */
 export function authJwtCallback({
   token,
   user,
@@ -17,13 +14,17 @@ export function authJwtCallback({
 }): JWT {
   if (user) {
     token.id = user.id;
-    const u = user as { role?: string; image?: string | null };
+    const u = user as { role?: string; image?: string | null; rememberMe?: boolean };
     if (typeof u.role === "string") {
       token.role = u.role;
     }
     if (typeof u.image === "string") {
       token.picture = u.image;
     }
+    const rememberMe = u.rememberMe ?? false;
+    token.exp = rememberMe
+      ? Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+      : Math.floor(Date.now() / 1000) + 24 * 60 * 60;
   }
   if (trigger === "update" && session && typeof session === "object") {
     const s = session as { user?: { image?: string | null } };
@@ -37,9 +38,6 @@ export function authJwtCallback({
   return token;
 }
 
-/**
- * NextAuth session callback (unit-tested).
- */
 export function authSessionCallback({
   session,
   token,
