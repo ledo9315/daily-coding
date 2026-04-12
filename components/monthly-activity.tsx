@@ -1,6 +1,7 @@
 import type { MonthlyActivity } from "@/lib/api";
 import { progressPercentage } from "@/lib/progress-percentage";
 import { cn } from "@/lib/utils";
+import { Check } from "@nsmr/pixelart-react";
 
 const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] as const;
 
@@ -63,7 +64,11 @@ export function MonthlyActivityView({ activity }: { activity: MonthlyActivity })
                       .join(" · ")
               }
             >
-              {cell.day ?? ""}
+              {cell.completed ? (
+                <Check className="h-5 w-5" fill="currentColor" />
+              ) : (
+                cell.day ?? ""
+              )}
             </div>
           ))}
         </div>

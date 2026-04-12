@@ -32,6 +32,8 @@ export async function GET() {
   let todaySubmission: {
     status: "completed" | "failed" | "pending";
     submittedAt: string;
+    code: string;
+    language: string;
   } | null = null;
 
   if (userId) {
@@ -45,19 +47,19 @@ export async function GET() {
         challengeId: challenge.id,
         createdAt: { gte: dayStart, lt: dayEnd },
       },
-      select: { status: true, createdAt: true },
+      select: { status: true, createdAt: true, code: true, language: true },
       orderBy: { createdAt: "desc" },
     });
 
     if (sub) {
       const submittedAt = sub.createdAt.toISOString();
-      if (sub.status === "completed") {
-        todaySubmission = { status: "completed", submittedAt };
-      } else if (sub.status === "failed") {
-        todaySubmission = { status: "failed", submittedAt };
-      } else {
-        todaySubmission = { status: "pending", submittedAt };
-      }
+      const status =
+        sub.status === "completed"
+          ? "completed"
+          : sub.status === "failed"
+            ? "failed"
+            : "pending";
+      todaySubmission = { status, submittedAt, code: sub.code, language: sub.language };
     }
   }
 

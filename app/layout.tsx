@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "./providers";
 
 const vt323 = VT323({
   weight: "400",
@@ -58,7 +59,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${vt323.variable} ${pressStart.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -66,7 +67,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider>
-            {children}
+            <Providers>
+              {children}
+            </Providers>
           </SessionProvider>
           <Toaster />
         </ThemeProvider>

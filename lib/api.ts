@@ -124,6 +124,8 @@ export interface DailyChallenge {
   todaySubmission: {
     status: "completed" | "failed" | "pending";
     submittedAt: string;
+    code: string;
+    language: string;
   } | null;
 }
 
