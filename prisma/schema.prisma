@@ -60,6 +60,10 @@ model User {
   avatar       String
   email        String       @unique
   passwordHash String?
+  emailVerified Boolean  @default(false)
+  accounts      Account[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
   role         UserRole     @default(user)
 
   streak       Int          @default(0)
@@ -155,4 +159,31 @@ model RankingEntry {
   createdAt        DateTime      @default(now())
 
   @@unique([userId, period, periodDate])
+}
+
+model Account {
+  id                String @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
