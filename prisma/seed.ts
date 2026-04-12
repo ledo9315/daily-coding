@@ -568,6 +568,54 @@ async function main() {
     },
   });
 
+  // Keep seed reruns deterministic even when records already existed with drifted state.
+  await prisma.user.updateMany({
+    where: {
+      email: {
+        in: [
+          "admin@dailydev.local",
+          "anna.schmidt@company.com",
+          "tom.weber@company.com",
+          "max.mustermann@company.com",
+          "lisa.mueller@company.com",
+          "sarah.klein@company.com",
+          "jan.becker@company.com",
+          "julia.fischer@company.com",
+          "peter.hoffmann@company.com",
+          "maria.wagner@company.com",
+          "david.schulz@company.com",
+        ],
+      },
+    },
+    data: { emailVerified: true },
+  });
+
+  await prisma.challenge.updateMany({ data: { isActive: false } });
+  await prisma.challenge.update({
+    where: { id: challengeToday.id },
+    data: { isActive: true, date: anchor },
+  });
+  await prisma.challenge.update({
+    where: { id: challengeBinarySearch.id },
+    data: { date: addUtcDays(anchor, -1) },
+  });
+  await prisma.challenge.update({
+    where: { id: challengeStringReversal.id },
+    data: { date: addUtcDays(anchor, -2) },
+  });
+  await prisma.challenge.update({
+    where: { id: challengeHashMap.id },
+    data: { date: addUtcDays(anchor, -3) },
+  });
+  await prisma.challenge.update({
+    where: { id: challengeRecursion.id },
+    data: { date: addUtcDays(anchor, -4) },
+  });
+  await prisma.challenge.update({
+    where: { id: challengeBinaryTree.id },
+    data: { date: addUtcDays(anchor, -5) },
+  });
+
   // ─── Submissions ─────────────────────────────────────────────────────────────
 
   const submissionData = [

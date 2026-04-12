@@ -30,9 +30,16 @@ export function RegisterForm() {
       });
 
       let message = "Unbekannter Fehler.";
+      let verificationEmailSent = true;
       try {
-        const data = (await res.json()) as { error?: string };
+        const data = (await res.json()) as {
+          error?: string;
+          verificationEmailSent?: boolean;
+        };
         if (data?.error) message = data.error;
+        if (typeof data?.verificationEmailSent === "boolean") {
+          verificationEmailSent = data.verificationEmailSent;
+        }
       } catch {
         /* keine JSON-Antwort (z. B. 500 HTML) */
       }
@@ -43,10 +50,17 @@ export function RegisterForm() {
         return;
       }
 
-      toast.success("Konto erstellt!", {
-        description:
-          "Bitte bestätige deine E-Mail-Adresse. Wir haben dir eine Verifizierungs-E-Mail gesendet.",
-      });
+      if (verificationEmailSent) {
+        toast.success("Konto erstellt!", {
+          description:
+            "Bitte bestätige deine E-Mail-Adresse. Wir haben dir eine Verifizierungs-E-Mail gesendet.",
+        });
+      } else {
+        toast.warning("Konto erstellt, aber keine E-Mail gesendet", {
+          description:
+            "Der Versand der Verifizierungs-E-Mail ist fehlgeschlagen. Bitte kontaktiere den Support oder versuche es erneut.",
+        });
+      }
       router.push("/login?pending=1");
     } catch (err) {
       const desc =

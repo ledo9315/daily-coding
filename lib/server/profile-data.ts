@@ -8,28 +8,46 @@ import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challe
 import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
 import { utcDayKey } from "@/lib/streak-days";
 
-export async function getUserProfileData(userId: string): Promise<UserProfile | null> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      submissions: {
-        orderBy: { createdAt: "desc" },
-        take: 10,
-        include: { challenge: true },
-      },
-    },
-  });
+export async function getUserProfileData(
+  userId: string,
+  userEmail?: string | null
+): Promise<UserProfile | null> {
+  const user = userEmail
+    ? await prisma.user.findFirst({
+        where: {
+          OR: [{ id: userId }, { email: userEmail }],
+        },
+        include: {
+          submissions: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: { challenge: true },
+          },
+        },
+      })
+    : await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          submissions: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: { challenge: true },
+          },
+        },
+      });
   if (!user) return null;
+
+  const resolvedUserId = user.id;
 
   const [todayRankNum, completedSubmissions, achievementDefs, userAchievements] =
     await Promise.all([
-      getTodayRankNumber(userId),
+      getTodayRankNumber(resolvedUserId),
       prisma.submission.findMany({
-        where: { userId: userId, status: "completed" },
+        where: { userId: resolvedUserId, status: "completed" },
         include: { challenge: { select: { points: true } } },
       }),
       prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
-      prisma.userAchievement.findMany({ where: { userId } }),
+      prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
     ]);
 
   const points = completedSubmissions.reduce((sum, s) => sum + s.challenge.points, 0);

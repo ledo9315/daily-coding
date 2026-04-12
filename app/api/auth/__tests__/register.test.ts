@@ -64,5 +64,23 @@ describe("POST /api/auth/register", () => {
     expect(res.status).toBe(201);
     expect(mockCreateEmailVerificationToken).toHaveBeenCalledWith("new-user");
     expect(mockSendVerificationEmail).toHaveBeenCalledWith("new@b.de", "tok123");
+
+    const body = (await res.json()) as { success: boolean; verificationEmailSent: boolean };
+    expect(body).toEqual({ success: true, verificationEmailSent: true });
+  });
+
+  it("returns success but marks verification email as failed when sending throws", async () => {
+    mockFindUnique.mockResolvedValueOnce(null);
+    mockCreate.mockResolvedValueOnce({ id: "new-user" });
+    mockCreateEmailVerificationToken.mockResolvedValueOnce("tok123");
+    mockSendVerificationEmail.mockRejectedValueOnce(new Error("resend failure"));
+
+    const res = await POST(
+      makeRequest({ email: "new@b.de", password: "secret1234", name: "New User" })
+    );
+
+    expect(res.status).toBe(201);
+    const body = (await res.json()) as { success: boolean; verificationEmailSent: boolean };
+    expect(body).toEqual({ success: true, verificationEmailSent: false });
   });
 });
