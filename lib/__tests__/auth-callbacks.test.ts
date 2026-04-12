@@ -40,6 +40,28 @@ describe("authJwtCallback", () => {
     });
     expect(out.picture).toBe("/user/minipix4.png");
   });
+
+  it("sets token.exp to 24h when rememberMe is false", () => {
+    const now = Math.floor(Date.now() / 1000);
+    const token = {} as JWT;
+    const out = authJwtCallback({
+      token,
+      user: { id: "u1", role: "user", rememberMe: false } as Parameters<typeof authJwtCallback>[0]["user"],
+    });
+    expect(out.exp).toBeGreaterThanOrEqual(now + 24 * 60 * 60 - 5);
+    expect(out.exp).toBeLessThanOrEqual(now + 24 * 60 * 60 + 5);
+  });
+
+  it("sets token.exp to 30 days when rememberMe is true", () => {
+    const now = Math.floor(Date.now() / 1000);
+    const token = {} as JWT;
+    const out = authJwtCallback({
+      token,
+      user: { id: "u1", role: "user", rememberMe: true } as Parameters<typeof authJwtCallback>[0]["user"],
+    });
+    expect(out.exp).toBeGreaterThanOrEqual(now + 30 * 24 * 60 * 60 - 5);
+    expect(out.exp).toBeLessThanOrEqual(now + 30 * 24 * 60 * 60 + 5);
+  });
 });
 
 describe("authSessionCallback", () => {

@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { ArrowRight, Lock, Mail, User } from "@nsmr/pixelart-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -44,26 +43,11 @@ export function RegisterForm() {
         return;
       }
 
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        toast.error("Anmeldung fehlgeschlagen", {
-          description:
-            "Konto erstellt, aber Anmeldung fehlgeschlagen. Bitte einloggen.",
-        });
-        router.push("/login");
-        return;
-      }
-
       toast.success("Konto erstellt!", {
-        description: "Du wurdest automatisch eingeloggt.",
+        description:
+          "Bitte bestätige deine E-Mail-Adresse. Wir haben dir eine Verifizierungs-E-Mail gesendet.",
       });
-      router.push("/");
-      router.refresh();
+      router.push("/login?pending=1");
     } catch (err) {
       const desc =
         err instanceof Error ? err.message : "Netzwerk- oder Serverfehler.";

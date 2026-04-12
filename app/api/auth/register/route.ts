@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { createEmailVerificationToken } from "@/lib/server/auth-service";
+import { sendVerificationEmail } from "@/lib/server/email-service";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -40,15 +42,16 @@ export async function POST(request: NextRequest) {
     .toUpperCase()
     .slice(0, 2);
 
-  await prisma.user.create({
-    data: {
-      email,
-      passwordHash,
-      name,
-      initials,
-      avatar: "",
-    },
+  const user = await prisma.user.create({
+    data: { email, passwordHash, name, initials, avatar: "" },
   });
+
+  try {
+    const token = await createEmailVerificationToken(user.id);
+    await sendVerificationEmail(email, token);
+  } catch {
+    // Non-fatal: user is created, email sending is best-effort
+  }
 
   return NextResponse.json({ success: true }, { status: 201 });
 }
