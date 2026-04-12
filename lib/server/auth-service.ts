@@ -16,7 +16,7 @@ export async function createEmailVerificationToken(userId: string): Promise<stri
 
 export async function verifyEmailToken(
   token: string
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; userId: string } | { error: string }> {
   const record = await prisma.emailVerificationToken.findUnique({ where: { token } });
   if (!record) return { error: "Token ungültig." };
   if (record.expiresAt < new Date()) {
@@ -25,7 +25,7 @@ export async function verifyEmailToken(
   }
   await prisma.user.update({ where: { id: record.userId }, data: { emailVerified: true } });
   await prisma.emailVerificationToken.delete({ where: { token } });
-  return { success: true };
+  return { success: true, userId: record.userId };
 }
 
 export async function createPasswordResetToken(userId: string): Promise<string> {

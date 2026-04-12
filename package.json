@@ -11,6 +11,7 @@
     "db:up": "docker compose up -d db",
     "infra:up": "docker compose up -d",
     "piston:install": "node scripts/install-piston-runtimes.mjs",
+    "db:reset": "prisma migrate reset --force && prisma db seed",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",

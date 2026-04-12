@@ -1,7 +1,11 @@
 import { Resend } from "resend";
 
 function getResend(): Resend {
-  return new Resend(process.env.RESEND_API_KEY);
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not configured");
+  }
+  return new Resend(apiKey);
 }
 
 function getFrom(): string {
@@ -9,7 +13,7 @@ function getFrom(): string {
 }
 
 function getAppUrl(): string {
-  return process.env.APP_URL ?? "http://localhost:3000";
+  return process.env.APP_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 }
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {

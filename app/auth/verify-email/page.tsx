@@ -1,23 +1,57 @@
-import { verifyEmailToken } from "@/lib/server/auth-service";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function VerifyEmailPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ token?: string }>;
-}) {
-  const params = await searchParams;
-  const token = params.token;
+import { Suspense, useEffect } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-  if (!token) {
-    redirect("/login?error=missing-token");
-  }
+function VerifyEmailPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const result = await verifyEmailToken(token);
+  useEffect(() => {
+    const token = searchParams.get("token");
 
-  if ("error" in result) {
-    redirect("/login?error=verification-failed");
-  }
+    if (!token) {
+      router.replace("/login?error=missing-token");
+      return;
+    }
 
-  redirect("/login?verified=1");
+    const run = async () => {
+      const result = await signIn("credentials", {
+        verificationToken: token,
+        rememberMe: "true",
+        redirect: false,
+      });
+
+      if (result?.error) {
+        router.replace("/login?error=verification-failed");
+        return;
+      }
+
+      router.replace("/challenge");
+      router.refresh();
+    };
+
+    void run();
+  }, [router, searchParams]);
+
+  return (
+    <main className="min-h-screen flex items-center justify-center px-4">
+      <p className="text-sm text-muted-foreground">Dein Konto wird verifiziert und du wirst angemeldet...</p>
+    </main>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center px-4">
+          <p className="text-sm text-muted-foreground">Dein Konto wird verifiziert und du wirst angemeldet...</p>
+        </main>
+      }
+    >
+      <VerifyEmailPageContent />
+    </Suspense>
+  );
 }

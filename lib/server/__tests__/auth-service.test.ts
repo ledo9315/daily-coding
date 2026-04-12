@@ -80,7 +80,7 @@ describe("verifyEmailToken", () => {
     mockUpdate.mockResolvedValueOnce({});
     mockDelete.mockResolvedValueOnce({});
     const result = await verifyEmailToken("t");
-    expect(result).toEqual({ success: true });
+    expect(result).toEqual({ success: true, userId: "u1" });
     expect(mockUpdate).toHaveBeenCalledWith({
       where: { id: "u1" },
       data: { emailVerified: true },

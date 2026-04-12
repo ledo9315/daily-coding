@@ -18,11 +18,9 @@ interface DbUser {
   avatar: string;
 }
 
-export async function findOrCreateOAuthUser(
-  profile: OAuthProfile,
+export async function findOAuthUserByAccount(
   account: OAuthAccount
-): Promise<DbUser> {
-  // 1. Returning user via same OAuth provider
+): Promise<DbUser | null> {
   const existingAccount = await prisma.account.findUnique({
     where: {
       provider_providerAccountId: {
@@ -33,12 +31,23 @@ export async function findOrCreateOAuthUser(
     include: { user: true },
   });
 
-  if (existingAccount) {
-    return {
-      id: existingAccount.user.id,
-      role: existingAccount.user.role as "user" | "admin",
-      avatar: existingAccount.user.avatar,
-    };
+  if (!existingAccount) return null;
+
+  return {
+    id: existingAccount.user.id,
+    role: existingAccount.user.role as "user" | "admin",
+    avatar: existingAccount.user.avatar,
+  };
+}
+
+export async function findOrCreateOAuthUser(
+  profile: OAuthProfile,
+  account: OAuthAccount
+): Promise<DbUser> {
+  // 1. Returning user via same OAuth provider
+  const linkedUser = await findOAuthUserByAccount(account);
+  if (linkedUser) {
+    return linkedUser;
   }
 
   // 2. Existing user by email (account linking)
@@ -54,6 +63,7 @@ export async function findOrCreateOAuthUser(
         providerAccountId: account.providerAccountId,
       },
     });
+
     return {
       id: existingUser.id,
       role: existingUser.role as "user" | "admin",

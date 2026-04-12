@@ -21,6 +21,7 @@ pnpm vitest run <path/to/file.test.ts>
 # Database
 pnpm db:up                  # Start only PostgreSQL in Docker
 pnpm infra:up               # Start PostgreSQL + Piston in Docker
+pnpm db:reset               # Reset DB, apply migrations, then seed explicitly
 pnpm db:migrate             # Apply migrations (prisma migrate deploy)
 pnpm db:seed                # Seed the database (tsx prisma/seed.ts)
 pnpm prisma migrate dev     # Create + apply a new migration locally
