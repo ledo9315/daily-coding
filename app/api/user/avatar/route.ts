@@ -26,8 +26,30 @@ export async function PATCH(request: Request) {
     );
   }
 
+  const user = result.userEmail
+    ? await prisma.user.findFirst({
+        where: {
+          OR: [{ id: result.userId }, { email: result.userEmail }],
+        },
+        select: { id: true },
+      })
+    : await prisma.user.findUnique({
+        where: { id: result.userId },
+        select: { id: true },
+      });
+
+  if (!user) {
+    return NextResponse.json(
+      {
+        error:
+          "Benutzer nicht gefunden. Bitte abmelden und erneut anmelden (z. B. nach Datenbank-Reset).",
+      },
+      { status: 401 }
+    );
+  }
+
   await prisma.user.update({
-    where: { id: result.userId },
+    where: { id: user.id },
     data: { avatar },
   });
 

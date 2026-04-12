@@ -9,6 +9,8 @@ vi.mock("@/lib/auth-session", () => ({
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
       update: vi.fn(),
     },
   },
@@ -18,12 +20,14 @@ import { getSessionUserId } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 
 const mockGetSession = vi.mocked(getSessionUserId);
+const mockFindUnique = vi.mocked(prisma.user.findUnique);
 const mockUpdate = vi.mocked(prisma.user.update);
 
 describe("PATCH /api/user/avatar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetSession.mockResolvedValue({ userId: "u-1" });
+    mockGetSession.mockResolvedValue({ userId: "u-1", userEmail: null });
+    mockFindUnique.mockResolvedValue({ id: "u-1" } as never);
   });
 
   it("returns 401 when unauthenticated", async () => {
