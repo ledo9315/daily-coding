@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { CodeEditor } from "@/components/code-editor";
 import { TestResults, type TestCase } from "@/components/test-results";
@@ -32,7 +33,6 @@ import {
   runTests,
   submitSolution,
   type CodeLanguageId,
-  type DailyChallenge,
   type SubmitCelebration,
 } from "@/lib/api";
 import { ChallengeSuccessModal } from "@/components/challenge-success-modal";
@@ -56,114 +56,95 @@ import { X } from "lucide-react";
 const CHALLENGE_POLL_MS = 60_000;
 
 export default function ChallengePage() {
-  const [challenge, setChallenge] = useState<DailyChallenge | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
   const [language, setLanguage] = useState<CodeLanguageId | null>(null);
   const [sources, setSources] = useState<Partial<Record<CodeLanguageId, string>>>({});
-  /**
-   * none = noch offen; success = eingereicht und Tests ok; failed = eingereicht, Tests nicht ok;
-   * pending = Submission noch ausstehend (selten).
-   */
   const [submitOutcome, setSubmitOutcome] = useState<
     "none" | "success" | "failed" | "pending"
   >("none");
   const [testCases, setTestCases] = useState<TestCase[]>([]);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
   const [testRunCount, setTestRunCount] = useState(0);
   const [celebrationOpen, setCelebrationOpen] = useState(false);
   const [celebration, setCelebration] = useState<SubmitCelebration | null>(null);
-  const [submitWarningDismissed, setSubmitWarningDismissed] = useState(false);
+  const [submitWarningDismissed, setSubmitWarningDismissed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("challenge_submit_warning_dismissed") === "true";
+    }
+    return false;
+  });
+
+  const prevChallengeIdRef = useRef<string | null>(null);
+
+  const {
+    data: challenge,
+    isLoading: isLoadingChallenge,
+    error: loadError,
+    refetch,
+  } = useQuery({
+    queryKey: ["daily-challenge"],
+    queryFn: getDailyChallenge,
+    refetchInterval: CHALLENGE_POLL_MS,
+    staleTime: CHALLENGE_POLL_MS,
+  });
+
+  // Initialisiert Sources/Language/Outcome wenn eine neue Challenge kommt
+  useEffect(() => {
+    if (!challenge) return;
+
+    const isNew = prevChallengeIdRef.current !== challenge.id;
+    if (isNew) {
+      if (prevChallengeIdRef.current !== null) {
+        toast.message("Neue Daily Challenge", {
+          description: "Der UTC-Tag hat gewechselt.",
+        });
+      }
+      prevChallengeIdRef.current = challenge.id;
+
+      if (challenge.todaySubmission) {
+        setLanguage(challenge.todaySubmission.language as CodeLanguageId);
+        setSources({
+          ...challenge.starterCodes,
+          [challenge.todaySubmission.language]: challenge.todaySubmission.code,
+        });
+      } else {
+        setLanguage(challenge.defaultLanguage);
+        setSources({ ...challenge.starterCodes });
+      }
+
+      setTestCases(challenge.testCases as TestCase[]);
+      setTestRunCount(0);
+
+      if (challenge.todaySubmission) {
+        const { status, submittedAt } = challenge.todaySubmission;
+        setSubmitOutcome(
+          status === "completed" ? "success"
+          : status === "failed" ? "failed"
+          : "pending"
+        );
+        setSubmittedAtLabel(
+          new Date(submittedAt).toLocaleTimeString("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        );
+      } else {
+        setSubmitOutcome("none");
+        setSubmittedAtLabel(undefined);
+      }
+    }
+  }, [challenge]);
 
   const isSubmitLocked = submitOutcome !== "none";
-
-  const loadChallenge = useCallback((options?: { silent?: boolean }) => {
-    const silent = options?.silent ?? false;
-    if (!silent) {
-      setLoadError(null);
-      setIsLoadingChallenge(true);
-    }
-    getDailyChallenge()
-      .then((data) => {
-        setChallenge((prev) => {
-          if (prev && prev.id !== data.id) {
-            toast.message("Neue Daily Challenge", {
-              description: "Der UTC-Tag hat gewechselt.",
-            });
-          }
-          return data;
-        });
-        setTestCases(data.testCases as TestCase[]);
-        setLanguage(data.defaultLanguage);
-        setSources({ ...data.starterCodes });
-        if (data.todaySubmission) {
-          const { status, submittedAt } = data.todaySubmission;
-          if (status === "completed") setSubmitOutcome("success");
-          else if (status === "failed") setSubmitOutcome("failed");
-          else setSubmitOutcome("pending");
-          setSubmittedAtLabel(
-            new Date(submittedAt).toLocaleTimeString("de-DE", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          );
-        } else {
-          setSubmitOutcome("none");
-          setSubmittedAtLabel(undefined);
-        }
-      })
-      .catch((e) => {
-        if (silent) return;
-        setChallenge(null);
-        const msg =
-          e instanceof Error ? e.message : "Challenge konnte nicht geladen werden.";
-        setLoadError(msg);
-        toast.error("Daily Challenge", { description: msg });
-      })
-      .finally(() => {
-        if (!silent) setIsLoadingChallenge(false);
-      });
-  }, []);
-
-  useEffect(() => {
-    loadChallenge();
-  }, [loadChallenge]);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      loadChallenge({ silent: true });
-    }, CHALLENGE_POLL_MS);
-    return () => clearInterval(id);
-  }, [loadChallenge]);
-
-  useEffect(() => {
-    setTestRunCount(0);
-  }, [challenge?.id]);
-
-  useEffect(() => {
-    setSubmitWarningDismissed(false);
-  }, [challenge?.id]);
 
   useEffect(() => {
     if (!challenge || isSubmitLocked) return;
     ensureSolveStart(challenge.id);
   }, [challenge?.id, isSubmitLocked]);
 
-  const currentCode =
-    language != null ? (sources[language] ?? "") : "";
-
-  const setCurrentCode = (next: string) => {
-    if (!language) return;
-    setSources((prev) => ({ ...prev, [language]: next }));
-  };
-
-  const handleRunTests = async () => {
-    if (!challenge || !language) return;
-    setIsRunning(true);
-    try {
-      const result = await runTests(challenge.id, currentCode, language);
+  const { mutate: runTestsMutation, isPending: isRunning } = useMutation({
+    mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
+      runTests(challenge!.id, code, lang),
+    onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
       setTestRunCount((c) => c + 1);
       if (result.runtimeOk === false) {
@@ -171,26 +152,21 @@ export default function ChallengePage() {
           description: "Mindestens ein Test ist fehlgeschlagen.",
         });
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Unbekannter Fehler";
-      toast.error("Testlauf fehlgeschlagen", { description: msg });
-    } finally {
-      setIsRunning(false);
-    }
-  };
+    },
+    onError: (e) => {
+      toast.error("Testlauf fehlgeschlagen", {
+        description: e instanceof Error ? e.message : "Unbekannter Fehler",
+      });
+    },
+  });
 
-  const handleSubmit = async () => {
-    if (!challenge || !language || isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      const solveDurationSeconds = getSolveDurationSeconds(challenge.id);
-      const result = await submitSolution(
-        challenge.id,
-        currentCode,
-        language,
-        solveDurationSeconds
-      );
-      clearSolveTimer(challenge.id);
+  const { mutate: submitMutation, isPending: isSubmitting } = useMutation({
+    mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) => {
+      const solveDurationSeconds = getSolveDurationSeconds(challenge!.id);
+      return submitSolution(challenge!.id, code, lang, solveDurationSeconds);
+    },
+    onSuccess: (result) => {
+      clearSolveTimer(challenge!.id);
       setTestCases(result.testCases as TestCase[]);
       setSubmittedAtLabel(
         new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
@@ -209,15 +185,33 @@ export default function ChallengePage() {
       } else {
         setSubmitOutcome("failed");
         toast.error("Abgabe nicht bestanden", {
-          description: "Mindestens ein Test ist fehlgeschlagen oder die Ausführung war fehlerhaft.",
+          description:
+            "Mindestens ein Test ist fehlgeschlagen oder die Ausführung war fehlerhaft.",
         });
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Unbekannter Fehler";
-      toast.error("Einreichen fehlgeschlagen", { description: msg });
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+    onError: (e) => {
+      toast.error("Einreichen fehlgeschlagen", {
+        description: e instanceof Error ? e.message : "Unbekannter Fehler",
+      });
+    },
+  });
+
+  const currentCode = language != null ? (sources[language] ?? "") : "";
+
+  const setCurrentCode = (next: string) => {
+    if (!language) return;
+    setSources((prev) => ({ ...prev, [language]: next }));
+  };
+
+  const handleRunTests = () => {
+    if (!challenge || !language) return;
+    runTestsMutation({ code: currentCode, lang: language });
+  };
+
+  const handleSubmit = () => {
+    if (!challenge || !language || isSubmitting) return;
+    submitMutation({ code: currentCode, lang: language });
   };
 
   if (isLoadingChallenge) {
@@ -238,17 +232,12 @@ export default function ChallengePage() {
             <AlertIcon className="h-4 w-4" fill="currentColor" />
             <AlertTitle>Keine Challenge</AlertTitle>
             <AlertDescription>
-              {loadError ??
-                "Es ist keine aktive Aufgabe verfügbar. Bitte Datenbank prüfen (migrate + seed) oder später erneut versuchen."}
+              {loadError instanceof Error
+                ? loadError.message
+                : "Es ist keine aktive Aufgabe verfügbar. Bitte Datenbank prüfen (migrate + seed) oder später erneut versuchen."}
             </AlertDescription>
           </Alert>
-          <Button
-            variant="outline"
-            className="rounded-none"
-            onClick={() => {
-              loadChallenge();
-            }}
-          >
+          <Button variant="outline" className="rounded-none" onClick={() => refetch()}>
             Erneut laden
           </Button>
         </main>
@@ -268,7 +257,6 @@ export default function ChallengePage() {
         height={300}
         width={1920}
       />
-      {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] h-150 w-150 bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
@@ -327,13 +315,8 @@ export default function ChallengePage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <BookOpen
-                    className="h-5 w-5 text-primary"
-                    fill="currentColor"
-                  />
-                  <CardTitle className="text-lg">
-                    Aufgabenbeschreibung
-                  </CardTitle>
+                  <BookOpen className="h-5 w-5 text-primary" fill="currentColor" />
+                  <CardTitle className="text-lg">Aufgabenbeschreibung</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -414,7 +397,7 @@ export default function ChallengePage() {
                   language={language}
                   fileName={languageFileName(language)}
                   readOnly={isSubmitLocked}
-                  className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50"
+                  className={`shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50${isSubmitLocked ? " opacity-50 grayscale pointer-events-none" : ""}`}
                 />
               ) : null}
             </div>
@@ -444,15 +427,16 @@ export default function ChallengePage() {
                   variant="ghost"
                   size="icon"
                   className="absolute right-1 top-1 h-8 w-8 rounded-none text-muted-foreground hover:text-foreground hover:bg-amber-500/20"
-                  onClick={() => setSubmitWarningDismissed(true)}
+                  onClick={() => {
+                    setSubmitWarningDismissed(true);
+                    localStorage.setItem("challenge_submit_warning_dismissed", "true");
+                  }}
                   aria-label="Hinweis schließen"
                 >
                   <X className="h-4 w-4" />
                 </Button>
                 <AlertIcon className="h-4 w-4" fill="currentColor" />
-                <AlertTitle className="text-lg leading-none mb-2">
-                  Achtung
-                </AlertTitle>
+                <AlertTitle className="text-lg leading-none mb-2">Achtung</AlertTitle>
                 <AlertDescription className="text-sm">
                   Pro Kalendertag (UTC) kannst du nur eine finale Abgabe machen. Stelle
                   sicher, dass alle Tests bestanden sind, bevor du einreichst.

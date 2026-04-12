@@ -2,7 +2,8 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { RankingTable } from "@/components/ranking-table";
 import { TopThreePodium } from "@/components/top-three-podium";
@@ -15,29 +16,89 @@ import {
 } from "@nsmr/pixelart-react";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { getRanking, type RankingEntry } from "@/lib/api";
+import { getRanking } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Period = "today" | "week" | "month";
 
+function TableRowSkeleton() {
+  return (
+    <div className="flex items-center gap-4 border-b border-border px-4 py-4">
+      <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+      <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+      <div className="flex-1 space-y-1.5">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+      <Skeleton className="h-5 w-16" />
+    </div>
+  );
+}
+
+function RankingSkeleton() {
+  return (
+    <div className="space-y-8">
+      <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
+        <CardHeader>
+          <Skeleton className="h-6 w-32 mx-auto" />
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end justify-center gap-6 pt-4">
+            <div className="flex flex-col items-center gap-2">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-16 w-24" />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Skeleton className="h-14 w-14 rounded-full" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-24 w-24" />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-24" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <div className="border border-border overflow-hidden">
+        <div className="flex gap-8 border-b border-border bg-secondary/50 px-4 py-3">
+          <Skeleton className="h-4 w-10" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <TableRowSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function RankingPage() {
   const [activeTab, setActiveTab] = useState<Period>("today");
-  const [rankings, setRankings] = useState<Record<Period, RankingEntry[]>>({
-    today: [],
-    week: [],
-    month: [],
+
+  const { data: todayRanking = [], isLoading: todayLoading } = useQuery({
+    queryKey: ["ranking", "today"],
+    queryFn: () => getRanking("today"),
   });
 
-  useEffect(() => {
-    Promise.all([
-      getRanking("today"),
-      getRanking("week"),
-      getRanking("month"),
-    ]).then(([today, week, month]) => {
-      setRankings({ today, week, month });
-    });
-  }, []);
+  const { data: weekRanking = [], isLoading: weekLoading } = useQuery({
+    queryKey: ["ranking", "week"],
+    queryFn: () => getRanking("week"),
+  });
 
-  const currentRanking = rankings[activeTab];
+  const { data: monthRanking = [], isLoading: monthLoading } = useQuery({
+    queryKey: ["ranking", "month"],
+    queryFn: () => getRanking("month"),
+  });
+
+  const isLoading = todayLoading || weekLoading || monthLoading;
+
+  const currentRanking =
+    activeTab === "today" ? todayRanking
+    : activeTab === "week" ? weekRanking
+    : monthRanking;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -51,7 +112,6 @@ export default function RankingPage() {
         height={300}
         width={1920}
       />
-      {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] h-150 w-150 bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
@@ -77,92 +137,80 @@ export default function RankingPage() {
           className="space-y-6"
         >
           <TabsList className="w-full sm:w-auto sm:grid-cols-none rounded-none">
-            <TabsTrigger
-              value="today"
-              className="gap-2 cursor-pointer rounded-none text-md"
-            >
-              <CalendarToday
-                className="h-4 w-4 hidden sm:block"
-                fill="currentColor"
-              />
+            <TabsTrigger value="today" className="gap-2 cursor-pointer rounded-none text-md">
+              <CalendarToday className="h-4 w-4 hidden sm:block" fill="currentColor" />
               Heute
             </TabsTrigger>
-            <TabsTrigger
-              value="week"
-              className="gap-2 cursor-pointer rounded-none text-md"
-            >
-              <CalendarWeek
-                className="h-4 w-4 hidden sm:block"
-                fill="currentColor"
-              />
+            <TabsTrigger value="week" className="gap-2 cursor-pointer rounded-none text-md">
+              <CalendarWeek className="h-4 w-4 hidden sm:block" fill="currentColor" />
               Woche
             </TabsTrigger>
-            <TabsTrigger
-              value="month"
-              className="gap-2 cursor-pointer rounded-none text-md"
-            >
-              <CalendarMonth
-                className="h-4 w-4 hidden sm:block"
-                fill="currentColor"
-              />
+            <TabsTrigger value="month" className="gap-2 cursor-pointer rounded-none text-md">
+              <CalendarMonth className="h-4 w-4 hidden sm:block" fill="currentColor" />
               Monat
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="today" className="space-y-8">
-            {rankings.today.length > 0 && (
-              <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
-                <CardHeader>
-                  <CardTitle className="text-center">Top 3 des Tages</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TopThreePodium
-                    variant="time"
-                    first={rankings.today[0]}
-                    second={rankings.today[1]}
-                    third={rankings.today[2]}
-                  />
-                </CardContent>
-              </Card>
-            )}
-            <RankingTable entries={currentRanking} showTime showPoints={false} />
-          </TabsContent>
+          {isLoading ? (
+            <RankingSkeleton />
+          ) : (
+            <>
+              <TabsContent value="today" className="space-y-8">
+                {todayRanking.length > 0 && (
+                  <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
+                    <CardHeader>
+                      <CardTitle className="text-center">Top 3 des Tages</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TopThreePodium
+                        variant="time"
+                        first={todayRanking[0]}
+                        second={todayRanking[1]}
+                        third={todayRanking[2]}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+                <RankingTable entries={currentRanking} showTime showPoints={false} />
+              </TabsContent>
 
-          <TabsContent value="week" className="space-y-8">
-            {rankings.week.length > 0 && (
-              <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
-                <CardHeader>
-                  <CardTitle className="text-center">Top 3 der Woche</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TopThreePodium
-                    first={rankings.week[0]}
-                    second={rankings.week[1]}
-                    third={rankings.week[2]}
-                  />
-                </CardContent>
-              </Card>
-            )}
-            <RankingTable entries={currentRanking} />
-          </TabsContent>
+              <TabsContent value="week" className="space-y-8">
+                {weekRanking.length > 0 && (
+                  <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
+                    <CardHeader>
+                      <CardTitle className="text-center">Top 3 der Woche</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TopThreePodium
+                        first={weekRanking[0]}
+                        second={weekRanking[1]}
+                        third={weekRanking[2]}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+                <RankingTable entries={currentRanking} />
+              </TabsContent>
 
-          <TabsContent value="month" className="space-y-8">
-            {rankings.month.length > 0 && (
-              <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
-                <CardHeader>
-                  <CardTitle className="text-center">Top 3 des Monats</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TopThreePodium
-                    first={rankings.month[0]}
-                    second={rankings.month[1]}
-                    third={rankings.month[2]}
-                  />
-                </CardContent>
-              </Card>
-            )}
-            <RankingTable entries={currentRanking} />
-          </TabsContent>
+              <TabsContent value="month" className="space-y-8">
+                {monthRanking.length > 0 && (
+                  <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
+                    <CardHeader>
+                      <CardTitle className="text-center">Top 3 des Monats</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TopThreePodium
+                        first={monthRanking[0]}
+                        second={monthRanking[1]}
+                        third={monthRanking[2]}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+                <RankingTable entries={currentRanking} />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </main>
     </div>
