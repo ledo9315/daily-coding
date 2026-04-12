@@ -43,19 +43,28 @@ export async function getDashboardRankingPreviewData(): Promise<{
   };
 }
 
-export async function getUserStatsData(userId: string): Promise<UserStats | null> {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+export async function getUserStatsData(
+  userId: string,
+  userEmail?: string | null
+): Promise<UserStats | null> {
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [{ id: userId }, ...(userEmail ? [{ email: userEmail }] : [])],
+    },
+  });
   if (!user) return null;
+
+  const resolvedUserId = user.id;
 
   const [todayRankNum, completedSubmissions, achievementDefs, userAchievements] =
     await Promise.all([
-      getTodayRankNumber(userId),
+      getTodayRankNumber(resolvedUserId),
       prisma.submission.findMany({
-        where: { userId: userId, status: "completed" },
+        where: { userId: resolvedUserId, status: "completed" },
         include: { challenge: { select: { points: true } } },
       }),
       prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
-      prisma.userAchievement.findMany({ where: { userId } }),
+      prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
     ]);
 
   const { unlockedCount: unlockedBadges } = buildUserAchievementsView(
