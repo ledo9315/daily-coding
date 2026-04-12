@@ -42,7 +42,10 @@ function LoginPageContent() {
             <CardDescription>Gib deine Zugangsdaten ein.</CardDescription>
           </CardHeader>
           <CardContent>
-            <LoginForm />
+            <LoginForm
+              githubEnabled={process.env.NEXT_PUBLIC_GITHUB_ENABLED === "true"}
+              googleEnabled={process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true"}
+            />
           </CardContent>
         </Card>
       </div>
