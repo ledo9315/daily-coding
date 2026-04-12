@@ -4,7 +4,7 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { authJwtCallback, authSessionCallback } from "@/lib/auth-callbacks";
 import { authorizeCredentials } from "@/lib/auth-credentials";
-import { findOrCreateOAuthUser } from "@/lib/server/oauth-user";
+import { findOrCreateOAuthUser, findOAuthUserByAccount } from "@/lib/server/oauth-user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -18,6 +18,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "E-Mail", type: "email" },
         password: { label: "Passwort", type: "password" },
         rememberMe: { label: "Angemeldet bleiben", type: "text" },
+        verificationToken: { label: "Verifizierungstoken", type: "text" },
       },
       authorize: authorizeCredentials,
     }),
@@ -44,11 +45,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt: async ({ token, user, account, trigger, session }) => {
       // OAuth sign-in: find/create DB user and set DB-based token fields
-      if (account?.type === "oauth" && user?.email) {
-        const dbUser = await findOrCreateOAuthUser(
-          { email: user.email, name: user.name, image: user.image },
-          { provider: account.provider, providerAccountId: account.providerAccountId }
-        );
+      if (account?.type === "oauth") {
+        const oauthAccount = {
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+        };
+        const email =
+          user?.email ??
+          (typeof token.email === "string" && token.email.length > 0
+            ? token.email
+            : undefined);
+
+        const dbUser = email
+          ? await findOrCreateOAuthUser(
+              { email, name: user?.name, image: user?.image },
+              oauthAccount
+            )
+          : await findOAuthUserByAccount(oauthAccount);
+
+        if (!dbUser) {
+          console.error("[auth] OAuth user could not be resolved", {
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            hasEmail: Boolean(email),
+          });
+          return token;
+        }
+
         token.id = dbUser.id;
         token.role = dbUser.role;
         token.picture = dbUser.avatar;

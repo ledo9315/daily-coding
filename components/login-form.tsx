@@ -102,7 +102,7 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
             htmlFor="remember-me"
             className="text-sm text-muted-foreground cursor-pointer"
           >
-            Angemeldet bleiben (30 Tage)
+            Angemeldet bleiben
           </Label>
         </div>
 

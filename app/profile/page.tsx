@@ -43,7 +43,10 @@ function resolveIcon(iconKey: string): React.ComponentType<{ className?: string 
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
-  const profile = await getUserProfileData(session.user.id);
+  const profile = await getUserProfileData(
+    session.user.id,
+    session.user.email ?? null
+  );
   if (!profile) {
     redirect("/api/auth/signout?callbackUrl=/login");
   }

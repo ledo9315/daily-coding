@@ -46,12 +46,18 @@ export async function POST(request: NextRequest) {
     data: { email, passwordHash, name, initials, avatar: "" },
   });
 
+  let verificationEmailSent = true;
   try {
     const token = await createEmailVerificationToken(user.id);
     await sendVerificationEmail(email, token);
-  } catch {
-    // Non-fatal: user is created, email sending is best-effort
+  } catch (error) {
+    verificationEmailSent = false;
+    console.error("[auth/register] verification email failed", {
+      userId: user.id,
+      email,
+      error,
+    });
   }
 
-  return NextResponse.json({ success: true }, { status: 201 });
+  return NextResponse.json({ success: true, verificationEmailSent }, { status: 201 });
 }

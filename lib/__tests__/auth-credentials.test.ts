@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockFindUnique = vi.fn();
 const mockCompare = vi.fn();
+const mockVerifyEmailToken = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -15,6 +16,10 @@ vi.mock("bcryptjs", () => ({
   default: {
     compare: (...args: unknown[]) => mockCompare(...args),
   },
+}));
+
+vi.mock("@/lib/server/auth-service", () => ({
+  verifyEmailToken: (...args: unknown[]) => mockVerifyEmailToken(...args),
 }));
 
 import { authorizeCredentials } from "@/lib/auth-credentials";
@@ -174,5 +179,40 @@ describe("authorizeCredentials", () => {
       rememberMe: "true",
     });
     expect((result as { rememberMe?: boolean } | null)?.rememberMe).toBe(true);
+  });
+
+  it("returns null for invalid verification token", async () => {
+    mockVerifyEmailToken.mockResolvedValueOnce({ error: "Token ungültig." });
+
+    const result = await authorizeCredentials({ verificationToken: "bad" });
+
+    expect(result).toBeNull();
+    expect(mockFindUnique).not.toHaveBeenCalled();
+    expect(mockCompare).not.toHaveBeenCalled();
+  });
+
+  it("logs user in via verification token", async () => {
+    mockVerifyEmailToken.mockResolvedValueOnce({ success: true, userId: "u1" });
+    mockFindUnique.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.de",
+      name: "A",
+      avatar: "",
+      role: "user",
+      emailVerified: true,
+      passwordHash: "hashed",
+    });
+
+    const result = await authorizeCredentials({ verificationToken: "good" });
+
+    expect(result).toEqual({
+      id: "u1",
+      name: "A",
+      email: "a@b.de",
+      image: "",
+      role: "user",
+      rememberMe: true,
+    });
+    expect(mockCompare).not.toHaveBeenCalled();
   });
 });
