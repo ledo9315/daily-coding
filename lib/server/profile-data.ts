@@ -12,18 +12,29 @@ export async function getUserProfileData(
   userId: string,
   userEmail?: string | null
 ): Promise<UserProfile | null> {
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [{ id: userId }, ...(userEmail ? [{ email: userEmail }] : [])],
-    },
-    include: {
-      submissions: {
-        orderBy: { createdAt: "desc" },
-        take: 10,
-        include: { challenge: true },
-      },
-    },
-  });
+  const user = userEmail
+    ? await prisma.user.findFirst({
+        where: {
+          OR: [{ id: userId }, { email: userEmail }],
+        },
+        include: {
+          submissions: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: { challenge: true },
+          },
+        },
+      })
+    : await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          submissions: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: { challenge: true },
+          },
+        },
+      });
   if (!user) return null;
 
   const resolvedUserId = user.id;
