@@ -31,6 +31,12 @@ export interface TodayChallenge {
 export interface UserStats {
   rank: string;
   points: string;
+  /** Prozentuale Rangentwicklung ggü. der Vorwoche (positiv = besser). */
+  rankTrendPercent: number;
+  /** Rangentwicklung in Plätzen ggü. der Vorwoche (positiv = besser). */
+  rankTrendPlaces: number;
+  /** Prozentuale Punkteentwicklung ggü. dem Vormonat. */
+  pointsTrendPercent: number;
   streak: number;
   streakRecord: number;
   totalSolved: number;

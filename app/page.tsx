@@ -71,13 +71,17 @@ export default async function DashboardPage() {
             value={userStats.rank}
             description="von 156 Nutzern"
             icon={Trophy}
-            trend={{ value: 3, label: "seit letzter Woche" }}
+            trend={{
+              value: userStats.rankTrendPlaces,
+              label: "Plätze seit letzter Woche",
+              unit: "number",
+            }}
           />
           <StatsCard
             title="PUNKTE"
             value={userStats.points}
             icon={Bullseye}
-            trend={{ value: 8, label: "diesen Monat" }}
+            trend={{ value: userStats.pointsTrendPercent, label: "diesen Monat" }}
           />
           <StatsCard
             title="STREAK"

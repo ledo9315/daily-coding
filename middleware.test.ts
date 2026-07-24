@@ -86,4 +86,11 @@ describe("middleware", () => {
     );
     expect(res.headers.get("location")).toBeNull();
   });
+
+  it("protects /settings path", async () => {
+    mockGetToken.mockResolvedValueOnce(null);
+    const res = await middleware(req("http://localhost:3000/settings"));
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toContain("callbackUrl=%2Fsettings");
+  });
 });
