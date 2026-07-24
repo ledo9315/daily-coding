@@ -75,13 +75,13 @@ export function LandingFooter() {
           <h4 className="font-heading text-sm mb-4">RECHTLICHES</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link href="#" className="hover:text-primary">
-                Datenschutz
+              <Link href="/impressum" className="hover:text-primary">
+                Impressum
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-primary">
-                AGB
+              <Link href="/datenschutz" className="hover:text-primary">
+                Datenschutz
               </Link>
             </li>
           </ul>
