@@ -8,7 +8,7 @@ import { findOrCreateOAuthUser, findOAuthUserByAccount } from "@/lib/server/oaut
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  debug: true,
+  debug: process.env.NODE_ENV !== "production",
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days max; per-user exp set in jwt callback
