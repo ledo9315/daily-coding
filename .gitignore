@@ -18,6 +18,9 @@ yarn-error.log*
 
 # env files
 .env*
+# ...but keep the committed example templates (no real secrets in them)
+!.env.example
+!.env.production.example
 
 # vercel
 .vercel
