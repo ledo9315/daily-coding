@@ -15,37 +15,64 @@ type UserAchievementRow = {
   unlockedAt: Date | null;
 };
 
-/** „Blitzschnell“: mindestens eine Abgabe in ≤180 Sekunden (3 Minuten). */
+type CompletedSubmission = {
+  createdAt: Date;
+  timeTaken?: number | null;
+  challenge?: { difficulty?: string | null } | null;
+};
+
+/** „Blitzschnell“ (ach-3): mindestens eine Abgabe in ≤180 Sekunden (3 Minuten). */
 const BLITZ_MAX_SECONDS = 180;
+/** „Wochenend-Krieger“ (ach-2): 7 Tage Streak. */
+const STREAK_WEEK = 7;
+/** „Unaufhaltsam“ (ach-5): 30 Tage Streak. */
+const STREAK_MONTH = 30;
+/** „Code-Meister“ (ach-4): 10 schwere Challenges gelöst. */
+const HARD_SOLVED = 10;
+/** „Perfektionist“ (ach-6): 20 Challenges gelöst (abgeschlossene Abgaben bestehen alle Testfälle). */
+const NO_ERROR_SOLVED = 20;
 
 /**
  * Baut die Achievement-Liste für ein Profil inkl. Sperr-/Freigabe-Logik.
- * Ohne UserAchievement-Zeilen: „ach-1“ (Erste Schritte) bei ≥1 Abschluss; „ach-3“ (Blitzschnell) bei ≤3 Minuten.
+ *
+ * Freischaltungen werden zur Laufzeit aus den vorhandenen Daten abgeleitet
+ * (keine separate „unlock“-Persistenz nötig). Eine vorhandene UserAchievement-Zeile
+ * mit `unlockedAt` hat Vorrang und friert das Freigabedatum ein.
  */
 export function buildUserAchievementsView(
   defs: DefRow[],
   userAchievements: UserAchievementRow[],
-  completedSubmissions: { createdAt: Date; timeTaken?: number | null }[]
+  completedSubmissions: CompletedSubmission[],
+  streakRecord = 0
 ): { achievements: Achievement[]; unlockedCount: number } {
-  const totalSolved = completedSubmissions.length;
-  const firstCompletedAt =
-    completedSubmissions.length > 0
-      ? completedSubmissions.reduce(
-          (earliest, s) => (s.createdAt < earliest ? s.createdAt : earliest),
-          completedSubmissions[0].createdAt
-        )
-      : null;
-
-  const blitzEligible = completedSubmissions.filter(
+  const byDate = [...completedSubmissions].sort(
+    (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+  );
+  const totalSolved = byDate.length;
+  const hardByDate = byDate.filter((s) => s.challenge?.difficulty === "hard");
+  const blitzByDate = byDate.filter(
     (s) => s.timeTaken != null && s.timeTaken > 0 && s.timeTaken <= BLITZ_MAX_SECONDS
   );
-  const blitzFirstAt =
-    blitzEligible.length > 0
-      ? blitzEligible.reduce(
-          (earliest, s) => (s.createdAt < earliest ? s.createdAt : earliest),
-          blitzEligible[0].createdAt
-        )
-      : null;
+
+  /** Datum der n-ten (1-basiert) Abgabe einer bereits nach Datum sortierten Liste. */
+  const nthDate = (list: CompletedSubmission[], n: number): Date | null =>
+    list.length >= n ? list[n - 1].createdAt : null;
+
+  // id → { unlocked durch abgeleitete Regel, Freigabedatum (falls ableitbar) }
+  const inferred: Record<string, { unlocked: boolean; at: Date | null }> = {
+    "ach-1": { unlocked: totalSolved > 0, at: nthDate(byDate, 1) },
+    "ach-2": { unlocked: streakRecord >= STREAK_WEEK, at: null },
+    "ach-3": { unlocked: blitzByDate.length > 0, at: nthDate(blitzByDate, 1) },
+    "ach-4": {
+      unlocked: hardByDate.length >= HARD_SOLVED,
+      at: nthDate(hardByDate, HARD_SOLVED),
+    },
+    "ach-5": { unlocked: streakRecord >= STREAK_MONTH, at: null },
+    "ach-6": {
+      unlocked: totalSolved >= NO_ERROR_SOLVED,
+      at: nthDate(byDate, NO_ERROR_SOLVED),
+    },
+  };
 
   const progressByAchievementId = new Map(
     userAchievements.map((ua) => [ua.achievementId, ua])
@@ -53,20 +80,17 @@ export function buildUserAchievementsView(
 
   const achievements: Achievement[] = defs.map((def) => {
     const ua = progressByAchievementId.get(def.id);
-    const inferredFirstSteps =
-      def.id === "ach-1" && totalSolved > 0 && ua?.unlockedAt == null;
-    const inferredBlitz =
-      def.id === "ach-3" && blitzEligible.length > 0 && ua?.unlockedAt == null;
-    const unlocked =
-      ua?.unlockedAt != null || inferredFirstSteps || inferredBlitz;
+    const rule = inferred[def.id];
+    const inferredUnlock = ua?.unlockedAt == null && rule?.unlocked === true;
+    const unlocked = ua?.unlockedAt != null || inferredUnlock;
+
     let unlockedAt: string | undefined;
     if (ua?.unlockedAt) {
       unlockedAt = formatDate(ua.unlockedAt);
-    } else if (inferredFirstSteps && firstCompletedAt) {
-      unlockedAt = formatDate(firstCompletedAt);
-    } else if (inferredBlitz && blitzFirstAt) {
-      unlockedAt = formatDate(blitzFirstAt);
+    } else if (inferredUnlock && rule?.at) {
+      unlockedAt = formatDate(rule.at);
     }
+
     return {
       id: def.id,
       title: def.title,

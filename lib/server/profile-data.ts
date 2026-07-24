@@ -44,7 +44,7 @@ export async function getUserProfileData(
       getTodayRankNumber(resolvedUserId),
       prisma.submission.findMany({
         where: { userId: resolvedUserId, status: "completed" },
-        include: { challenge: { select: { points: true } } },
+        include: { challenge: { select: { points: true, difficulty: true } } },
       }),
       prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
       prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
@@ -66,7 +66,8 @@ export async function getUserProfileData(
   const { achievements, unlockedCount: unlockedBadges } = buildUserAchievementsView(
     achievementDefs,
     userAchievements,
-    completedSubmissions
+    completedSubmissions,
+    user.streakRecord
   );
 
   return {
