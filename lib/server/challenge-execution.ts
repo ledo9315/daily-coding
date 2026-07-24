@@ -203,18 +203,12 @@ async function runPistonSmoke(
   const slots = list.length > 0 ? list : defaultSlots();
 
   if (mode === "submit") {
-    if (piston.ok) {
-      return {
-        testCases: slots.map((s, i) => ({
-          id: s.id,
-          name: s.name,
-          status: "passed" as const,
-          time: i === 0 ? `${piston.durationMs}ms` : "—",
-        })),
-        runtimeOk: true,
-        totalDurationMs,
-      };
-    }
+    // Ohne echte I/O-Testfälle lässt sich eine Einreichung nicht auf Korrektheit
+    // prüfen. Kein Auto-Pass — sonst gäbe es volle Punkte für Code, der nur
+    // kompiliert. Betrifft fehlkonfigurierte Challenges (Seed-Demos ohne Config
+    // oder Admin-Challenges ohne Test-Cases).
+    const note =
+      "Diese Challenge hat keine automatische Bewertung (Test-Cases mit Input/Expected) konfiguriert. Die Einreichung kann nicht gewertet werden.";
     return {
       testCases: slots.map((s, i) => ({
         id: s.id,
@@ -223,7 +217,9 @@ async function runPistonSmoke(
         time: i === 0 ? `${piston.durationMs}ms` : undefined,
         actual:
           i === 0
-            ? (piston.stderr || piston.stdout || `Exit ${piston.exitCode}`).slice(0, 2000)
+            ? piston.ok
+              ? note
+              : (piston.stderr || piston.stdout || `Exit ${piston.exitCode}`).slice(0, 2000)
             : undefined,
       })),
       runtimeOk: false,

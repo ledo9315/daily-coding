@@ -374,195 +374,295 @@ async function main() {
     },
   });
 
+  const binarySearchFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "binarySearch",
+        typescript: "binarySearch",
+        python: "binary_search",
+        php: "binarySearch",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Wert in der Mitte", input: '{"arr":[1,3,5,7,9],"target":5}', expected: "2" },
+      { id: 2, name: "Erstes Element", input: '{"arr":[1,3,5,7,9],"target":1}', expected: "0" },
+      { id: 3, name: "Letztes Element", input: '{"arr":[1,3,5,7,9],"target":9}', expected: "4" },
+      { id: 4, name: "Nicht vorhanden", input: '{"arr":[1,3,5,7,9],"target":4}', expected: "-1" },
+      { id: 5, name: "Leeres Array", input: '{"arr":[],"target":1}', expected: "-1" },
+    ],
+    starterCodes: {
+      javascript:
+        "function binarySearch(data) {\n  const { arr, target } = data;\n  // Your solution here\n  return -1;\n}",
+      typescript:
+        "function binarySearch(data: { arr: number[]; target: number }): number {\n  const { arr, target } = data;\n  // Your solution here\n  return -1;\n}",
+      python:
+        'def binary_search(data):\n    arr, target = data["arr"], data["target"]\n    # Your solution here\n    return -1\n',
+      php: "<?php\n\nfunction binarySearch($data) {\n    $arr = $data['arr'];\n    $target = $data['target'];\n    // Your solution here\n    return -1;\n}\n",
+    },
+    starterCode:
+      "function binarySearch(data) {\n  const { arr, target } = data;\n  // Your solution here\n  return -1;\n}",
+  };
+
   const challengeBinarySearch = await prisma.challenge.upsert({
     where: { id: "challenge-binary-search" },
-    update: {
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function binarySearch(arr, target) {\n  // Your solution here\n}",
-        typescript:
-          "function binarySearch(arr: number[], target: number): number {\n  // Your solution here\n  return -1;\n}",
-        python:
-          "def binary_search(arr, target):\n    # Your solution here\n    return -1\n",
-        php: "<?php\n\nfunction binarySearch($arr, $target) {\n    // Your solution here\n    return -1;\n}\n",
-      },
-      starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
-    },
+    update: { ...binarySearchFields },
     create: {
       id: "challenge-binary-search",
       title: "Binary Search",
-      description: "Implementiere eine effiziente binäre Suche.",
+      description:
+        "Implementiere binarySearch(data) mit data = { arr, target }: Gib den Index von target im aufsteigend sortierten Array arr zurück – oder -1, wenn target nicht enthalten ist.",
       difficulty: "easy",
       points: 120,
       categoryId: catAlgorithmen.id,
-      hint: "Teile das Array in der Mitte.",
-      examples: [{ input: "[1,3,5,7,9], target=5", output: "2" }],
-      testCases: [
-        { id: 1, name: "Test Case 1", status: "pending" },
-        { id: 2, name: "Test Case 2", status: "pending" },
+      hint: "Teile den Suchbereich in der Mitte und grenze ihn iterativ ein (O(log n)).",
+      examples: [
+        { input: '{ "arr": [1,3,5,7,9], "target": 5 }', output: "2" },
+        { input: '{ "arr": [1,3,5,7,9], "target": 4 }', output: "-1" },
       ],
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function binarySearch(arr, target) {\n  // Your solution here\n}",
-        typescript:
-          "function binarySearch(arr: number[], target: number): number {\n  // Your solution here\n  return -1;\n}",
-        python:
-          "def binary_search(arr, target):\n    # Your solution here\n    return -1\n",
-        php: "<?php\n\nfunction binarySearch($arr, $target) {\n    // Your solution here\n    return -1;\n}\n",
-      },
-      starterCode: "function binarySearch(arr, target) {\n  // Your solution here\n}",
+      ...binarySearchFields,
       isActive: false,
       date: addUtcDays(anchor, -1),
     },
   });
 
+  const stringReversalFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "reverseString",
+        typescript: "reverseString",
+        python: "reverse_string",
+        php: "reverseString",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Einfaches Wort", input: '"hello"', expected: '"olleh"' },
+      { id: 2, name: "Leerer String", input: '""', expected: '""' },
+      { id: 3, name: "Ein Zeichen", input: '"a"', expected: '"a"' },
+      { id: 4, name: "Palindrom", input: '"racecar"', expected: '"racecar"' },
+      { id: 5, name: "Mit Satzzeichen", input: '"Hello, World!"', expected: '"!dlroW ,olleH"' },
+    ],
+    starterCodes: {
+      javascript: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
+      typescript:
+        "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
+      python: "def reverse_string(s):\n    # Your solution here\n    return s\n",
+      php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
+    },
+    starterCode: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
+  };
+
   const challengeStringReversal = await prisma.challenge.upsert({
     where: { id: "challenge-string-reversal" },
-    update: {
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function reverseString(s) {\n  // Your solution here\n}",
-        typescript:
-          "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
-        python:
-          "def reverse_string(s: str):\n    # Your solution here\n    return s\n",
-        php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
-      },
-      starterCode: "function reverseString(s) {\n  // Your solution here\n}",
-    },
+    update: { ...stringReversalFields },
     create: {
       id: "challenge-string-reversal",
       title: "String Reversal",
-      description: "Kehre einen String um.",
+      description:
+        "Implementiere reverseString(s): Gib den übergebenen String in umgekehrter Zeichenreihenfolge zurück.",
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hint: "Nutze einen zwei-Zeiger-Ansatz.",
-      examples: [{ input: '"hello"', output: '"olleh"' }],
-      testCases: [
-        { id: 1, name: "Test Case 1", status: "pending" },
-        { id: 2, name: "Test Case 2", status: "pending" },
+      hint: "Nutze einen Zwei-Zeiger-Ansatz oder kehre die Zeichen direkt um.",
+      examples: [
+        { input: '"hello"', output: '"olleh"' },
+        { input: '"racecar"', output: '"racecar"' },
       ],
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function reverseString(s) {\n  // Your solution here\n}",
-        typescript:
-          "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
-        python:
-          "def reverse_string(s: str):\n    # Your solution here\n    return s\n",
-        php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
-      },
-      starterCode: "function reverseString(s) {\n  // Your solution here\n}",
+      ...stringReversalFields,
       isActive: false,
       date: addUtcDays(anchor, -2),
     },
   });
 
+  const hashMapFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "hashMap",
+        typescript: "hashMap",
+        python: "hash_map",
+        php: "hashMap",
+      },
+    },
+    testCases: [
+      {
+        id: 1,
+        name: "Set und Get",
+        input: '[["set","a",1],["get","a"],["get","b"]]',
+        expected: "[null,1,null]",
+      },
+      {
+        id: 2,
+        name: "Überschreiben",
+        input: '[["set","x",5],["set","x",9],["get","x"]]',
+        expected: "[null,null,9]",
+      },
+      {
+        id: 3,
+        name: "Has und Delete",
+        input: '[["set","k",7],["has","k"],["delete","k"],["has","k"],["get","k"]]',
+        expected: "[null,true,true,false,null]",
+      },
+      { id: 4, name: "Fehlender Schlüssel", input: '[["get","nope"]]', expected: "[null]" },
+      {
+        id: 5,
+        name: "Delete nicht vorhanden",
+        input: '[["set","a",1],["set","b",2],["delete","c"],["get","b"]]',
+        expected: "[null,null,false,2]",
+      },
+    ],
+    starterCodes: {
+      javascript: "function hashMap(operations) {\n  // Your solution here\n  return [];\n}",
+      typescript: "function hashMap(operations: any[]): any[] {\n  // Your solution here\n  return [];\n}",
+      python: "def hash_map(operations):\n    # Your solution here\n    return []\n",
+      php: "<?php\n\nfunction hashMap($operations) {\n    // Your solution here\n    return [];\n}\n",
+    },
+    starterCode: "function hashMap(operations) {\n  // Your solution here\n  return [];\n}",
+  };
+
   const challengeHashMap = await prisma.challenge.upsert({
     where: { id: "challenge-hashmap" },
-    update: {
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "class HashMap {\n  // Your solution here\n}",
-        typescript: "class HashMap {\n  // Your solution here\n}",
-        python: "class HashMap:\n    # Your solution here\n    pass\n",
-        php: "<?php\n\nclass HashMap {\n    // Your solution here\n}\n",
-      },
-      starterCode: "class HashMap {\n  // Your solution here\n}",
-    },
+    update: { ...hashMapFields },
     create: {
       id: "challenge-hashmap",
       title: "Hash Map Implementation",
-      description: "Implementiere eine einfache Hash Map.",
+      description:
+        "Implementiere hashMap(operations): Verarbeite eine Liste von Operationen und gib ein Array mit dem Ergebnis jeder Operation zurück. Jede Operation ist [typ, key] oder [typ, key, value]. Typen: \"set\" speichert value (Ergebnis null), \"get\" gibt den gespeicherten value oder null zurück, \"has\" gibt einen Boolean zurück, \"delete\" gibt einen Boolean zurück (ob der Schlüssel vorhanden war).",
       difficulty: "medium",
       points: 150,
       categoryId: catDatenstrukturen.id,
-      examples: [],
-      testCases: [],
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "class HashMap {\n  // Your solution here\n}",
-        typescript: "class HashMap {\n  // Your solution here\n}",
-        python: "class HashMap:\n    # Your solution here\n    pass\n",
-        php: "<?php\n\nclass HashMap {\n    // Your solution here\n}\n",
-      },
-      starterCode: "class HashMap {\n  // Your solution here\n}",
+      hint: "Verwende intern eine Map bzw. ein Dictionary und laufe die Operationen der Reihe nach durch.",
+      examples: [
+        {
+          input: '[["set","a",1],["get","a"],["get","b"]]',
+          output: "[null,1,null]",
+        },
+      ],
+      ...hashMapFields,
       isActive: false,
       date: addUtcDays(anchor, -3),
     },
   });
 
+  const recursionFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "fibonacci",
+        typescript: "fibonacci",
+        python: "fibonacci",
+        php: "fibonacci",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Basisfall 0", input: "0", expected: "0" },
+      { id: 2, name: "Basisfall 1", input: "1", expected: "1" },
+      { id: 3, name: "Kleiner Wert", input: "5", expected: "5" },
+      { id: 4, name: "Mittlerer Wert", input: "10", expected: "55" },
+      { id: 5, name: "Größerer Wert", input: "15", expected: "610" },
+    ],
+    starterCodes: {
+      javascript: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
+      typescript:
+        "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
+      python: "def fibonacci(n):\n    # Your solution here\n    return 0\n",
+      php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
+    },
+    starterCode: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
+  };
+
   const challengeRecursion = await prisma.challenge.upsert({
     where: { id: "challenge-recursion" },
-    update: {
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function fibonacci(n) {\n  // Your solution here\n}",
-        typescript:
-          "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
-        python:
-          "def fibonacci(n: int) -> int:\n    # Your solution here\n    return 0\n",
-        php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
-      },
-      starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
-    },
+    update: { ...recursionFields },
     create: {
       id: "challenge-recursion",
       title: "Recursion Basics",
-      description: "Löse eine Fibonacci-Berechnung rekursiv.",
+      description:
+        "Implementiere fibonacci(n): Gib die n-te Fibonacci-Zahl zurück (0-indiziert, d. h. fibonacci(0) = 0, fibonacci(1) = 1).",
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      examples: [{ input: "5", output: "5" }],
-      testCases: [],
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function fibonacci(n) {\n  // Your solution here\n}",
-        typescript:
-          "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
-        python:
-          "def fibonacci(n: int) -> int:\n    # Your solution here\n    return 0\n",
-        php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
-      },
-      starterCode: "function fibonacci(n) {\n  // Your solution here\n}",
+      hint: "fibonacci(n) = fibonacci(n-1) + fibonacci(n-2), mit fibonacci(0) = 0 und fibonacci(1) = 1.",
+      examples: [
+        { input: "5", output: "5" },
+        { input: "10", output: "55" },
+      ],
+      ...recursionFields,
       isActive: false,
       date: addUtcDays(anchor, -4),
     },
   });
 
+  const binaryTreeFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "inorderTraversal",
+        typescript: "inorderTraversal",
+        python: "inorder_traversal",
+        php: "inorderTraversal",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Leerer Baum", input: "null", expected: "[]" },
+      {
+        id: 2,
+        name: "Einzelner Knoten",
+        input: '{"val":1,"left":null,"right":null}',
+        expected: "[1]",
+      },
+      {
+        id: 3,
+        name: "Rechts-lastig",
+        input:
+          '{"val":1,"left":null,"right":{"val":2,"left":{"val":3,"left":null,"right":null},"right":null}}',
+        expected: "[1,3,2]",
+      },
+      {
+        id: 4,
+        name: "Suchbaum",
+        input:
+          '{"val":2,"left":{"val":1,"left":null,"right":null},"right":{"val":3,"left":null,"right":null}}',
+        expected: "[1,2,3]",
+      },
+      {
+        id: 5,
+        name: "Vollständiger Baum",
+        input:
+          '{"val":4,"left":{"val":2,"left":{"val":1,"left":null,"right":null},"right":{"val":3,"left":null,"right":null}},"right":{"val":6,"left":{"val":5,"left":null,"right":null},"right":{"val":7,"left":null,"right":null}}}',
+        expected: "[1,2,3,4,5,6,7]",
+      },
+    ],
+    starterCodes: {
+      javascript: "function inorderTraversal(root) {\n  // Your solution here\n  return [];\n}",
+      typescript:
+        "function inorderTraversal(root: any): number[] {\n  // Your solution here\n  return [];\n}",
+      python: "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
+      php: "<?php\n\nfunction inorderTraversal($root) {\n    // Your solution here\n    return [];\n}\n",
+    },
+    starterCode: "function inorderTraversal(root) {\n  // Your solution here\n  return [];\n}",
+  };
+
   const challengeBinaryTree = await prisma.challenge.upsert({
     where: { id: "challenge-binary-tree" },
-    update: {
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function inorderTraversal(root) {\n  // Your solution here\n}",
-        typescript:
-          "function inorderTraversal(root: TreeNode | null): number[] {\n  // Your solution here\n  return [];\n}",
-        python:
-          "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
-        php: "<?php\n\nfunction inorderTraversal($root) {\n    // Your solution here\n    return [];\n}\n",
-      },
-      starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
-    },
+    update: { ...binaryTreeFields },
     create: {
       id: "challenge-binary-tree",
       title: "Binary Tree Traversal",
-      description: "Traversiere einen binären Baum in-order.",
+      description:
+        'Implementiere inorderTraversal(root): Gib die In-order-Reihenfolge (links, Wurzel, rechts) der Knotenwerte als Array zurück. Ein Knoten hat die Form { val, left, right }; leere Teilbäume sind null.',
       difficulty: "hard",
       points: 200,
       categoryId: catBaeume.id,
-      examples: [],
-      testCases: [],
-      supportedLanguages: [...supportedLangs],
-      starterCodes: {
-        javascript: "function inorderTraversal(root) {\n  // Your solution here\n}",
-        typescript:
-          "function inorderTraversal(root: TreeNode | null): number[] {\n  // Your solution here\n  return [];\n}",
-        python:
-          "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
-        php: "<?php\n\nfunction inorderTraversal($root) {\n    // Your solution here\n    return [];\n}\n",
-      },
-      starterCode: "function inorderTraversal(root) {\n  // Your solution here\n}",
+      hint: "In-order: erst den linken Teilbaum, dann die Wurzel, dann den rechten Teilbaum besuchen.",
+      examples: [
+        {
+          input: '{ "val": 2, "left": { "val": 1 }, "right": { "val": 3 } }',
+          output: "[1,2,3]",
+        },
+      ],
+      ...binaryTreeFields,
       isActive: false,
       date: addUtcDays(anchor, -5),
     },
