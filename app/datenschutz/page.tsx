@@ -6,14 +6,11 @@ export const metadata: Metadata = {
   title: "Datenschutzerklärung – Daily Dev",
 };
 
-// ponytail: statischer Rechtstext, auf den aktuellen Funktionsumfang zugeschnitten.
-// Vor dem Launch juristisch prüfen und die genannten Auftragsverarbeiter
-// (Hosting, Datenbank, E-Mail, OAuth) mit den tatsächlich eingesetzten Diensten abgleichen.
 export default function DatenschutzPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <LandingNavbar />
-      <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-3xl px-4 pt-32 pb-16 sm:px-6 lg:px-8">
         <h1 className="font-pixel text-2xl mb-8 uppercase tracking-wide">
           Datenschutz&shy;erklärung
         </h1>

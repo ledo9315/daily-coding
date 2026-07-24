@@ -4,7 +4,7 @@ export function LandingNavbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/landing" className="flex items-center gap-3 group">
           <span className="text-xl font-pixel tracking-tighter text-primary">
             {">_"}
           </span>
