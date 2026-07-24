@@ -668,6 +668,446 @@ async function main() {
     },
   });
 
+  // ─── Weitere Challenges (LeetCode-/Codewars-Klassiker) ─────────────────────────
+
+  const twoSumFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "twoSum",
+        typescript: "twoSum",
+        python: "two_sum",
+        php: "twoSum",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Beispiel", input: '{"nums":[2,7,11,15],"target":9}', expected: "[0,1]" },
+      { id: 2, name: "Mitte", input: '{"nums":[3,2,4],"target":6}', expected: "[1,2]" },
+      { id: 3, name: "Duplikate", input: '{"nums":[3,3],"target":6}', expected: "[0,1]" },
+      { id: 4, name: "Ende", input: '{"nums":[1,2,3,4,5],"target":9}', expected: "[3,4]" },
+      { id: 5, name: "Negative", input: '{"nums":[-1,-2,-3,-4],"target":-6}', expected: "[1,3]" },
+    ],
+    starterCodes: {
+      javascript:
+        "function twoSum(data) {\n  const { nums, target } = data;\n  // Your solution here\n  return [];\n}",
+      typescript:
+        "function twoSum(data: { nums: number[]; target: number }): number[] {\n  const { nums, target } = data;\n  // Your solution here\n  return [];\n}",
+      python:
+        'def two_sum(data):\n    nums, target = data["nums"], data["target"]\n    # Your solution here\n    return []\n',
+      php: "<?php\n\nfunction twoSum($data) {\n    $nums = $data['nums'];\n    $target = $data['target'];\n    // Your solution here\n    return [];\n}\n",
+    },
+    starterCode:
+      "function twoSum(data) {\n  const { nums, target } = data;\n  // Your solution here\n  return [];\n}",
+  };
+
+  const challengeTwoSum = await prisma.challenge.upsert({
+    where: { id: "challenge-two-sum" },
+    update: { ...twoSumFields },
+    create: {
+      id: "challenge-two-sum",
+      title: "Two Sum",
+      description:
+        "Implementiere twoSum(data) mit data = { nums, target }: Gib die beiden Indizes (aufsteigend) zurück, deren Werte zusammen target ergeben. Es existiert genau eine Lösung.",
+      difficulty: "medium",
+      points: 150,
+      categoryId: catAlgorithmen.id,
+      hint: "Speichere gesehene Werte in einer Map: für jedes Element prüfst du, ob target - element bereits vorkam.",
+      examples: [{ input: '{ "nums": [2,7,11,15], "target": 9 }', output: "[0,1]" }],
+      ...twoSumFields,
+      isActive: false,
+      date: addUtcDays(anchor, -6),
+    },
+  });
+
+  const fizzBuzzFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "fizzBuzz",
+        typescript: "fizzBuzz",
+        python: "fizz_buzz",
+        php: "fizzBuzz",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Eins", input: "1", expected: '["1"]' },
+      { id: 2, name: "Bis 3", input: "3", expected: '["1","2","Fizz"]' },
+      { id: 3, name: "Bis 5", input: "5", expected: '["1","2","Fizz","4","Buzz"]' },
+      { id: 4, name: "Bis 6", input: "6", expected: '["1","2","Fizz","4","Buzz","Fizz"]' },
+      {
+        id: 5,
+        name: "Bis 15",
+        input: "15",
+        expected:
+          '["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]',
+      },
+    ],
+    starterCodes: {
+      javascript: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
+      typescript: "function fizzBuzz(n: number): string[] {\n  // Your solution here\n  return [];\n}",
+      python: "def fizz_buzz(n):\n    # Your solution here\n    return []\n",
+      php: "<?php\n\nfunction fizzBuzz($n) {\n    // Your solution here\n    return [];\n}\n",
+    },
+    starterCode: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
+  };
+
+  const challengeFizzBuzz = await prisma.challenge.upsert({
+    where: { id: "challenge-fizzbuzz" },
+    update: { ...fizzBuzzFields },
+    create: {
+      id: "challenge-fizzbuzz",
+      title: "FizzBuzz",
+      description:
+        'Implementiere fizzBuzz(n): Gib ein Array der Länge n zurück. Für jede Zahl 1..n: Vielfache von 3 werden zu "Fizz", von 5 zu "Buzz", von beiden zu "FizzBuzz", sonst die Zahl als String.',
+      difficulty: "easy",
+      points: 100,
+      categoryId: catAlgorithmen.id,
+      hint: "Prüfe zuerst auf teilbar durch 15, dann durch 3, dann durch 5.",
+      examples: [{ input: "5", output: '["1","2","Fizz","4","Buzz"]' }],
+      ...fizzBuzzFields,
+      isActive: false,
+      date: addUtcDays(anchor, -7),
+    },
+  });
+
+  const validParenthesesFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "isValid",
+        typescript: "isValid",
+        python: "is_valid",
+        php: "isValid",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Einfaches Paar", input: '"()"', expected: "true" },
+      { id: 2, name: "Alle Typen", input: '"()[]{}"', expected: "true" },
+      { id: 3, name: "Falsch geschlossen", input: '"(]"', expected: "false" },
+      { id: 4, name: "Falsche Reihenfolge", input: '"([)]"', expected: "false" },
+      { id: 5, name: "Verschachtelt", input: '"{[]}"', expected: "true" },
+    ],
+    starterCodes: {
+      javascript: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
+      typescript: "function isValid(s: string): boolean {\n  // Your solution here\n  return false;\n}",
+      python: "def is_valid(s):\n    # Your solution here\n    return False\n",
+      php: "<?php\n\nfunction isValid($s) {\n    // Your solution here\n    return false;\n}\n",
+    },
+    starterCode: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
+  };
+
+  const challengeValidParentheses = await prisma.challenge.upsert({
+    where: { id: "challenge-valid-parentheses" },
+    update: { ...validParenthesesFields },
+    create: {
+      id: "challenge-valid-parentheses",
+      title: "Valid Parentheses",
+      description:
+        "Implementiere isValid(s): Prüfe, ob die Klammern in s korrekt verschachtelt und geschlossen sind. Erlaubte Zeichen: (), [], {}. Gib true oder false zurück.",
+      difficulty: "medium",
+      points: 150,
+      categoryId: catDatenstrukturen.id,
+      hint: "Nutze einen Stack: öffnende Klammern legst du ab, bei schließenden muss die oberste passen.",
+      examples: [
+        { input: '"()[]{}"', output: "true" },
+        { input: '"([)]"', output: "false" },
+      ],
+      ...validParenthesesFields,
+      isActive: false,
+      date: addUtcDays(anchor, -8),
+    },
+  });
+
+  const countVowelsFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "countVowels",
+        typescript: "countVowels",
+        python: "count_vowels",
+        php: "countVowels",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Wort", input: '"hello"', expected: "2" },
+      { id: 2, name: "Leer", input: '""', expected: "0" },
+      { id: 3, name: "Keine Vokale", input: '"why"', expected: "0" },
+      { id: 4, name: "Nur Vokale", input: '"AEIOU"', expected: "5" },
+      { id: 5, name: "Gemischt", input: '"Programming"', expected: "3" },
+    ],
+    starterCodes: {
+      javascript: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
+      typescript: "function countVowels(s: string): number {\n  // Your solution here\n  return 0;\n}",
+      python: "def count_vowels(s):\n    # Your solution here\n    return 0\n",
+      php: "<?php\n\nfunction countVowels($s) {\n    // Your solution here\n    return 0;\n}\n",
+    },
+    starterCode: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
+  };
+
+  const challengeCountVowels = await prisma.challenge.upsert({
+    where: { id: "challenge-count-vowels" },
+    update: { ...countVowelsFields },
+    create: {
+      id: "challenge-count-vowels",
+      title: "Count Vowels",
+      description:
+        "Implementiere countVowels(s): Zähle die Vokale (a, e, i, o, u – Groß-/Kleinschreibung egal) im String s.",
+      difficulty: "easy",
+      points: 100,
+      categoryId: catStrings.id,
+      hint: "Wandle den String in Kleinbuchstaben um und prüfe jedes Zeichen gegen die Vokalmenge.",
+      examples: [{ input: '"hello"', output: "2" }],
+      ...countVowelsFields,
+      isActive: false,
+      date: addUtcDays(anchor, -9),
+    },
+  });
+
+  const maxSubArrayFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "maxSubArray",
+        typescript: "maxSubArray",
+        python: "max_sub_array",
+        php: "maxSubArray",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Gemischt", input: "[-2,1,-3,4,-1,2,1,-5,4]", expected: "6" },
+      { id: 2, name: "Ein Element", input: "[1]", expected: "1" },
+      { id: 3, name: "Überwiegend positiv", input: "[5,4,-1,7,8]", expected: "23" },
+      { id: 4, name: "Nur negativ", input: "[-1,-2,-3]", expected: "-1" },
+      { id: 5, name: "Klein", input: "[3,-2,5,-1]", expected: "6" },
+    ],
+    starterCodes: {
+      javascript: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
+      typescript: "function maxSubArray(nums: number[]): number {\n  // Your solution here\n  return 0;\n}",
+      python: "def max_sub_array(nums):\n    # Your solution here\n    return 0\n",
+      php: "<?php\n\nfunction maxSubArray($nums) {\n    // Your solution here\n    return 0;\n}\n",
+    },
+    starterCode: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
+  };
+
+  const challengeMaxSubArray = await prisma.challenge.upsert({
+    where: { id: "challenge-max-subarray" },
+    update: { ...maxSubArrayFields },
+    create: {
+      id: "challenge-max-subarray",
+      title: "Maximum Subarray",
+      description:
+        "Implementiere maxSubArray(nums): Gib die größtmögliche Summe eines zusammenhängenden Teil-Arrays zurück (mindestens ein Element).",
+      difficulty: "medium",
+      points: 150,
+      categoryId: catAlgorithmen.id,
+      hint: "Kadane: laufe einmal durch und entscheide je Element, ob du die bisherige Summe fortführst oder neu beginnst.",
+      examples: [{ input: "[-2,1,-3,4,-1,2,1,-5,4]", output: "6" }],
+      ...maxSubArrayFields,
+      isActive: false,
+      date: addUtcDays(anchor, -10),
+    },
+  });
+
+  const isAnagramFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "isAnagram",
+        typescript: "isAnagram",
+        python: "is_anagram",
+        php: "isAnagram",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Anagramm", input: '{"s":"anagram","t":"nagaram"}', expected: "true" },
+      { id: 2, name: "Kein Anagramm", input: '{"s":"rat","t":"car"}', expected: "false" },
+      { id: 3, name: "Beide leer", input: '{"s":"","t":""}', expected: "true" },
+      { id: 4, name: "Verschiedene Länge", input: '{"s":"a","t":"ab"}', expected: "false" },
+      { id: 5, name: "Klassiker", input: '{"s":"listen","t":"silent"}', expected: "true" },
+    ],
+    starterCodes: {
+      javascript:
+        "function isAnagram(data) {\n  const { s, t } = data;\n  // Your solution here\n  return false;\n}",
+      typescript:
+        "function isAnagram(data: { s: string; t: string }): boolean {\n  const { s, t } = data;\n  // Your solution here\n  return false;\n}",
+      python:
+        'def is_anagram(data):\n    s, t = data["s"], data["t"]\n    # Your solution here\n    return False\n',
+      php: "<?php\n\nfunction isAnagram($data) {\n    $s = $data['s'];\n    $t = $data['t'];\n    // Your solution here\n    return false;\n}\n",
+    },
+    starterCode:
+      "function isAnagram(data) {\n  const { s, t } = data;\n  // Your solution here\n  return false;\n}",
+  };
+
+  const challengeIsAnagram = await prisma.challenge.upsert({
+    where: { id: "challenge-valid-anagram" },
+    update: { ...isAnagramFields },
+    create: {
+      id: "challenge-valid-anagram",
+      title: "Valid Anagram",
+      description:
+        "Implementiere isAnagram(data) mit data = { s, t }: Gib true zurück, wenn t ein Anagramm von s ist (dieselben Buchstaben in derselben Anzahl).",
+      difficulty: "easy",
+      points: 100,
+      categoryId: catStrings.id,
+      hint: "Sortiere beide Strings und vergleiche – oder zähle die Buchstabenhäufigkeiten.",
+      examples: [{ input: '{ "s": "listen", "t": "silent" }', output: "true" }],
+      ...isAnagramFields,
+      isActive: false,
+      date: addUtcDays(anchor, -11),
+    },
+  });
+
+  const digitalRootFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "digitalRoot",
+        typescript: "digitalRoot",
+        python: "digital_root",
+        php: "digitalRoot",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Null", input: "0", expected: "0" },
+      { id: 2, name: "Einstellig", input: "5", expected: "5" },
+      { id: 3, name: "Dreistellig", input: "942", expected: "6" },
+      { id: 4, name: "Mehrfach falten", input: "132189", expected: "6" },
+      { id: 5, name: "Groß", input: "493193", expected: "2" },
+    ],
+    starterCodes: {
+      javascript: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
+      typescript: "function digitalRoot(n: number): number {\n  // Your solution here\n  return 0;\n}",
+      python: "def digital_root(n):\n    # Your solution here\n    return 0\n",
+      php: "<?php\n\nfunction digitalRoot($n) {\n    // Your solution here\n    return 0;\n}\n",
+    },
+    starterCode: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
+  };
+
+  const challengeDigitalRoot = await prisma.challenge.upsert({
+    where: { id: "challenge-digital-root" },
+    update: { ...digitalRootFields },
+    create: {
+      id: "challenge-digital-root",
+      title: "Digital Root",
+      description:
+        "Implementiere digitalRoot(n): Addiere wiederholt die Ziffern von n, bis nur noch eine einzelne Ziffer (0–9) übrig ist, und gib sie zurück.",
+      difficulty: "easy",
+      points: 100,
+      categoryId: catAlgorithmen.id,
+      hint: "Wiederhole die Quersumme, bis das Ergebnis kleiner als 10 ist.",
+      examples: [{ input: "942", output: "6" }],
+      ...digitalRootFields,
+      isActive: false,
+      date: addUtcDays(anchor, -12),
+    },
+  });
+
+  const moveZeroesFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "moveZeroes",
+        typescript: "moveZeroes",
+        python: "move_zeroes",
+        php: "moveZeroes",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Beispiel", input: "[0,1,0,3,12]", expected: "[1,3,12,0,0]" },
+      { id: 2, name: "Nur Null", input: "[0]", expected: "[0]" },
+      { id: 3, name: "Keine Null", input: "[1,2,3]", expected: "[1,2,3]" },
+      { id: 4, name: "Führende Nullen", input: "[0,0,1]", expected: "[1,0,0]" },
+      { id: 5, name: "Verteilt", input: "[4,0,5,0,0,6]", expected: "[4,5,6,0,0,0]" },
+    ],
+    starterCodes: {
+      javascript: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
+      typescript: "function moveZeroes(nums: number[]): number[] {\n  // Your solution here\n  return nums;\n}",
+      python: "def move_zeroes(nums):\n    # Your solution here\n    return nums\n",
+      php: "<?php\n\nfunction moveZeroes($nums) {\n    // Your solution here\n    return $nums;\n}\n",
+    },
+    starterCode: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
+  };
+
+  const challengeMoveZeroes = await prisma.challenge.upsert({
+    where: { id: "challenge-move-zeroes" },
+    update: { ...moveZeroesFields },
+    create: {
+      id: "challenge-move-zeroes",
+      title: "Move Zeroes",
+      description:
+        "Implementiere moveZeroes(nums): Verschiebe alle Nullen ans Ende des Arrays und behalte die Reihenfolge der übrigen Elemente bei.",
+      difficulty: "easy",
+      points: 100,
+      categoryId: catDatenstrukturen.id,
+      hint: "Sammle zuerst alle Nicht-Null-Werte, fülle danach mit Nullen auf.",
+      examples: [{ input: "[0,1,0,3,12]", output: "[1,3,12,0,0]" }],
+      ...moveZeroesFields,
+      isActive: false,
+      date: addUtcDays(anchor, -13),
+    },
+  });
+
+  const romanToIntFields = {
+    supportedLanguages: [...supportedLangs],
+    evaluationConfig: {
+      callableByLanguage: {
+        javascript: "romanToInt",
+        typescript: "romanToInt",
+        python: "roman_to_int",
+        php: "romanToInt",
+      },
+    },
+    testCases: [
+      { id: 1, name: "Einfach", input: '"III"', expected: "3" },
+      { id: 2, name: "Mit Subtraktion", input: '"IV"', expected: "4" },
+      { id: 3, name: "Neun", input: '"IX"', expected: "9" },
+      { id: 4, name: "Mittel", input: '"LVIII"', expected: "58" },
+      { id: 5, name: "Komplex", input: '"MCMXCIV"', expected: "1994" },
+    ],
+    starterCodes: {
+      javascript: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",
+      typescript: "function romanToInt(s: string): number {\n  // Your solution here\n  return 0;\n}",
+      python: "def roman_to_int(s):\n    # Your solution here\n    return 0\n",
+      php: "<?php\n\nfunction romanToInt($s) {\n    // Your solution here\n    return 0;\n}\n",
+    },
+    starterCode: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",
+  };
+
+  const challengeRomanToInt = await prisma.challenge.upsert({
+    where: { id: "challenge-roman-to-integer" },
+    update: { ...romanToIntFields },
+    create: {
+      id: "challenge-roman-to-integer",
+      title: "Roman to Integer",
+      description:
+        "Implementiere romanToInt(s): Wandle eine römische Zahl (I=1, V=5, X=10, L=50, C=100, D=500, M=1000) in ihren ganzzahligen Wert um. Steht ein kleinerer Wert vor einem größeren, wird er subtrahiert (z. B. IV = 4).",
+      difficulty: "medium",
+      points: 150,
+      categoryId: catStrings.id,
+      hint: "Gehe von links nach rechts: ist der aktuelle Wert kleiner als der nächste, ziehe ihn ab, sonst addiere ihn.",
+      examples: [
+        { input: '"IX"', output: "9" },
+        { input: '"MCMXCIV"', output: "1994" },
+      ],
+      ...romanToIntFields,
+      isActive: false,
+      date: addUtcDays(anchor, -14),
+    },
+  });
+
+  // Diese Challenges werden nur angelegt (kein späterer Verweis nötig).
+  void [
+    challengeTwoSum,
+    challengeFizzBuzz,
+    challengeValidParentheses,
+    challengeCountVowels,
+    challengeMaxSubArray,
+    challengeIsAnagram,
+    challengeDigitalRoot,
+    challengeMoveZeroes,
+    challengeRomanToInt,
+  ];
+
   // Keep seed reruns deterministic even when records already existed with drifted state.
   await prisma.user.updateMany({
     where: {
