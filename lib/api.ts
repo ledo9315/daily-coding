@@ -40,6 +40,8 @@ export interface UserStats {
   streak: number;
   streakRecord: number;
   totalSolved: number;
+  /** Gesamtzahl registrierter Nutzer (für "Rang X von N"). */
+  totalUsers: number;
   level: number;
   levelMax: number;
   badges: number;
