@@ -12,6 +12,7 @@ vi.mock("@/lib/auth-session", () => ({
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockUserFindUnique = vi.fn();
+const mockUserCount = vi.fn();
 const mockRankingEntryFindMany = vi.fn();
 const mockGetTodayRankNumber = vi.fn();
 const mockSubmissionFindMany = vi.fn();
@@ -26,6 +27,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+      count: (...args: unknown[]) => mockUserCount(...args),
     },
     rankingEntry: {
       findMany: (...args: unknown[]) => mockRankingEntryFindMany(...args),
@@ -57,6 +59,7 @@ beforeEach(() => {
   mockSubmissionFindMany.mockResolvedValue([]);
   mockAchievementDefFindMany.mockResolvedValue(sixAchievementDefs);
   mockUserAchievementFindMany.mockResolvedValue([]);
+  mockUserCount.mockResolvedValue(156);
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -148,9 +151,11 @@ describe("GET /api/user/stats", () => {
       { challenge: { points: 100 }, createdAt: new Date() },
       { challenge: { points: 100 }, createdAt: new Date() },
     ]);
+    mockUserCount.mockResolvedValueOnce(156);
     const res = await getUserStatsHandler();
     const json = await res.json();
     expect(json.totalSolved).toBe(3);
+    expect(json.totalUsers).toBe(156);
   });
 
   it("returns points=0 and totalSolved=0 when no submissions", async () => {

@@ -69,7 +69,7 @@ export default async function DashboardPage() {
           <StatsCard
             title="DEIN RANG"
             value={userStats.rank}
-            description="von 156 Nutzern"
+            description={`von ${userStats.totalUsers.toLocaleString("de-DE")} Nutzern`}
             icon={Trophy}
             trend={{
               value: userStats.rankTrendPlaces,

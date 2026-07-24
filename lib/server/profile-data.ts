@@ -39,7 +39,7 @@ export async function getUserProfileData(
 
   const resolvedUserId = user.id;
 
-  const [todayRankNum, completedSubmissions, achievementDefs, userAchievements] =
+  const [todayRankNum, completedSubmissions, achievementDefs, userAchievements, totalUsers] =
     await Promise.all([
       getTodayRankNumber(resolvedUserId),
       prisma.submission.findMany({
@@ -48,6 +48,7 @@ export async function getUserProfileData(
       }),
       prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
       prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
+      prisma.user.count(),
     ]);
 
   const points = completedSubmissions.reduce((sum, s) => sum + s.challenge.points, 0);
@@ -83,6 +84,7 @@ export async function getUserProfileData(
       streak: user.streak,
       streakRecord: user.streakRecord,
       totalSolved,
+      totalUsers,
       level,
       levelMax: nextLevelThreshold(level),
       badges: unlockedBadges,
