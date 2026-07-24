@@ -5,7 +5,7 @@ export function LandingFooter() {
     <footer className="border-t border-border bg-card text-card-foreground py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Link href="/" className="flex items-center gap-3 group mb-4">
+          <Link href="/landing" className="flex items-center gap-3 group mb-4">
             <span className="text-xl font-pixel tracking-tighter text-primary">
               {">_"}
             </span>
@@ -19,7 +19,7 @@ export function LandingFooter() {
           </p>
         </div>
 
-        <div>
+        {/* <div>
           <h4 className="font-heading text-sm mb-4">PLATTFORM</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
@@ -69,7 +69,7 @@ export function LandingFooter() {
               </Link>
             </li>
           </ul>
-        </div>
+        </div> */}
 
         <div>
           <h4 className="font-heading text-sm mb-4">RECHTLICHES</h4>
