@@ -8,6 +8,11 @@ import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 
+function percentageDelta(current: number, previous: number): number {
+  if (previous <= 0) return current > 0 ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
 export async function getTodayChallengeSummary(): Promise<TodayChallenge | null> {
   const challenge = await findDailyChallengeForApp();
 
@@ -58,6 +63,13 @@ export async function getUserStatsData(
 
   const resolvedUserId = user.id;
 
+  const weeklyRankingEntries = await prisma.rankingEntry.findMany({
+    where: { userId: resolvedUserId, period: "week" },
+    orderBy: { periodDate: "desc" },
+    take: 2,
+    select: { rank: true },
+  });
+
   const [todayRankNum, completedSubmissions, achievementDefs, userAchievements] =
     await Promise.all([
       getTodayRankNumber(resolvedUserId),
@@ -80,9 +92,47 @@ export async function getUserStatsData(
   const level = calculateLevel(points);
   const monthlyChallengesSolved = countSubmissionsInUtcMonth(completedSubmissions);
 
+  const now = new Date();
+  const currentMonth = now.getUTCMonth();
+  const currentYear = now.getUTCFullYear();
+  const previousMonthDate = new Date(Date.UTC(currentYear, currentMonth - 1, 1));
+  const previousMonth = previousMonthDate.getUTCMonth();
+  const previousMonthYear = previousMonthDate.getUTCFullYear();
+
+  const currentMonthPoints = completedSubmissions
+    .filter(
+      (s) =>
+        s.createdAt.getUTCFullYear() === currentYear &&
+        s.createdAt.getUTCMonth() === currentMonth
+    )
+    .reduce((sum, s) => sum + s.challenge.points, 0);
+
+  const previousMonthPoints = completedSubmissions
+    .filter(
+      (s) =>
+        s.createdAt.getUTCFullYear() === previousMonthYear &&
+        s.createdAt.getUTCMonth() === previousMonth
+    )
+    .reduce((sum, s) => sum + s.challenge.points, 0);
+
+  const currentWeekRank = weeklyRankingEntries[0]?.rank;
+  const previousWeekRank = weeklyRankingEntries[1]?.rank;
+  const rankTrendPercent =
+    typeof currentWeekRank === "number" && typeof previousWeekRank === "number"
+      ? percentageDelta(previousWeekRank, currentWeekRank)
+      : 0;
+  const rankTrendPlaces =
+    typeof currentWeekRank === "number" && typeof previousWeekRank === "number"
+      ? previousWeekRank - currentWeekRank
+      : 0;
+  const pointsTrendPercent = percentageDelta(currentMonthPoints, previousMonthPoints);
+
   return {
     rank: todayRankNum != null ? `#${todayRankNum}` : "#-",
     points: points.toLocaleString("de-DE"),
+    rankTrendPercent,
+    rankTrendPlaces,
+    pointsTrendPercent,
     streak: user.streak,
     streakRecord: user.streakRecord,
     totalSolved,

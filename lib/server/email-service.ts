@@ -52,3 +52,15 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
 <p>willkommen bei Daily Dev! Löse täglich Coding-Challenges und steige im Ranking auf.</p>`,
   });
 }
+
+export async function sendAccountDeletionEmail(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  await resend.emails.send({
+    from: getFrom(),
+    to,
+    subject: "Konto erfolgreich geloescht - Daily Dev",
+    html: `<p>Hi ${name || "there"},</p>
+<p>dein Daily-Dev-Konto wurde erfolgreich geloescht.</p>
+<p>Wenn du das nicht selbst warst, kontaktiere uns bitte sofort.</p>`,
+  });
+}

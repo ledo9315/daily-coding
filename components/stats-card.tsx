@@ -10,6 +10,7 @@ interface StatsCardProps {
   trend?: {
     value: number;
     label: string;
+    unit?: "percent" | "number";
   };
   className?: string;
 }
@@ -22,6 +23,11 @@ export function StatsCard({
   trend,
   className,
 }: StatsCardProps) {
+  const trendUnit = trend?.unit ?? "percent";
+  const trendText = trend
+    ? `${trend.value > 0 ? "+" : ""}${trend.value}${trendUnit === "percent" ? "%" : ""}`
+    : "";
+
   return (
     <CardSpotlight
       className={cn("pixel-box p-4 bg-card", className)}
@@ -47,11 +53,14 @@ export function StatsCard({
             <span
               className={cn(
                 "text-lg font-sans",
-                trend.value > 0 ? "text-primary" : "text-destructive",
+                trend.value > 0
+                  ? "text-primary"
+                  : trend.value < 0
+                    ? "text-destructive"
+                    : "text-muted-foreground",
               )}
             >
-              {trend.value > 0 ? "+" : ""}
-              {trend.value}%
+              {trendText}
             </span>
             <span className="text-md text-muted-foreground">{trend.label}</span>
           </div>

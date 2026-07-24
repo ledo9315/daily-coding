@@ -12,6 +12,7 @@ vi.mock("@/lib/auth-session", () => ({
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockUserFindUnique = vi.fn();
+const mockRankingEntryFindMany = vi.fn();
 const mockGetTodayRankNumber = vi.fn();
 const mockSubmissionFindMany = vi.fn();
 const mockAchievementDefFindMany = vi.fn();
@@ -25,6 +26,9 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+    },
+    rankingEntry: {
+      findMany: (...args: unknown[]) => mockRankingEntryFindMany(...args),
     },
     submission: {
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
@@ -49,6 +53,7 @@ const sixAchievementDefs = [1, 2, 3, 4, 5, 6].map((n) => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockRankingEntryFindMany.mockResolvedValue([]);
   mockSubmissionFindMany.mockResolvedValue([]);
   mockAchievementDefFindMany.mockResolvedValue(sixAchievementDefs);
   mockUserAchievementFindMany.mockResolvedValue([]);

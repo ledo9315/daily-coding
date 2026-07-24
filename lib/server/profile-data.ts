@@ -77,6 +77,9 @@ export async function getUserProfileData(
     stats: {
       rank: todayRankNum != null ? `#${todayRankNum}` : "#-",
       points: points.toLocaleString("de-DE"),
+      rankTrendPercent: 0,
+      rankTrendPlaces: 0,
+      pointsTrendPercent: 0,
       streak: user.streak,
       streakRecord: user.streakRecord,
       totalSolved,

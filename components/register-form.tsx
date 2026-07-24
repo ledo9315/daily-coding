@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,16 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("accountDeleted") !== "1") return;
+
+    toast.success("Account erfolgreich geloescht", {
+      description: "Du kannst jederzeit ein neues Konto erstellen.",
+    });
+    router.replace("/register");
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +107,7 @@ export function RegisterForm() {
           <Input
             id="email"
             type="email"
-            placeholder="name@firma.de"
+            placeholder="deine@email.de"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             

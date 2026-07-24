@@ -62,7 +62,7 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
             <Input
               id="email"
               type="email"
-              placeholder="name@firma.de"
+              placeholder="deine@email.de"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-background pl-9"
