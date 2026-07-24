@@ -31,6 +31,16 @@ type PistonExecuteResponse = {
 const runtimeCache = new Map<string, PistonRuntimeInfo[]>();
 
 /**
+ * Optionaler Bearer-Token für einen abgesicherten, öffentlich erreichbaren
+ * Piston-Endpunkt (Reverse Proxy verlangt den Header). Ohne PISTON_API_TOKEN
+ * werden keine Auth-Header gesendet (lokale Entwicklung).
+ */
+function pistonAuthHeaders(): Record<string, string> {
+  const token = process.env.PISTON_API_TOKEN;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+/**
  * Self-host: PISTON_API_URL = Ursprung, z. B. http://127.0.0.1:2000 → /api/v2/runtimes
  * Legacy (EMKC): …/api/v2/piston → …/runtimes unter diesem Prefix
  */
@@ -53,6 +63,7 @@ export async function fetchPistonRuntimes(
   const hit = runtimeCache.get(runtimesUrl);
   if (hit && hit.length > 0) return hit;
   const res = await fetch(runtimesUrl, {
+    headers: pistonAuthHeaders(),
     signal: AbortSignal.timeout(15_000),
   });
   if (!res.ok) {
@@ -159,7 +170,7 @@ export async function executeWithPiston(
   const t0 = Date.now();
   const res = await fetch(executeUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...pistonAuthHeaders() },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(20_000),
   });
