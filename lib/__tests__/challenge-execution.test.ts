@@ -132,7 +132,23 @@ describe("runChallengeTests (IO evaluation)", () => {
 });
 
 describe("runChallengeTests (smoke, no IO)", () => {
-  it("uses a single run without stdin when there is no evaluationConfig", async () => {
+  it("run mode: single run without stdin, runtimeOk reflects compile status", async () => {
+    mockExecute.mockResolvedValueOnce(pistonOk(""));
+
+    const { testCases, runtimeOk } = await runChallengeTests(
+      { testCases: [{ id: 1, name: "T" }] },
+      "console.log(1)",
+      "javascript",
+      "run"
+    );
+
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    expect(mockExecute.mock.calls[0]?.[2]).toBe("");
+    expect(runtimeOk).toBe(true);
+    expect(testCases.length).toBeGreaterThan(0);
+  });
+
+  it("submit mode: never auto-passes without IO evaluation, even when code runs", async () => {
     mockExecute.mockResolvedValueOnce(pistonOk(""));
 
     const { testCases, runtimeOk } = await runChallengeTests(
@@ -142,9 +158,8 @@ describe("runChallengeTests (smoke, no IO)", () => {
       "submit"
     );
 
-    expect(mockExecute).toHaveBeenCalledTimes(1);
-    expect(mockExecute.mock.calls[0]?.[2]).toBe("");
-    expect(runtimeOk).toBe(true);
-    expect(testCases.length).toBeGreaterThan(0);
+    expect(runtimeOk).toBe(false);
+    expect(testCases.every((t) => t.status !== "passed")).toBe(true);
+    expect(testCases[0]?.actual).toContain("keine automatische Bewertung");
   });
 });
