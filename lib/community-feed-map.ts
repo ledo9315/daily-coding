@@ -3,9 +3,6 @@ import type { FeedItemProps } from "@/components/feed-item";
 import { avatarImageSrc } from "@/lib/avatar-src";
 import { levelTitleDe } from "@/lib/level";
 
-/**
- * Mappt API-Zeilen auf FeedItem. Bei Levelaufstieg: Typ „level-up“ und kombinierte Beschreibung.
- */
 export function communityFeedItemToFeedItem(item: CommunityFeedItem): FeedItemProps {
   const baseUser = {
     name: item.user.name,

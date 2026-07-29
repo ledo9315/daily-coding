@@ -6,21 +6,15 @@ import { computeLevelUpBySubmissionId } from "@/lib/server/community-feed-level"
 const DEFAULT_LIMIT = 15;
 const MAX_LIMIT = 50;
 
-function parseLimit(raw: string | null): number {
-  if (!raw) return DEFAULT_LIMIT;
-  const n = Number.parseInt(raw, 10);
-  if (!Number.isFinite(n) || n < 1) return DEFAULT_LIMIT;
-  return Math.min(MAX_LIMIT, Math.floor(n));
+function parseLimit(rawLimit: string | null): number {
+  if (!rawLimit) return DEFAULT_LIMIT;
+  const parsedLimit = Number.parseInt(rawLimit, 10);
+  if (!Number.isFinite(parsedLimit) || parsedLimit < 1) return DEFAULT_LIMIT;
+  return Math.min(MAX_LIMIT, Math.floor(parsedLimit));
 }
 
-function emailToUsername(email: string): string {
-  const local = email.split("@")[0]?.trim();
-  if (!local) return "@user";
-  return `@${local}`;
-}
-
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
   const cursor = searchParams.get("cursor")?.trim() || undefined;
   const limit = parseLimit(searchParams.get("limit"));
   const take = limit + 1;
@@ -40,9 +34,9 @@ export async function GET(req: Request) {
   const page = hasMore ? submissions.slice(0, limit) : submissions;
   const nextCursor = hasMore && page.length > 0 ? page[page.length - 1].id : null;
 
-  const userIds = [...new Set(page.map((s) => s.userId))];
+  const userIds = [...new Set(page.map((submission) => submission.userId))];
 
-  const orderedSubs =
+  const orderedSubmissions =
     userIds.length === 0
       ? []
       : await prisma.submission.findMany({
@@ -56,54 +50,55 @@ export async function GET(req: Request) {
         });
 
   const lifetimePoints = new Map<string, number>();
-  for (const r of orderedSubs) {
+  for (const submission of orderedSubmissions) {
     lifetimePoints.set(
-      r.userId,
-      (lifetimePoints.get(r.userId) ?? 0) + r.challenge.points,
+      submission.userId,
+      (lifetimePoints.get(submission.userId) ?? 0) + submission.challenge.points,
     );
   }
 
   const levelUpMap = computeLevelUpBySubmissionId(
-    page.map((s) => ({
-      id: s.id,
-      userId: s.userId,
-      challenge: { points: s.challenge.points },
+    page.map((submission) => ({
+      id: submission.id,
+      userId: submission.userId,
+      challenge: { points: submission.challenge.points },
     })),
-    orderedSubs,
+    orderedSubmissions,
   );
 
   const now = new Date();
   const formatRelativeTime = (date: Date) => {
-    const diffMs = now.getTime() - date.getTime();
-    const diffMin = Math.floor(diffMs / 60000);
-    if (diffMin < 60) return `vor ${diffMin} Minuten`;
-    const diffH = Math.floor(diffMin / 60);
-    if (diffH < 24) return `vor ${diffH} Stunde${diffH > 1 ? "n" : ""}`;
-    return `vor ${Math.floor(diffH / 24)} Tagen`;
+    const elapsedMs = now.getTime() - date.getTime();
+    const elapsedMinutes = Math.floor(elapsedMs / 60000);
+    if (elapsedMinutes < 60) return `vor ${elapsedMinutes} Minuten`;
+    const elapsedHours = Math.floor(elapsedMinutes / 60);
+    if (elapsedHours < 24)
+      return `vor ${elapsedHours} Stunde${elapsedHours > 1 ? "n" : ""}`;
+    return `vor ${Math.floor(elapsedHours / 24)} Tagen`;
   };
 
-  const items = page.map((s) => {
-    const lu = levelUpMap.get(s.id);
+  const items = page.map((submission) => {
+    const levelUp = levelUpMap.get(submission.id);
     return {
-      id: s.id,
+      id: submission.id,
       kind: "challenge-solved" as const,
       user: {
-        name: s.user.name,
-        initials: s.user.initials,
-        avatar: s.user.avatar,
-        level: calculateLevel(lifetimePoints.get(s.userId) ?? 0),
+        name: submission.user.name,
+        initials: submission.user.initials,
+        avatar: submission.user.avatar,
+        level: calculateLevel(lifetimePoints.get(submission.userId) ?? 0),
       },
-      username: emailToUsername(s.user.email),
+      username: `@${submission.user.name}`,
       action: "hat die Challenge gelöst",
-      challenge: s.challenge.title,
-      points: s.challenge.points,
-      time: formatRelativeTime(s.createdAt),
-      createdAt: s.createdAt.toISOString(),
-      ...(lu
+      challenge: submission.challenge.title,
+      points: submission.challenge.points,
+      time: formatRelativeTime(submission.createdAt),
+      createdAt: submission.createdAt.toISOString(),
+      ...(levelUp
         ? {
             levelUp: {
-              previousLevel: lu.previousLevel,
-              newLevel: lu.newLevel,
+              previousLevel: levelUp.previousLevel,
+              newLevel: levelUp.newLevel,
             },
           }
         : {}),
