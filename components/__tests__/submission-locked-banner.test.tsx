@@ -1,11 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-
-// Nur das eine Icon, das die Komponente importiert — @nsmr/pixelart-react
-// scheitert im Node-Env an einer unauflösbaren ESM-Endung.
-vi.mock("@nsmr/pixelart-react", () => ({
-  Lock: () => null,
-}));
 
 import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
 
@@ -34,5 +28,11 @@ describe("SubmissionLockedBanner", () => {
 
   it("ist für Screenreader als Statusmeldung ausgezeichnet", () => {
     expect(markup).toContain('role="status"');
+  });
+
+  // #59: Belegt, dass Icons ohne Mock auflösbar sind — vorher scheiterte der
+  // Import von @nsmr/pixelart-react im Node-Env an einer fehlenden ESM-Endung.
+  it("rendert das echte Schloss-Icon ohne Mock", () => {
+    expect(markup).toContain("<svg");
   });
 });
