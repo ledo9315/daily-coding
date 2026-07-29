@@ -135,6 +135,11 @@ export interface DailyChallenge {
     code: string;
     language: string;
   } | null;
+  /**
+   * Serverseitiger Start der Bearbeitung (ISO). Quelle für die angezeigte
+   * verstrichene Zeit; null wenn nicht eingeloggt.
+   */
+  startedAt: string | null;
 }
 
 export interface CommunityFeedItem {
