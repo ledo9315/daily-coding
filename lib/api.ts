@@ -26,6 +26,11 @@ export interface TodayChallenge {
   difficulty: "easy" | "medium" | "hard";
   points: number;
   category: string;
+  /**
+   * Status der heutigen (UTC) Abgabe des eingeloggten Nutzers; null wenn nicht
+   * eingeloggt oder noch nicht abgegeben.
+   */
+  todayStatus: "completed" | "failed" | "pending" | null;
 }
 
 export interface UserStats {

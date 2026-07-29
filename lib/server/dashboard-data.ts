@@ -2,7 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { formatTime } from "@/lib/format";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import type { RankingEntry, TodayChallenge, UserStats } from "@/lib/api";
-import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
+import {
+  findDailyChallengeForApp,
+  findTodaySubmission,
+  publicSubmissionStatus,
+} from "@/lib/server/challenge-day";
 import { getLiveRanking, getTodayRankNumber } from "@/lib/server/ranking-live";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
@@ -13,10 +17,16 @@ function percentageDelta(current: number, previous: number): number {
   return Math.round(((current - previous) / previous) * 100);
 }
 
-export async function getTodayChallengeSummary(): Promise<TodayChallenge | null> {
+export async function getTodayChallengeSummary(
+  userId?: string
+): Promise<TodayChallenge | null> {
   const challenge = await findDailyChallengeForApp();
 
   if (!challenge) return null;
+
+  const todaySubmission = userId
+    ? await findTodaySubmission(userId, challenge.id)
+    : null;
 
   return {
     title: challenge.title.toUpperCase(),
@@ -24,6 +34,9 @@ export async function getTodayChallengeSummary(): Promise<TodayChallenge | null>
     difficulty: challenge.difficulty,
     points: challenge.points,
     category: challenge.category.name.toUpperCase(),
+    todayStatus: todaySubmission
+      ? publicSubmissionStatus(todaySubmission.status)
+      : null,
   };
 }
 
