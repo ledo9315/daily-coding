@@ -52,6 +52,13 @@ describe("findTodaySubmission", () => {
     });
   });
 
+  // #60: Ohne testResults zeigt die Seite nach dem Reload die leere Vorlage
+  // („0/5 bestanden") neben „Erfolgreich abgegeben".
+  it("includes the stored test results", async () => {
+    await findTodaySubmission("user-1", "ch-1");
+    expect(mockSubmissionFindFirst.mock.calls[0][0].select.testResults).toBe(true);
+  });
+
   it("returns null when nothing was submitted today", async () => {
     expect(await findTodaySubmission("user-1", "ch-1")).toBeNull();
   });
