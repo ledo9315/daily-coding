@@ -27,9 +27,15 @@ const mockSubmissionFindMany = vi.fn();
 const mockSubmissionAggregate = vi.fn();
 const mockSubmissionCount = vi.fn();
 const mockCreate = vi.fn();
+const mockChallengeStartFindUnique = vi.fn();
+const mockChallengeStartCreateMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    challengeStart: {
+      findUnique: (...args: unknown[]) => mockChallengeStartFindUnique(...args),
+      createMany: (...args: unknown[]) => mockChallengeStartCreateMany(...args),
+    },
     user: {
       findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
       update: (...args: unknown[]) => mockUserUpdate(...args),
@@ -57,6 +63,8 @@ beforeEach(() => {
   mockSubmissionCount.mockResolvedValue(3);
   mockUserUpdate.mockResolvedValue({ streak: 1, streakRecord: 1 });
   mockAuth.mockResolvedValue(null);
+  mockChallengeStartFindUnique.mockResolvedValue(null);
+  mockChallengeStartCreateMany.mockResolvedValue({ count: 1 });
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -195,6 +203,27 @@ describe("GET /api/challenge/daily", () => {
     const json = await res.json();
     expect(json.todaySubmission).toBeNull();
     expect(mockSubmissionFindFirst).toHaveBeenCalled();
+  });
+
+  // Regression zu #46: Die Startzeit muss serverseitig entstehen, damit die
+  // Lösezeit nicht vom Client bestimmt wird.
+  it("records the solve start once for a logged-in user", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    await getDailyHandler();
+    expect(mockChallengeStartCreateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: [{ userId: "user-test", challengeId: "ch-1" }],
+        skipDuplicates: true,
+      })
+    );
+  });
+
+  it("does not record a solve start for anonymous visitors", async () => {
+    mockAuth.mockResolvedValueOnce(null);
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    await getDailyHandler();
+    expect(mockChallengeStartCreateMany).not.toHaveBeenCalled();
   });
 });
 
@@ -383,19 +412,47 @@ describe("POST /api/challenge/[id]/submit", () => {
     );
   });
 
-  it("stores solveDurationSeconds as timeTaken when the client sends it", async () => {
+  // Regression zu #46: Die Lösezeit entscheidet über die Platzierung in der
+  // Rangliste und darf deshalb nicht vom Client kommen.
+  it("ignores a client-supplied solveDurationSeconds", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockChallengeStartFindUnique.mockResolvedValueOnce({
+      startedAt: new Date(Date.now() - 300_000), // vor 5 Minuten
+    });
     mockCreate.mockResolvedValueOnce({});
-    await submitHandler(makeRequest("ch-1", "code", "javascript", { solveDurationSeconds: 142 }), {
+    await submitHandler(makeRequest("ch-1", "code", "javascript", { solveDurationSeconds: 1 }), {
       params: Promise.resolve({ id: "ch-1" }),
     });
-    expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          timeTaken: 142,
-        }),
-      })
-    );
+    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
+    expect(stored).not.toBe(1);
+    expect(stored).toBeGreaterThanOrEqual(299);
+    expect(stored).toBeLessThanOrEqual(302);
+  });
+
+  it("computes timeTaken from the server-side start record", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockChallengeStartFindUnique.mockResolvedValueOnce({
+      startedAt: new Date(Date.now() - 142_000),
+    });
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1", "code", "javascript"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
+    expect(stored).toBeGreaterThanOrEqual(141);
+    expect(stored).toBeLessThanOrEqual(144);
+  });
+
+  it("falls back to execution time when no start record exists", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockChallengeStartFindUnique.mockResolvedValueOnce(null);
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1", "code", "javascript", { solveDurationSeconds: 5 }), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
+    expect(stored).not.toBe(5);
+    expect(stored).toBe(1); // Sandbox-Summe des Stub-Runners
   });
 
   it("update streak and record after successful submission", async () => {

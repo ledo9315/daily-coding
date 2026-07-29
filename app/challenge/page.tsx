@@ -40,11 +40,6 @@ import { ChallengeSuccessModal } from "@/components/challenge-success-modal";
 import { languageFileName, languageLabel } from "@/lib/challenge-languages";
 import { notifyUserStatsChanged } from "@/lib/user-stats-events";
 import {
-  ensureSolveStart,
-  getSolveDurationSeconds,
-  clearSolveTimer,
-} from "@/lib/solve-timer";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -137,11 +132,6 @@ export default function ChallengePage() {
 
   const isSubmitLocked = submitOutcome !== "none";
 
-  useEffect(() => {
-    if (!challenge || isSubmitLocked) return;
-    ensureSolveStart(challenge.id);
-  }, [challenge?.id, isSubmitLocked]);
-
   const { mutate: runTestsMutation, isPending: isRunning } = useMutation({
     mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
       runTests(challenge!.id, code, lang),
@@ -162,12 +152,9 @@ export default function ChallengePage() {
   });
 
   const { mutate: submitMutation, isPending: isSubmitting } = useMutation({
-    mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) => {
-      const solveDurationSeconds = getSolveDurationSeconds(challenge!.id);
-      return submitSolution(challenge!.id, code, lang, solveDurationSeconds);
-    },
+    mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
+      submitSolution(challenge!.id, code, lang),
     onSuccess: (result) => {
-      clearSolveTimer(challenge!.id);
       setTestCases(result.testCases as TestCase[]);
       setSubmittedAtLabel(
         new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
