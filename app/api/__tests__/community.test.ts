@@ -86,7 +86,7 @@ describe("GET /api/community/feed", () => {
       id: "sub-1",
       kind: "challenge-solved",
       user: { name: "Alice Müller", initials: "AM", level: 4 },
-      username: "@alice",
+      username: "@Alice Müller",
       action: "hat die Challenge gelöst",
       challenge: "Two Sum",
       points: 200,
