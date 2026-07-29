@@ -20,7 +20,6 @@ interface RankingPreviewCardProps {
   users: RankingUser[];
   href: string;
   showTime?: boolean;
-  /** Bei Tages-Ranking identische Challenge-Punkte — nur Zeit anzeigen. */
   showPoints?: boolean;
 }
 
@@ -86,7 +85,7 @@ export function RankingPreviewCard({
                 <AvatarFallback
                   className={cn(
                     "rounded-none text-[10px] font-sans font-semibold leading-none tracking-tight",
-                    "bg-gradient-to-b from-zinc-600 to-zinc-900 text-zinc-100",
+                    "bg-linear-to-b from-zinc-600 to-zinc-900 text-zinc-100",
                     "ring-1 ring-inset ring-white/15",
                   )}
                 >
