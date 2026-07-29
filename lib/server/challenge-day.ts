@@ -25,6 +25,7 @@ export async function findTodaySubmission(userId: string, challengeId: string) {
       createdAt: true,
       code: true,
       language: true,
+      testResults: true,
     },
     orderBy: { createdAt: "desc" },
   });

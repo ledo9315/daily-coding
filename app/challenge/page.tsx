@@ -109,7 +109,13 @@ export default function ChallengePage() {
         setSources({ ...challenge.starterCodes });
       }
 
-      setTestCases(challenge.testCases as TestCase[]);
+      // Bewertete Ergebnisse der heutigen Abgabe bevorzugen — sonst zeigte das
+      // Panel nach einem Reload die leere Vorlage („0/5") neben „Erfolgreich
+      // abgegeben". Altdaten ohne gespeicherte Ergebnisse fallen auf die Vorlage.
+      const storedResults = challenge.todaySubmission?.testResults;
+      setTestCases(
+        (storedResults?.length ? storedResults : challenge.testCases) as TestCase[]
+      );
       setTestRunCount(0);
 
       if (challenge.todaySubmission) {

@@ -38,6 +38,8 @@ export async function GET() {
     submittedAt: string;
     code: string;
     language: string;
+    /** Bewertete Testfälle der Abgabe; null bei Altdaten ohne gespeicherte Ergebnisse. */
+    testResults: unknown;
   } | null = null;
 
   if (userId) {
@@ -62,6 +64,7 @@ export async function GET() {
         submittedAt,
         code: sub.code,
         language: sub.language,
+        testResults: Array.isArray(sub.testResults) ? sub.testResults : null,
       };
     }
   }
