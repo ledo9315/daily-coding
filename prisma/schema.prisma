@@ -69,6 +69,7 @@ model User {
   streak       Int          @default(0)
   streakRecord Int          @default(0)
   submissions    Submission[]
+  challengeStarts ChallengeStart[]
   achievements   UserAchievement[]
   rankingEntries RankingEntry[]
   createdAt    DateTime     @default(now())
@@ -83,6 +84,21 @@ model AchievementDef {
   rarity       AchievementRarity @default(common)
   userProgress UserAchievement[]
   createdAt    DateTime          @default(now())
+}
+
+/// Serverseitiger Startzeitpunkt der Bearbeitung. Entsteht beim ersten Abruf der
+/// Challenge und ist die einzige Quelle für die Lösezeit in der Rangliste —
+/// der Client darf sie nicht bestimmen.
+/// ponytail: kein Tagesschlüssel nötig, `Challenge.date` ist unique → eine
+/// Challenge gehört zu genau einem Tag.
+model ChallengeStart {
+  userId      String
+  challengeId String
+  startedAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+
+  @@id([userId, challengeId])
 }
 
 model UserAchievement {
@@ -125,6 +141,7 @@ model Challenge {
   isActive    Boolean      @default(false)
   date        DateTime?    @unique
   submissions Submission[]
+  starts      ChallengeStart[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }

@@ -9,12 +9,25 @@ import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 
 const MAX_SOLVE_DURATION_SECONDS = 7 * 24 * 3600;
 
-function parseSolveDurationSeconds(body: Record<string, unknown>): number | null {
-  const v = body.solveDurationSeconds;
-  if (typeof v !== "number" || !Number.isFinite(v)) return null;
-  const s = Math.floor(v);
-  if (s < 0) return null;
-  return Math.min(s, MAX_SOLVE_DURATION_SECONDS);
+/**
+ * Lösezeit aus dem serverseitigen Startzeitpunkt (`ChallengeStart`, gesetzt beim
+ * ersten Abruf der Challenge). Bewusst NICHT aus dem Request-Body: die Zeit
+ * entscheidet über die Platzierung in der Rangliste, ein Client-Wert wäre frei
+ * wählbar. Ohne Startzeitpunkt (z. B. Abgabe ohne vorherigen Abruf) → null,
+ * dann greift die Sandbox-Laufzeit als Näherung.
+ */
+async function serverSolveDurationSeconds(
+  userId: string,
+  challengeId: string
+): Promise<number | null> {
+  const start = await prisma.challengeStart.findUnique({
+    where: { userId_challengeId: { userId, challengeId } },
+    select: { startedAt: true },
+  });
+  if (!start) return null;
+  const seconds = Math.floor((Date.now() - start.startedAt.getTime()) / 1000);
+  if (seconds < 0) return null;
+  return Math.min(Math.max(1, seconds), MAX_SOLVE_DURATION_SECONDS);
 }
 
 export async function POST(
@@ -89,17 +102,12 @@ export async function POST(
     "submit"
   );
 
-  const clientSolveSeconds = parseSolveDurationSeconds(body);
+  const solveSeconds = await serverSolveDurationSeconds(userId, challengeId);
   const executionSeconds =
     totalDurationMs > 0 ? Math.max(1, Math.ceil(totalDurationMs / 1000)) : null;
 
-  /** Anzeige: bevorzugt Wandzeit seit Challenge-Start (Client); sonst Sandbox-Summe. */
-  let timeTakenSeconds: number | null = null;
-  if (clientSolveSeconds != null) {
-    timeTakenSeconds = clientSolveSeconds === 0 ? 1 : clientSolveSeconds;
-  } else if (executionSeconds != null) {
-    timeTakenSeconds = executionSeconds;
-  }
+  /** Rangliste: Wandzeit seit dem serverseitigen Start; sonst Sandbox-Summe. */
+  const timeTakenSeconds = solveSeconds ?? executionSeconds;
 
   await prisma.submission.create({
     data: {
