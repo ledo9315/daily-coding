@@ -219,6 +219,27 @@ describe("GET /api/challenge/daily", () => {
     );
   });
 
+  // #47: Die Startzeit wird ausgeliefert, damit die Seite die verstrichene
+  // Bearbeitungszeit anzeigen kann — Quelle bleibt der Server.
+  it("returns startedAt for a logged-in user", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockChallengeStartFindUnique.mockResolvedValueOnce({
+      startedAt: new Date("2026-07-30T10:00:00.000Z"),
+    });
+    const res = await getDailyHandler();
+    const json = await res.json();
+    expect(json.startedAt).toBe("2026-07-30T10:00:00.000Z");
+  });
+
+  it("returns startedAt null for anonymous visitors", async () => {
+    mockAuth.mockResolvedValueOnce(null);
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    const res = await getDailyHandler();
+    const json = await res.json();
+    expect(json.startedAt).toBeNull();
+  });
+
   it("does not record a solve start for anonymous visitors", async () => {
     mockAuth.mockResolvedValueOnce(null);
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
