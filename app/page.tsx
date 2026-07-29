@@ -25,7 +25,7 @@ export default async function DashboardPage() {
 
   const [rankingPreview, todayChallenge, userStats] = await Promise.all([
     getDashboardRankingPreviewData(),
-    getTodayChallengeSummary(),
+    getTodayChallengeSummary(userId),
     getUserStatsData(userId, userEmail),
   ]);
   if (!userStats) {
@@ -105,6 +105,7 @@ export default async function DashboardPage() {
             difficulty={todayChallenge.difficulty}
             points={todayChallenge.points}
             category={todayChallenge.category}
+            todayStatus={todayChallenge.todayStatus}
             className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-primary/50"
           />
         </div>
