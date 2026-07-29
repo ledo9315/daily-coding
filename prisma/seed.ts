@@ -38,7 +38,16 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
 
   // ─── Users ───────────────────────────────────────────────────────────────────
+  // Demo-Daten (Nutzer, Rankings, Submissions, Default-Admin) nur beim vollen Seed.
+  // Für Produktion: SEED_CONTENT_ONLY=true → nur Kategorien, Achievements, Challenges.
+  const contentOnly = process.env.SEED_CONTENT_ONLY === "true";
 
+  let anna!: { id: string }, tom!: { id: string }, max!: { id: string },
+    lisa!: { id: string }, sarah!: { id: string }, jan!: { id: string },
+    julia!: { id: string }, peter!: { id: string }, maria!: { id: string },
+    david!: { id: string };
+
+  if (!contentOnly) {
   await prisma.user.upsert({
     where: { email: "admin@dailydev.local" },
     update: {
@@ -58,7 +67,7 @@ async function main() {
     },
   });
 
-  const anna = await prisma.user.upsert({
+  anna = await prisma.user.upsert({
     where: { email: "anna.schmidt@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -73,7 +82,7 @@ async function main() {
     },
   });
 
-  const tom = await prisma.user.upsert({
+  tom = await prisma.user.upsert({
     where: { email: "tom.weber@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -88,7 +97,7 @@ async function main() {
     },
   });
 
-  const max = await prisma.user.upsert({
+  max = await prisma.user.upsert({
     where: { email: "max.mustermann@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -103,7 +112,7 @@ async function main() {
     },
   });
 
-  const lisa = await prisma.user.upsert({
+  lisa = await prisma.user.upsert({
     where: { email: "lisa.mueller@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -118,7 +127,7 @@ async function main() {
     },
   });
 
-  const sarah = await prisma.user.upsert({
+  sarah = await prisma.user.upsert({
     where: { email: "sarah.klein@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -133,7 +142,7 @@ async function main() {
     },
   });
 
-  const jan = await prisma.user.upsert({
+  jan = await prisma.user.upsert({
     where: { email: "jan.becker@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -148,7 +157,7 @@ async function main() {
     },
   });
 
-  const julia = await prisma.user.upsert({
+  julia = await prisma.user.upsert({
     where: { email: "julia.fischer@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -163,7 +172,7 @@ async function main() {
     },
   });
 
-  const peter = await prisma.user.upsert({
+  peter = await prisma.user.upsert({
     where: { email: "peter.hoffmann@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -178,7 +187,7 @@ async function main() {
     },
   });
 
-  const maria = await prisma.user.upsert({
+  maria = await prisma.user.upsert({
     where: { email: "maria.wagner@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -193,7 +202,7 @@ async function main() {
     },
   });
 
-  const david = await prisma.user.upsert({
+  david = await prisma.user.upsert({
     where: { email: "david.schulz@company.com" },
     update: { passwordHash: devPasswordHash },
     create: {
@@ -207,6 +216,7 @@ async function main() {
       streakRecord: 9,
     },
   });
+  } // Ende Demo-Nutzer
 
   // ─── Categories ──────────────────────────────────────────────────────────────
 
@@ -252,6 +262,7 @@ async function main() {
 
   // ─── User Achievements ────────────────────────────────────────────────────────
 
+  if (!contentOnly) {
   const userAchievements = [
     { userId: max.id, achievementId: "ach-1", unlockedAt: new Date("2026-01-15") },
     { userId: max.id, achievementId: "ach-2", unlockedAt: new Date("2026-01-22") },
@@ -268,6 +279,7 @@ async function main() {
       create: ua,
     });
   }
+  } // Ende Demo-User-Achievements
 
   // ─── Challenges ───────────────────────────────────────────────────────────────
 
@@ -1109,6 +1121,7 @@ async function main() {
   ];
 
   // Keep seed reruns deterministic even when records already existed with drifted state.
+  if (!contentOnly)
   await prisma.user.updateMany({
     where: {
       email: {
@@ -1158,6 +1171,7 @@ async function main() {
 
   // ─── Submissions ─────────────────────────────────────────────────────────────
 
+  if (!contentOnly) {
   const submissionData = [
     { userId: max.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 323, rank: 8 },
     { userId: max.id, challengeId: challengeBinarySearch.id, code: "// solved", status: "completed" as const, timeTaken: 192, rank: 3 },
@@ -1252,6 +1266,7 @@ async function main() {
       create: { period: "month", periodDate: monthDate, ...entry },
     });
   }
+  } // Ende Demo-Submissions/Rankings
 
   console.log("✅ Seed complete");
 }
