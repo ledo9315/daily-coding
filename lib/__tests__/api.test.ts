@@ -284,18 +284,15 @@ describe("submitSolution", () => {
     );
   });
 
-  it("includes solveDurationSeconds in submit body when provided", async () => {
+  // Regression zu #46: Die Lösezeit entsteht serverseitig, der Client schickt keine.
+  it("sends no client-side solve duration in the submit body", async () => {
     mockOkResponse({ success: true, testCases: [] });
-    await submitSolution("ch-1", "x", "javascript", 90);
+    await submitSolution("ch-1", "x", "javascript");
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/challenge/ch-1/submit",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({
-          code: "x",
-          language: "javascript",
-          solveDurationSeconds: 90,
-        }),
+        body: JSON.stringify({ code: "x", language: "javascript" }),
       })
     );
   });

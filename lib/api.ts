@@ -243,9 +243,7 @@ export function getDailyChallenge(): Promise<DailyChallenge> {
 export function submitSolution(
   challengeId: string,
   code: string,
-  language: CodeLanguageId,
-  /** Wandzeit seit Challenge-Anzeige (Sekunden); optional, sonst Fallback Server. */
-  solveDurationSeconds?: number
+  language: CodeLanguageId
 ): Promise<{
     success: boolean;
     testCases: ChallengeTestCase[];
@@ -254,13 +252,9 @@ export function submitSolution(
     runtimeOk?: boolean;
     celebration?: SubmitCelebration;
   }> {
-  const body: Record<string, unknown> = { code, language };
-  if (typeof solveDurationSeconds === "number" && Number.isFinite(solveDurationSeconds)) {
-    body.solveDurationSeconds = Math.max(0, Math.floor(solveDurationSeconds));
-  }
   return apiFetch(`/api/challenge/${challengeId}/submit`, {
     method: "POST",
-    body: JSON.stringify(body),
+    body: JSON.stringify({ code, language }),
   });
 }
 
