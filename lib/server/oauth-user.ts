@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { starterAvatarPath } from "@/lib/user-avatars";
+import { nameKeyOf, uniqueDisplayName } from "@/lib/display-name";
 
 /**
  * No `image` field on purpose. The provider sends a picture URL, but storing it would
@@ -79,7 +80,15 @@ export async function findOrCreateOAuthUser(
   }
 
   // 3. Brand-new user via OAuth
-  const name = profile.name ?? profile.email.split("@")[0];
+  /**
+   * A counter is appended when the provider's name is taken — rejecting is not an option
+   * here. The user comes back from Google or GitHub expecting an account, and there is no
+   * form left to show an error in. The registration form does reject (#107).
+   */
+  const name = await uniqueDisplayName(
+    profile.name ?? profile.email.split("@")[0],
+    async (key) => (await prisma.user.findUnique({ where: { nameKey: key } })) !== null
+  );
   const initials = name
     .split(" ")
     .map((p: string) => p[0])
@@ -91,6 +100,7 @@ export async function findOrCreateOAuthUser(
     data: {
       email: profile.email,
       name,
+      nameKey: nameKeyOf(name),
       initials,
       avatar: starterAvatarPath(profile.email),
       emailVerified: true, // OAuth providers pre-verify emails
