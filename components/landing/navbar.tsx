@@ -8,14 +8,14 @@ export function LandingNavbar() {
           <span className="text-xl font-pixel tracking-tighter text-primary">
             {">_"}
           </span>
-          <span className="font-pixel text-xs text-foreground tracking-tight">
+          <span className="font-pixel text-[10px] tracking-tight text-foreground sm:text-xs">
             DAILY CODING
           </span>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/login"
-            className="hidden text-sm font-medium hover:text-primary sm:block"
+            className="text-sm font-medium hover:text-primary"
           >
             LOGIN
           </Link>
