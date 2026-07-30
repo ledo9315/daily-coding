@@ -95,7 +95,7 @@ export default async function ProfilePage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          <div className="min-w-0 space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
               <StatsCard
                 title="LEVEL"

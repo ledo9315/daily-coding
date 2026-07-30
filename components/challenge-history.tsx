@@ -67,8 +67,15 @@ export function ChallengeHistory({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="truncate font-medium">{entry.title}</h4>
+                  {/*
+                    `min-w-0` on every flex ancestor, not just this one: a flex item
+                    defaults to `min-width: auto`, so without it the title refuses to
+                    shrink and the row pushes the whole grid column past the viewport (#79).
+                    Wrapping instead of truncating, because "Array Ma…" tells a phone user
+                    nothing — the badge drops to its own line when the title needs the room.
+                  */}
+                  <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                    <h4 className="min-w-0 font-medium break-words">{entry.title}</h4>
                     <DifficultyBadge size="sm" difficulty={entry.difficulty} />
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
@@ -77,10 +84,12 @@ export function ChallengeHistory({
                   </div>
                 </div>
 
-                <PointsChip
-                  points={entry.status === "completed" ? entry.points : 0}
-                  variant="default"
-                />
+                <div className="shrink-0">
+                  <PointsChip
+                    points={entry.status === "completed" ? entry.points : 0}
+                    variant="default"
+                  />
+                </div>
               </div>
             );
           })}

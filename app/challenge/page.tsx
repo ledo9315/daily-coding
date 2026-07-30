@@ -293,7 +293,7 @@ export default function ChallengePage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
