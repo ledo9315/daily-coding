@@ -8,8 +8,11 @@ export function LandingNavbar() {
           <span className="text-xl font-pixel tracking-tighter text-primary">
             {">_"}
           </span>
-          <span className="font-pixel text-[10px] tracking-tight text-foreground sm:text-xs">
-            DAILY CODING
+          {/* Two lines, like the header on every signed-in page — one logo, one shape. */}
+          <span className="font-pixel text-[10px] leading-tight tracking-tight text-foreground sm:text-xs">
+            DAILY
+            <br />
+            CODING
           </span>
         </Link>
         <div className="flex items-center gap-3 sm:gap-4">
