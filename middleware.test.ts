@@ -93,4 +93,33 @@ describe("middleware", () => {
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("callbackUrl=%2Fsettings");
   });
+
+  /**
+   * #114: the app answers on daily-coding.de and on the vercel.app alias with identical
+   * content. Without a marker, a search engine may index the alias as the real thing and
+   * the brand name never appears in the results. A redirect would fix it too, but it
+   * would also close the fallback route the alias provides if DNS ever breaks.
+   */
+  describe("indexing of the vercel.app alias", () => {
+    it("marks it noindex", async () => {
+      const res = await middleware(req("https://daily-coding-challenge-ui.vercel.app/landing"));
+      expect(res.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    });
+
+    it("leaves the canonical host indexable", async () => {
+      const res = await middleware(req("https://daily-coding.de/landing"));
+      expect(res.headers.get("x-robots-tag")).toBeNull();
+    });
+
+    it("marks it on protected paths too, where it redirects to the login", async () => {
+      mockGetToken.mockResolvedValueOnce(null);
+      const res = await middleware(req("https://preview-xyz.vercel.app/profile"));
+      expect(res.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    });
+
+    it("does not mistake a lookalike host for the alias", async () => {
+      const res = await middleware(req("https://vercel.app.daily-coding.de/landing"));
+      expect(res.headers.get("x-robots-tag")).toBeNull();
+    });
+  });
 });
