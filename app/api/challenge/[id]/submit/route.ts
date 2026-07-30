@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
 import { runChallengeTests } from "@/lib/server/challenge-execution";
-import { startOfUtcDay } from "@/lib/server/ranking-period";
+import { findTodaySubmission, utcDayRange } from "@/lib/server/challenge-day";
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 
 const MAX_SOLVE_DURATION_SECONDS = 7 * 24 * 3600;
@@ -72,18 +72,7 @@ export async function POST(
     );
   }
 
-  const dayStart = startOfUtcDay(new Date());
-  const dayEnd = new Date(dayStart);
-  dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
-
-  const alreadyToday = await prisma.submission.findFirst({
-    where: {
-      userId,
-      challengeId,
-      createdAt: { gte: dayStart, lt: dayEnd },
-    },
-    select: { id: true },
-  });
+  const alreadyToday = await findTodaySubmission(userId, challengeId);
 
   if (alreadyToday) {
     return NextResponse.json(
@@ -146,12 +135,13 @@ export async function POST(
       select: { streak: true, streakRecord: true },
     });
 
+    const today = utcDayRange();
     const [avgAgg, completionsToday] = await Promise.all([
       prisma.submission.aggregate({
         where: {
           challengeId,
           status: "completed",
-          createdAt: { gte: dayStart, lt: dayEnd },
+          createdAt: today,
           timeTaken: { not: null },
         },
         _avg: { timeTaken: true },
@@ -160,7 +150,7 @@ export async function POST(
         where: {
           challengeId,
           status: "completed",
-          createdAt: { gte: dayStart, lt: dayEnd },
+          createdAt: today,
         },
       }),
     ]);
