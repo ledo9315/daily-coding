@@ -17,12 +17,19 @@ type UserAchievementRow = {
 
 type CompletedSubmission = {
   createdAt: Date;
-  timeTaken?: number | null;
+  language?: string | null;
   challenge?: { difficulty?: string | null } | null;
 };
 
-/** „Blitzschnell“ (ach-3): at least one submission in <=180 seconds (3 minutes). */
-const BLITZ_MAX_SECONDS = 180;
+/**
+ * „Polyglott“ (ach-3): solved in three different languages. Replaces the former
+ * „Blitzschnell“, which needed a solve duration — that measurement went away with the
+ * daily ranking (#91).
+ *
+ * Reachable because the submit lock is per challenge and day, not per language: three
+ * days with three languages is enough.
+ */
+const POLYGLOT_LANGUAGES = 3;
 /** „Wochenend-Krieger“ (ach-2): a 7-day streak. */
 const STREAK_WEEK = 7;
 /** „Unaufhaltsam“ (ach-5): a 30-day streak. */
@@ -50,9 +57,18 @@ export function buildUserAchievementsView(
   );
   const totalSolved = byDate.length;
   const hardByDate = byDate.filter((s) => s.challenge?.difficulty === "hard");
-  const blitzByDate = byDate.filter(
-    (s) => s.timeTaken != null && s.timeTaken > 0 && s.timeTaken <= BLITZ_MAX_SECONDS
-  );
+  /**
+   * The submission that first completes the third distinct language — used both as the
+   * unlock condition and as the unlock date.
+   */
+  const seenLanguages = new Set<string>();
+  let polyglotAt: Date | null = null;
+  for (const s of byDate) {
+    if (s.language) seenLanguages.add(s.language);
+    if (polyglotAt === null && seenLanguages.size >= POLYGLOT_LANGUAGES) {
+      polyglotAt = s.createdAt;
+    }
+  }
 
   /** Date of the nth (1-based) submission in a list already sorted by date. */
   const nthDate = (list: CompletedSubmission[], n: number): Date | null =>
@@ -62,7 +78,7 @@ export function buildUserAchievementsView(
   const inferred: Record<string, { unlocked: boolean; at: Date | null }> = {
     "ach-1": { unlocked: totalSolved > 0, at: nthDate(byDate, 1) },
     "ach-2": { unlocked: streakRecord >= STREAK_WEEK, at: null },
-    "ach-3": { unlocked: blitzByDate.length > 0, at: nthDate(blitzByDate, 1) },
+    "ach-3": { unlocked: polyglotAt !== null, at: polyglotAt },
     "ach-4": {
       unlocked: hardByDate.length >= HARD_SOLVED,
       at: nthDate(hardByDate, HARD_SOLVED),

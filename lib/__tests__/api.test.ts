@@ -83,12 +83,12 @@ describe("getServerApiBaseUrl", () => {
 describe("apiFetch error handling", () => {
   it("throws on non-ok responses", async () => {
     mockErrorResponse(500);
-    await expect(getRanking("today")).rejects.toThrow("API error 500");
+    await expect(getRanking("week")).rejects.toThrow("API error 500");
   });
 
   it("includes the path in the error message", async () => {
     mockErrorResponse(404);
-    await expect(getRanking("today")).rejects.toThrow("/api/ranking");
+    await expect(getRanking("week")).rejects.toThrow("/api/ranking");
   });
 
   it("uses server JSON `error` string when present", async () => {
@@ -104,11 +104,11 @@ describe("apiFetch error handling", () => {
 // ─── getRanking ──────────────────────────────────────────────────────────────
 
 describe("getRanking", () => {
-  it("calls GET /api/ranking?period=today", async () => {
+  it("calls GET /api/ranking?period=week", async () => {
     mockOkResponse([]);
-    await getRanking("today");
+    await getRanking("week");
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/ranking?period=today",
+      "/api/ranking?period=week",
       expect.objectContaining({ headers: { "Content-Type": "application/json" } })
     );
   });
@@ -136,7 +136,7 @@ describe("getRanking", () => {
       { rank: 1, name: "Alice", initials: "A", points: 100, avatar: "🐱", level: 5 },
     ];
     mockOkResponse(entries);
-    const result = await getRanking("today");
+    const result = await getRanking("week");
     expect(result).toEqual(entries);
   });
 });
@@ -171,7 +171,7 @@ describe("getTodayChallenge", () => {
 
 describe("getDashboardRankingPreview", () => {
   it("calls GET /api/ranking/preview", async () => {
-    mockOkResponse({ today: [] });
+    mockOkResponse({ week: [] });
     await getDashboardRankingPreview();
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/ranking/preview",
@@ -179,8 +179,8 @@ describe("getDashboardRankingPreview", () => {
     );
   });
 
-  it("returns today ranking entries without team", async () => {
-    const preview = { today: [{ rank: 1, name: "Bob", initials: "B", points: 200, avatar: "🐶", level: 3 }] };
+  it("returns week ranking entries without team", async () => {
+    const preview = { week: [{ rank: 1, name: "Bob", initials: "B", points: 200, avatar: "🐶", level: 3 }] };
     mockOkResponse(preview);
     const result = await getDashboardRankingPreview();
     expect(result).toEqual(preview);

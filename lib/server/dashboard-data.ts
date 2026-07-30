@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { formatTime } from "@/lib/format";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import type { RankingEntry, TodayChallenge, UserStats } from "@/lib/api";
 import {
@@ -43,21 +42,25 @@ export async function getTodayChallengeSummary(
   };
 }
 
+/**
+ * Top five of the running week. Used to be the daily ranking; that one is gone together
+ * with the solve-time measurement (#91), and the week is the shortest period left.
+ */
 export async function getDashboardRankingPreviewData(): Promise<{
-  today: RankingEntry[];
+  week: RankingEntry[];
 }> {
-  const rows = await getLiveRanking("today");
+  const rows = await getLiveRanking("week");
   const top = rows.slice(0, 5);
   const userIds = top.map((e) => e.userId);
   const lifetimePoints = await getLifetimePointsByUserIds(userIds);
 
   return {
-    today: top.map((e) => ({
+    week: top.map((e) => ({
       rank: e.rank,
       name: e.user.name,
       initials: e.user.initials,
       points: e.points,
-      time: formatTime(e.timeSeconds),
+      challengesSolved: e.challengesSolved,
       avatar: e.user.avatar,
       level: calculateLevel(lifetimePoints.get(e.userId) ?? 0),
     })),

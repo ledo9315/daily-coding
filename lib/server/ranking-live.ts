@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import {
   startOfUtcMonth,
   startOfUtcWeek,
@@ -24,101 +23,22 @@ export type LiveRankingUser = {
   avatar: string;
 };
 
-/** One API row — today ranks by fastest time, week/month by number of daily challenges solved (points = sum). */
+/** One API row — ranked by the number of daily challenges solved, points as the sum. */
 export type LiveRankingRow = {
   userId: string;
   rank: number;
   user: LiveRankingUser;
-  /** "today" only: best solve time in seconds. */
-  timeSeconds: number | null;
-  /** Today: points of the daily challenge. Week/month: sum of challenge points across the daily challenges solved in the period. */
+  /** Sum of challenge points across the daily challenges solved in the period. */
   points: number;
-  /** Week/month only: number of distinct daily challenges with a "completed" submission. */
-  challengesSolved?: number;
+  /** Number of distinct daily challenges with a "completed" submission. */
+  challengesSolved: number;
 };
 
 export async function getLiveRanking(
-  period: "today" | "week" | "month",
+  period: "week" | "month",
   now: Date = new Date()
 ): Promise<LiveRankingRow[]> {
-  switch (period) {
-    case "today":
-      return getTodayLiveRanking();
-    case "week":
-      return getWeekLiveRanking(now);
-    case "month":
-      return getMonthLiveRanking(now);
-  }
-}
-
-/**
- * The user's place in today's speed ranking (one daily challenge per day).
- * `null` when there is no completed submission for the current daily challenge.
- */
-export async function getTodayRankNumber(userId: string): Promise<number | null> {
-  const rows = await getTodayLiveRanking();
-  const row = rows.find((r) => r.userId === userId);
-  return row ? row.rank : null;
-}
-
-async function getTodayLiveRanking(): Promise<LiveRankingRow[]> {
-  const challenge = await findDailyChallengeForApp();
-  if (!challenge) return [];
-
-  const submissions = await prisma.submission.findMany({
-    where: {
-      challengeId: challenge.id,
-      status: "completed",
-    },
-    include: { user: true },
-    orderBy: { createdAt: "asc" },
-  });
-
-  const bestByUser = new Map<
-    string,
-    { time: number | null; user: (typeof submissions)[0]["user"] }
-  >();
-
-  for (const s of submissions) {
-    const prev = bestByUser.get(s.userId);
-    const t = s.timeTaken;
-    if (!prev) {
-      bestByUser.set(s.userId, { time: t, user: s.user });
-      continue;
-    }
-    if (prev.time == null && t == null) continue;
-    if (prev.time == null) {
-      bestByUser.set(s.userId, { time: t, user: s.user });
-      continue;
-    }
-    if (t == null) continue;
-    if (t < prev.time) bestByUser.set(s.userId, { time: t, user: s.user });
-  }
-
-  const sorted = [...bestByUser.entries()]
-    .map(([uid, { time, user }]) => ({
-      userId: uid,
-      user,
-      timeSeconds: time,
-      sortKey: time == null ? Number.POSITIVE_INFINITY : time,
-    }))
-    .sort(
-      (a, b) =>
-        a.sortKey - b.sortKey || a.userId.localeCompare(b.userId)
-    );
-
-  return sorted.map((r, i) => ({
-    userId: r.userId,
-    rank: i + 1,
-    user: {
-      id: r.user.id,
-      name: r.user.name,
-      initials: r.user.initials,
-      avatar: r.user.avatar,
-    },
-    timeSeconds: r.timeSeconds,
-    points: challenge.points,
-  }));
+  return period === "week" ? getWeekLiveRanking(now) : getMonthLiveRanking(now);
 }
 
 async function getWeekLiveRanking(now: Date): Promise<LiveRankingRow[]> {
@@ -198,7 +118,6 @@ async function aggregatePeriodByDailyChallenges(
       initials: r.user.initials,
       avatar: r.user.avatar,
     },
-    timeSeconds: null,
     points: r.points,
     challengesSolved: r.challengesSolved,
   }));

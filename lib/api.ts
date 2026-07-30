@@ -14,7 +14,6 @@ export interface RankingEntry {
   name: string;
   initials: string;
   points: number;
-  time?: string;
   avatar: string;
   level?: number;
   challengesSolved?: number;
@@ -74,7 +73,6 @@ export interface ChallengeHistoryEntry {
   difficulty: "easy" | "medium" | "hard";
   status: "pending" | "completed" | "failed" | "skipped";
   points: number;
-  time: string;
   rank?: number;
 }
 
@@ -103,11 +101,8 @@ export interface ChallengeTestCase {
 
 /** Extra data for the success UI shown after a passing submission. */
 export interface SubmitCelebration {
-  timeTakenSeconds: number;
   streak: number;
   streakRecord: number;
-  /** Mean solve time (seconds) across today's submissions (UTC day) for this challenge; only rows with timeTaken. */
-  avgSolveTimeTodaySeconds: number | null;
   /** Number of completed submissions for this challenge on the current UTC day. */
   completionsToday: number;
 }
@@ -145,11 +140,6 @@ export interface DailyChallenge {
      */
     testResults: ChallengeTestCase[] | null;
   } | null;
-  /**
-   * Server-side start of work (ISO). Source for the elapsed time shown in the
-   * UI; null when not signed in.
-   */
-  startedAt: string | null;
 }
 
 export interface CommunityFeedItem {
@@ -222,7 +212,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 // ─── Ranking ──────────────────────────────────────────────────────────────────
 
 export function getRanking(
-  period: "today" | "week" | "month"
+  period: "week" | "month"
 ): Promise<RankingEntry[]> {
   return apiFetch<RankingEntry[]>(`/api/ranking?period=${period}`);
 }
@@ -234,7 +224,7 @@ export function getTodayChallenge(): Promise<TodayChallenge> {
 }
 
 export function getDashboardRankingPreview(): Promise<{
-  today: RankingEntry[];
+  week: RankingEntry[];
 }> {
   return apiFetch("/api/ranking/preview");
 }

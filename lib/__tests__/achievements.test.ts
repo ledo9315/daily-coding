@@ -33,12 +33,15 @@ describe("buildUserAchievementsView", () => {
     expect(unlockedCount).toBe(1);
   });
 
-  it("unlocks ach-3 (Blitzschnell) when a submission is within 180s", () => {
+  /**
+   * #91: ach-3 used to be „Blitzschnell" and needed a solve duration. It is now
+   * „Polyglott": three different languages across all completed submissions.
+   */
+  it("unlocks ach-3 (Polyglott) after three different languages", () => {
     const completed = [
-      {
-        createdAt: new Date("2026-04-06T12:00:00Z"),
-        timeTaken: 120,
-      },
+      { createdAt: new Date("2026-04-06T12:00:00Z"), language: "javascript" },
+      { createdAt: new Date("2026-04-07T12:00:00Z"), language: "python" },
+      { createdAt: new Date("2026-04-08T12:00:00Z"), language: "php" },
     ];
     const { achievements } = buildUserAchievementsView(
       [def("ach-1"), def("ach-3")],
@@ -46,6 +49,35 @@ describe("buildUserAchievementsView", () => {
       completed
     );
     expect(achievements.find((a) => a.id === "ach-3")?.unlocked).toBe(true);
+  });
+
+  it("keeps ach-3 locked when the same language is used repeatedly", () => {
+    const completed = [
+      { createdAt: new Date("2026-04-06T12:00:00Z"), language: "javascript" },
+      { createdAt: new Date("2026-04-07T12:00:00Z"), language: "javascript" },
+      { createdAt: new Date("2026-04-08T12:00:00Z"), language: "javascript" },
+    ];
+    const { achievements } = buildUserAchievementsView(
+      [def("ach-1"), def("ach-3")],
+      [],
+      completed
+    );
+    expect(achievements.find((a) => a.id === "ach-3")?.unlocked).toBe(false);
+  });
+
+  it("dates ach-3 at the submission that adds the third language", () => {
+    const completed = [
+      { createdAt: new Date("2026-04-06T12:00:00Z"), language: "javascript" },
+      { createdAt: new Date("2026-04-07T12:00:00Z"), language: "python" },
+      { createdAt: new Date("2026-04-08T12:00:00Z"), language: "php" },
+      { createdAt: new Date("2026-04-09T12:00:00Z"), language: "typescript" },
+    ];
+    const { achievements } = buildUserAchievementsView(
+      [def("ach-1"), def("ach-3")],
+      [],
+      completed
+    );
+    expect(achievements.find((a) => a.id === "ach-3")?.unlockedAt).toBe("08.04.2026");
   });
 
   it("unlocks ach-2 at a 7-day streak record and ach-5 only at 30", () => {

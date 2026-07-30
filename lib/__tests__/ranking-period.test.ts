@@ -28,11 +28,8 @@ describe("ranking-period", () => {
     expect(startOfUtcMonth(d).toISOString()).toBe("2026-04-01T00:00:00.000Z");
   });
 
-  it("getPeriodDateForRanking maps today/week/month", () => {
+  it("getPeriodDateForRanking maps week/month", () => {
     const now = new Date("2026-04-08T15:00:00.000Z");
-    expect(getPeriodDateForRanking("today", now).toISOString()).toBe(
-      "2026-04-08T00:00:00.000Z"
-    );
     expect(getPeriodDateForRanking("week", now).toISOString()).toBe(
       "2026-04-06T00:00:00.000Z"
     );
