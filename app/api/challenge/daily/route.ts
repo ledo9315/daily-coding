@@ -37,6 +37,13 @@ export async function GET() {
   } | null = null;
 
   if (userId) {
+    // Startzeit der Bearbeitung: nur beim ersten Abruf, spätere Aufrufe (Polling,
+    // Reload) lassen sie unverändert — `skipDuplicates` gegen den Primärschlüssel.
+    await prisma.challengeStart.createMany({
+      data: [{ userId, challengeId: challenge.id }],
+      skipDuplicates: true,
+    });
+
     const dayStart = startOfUtcDay(new Date());
     const dayEnd = new Date(dayStart);
     dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
