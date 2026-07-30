@@ -5,6 +5,7 @@ import {
   startOfUtcWeek,
   startOfUtcMonth,
 } from "../lib/server/ranking-period";
+import { seedAchievementDefs } from "../lib/server/achievement-defs";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 import bcrypt from "bcryptjs";
@@ -243,22 +244,7 @@ async function main() {
 
   // ─── Achievement Definitions (global) ────────────────────────────────────────
 
-  const achievementDefs = [
-    { id: "ach-1", title: "Erste Schritte",    description: "Erste Challenge abgeschlossen",        iconKey: "Check",        rarity: "common"    as const },
-    { id: "ach-2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht",               iconKey: "CalendarWeek", rarity: "rare"      as const },
-    { id: "ach-3", title: "Polyglott",         description: "In drei verschiedenen Sprachen gelöst", iconKey: "Code",       rarity: "rare"      as const },
-    { id: "ach-4", title: "Code-Meister",      description: "10 schwere Challenges gelöst",         iconKey: "Trophy",       rarity: "epic"      as const },
-    { id: "ach-5", title: "Unaufhaltsam",      description: "30 Tage Streak erreicht",              iconKey: "Zap",          rarity: "legendary" as const },
-    { id: "ach-6", title: "Perfektionist",     description: "20 Challenges ohne Fehler",            iconKey: "Bullseye",     rarity: "epic"      as const },
-  ];
-
-  for (const def of achievementDefs) {
-    await prisma.achievementDef.upsert({
-      where: { id: def.id },
-      update: {},
-      create: def,
-    });
-  }
+  await seedAchievementDefs(prisma);
 
   // ─── User Achievements ────────────────────────────────────────────────────────
 
