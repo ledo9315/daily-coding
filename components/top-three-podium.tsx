@@ -16,8 +16,13 @@ interface TopUser {
 
 interface TopThreePodiumProps {
   first: TopUser;
-  second: TopUser;
-  third: TopUser;
+  /**
+   * Plätze 2 und 3 fehlen, solange noch nicht genug Leute gelöst haben. Die
+   * Rangliste übergibt Indexzugriffe (`ranking[1]`), die dann `undefined` sind —
+   * als erforderliche Props deklariert riss das die ganze Seite mit (#81).
+   */
+  second?: TopUser;
+  third?: TopUser;
   className?: string;
   /** Tages-Ranking: Zeit statt identischer Challenge-Punkte. */
   variant?: "points" | "time";
@@ -64,36 +69,38 @@ export function TopThreePodium({
   const fallbackBase =
     "font-sans font-semibold tracking-tight bg-gradient-to-b from-zinc-600 to-zinc-900 text-zinc-100 ring-1 ring-inset ring-white/15";
 
-  const secondSrc = avatarImageSrc(second.avatar);
   const firstSrc = avatarImageSrc(first.avatar);
-  const thirdSrc = avatarImageSrc(third.avatar);
+  const secondSrc = second ? avatarImageSrc(second.avatar) : null;
+  const thirdSrc = third ? avatarImageSrc(third.avatar) : null;
 
   return (
     <div className={cn("flex items-end justify-center gap-4", className)}>
       {/* Second Place */}
-      <div className="flex flex-col items-center">
-        <Avatar className="h-16 w-16 border-2 border-zinc-400">
-          {secondSrc ? (
-            <AvatarImage src={secondSrc} alt={second.name} />
-          ) : null}
-          <AvatarFallback className={cn("text-lg", fallbackBase)}>
-            {second.initials}
-          </AvatarFallback>
-        </Avatar>
-        <div className="mt-2 text-center flex flex-col items-center gap-1">
-          <p className="font-semibold">{second.name}</p>
-          {second.level && (
-            <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-              Level {second.level}
-            </span>
-          )}
-          <PodiumMetric user={second} variant={variant} />
+      {second ? (
+        <div className="flex flex-col items-center">
+          <Avatar className="h-16 w-16 border-2 border-zinc-400">
+            {secondSrc ? (
+              <AvatarImage src={secondSrc} alt={second.name} />
+            ) : null}
+            <AvatarFallback className={cn("text-lg", fallbackBase)}>
+              {second.initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="mt-2 text-center flex flex-col items-center gap-1">
+            <p className="font-semibold">{second.name}</p>
+            {second.level && (
+              <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+                Level {second.level}
+              </span>
+            )}
+            <PodiumMetric user={second} variant={variant} />
+          </div>
+          <div className="mt-3 flex h-24 w-24 flex-col items-center justify-start rounded-none bg-zinc-400/20 pt-4">
+            <Trophy className="h-8 w-8 text-zinc-400" />
+            <span className="mt-1 text-2xl font-bold text-zinc-400">2</span>
+          </div>
         </div>
-        <div className="mt-3 flex h-24 w-24 flex-col items-center justify-start rounded-none bg-zinc-400/20 pt-4">
-          <Trophy className="h-8 w-8 text-zinc-400" />
-          <span className="mt-1 text-2xl font-bold text-zinc-400">2</span>
-        </div>
-      </div>
+      ) : null}
 
       {/* First Place */}
       <div className="flex flex-col items-center">
@@ -127,33 +134,35 @@ export function TopThreePodium({
       </div>
 
       {/* Third Place */}
-      <div className="flex flex-col items-center">
-        <Avatar className="h-16 w-16 border-2 border-amber-700">
-          {thirdSrc ? <AvatarImage src={thirdSrc} alt={third.name} /> : null}
-          <AvatarFallback
-            className={cn(
-              "text-lg",
-              fallbackBase,
-              "from-amber-950/80 to-zinc-950 text-amber-100/95 ring-amber-700/30",
+      {third ? (
+        <div className="flex flex-col items-center">
+          <Avatar className="h-16 w-16 border-2 border-amber-700">
+            {thirdSrc ? <AvatarImage src={thirdSrc} alt={third.name} /> : null}
+            <AvatarFallback
+              className={cn(
+                "text-lg",
+                fallbackBase,
+                "from-amber-950/80 to-zinc-950 text-amber-100/95 ring-amber-700/30",
+              )}
+            >
+              {third.initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="mt-2 text-center flex flex-col items-center gap-1">
+            <p className="font-semibold">{third.name}</p>
+            {third.level && (
+              <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
+                Level {third.level}
+              </span>
             )}
-          >
-            {third.initials}
-          </AvatarFallback>
-        </Avatar>
-        <div className="mt-2 text-center flex flex-col items-center gap-1">
-          <p className="font-semibold">{third.name}</p>
-          {third.level && (
-            <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-              Level {third.level}
-            </span>
-          )}
-          <PodiumMetric user={third} variant={variant} />
+            <PodiumMetric user={third} variant={variant} />
+          </div>
+          <div className="mt-3 flex h-16 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-700/20 pt-2">
+            <Trophy className="h-6 w-6 text-amber-700" />
+            <span className="text-xl font-bold text-amber-700">3</span>
+          </div>
         </div>
-        <div className="mt-3 flex h-16 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-700/20 pt-2">
-          <Trophy className="h-6 w-6 text-amber-700" />
-          <span className="text-xl font-bold text-amber-700">3</span>
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }
