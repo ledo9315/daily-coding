@@ -177,6 +177,7 @@ describe("GET /api/challenge/daily", () => {
     expect(json.todaySubmission).toEqual({
       status: "completed",
       submittedAt: "2026-04-06T15:00:00.000Z",
+      testResults: null,
     });
   });
 
@@ -192,6 +193,7 @@ describe("GET /api/challenge/daily", () => {
     expect(json.todaySubmission).toEqual({
       status: "failed",
       submittedAt: "2026-04-06T12:30:00.000Z",
+      testResults: null,
     });
   });
 
@@ -217,6 +219,44 @@ describe("GET /api/challenge/daily", () => {
         skipDuplicates: true,
       })
     );
+  });
+
+  // #60: Gespeicherte Testergebnisse der heutigen Abgabe mitliefern, sonst zeigt
+  // die Seite nach dem Reload die leere Vorlage.
+  it("returns the stored test results of today's submission", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockSubmissionFindFirst.mockResolvedValueOnce({
+      id: "sub-1",
+      status: "completed",
+      createdAt: new Date(),
+      code: "x",
+      language: "javascript",
+      testResults: [
+        { id: 1, name: "Einfaches Array", status: "passed" },
+        { id: 2, name: "Leeres Array", status: "passed" },
+      ],
+    });
+    const res = await getDailyHandler();
+    const json = await res.json();
+    expect(json.todaySubmission.testResults).toHaveLength(2);
+    expect(json.todaySubmission.testResults[0].status).toBe("passed");
+  });
+
+  it("returns null test results for legacy submissions without them", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockSubmissionFindFirst.mockResolvedValueOnce({
+      id: "sub-old",
+      status: "completed",
+      createdAt: new Date(),
+      code: "x",
+      language: "javascript",
+      testResults: null,
+    });
+    const res = await getDailyHandler();
+    const json = await res.json();
+    expect(json.todaySubmission.testResults).toBeNull();
   });
 
   // #47: Die Startzeit wird ausgeliefert, damit die Seite die verstrichene
