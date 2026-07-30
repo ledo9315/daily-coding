@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
 import { formatTime, formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
-import { getTodayRankNumber } from "@/lib/server/ranking-live";
+import { getAllTimeRankNumber } from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
@@ -39,9 +39,9 @@ export async function getUserProfileData(
 
   const resolvedUserId = user.id;
 
-  const [todayRankNum, completedSubmissions, achievementDefs, userAchievements, totalUsers] =
+  const [allTimeRank, completedSubmissions, achievementDefs, userAchievements, totalUsers] =
     await Promise.all([
-      getTodayRankNumber(resolvedUserId),
+      getAllTimeRankNumber(resolvedUserId),
       prisma.submission.findMany({
         where: { userId: resolvedUserId, status: "completed" },
         include: { challenge: { select: { points: true, difficulty: true } } },
@@ -77,7 +77,7 @@ export async function getUserProfileData(
     avatar: user.avatar,
     role: "",
     stats: {
-      rank: todayRankNum != null ? `#${todayRankNum}` : "#-",
+      rank: `#${allTimeRank}`,
       points: points.toLocaleString("de-DE"),
       rankTrendPercent: 0,
       rankTrendPlaces: 0,

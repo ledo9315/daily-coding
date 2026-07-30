@@ -7,8 +7,11 @@ import {
   findTodaySubmission,
   publicSubmissionStatus,
 } from "@/lib/server/challenge-day";
-import { getLiveRanking, getTodayRankNumber } from "@/lib/server/ranking-live";
-import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
+import { getLiveRanking } from "@/lib/server/ranking-live";
+import {
+  getAllTimeRankNumber,
+  getLifetimePointsByUserIds,
+} from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 
@@ -83,9 +86,9 @@ export async function getUserStatsData(
     select: { rank: true },
   });
 
-  const [todayRankNum, completedSubmissions, achievementDefs, userAchievements, totalUsers] =
+  const [allTimeRank, completedSubmissions, achievementDefs, userAchievements, totalUsers] =
     await Promise.all([
-      getTodayRankNumber(resolvedUserId),
+      getAllTimeRankNumber(resolvedUserId),
       prisma.submission.findMany({
         where: { userId: resolvedUserId, status: "completed" },
         include: { challenge: { select: { points: true, difficulty: true } } },
@@ -143,7 +146,7 @@ export async function getUserStatsData(
   const pointsTrendPercent = percentageDelta(currentMonthPoints, previousMonthPoints);
 
   return {
-    rank: todayRankNum != null ? `#${todayRankNum}` : "#-",
+    rank: `#${allTimeRank}`,
     points: points.toLocaleString("de-DE"),
     rankTrendPercent,
     rankTrendPlaces,
