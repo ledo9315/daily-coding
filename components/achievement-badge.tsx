@@ -8,6 +8,8 @@ interface AchievementBadgeProps {
   unlocked?: boolean;
   rarity?: "common" | "rare" | "epic" | "legendary";
   unlockedAt?: string;
+  /** Standing towards the goal; only rendered while locked (#96). */
+  progress?: { current: number; target: number; label?: string };
   className?: string;
 }
 
@@ -49,9 +51,14 @@ export function AchievementBadge({
   unlocked = true,
   rarity = "common",
   unlockedAt,
+  progress,
   className,
 }: AchievementBadgeProps) {
   const config = rarityConfig[rarity];
+  const percent =
+    progress && progress.target > 0
+      ? Math.min(100, Math.round((progress.current / progress.target) * 100))
+      : 0;
 
   return (
     <div
@@ -93,6 +100,26 @@ export function AchievementBadge({
             <p className="mt-2 text-xs text-muted-foreground">
               Freigeschaltet am {unlockedAt}
             </p>
+          )}
+          {!unlocked && progress && (
+            <div className="mt-2">
+              <p className="text-xs text-muted-foreground">
+                {progress.label ? `${progress.label}: ` : ""}
+                {progress.current}/{progress.target}
+              </p>
+              {/* ponytail: a div with an inline width, not the shadcn Progress
+                  primitive — that one animates via a transform and would not survive
+                  the grayscale/opacity treatment of a locked badge as legibly. */}
+              <div
+                className="mt-1 h-1.5 w-full bg-muted"
+                role="progressbar"
+                aria-valuenow={progress.current}
+                aria-valuemin={0}
+                aria-valuemax={progress.target}
+              >
+                <div className="h-full bg-foreground/40" style={{ width: `${percent}%` }} />
+              </div>
+            </div>
           )}
         </div>
       </div>
