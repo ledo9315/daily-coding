@@ -1,0 +1,15 @@
+# Seit pnpm 11 gelten nicht freigegebene Build-Skripte als Fehler, und pnpm liest
+# Einstellungen nicht mehr aus dem "pnpm"-Feld in package.json. Ohne Eintrag hier
+# bricht schon `pnpm exec` ab, weil davor eine Abhängigkeitsprüfung läuft.
+#
+# Alle fünf holen bzw. verlinken plattformspezifische Binärdateien:
+#   prisma / @prisma/engines  Engine-Binaries (schema-engine) für prisma migrate
+#   esbuild                   Transpiler-Binary, von Vite/Vitest benutzt
+#   sharp                     libvips für die Bildoptimierung von Next.js
+#   unrs-resolver             napi-Resolver, von ESLint benutzt
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  sharp: true
+  unrs-resolver: true
