@@ -42,7 +42,7 @@ describe("GET /api/community/feed", () => {
     ...overrides,
   });
 
-  /** Chronologische Submissions für Lifetime + Level-Up (IDs müssen zur Seitenzeile passen). */
+  /** Chronological submissions for lifetime points and level-up; ids must match the page row. */
   function withLifetimePoints(submission: ReturnType<typeof makeSubmission>) {
     mockFindMany
       .mockResolvedValueOnce([submission])

@@ -39,14 +39,14 @@ export async function GET() {
     submittedAt: string;
     code: string;
     language: string;
-    /** Bewertete Testfälle der Abgabe; null bei Altdaten ohne gespeicherte Ergebnisse. */
+    /** Graded test cases of the submission; null for legacy rows without stored results. */
     testResults: unknown;
   } | null = null;
 
   if (userId) {
-    // Startzeit der Bearbeitung — gilt **pro UTC-Tag**. Innerhalb des Tages
-    // lassen Polling und Reload sie unverändert; stammt sie aus einem früheren
-    // Tag (dieselbe Aufgabe kommt im Rotationszyklus wieder), wird sie erneuert.
+    // Start of work — scoped **per UTC day**. Within the day, polling and reloads
+    // leave it untouched; if it comes from an earlier day (the same challenge
+    // returns in the rotation cycle), it is renewed.
     const existingStart = await prisma.challengeStart.findUnique({
       where: { userId_challengeId: { userId, challengeId: challenge.id } },
       select: { startedAt: true },
@@ -91,9 +91,9 @@ export async function GET() {
     starterCodes,
     /** @deprecated Use starterCodes + defaultLanguage */
     starterCode: starterCodes[defaultLanguage] ?? "",
-    /** Eingeloggt: Abgabe heute (UTC) für diese Challenge, sonst null. */
+    /** When signed in: today's (UTC) submission for this challenge, else null. */
     todaySubmission,
-    /** Serverseitiger Start der Bearbeitung (ISO), sonst null. */
+    /** Server-side start of work (ISO), else null. */
     startedAt,
   });
 }

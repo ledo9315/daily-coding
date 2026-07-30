@@ -21,23 +21,23 @@ type CompletedSubmission = {
   challenge?: { difficulty?: string | null } | null;
 };
 
-/** „Blitzschnell“ (ach-3): mindestens eine Abgabe in ≤180 Sekunden (3 Minuten). */
+/** „Blitzschnell“ (ach-3): at least one submission in <=180 seconds (3 minutes). */
 const BLITZ_MAX_SECONDS = 180;
-/** „Wochenend-Krieger“ (ach-2): 7 Tage Streak. */
+/** „Wochenend-Krieger“ (ach-2): a 7-day streak. */
 const STREAK_WEEK = 7;
-/** „Unaufhaltsam“ (ach-5): 30 Tage Streak. */
+/** „Unaufhaltsam“ (ach-5): a 30-day streak. */
 const STREAK_MONTH = 30;
-/** „Code-Meister“ (ach-4): 10 schwere Challenges gelöst. */
+/** „Code-Meister“ (ach-4): 10 hard challenges solved. */
 const HARD_SOLVED = 10;
-/** „Perfektionist“ (ach-6): 20 Challenges gelöst (abgeschlossene Abgaben bestehen alle Testfälle). */
+/** „Perfektionist“ (ach-6): 20 challenges solved (a completed submission passes every test case). */
 const NO_ERROR_SOLVED = 20;
 
 /**
- * Baut die Achievement-Liste für ein Profil inkl. Sperr-/Freigabe-Logik.
+ * Builds the achievement list for a profile, including locked/unlocked state.
  *
- * Freischaltungen werden zur Laufzeit aus den vorhandenen Daten abgeleitet
- * (keine separate „unlock“-Persistenz nötig). Eine vorhandene UserAchievement-Zeile
- * mit `unlockedAt` hat Vorrang und friert das Freigabedatum ein.
+ * Unlocks are derived at runtime from existing data, so no separate "unlock"
+ * persistence is needed. An existing UserAchievement row with `unlockedAt` takes
+ * precedence and freezes the unlock date.
  */
 export function buildUserAchievementsView(
   defs: DefRow[],
@@ -54,11 +54,11 @@ export function buildUserAchievementsView(
     (s) => s.timeTaken != null && s.timeTaken > 0 && s.timeTaken <= BLITZ_MAX_SECONDS
   );
 
-  /** Datum der n-ten (1-basiert) Abgabe einer bereits nach Datum sortierten Liste. */
+  /** Date of the nth (1-based) submission in a list already sorted by date. */
   const nthDate = (list: CompletedSubmission[], n: number): Date | null =>
     list.length >= n ? list[n - 1].createdAt : null;
 
-  // id → { unlocked durch abgeleitete Regel, Freigabedatum (falls ableitbar) }
+  // id -> { unlocked by a derived rule, unlock date where derivable }
   const inferred: Record<string, { unlocked: boolean; at: Date | null }> = {
     "ach-1": { unlocked: totalSolved > 0, at: nthDate(byDate, 1) },
     "ach-2": { unlocked: streakRecord >= STREAK_WEEK, at: null },

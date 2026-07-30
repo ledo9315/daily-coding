@@ -115,3 +115,24 @@ Supported languages: `javascript`, `typescript`, `python`, `php` (matches `CodeL
 - E2E tests: Playwright, under `e2e/`
 - Test environment is `node` (see `vitest.config.ts`) — no DOM globals by default
 - Path alias `@/` resolves to project root
+- `describe`/`it` descriptions in English (see language convention below)
+
+## Language convention
+
+**Developer-facing text is English, user-facing text is German.**
+
+English: code comments, JSDoc, `describe`/`it` descriptions, identifiers.
+
+German — do not translate these:
+
+- UI strings in JSX, API error messages, email bodies, toasts, button labels
+- Challenge content in `prisma/seed.ts` (titles, descriptions, test-case names)
+- Starter-code templates such as `defaultCode` in `components/code-editor.tsx`,
+  which the user reads inside the editor
+- Achievement titles quoted inside comments (`„Blitzschnell“`), because they name
+  a user-visible string
+
+There is no lint rule for this — umlaut heuristics trip over proper nouns and over
+the German UI strings that are supposed to stay. When translating an old comment,
+keep the *why*: a comment that only restates what the code does is worth deleting
+rather than translating.

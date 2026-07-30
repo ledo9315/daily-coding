@@ -10,8 +10,8 @@ export { utcDayKey, consecutiveStreakFromCompletedDaySet } from "@/lib/streak-da
 const LOOKBACK_DAYS = 400;
 
 /**
- * Längste aktuelle Streak: aufeinanderfolgende UTC-Kalendertage mit mindestens einer
- * abgeschlossenen Submission (`status === completed`), rückwärts ab `asOf`.
+ * Current streak length: consecutive UTC calendar days with at least one completed
+ * submission (`status === completed`), walking back from `asOf`.
  */
 export async function computeConsecutiveStreakDays(
   userId: string,

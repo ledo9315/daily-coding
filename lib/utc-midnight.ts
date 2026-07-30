@@ -1,6 +1,6 @@
 /**
- * Millisekunden bis zur nächsten UTC-Kalendermitternacht (00:00:00.000 UTC).
- * Entspricht dem Tageswechsel für Daily-Challenge / Submissions im Projekt.
+ * Milliseconds until the next UTC calendar midnight (00:00:00.000 UTC).
+ * This is the day boundary used for the daily challenge and submissions.
  */
 export function getMsUntilNextUtcMidnight(now: Date = new Date()): number {
   const y = now.getUTCFullYear();

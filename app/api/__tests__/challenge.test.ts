@@ -146,7 +146,7 @@ describe("GET /api/challenge/daily", () => {
     expect(json.starterCode).toBe("function legacy() {}");
   });
 
-  // #67: Ohne Rotation lieferte die Rückfallebene dauerhaft dieselbe Aufgabe.
+  // #67: without rotation the fallback served the same challenge forever.
   it("prefers the challenge scheduled for today over the rotation", async () => {
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
     await getDailyHandler();
@@ -219,8 +219,8 @@ describe("GET /api/challenge/daily", () => {
     expect(mockSubmissionFindFirst).toHaveBeenCalled();
   });
 
-  // Regression zu #46: Die Startzeit muss serverseitig entstehen, damit die
-  // Lösezeit nicht vom Client bestimmt wird.
+  // Regression test for #46: the start time must be created server-side, so the
+  // solve time is not decided by the client.
   it("records the solve start for a logged-in user without one", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
@@ -234,8 +234,8 @@ describe("GET /api/challenge/daily", () => {
     );
   });
 
-  // #68: Die Startzeit muss pro UTC-Tag gelten. Ohne Tagesbezug lief die
-  // verstrichene Zeit über Mitternacht hinweg weiter (98:31 bei 40 Minuten Tag).
+  // #68: the start time must be scoped per UTC day. Without that, the elapsed time
+  // kept running across midnight (98:31 on a day that was 40 minutes old).
   it("renews a start timestamp from an earlier UTC day", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
@@ -265,8 +265,8 @@ describe("GET /api/challenge/daily", () => {
     expect(json.startedAt).toBe(earlierToday.toISOString());
   });
 
-  // #60: Gespeicherte Testergebnisse der heutigen Abgabe mitliefern, sonst zeigt
-  // die Seite nach dem Reload die leere Vorlage.
+  // #60: return the stored test results of today's submission, otherwise the page
+  // shows the empty template after a reload.
   it("returns the stored test results of today's submission", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
@@ -303,8 +303,8 @@ describe("GET /api/challenge/daily", () => {
     expect(json.todaySubmission.testResults).toBeNull();
   });
 
-  // #47: Die Startzeit wird ausgeliefert, damit die Seite die verstrichene
-  // Bearbeitungszeit anzeigen kann — Quelle bleibt der Server.
+  // #47: the start time is returned so the page can display the elapsed working
+  // time — the server stays the source of truth.
   it("returns startedAt for a logged-in user", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
@@ -518,8 +518,8 @@ describe("POST /api/challenge/[id]/submit", () => {
     );
   });
 
-  // Regression zu #46: Die Lösezeit entscheidet über die Platzierung in der
-  // Rangliste und darf deshalb nicht vom Client kommen.
+  // Regression test for #46: the solve time decides the ranking position, so it
+  // must not come from the client.
   it("ignores a client-supplied solveDurationSeconds", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     mockChallengeStartFindUnique.mockResolvedValueOnce({
@@ -549,8 +549,8 @@ describe("POST /api/challenge/[id]/submit", () => {
     expect(stored).toBeLessThanOrEqual(144);
   });
 
-  // #68: Ein Startzeitpunkt aus einem Vortag darf keine Müll-Lösezeit in die
-  // Rangliste schreiben.
+  // #68: a start timestamp from an earlier day must not write a garbage solve time
+  // into the ranking.
   it("ignores a start timestamp from an earlier UTC day", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     mockChallengeStartFindUnique.mockResolvedValueOnce({

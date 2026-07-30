@@ -1,13 +1,14 @@
 /**
- * Catppuccin **Frappe** für Monaco Editor.
- * Farben: https://github.com/catppuccin/palette (Frappe)
- * Es gibt kein offizielles `monaco-catppuccin`-Paket — Token-Regeln sind an VSCode/Monaco-Scopes angelehnt.
+ * Catppuccin **Frappe** for the Monaco editor.
+ * Colors: https://github.com/catppuccin/palette (Frappe)
+ * There is no official `monaco-catppuccin` package — the token rules are modelled
+ * on the VSCode/Monaco scopes.
  */
 import type { Monaco } from "@monaco-editor/react";
 
 export const MONACO_THEME_FRAPPE = "catppuccin-frappe";
 
-/** Frappe-Palette (Hex, lowercase) */
+/** Frappe palette (hex, lowercase) */
 const frappe = {
   rosewater: "f2d5cf",
   flamingo: "eebebe",

@@ -59,10 +59,10 @@ export function authSessionCallback({
 }
 
 /**
- * Trifft auf jeden externen Provider zu — Google ist "oidc", GitHub "oauth".
- * Bewusst als Ausschluss von "credentials" formuliert statt als Aufzählung:
- * die Prüfung auf einen einzelnen Typ hatte Google-Logins übersehen.
- * Type-Guard, damit `account` im Zweig danach als definiert gilt.
+ * True for every external provider — Google is "oidc", GitHub is "oauth".
+ * Deliberately written as "not credentials" rather than a list of known types:
+ * checking for a single type had silently missed Google logins.
+ * A type guard, so `account` counts as defined in the branch that follows.
  */
 export function isFederatedAccount<T extends { type?: string }>(
   account: T | null | undefined

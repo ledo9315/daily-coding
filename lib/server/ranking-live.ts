@@ -24,16 +24,16 @@ export type LiveRankingUser = {
   avatar: string;
 };
 
-/** Eine Zeile für die API — Tages-Ranking nach schnellster Zeit, Woche/Monat nach Anzahl gelöster Daily-Challenges (Punkte = Summe). */
+/** One API row — today ranks by fastest time, week/month by number of daily challenges solved (points = sum). */
 export type LiveRankingRow = {
   userId: string;
   rank: number;
   user: LiveRankingUser;
-  /** Nur „today“: beste Laufzeit in Sekunden. */
+  /** "today" only: best solve time in seconds. */
   timeSeconds: number | null;
-  /** Heute: Punkte der Daily-Challenge; Woche/Monat: Summe der Challenge-Punkte der gelösten Tagesaufgaben in der Periode. */
+  /** Today: points of the daily challenge. Week/month: sum of challenge points across the daily challenges solved in the period. */
   points: number;
-  /** Nur Woche/Monat: Anzahl unterschiedlicher Tages-Challenges mit Abgabe „completed“. */
+  /** Week/month only: number of distinct daily challenges with a "completed" submission. */
   challengesSolved?: number;
 };
 
@@ -52,8 +52,8 @@ export async function getLiveRanking(
 }
 
 /**
- * Platz des Nutzers im heutigen Geschwindigkeits-Ranking (eine Daily-Challenge pro Tag).
- * `null`, wenn keine abgeschlossene Abgabe zur aktuellen Tagesaufgabe existiert.
+ * The user's place in today's speed ranking (one daily challenge per day).
+ * `null` when there is no completed submission for the current daily challenge.
  */
 export async function getTodayRankNumber(userId: string): Promise<number | null> {
   const rows = await getTodayLiveRanking();
@@ -134,8 +134,9 @@ async function getMonthLiveRanking(now: Date): Promise<LiveRankingRow[]> {
 }
 
 /**
- * Woche/Monat: sortiert nach **Anzahl** gelöster Tages-Challenges (`challenge.date` in der Periode),
- * bei Gleichstand nach **Summe der Challenge-Punkte**, dann stabil nach `userId`.
+ * Week/month: sorted by the **number** of daily challenges solved (`challenge.date`
+ * within the period), ties broken by the **sum of challenge points**, then by
+ * `userId` for a stable order.
  */
 async function aggregatePeriodByDailyChallenges(
   periodStart: Date,

@@ -2,12 +2,12 @@ import { Lock } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Erklärt die Sperre direkt dort, wo sie sichtbar ist — über dem ausgegrauten
- * Editor. Der frühere Hinweis stand am Seitenanfang und war beim Scrollen zum
- * Editor aus dem Bild, sodass nur ein toter grauer Editor übrig blieb.
+ * Explains the lock right where it is visible — above the greyed-out editor. The
+ * earlier hint sat at the top of the page and was scrolled out of view by the time
+ * you reached the editor, leaving nothing but a dead grey box.
  *
- * Nennt bewusst auch das gesperrte Testen: nicht nur die Abgabe ist blockiert,
- * sondern ebenso „Test ausführen", Sprachauswahl und der Editor selbst.
+ * Deliberately mentions that testing is locked too: it is not only submitting,
+ * but also "run tests", the language picker and the editor itself.
  */
 export function SubmissionLockedBanner({ className }: { className?: string }) {
   return (

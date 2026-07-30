@@ -4,35 +4,35 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
 
 /**
- * #36: Der Editor wurde ausgegraut und gesperrt, ohne Erklärung an der Stelle
- * der Sperre. Der Hinweis stand am Seitenanfang und war beim Scrollen zum Editor
- * längst aus dem Bild.
+ * #36: the editor was greyed out and locked with no explanation where the lock was
+ * visible. The hint sat at the top of the page and was long out of view by the time
+ * you scrolled down to the editor.
  */
 describe("SubmissionLockedBanner", () => {
   const markup = renderToStaticMarkup(<SubmissionLockedBanner />);
 
-  it("nennt die erfolgte Abgabe", () => {
+  it("mentions that a submission was made", () => {
     expect(markup).toMatch(/abgegeben/i);
   });
 
-  it("nennt, dass auch das Testen gesperrt ist", () => {
-    // Ohne diesen Teil sucht man vergeblich, warum „Test ausführen" nicht geht.
+  it("mentions that testing is locked too", () => {
+    // Without this part you are left guessing why "run tests" does nothing.
     expect(markup).toMatch(/test/i);
     expect(markup).toMatch(/gesperrt|nicht möglich/i);
   });
 
-  it("nennt, bis wann die Sperre gilt", () => {
+  it("mentions how long the lock lasts", () => {
     expect(markup).toMatch(/morgen/i);
     expect(markup).toMatch(/UTC/);
   });
 
-  it("ist für Screenreader als Statusmeldung ausgezeichnet", () => {
+  it("is marked up as a status message for screen readers", () => {
     expect(markup).toContain('role="status"');
   });
 
-  // #59: Belegt, dass Icons ohne Mock auflösbar sind — vorher scheiterte der
-  // Import von @nsmr/pixelart-react im Node-Env an einer fehlenden ESM-Endung.
-  it("rendert das echte Schloss-Icon ohne Mock", () => {
+  // #59: proves icons resolve without a mock — importing @nsmr/pixelart-react used
+  // to fail in the node env because of a missing ESM file extension.
+  it("renders the real lock icon without a mock", () => {
     expect(markup).toContain("<svg");
   });
 });

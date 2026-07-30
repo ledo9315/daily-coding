@@ -1,11 +1,11 @@
 import type { RankingPeriod } from "@/lib/generated/prisma/enums";
 
-/** UTC-Mitternacht für den Kalendertag von `d` (reine Datumsgrenze, konsistent mit Seed). */
+/** UTC midnight for the calendar day of `d` — a pure date boundary, consistent with the seed. */
 export function startOfUtcDay(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
-/** Montag 00:00 UTC der ISO-Woche, die `d` enthält. */
+/** Monday 00:00 UTC of the ISO week containing `d`. */
 export function startOfUtcWeek(d: Date): Date {
   const date = startOfUtcDay(d);
   const day = date.getUTCDay(); // 0 So … 6 Sa
@@ -14,13 +14,13 @@ export function startOfUtcWeek(d: Date): Date {
   return date;
 }
 
-/** Erster Tag des UTC-Kalendermonats. */
+/** First day of the UTC calendar month. */
 export function startOfUtcMonth(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
 }
 
 /**
- * `periodDate` für RankingEntry-Abfragen — muss exakt zum Seed und zur DB passen.
+ * `periodDate` for RankingEntry queries — must match the seed and the DB exactly.
  */
 export function getPeriodDateForRanking(
   period: RankingPeriod,
