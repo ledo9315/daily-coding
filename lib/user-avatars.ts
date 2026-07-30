@@ -3,17 +3,26 @@
  * Only these paths can be set through the API — no free-form values.
  */
 export const USER_AVATAR_PATHS = [
-  "/user/chibi1.png",
-  "/user/chibi2.png",
-  "/user/chibi3.png",
-  "/user/minipix2.png",
-  "/user/minipix4.png",
-  "/user/minipix5.png",
-  "/user/minipix6.png",
-  "/user/pony2.png",
-  "/user/pony3.png",
-  "/user/pony4.png",
-  "/user/guy1.png",
+  "/user/mike.png",
+  "/user/christine.png",
+  "/user/alex.png",
+  "/user/isabella.png",
+  "/user/steve.png",
+  "/user/jessica.png",
+  "/user/nancy.png",
+  "/user/nelly.png",
+  "/user/ben.png",
+  "/user/bruno.png",
+  "/user/sophie.png",
+  "/user/elena.png",
+  "/user/jordan.png",
+  "/user/stella.png",
+  "/user/anna.png",
+  "/user/lili.png",
+  "/user/rex.png",
+  "/user/hopper.png",
+  "/user/tom.png",
+  "/user/gpt.png",
 ] as const;
 
 export type UserAvatarPath = (typeof USER_AVATAR_PATHS)[number];
