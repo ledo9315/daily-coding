@@ -10,6 +10,7 @@ import { SubmissionStatus } from "@/components/submission-status";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { CountdownTimer } from "@/components/countdown-timer";
+import { SolveElapsedTimer } from "@/components/solve-elapsed-timer";
 import {
   Card,
   CardContent,
@@ -277,9 +278,14 @@ export default function ChallengePage() {
             />
           </div>
 
-          <div className="flex items-center gap-4">
-            <PointsChip points={challenge.points} variant="highlight" size="lg" />
-            <CountdownTimer />
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <div className="flex items-center gap-4">
+              <PointsChip points={challenge.points} variant="highlight" size="lg" />
+              <CountdownTimer />
+            </div>
+            {challenge.startedAt && !isSubmitLocked ? (
+              <SolveElapsedTimer startedAt={challenge.startedAt} />
+            ) : null}
           </div>
         </div>
 
