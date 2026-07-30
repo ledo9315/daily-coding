@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-/** Aktuelle Rolle aus der DB (nicht aus dem JWT — dort kann sie veraltet sein). */
+/** Current role from the DB, not from the JWT where it can be stale. */
 export async function getUserRoleFromDb(
   userId: string,
 ): Promise<"user" | "admin" | null> {

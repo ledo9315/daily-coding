@@ -5,7 +5,7 @@ import { utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 export type MonthlyActivityDayCell = {
   day: number | null;
   completed: boolean;
-  /** Liegt in der aktuellen Gewinnserie (aufeinanderfolgende UTC-Tage mit Abschluss). */
+  /** Part of the current streak (consecutive UTC days with a completion). */
   inStreak: boolean;
 };
 
@@ -19,8 +19,9 @@ export type MonthlyActivity = {
 };
 
 /**
- * Kalenderraster für den UTC-Monat von `now`: Mo–So-Spalten, Füllzellen am Monatsanfang,
- * ein Kästchen pro Kalendertag. Streak kommt aus denselben UTC-Tag-Regeln wie im Rest der App.
+ * Calendar grid for the UTC month of `now`: Mon–Sun columns, filler cells at the
+ * start of the month, one cell per calendar day. The streak follows the same
+ * UTC-day rules as the rest of the app.
  */
 export function buildMonthlyActivityGrid(
   now: Date,

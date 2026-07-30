@@ -15,7 +15,7 @@ vi.mock("@/lib/server/user-points", () => ({
     mockGetLifetimePointsByUserIds(...args),
 }));
 
-/** Verhindert Laden von `lib/prisma` (server-only) über `dashboard-data` im Preview-Handler. */
+/** Prevents `lib/prisma` (server-only) from being pulled in via `dashboard-data` in the preview handler. */
 vi.mock("@/lib/prisma", () => ({
   prisma: {},
 }));

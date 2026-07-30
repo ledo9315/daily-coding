@@ -6,7 +6,7 @@ function jsonPretty(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
-/** UTC-Kalendertag als `YYYY-MM-DD` — passend für `<input type="date">`. */
+/** UTC calendar day as `YYYY-MM-DD`, the format `<input type="date">` expects. */
 function formatUtcDay(d: Date): string {
   return d.toISOString().slice(0, 10);
 }

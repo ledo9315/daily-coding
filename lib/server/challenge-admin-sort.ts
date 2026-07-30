@@ -3,11 +3,11 @@ import { startOfUtcDay } from "@/lib/server/ranking-period";
 type HasDate = { date: Date | null; id?: string };
 
 /**
- * Admin-Tabelle: „als Nächstes dran“ oben.
+ * Admin table: whatever is up next goes on top.
  *
- * 1. `date` ≥ heute 00:00 UTC — aufsteigend (heute, morgen, …)
- * 2. `date` &lt; heute — absteigend (kürzlich Vergangenes zuerst)
- * 3. kein `date` — zuletzt
+ * 1. `date` >= today 00:00 UTC — ascending (today, tomorrow, …)
+ * 2. `date` &lt; today — descending (most recent past first)
+ * 3. no `date` — last
  */
 export function compareChallengesBySchedule(
   a: HasDate,

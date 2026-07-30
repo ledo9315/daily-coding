@@ -120,8 +120,8 @@ describe("/api/admin/challenges/[id]", () => {
     expect(mockChallengeUpdate).toHaveBeenCalled();
   });
 
-  // #71: Die Uhrzeit war wirkungslos, verschob aber den UTC-Tag. Der Server
-  // normalisiert jetzt selbst — auch bei direktem API-Aufruf.
+  // #71: the time of day had no effect but shifted the UTC day. The server now
+  // normalises it itself, including for direct API calls.
   it("PATCH normalises the daily date to UTC midnight", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "a1" } });
     mockUserFindUnique.mockResolvedValueOnce({ role: "admin" });

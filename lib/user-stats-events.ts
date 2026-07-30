@@ -1,4 +1,4 @@
-/** Event, damit die Header-Stats (Streak, Level) nach relevanten Aktionen neu geladen werden. */
+/** Event that makes the header stats (streak, level) reload after relevant actions. */
 export const USER_STATS_CHANGED_EVENT = "dcc:user-stats-changed" as const;
 
 export function notifyUserStatsChanged(): void {

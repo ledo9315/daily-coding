@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { getUserRoleFromDb } from "@/lib/server/user-role";
 
 /**
- * Server Components: nur für eingeloggte Admins; sonst Redirect.
- * Rolle kommt aus der DB (nicht aus dem Session-JWT).
+ * For server components: signed-in admins only, everyone else is redirected.
+ * The role comes from the DB, not from the session JWT.
  */
 export async function requireAdminPage(callbackPath = "/admin/challenges/new") {
   const session = await auth();

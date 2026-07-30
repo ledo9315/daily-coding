@@ -125,8 +125,8 @@ export function AdminChallengeForm({
       },
       supportedLanguages: ["javascript", "typescript", "python", "php"] as const,
       isActive,
-      // Als UTC-Tag interpretieren, nicht als lokale Zeit: sonst landet die
-      // Aufgabe für Zeitzonen östlich von UTC am Vortag (#71).
+      // Interpret this as a UTC day, not as local time: otherwise the challenge
+      // lands on the previous day for time zones east of UTC (#71).
       dateIso: dateUtcDay ? `${dateUtcDay}T00:00:00.000Z` : null,
     };
 
@@ -404,7 +404,7 @@ export function AdminChallengeForm({
   );
 }
 
-/** @deprecated Nutze AdminChallengeForm mit mode="create" */
+/** @deprecated Use AdminChallengeForm with mode="create" */
 export function CreateChallengeForm(props: {
   categories: CategoryOption[];
 }) {

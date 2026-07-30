@@ -1,6 +1,6 @@
 /**
- * Vordefinierte Pixel-Avatare unter `public/user/`.
- * Nur diese Pfade sind per API setzbar (kein Freitext).
+ * Predefined pixel avatars under `public/user/`.
+ * Only these paths can be set through the API — no free-form values.
  */
 export const USER_AVATAR_PATHS = [
   "/user/chibi1.png",

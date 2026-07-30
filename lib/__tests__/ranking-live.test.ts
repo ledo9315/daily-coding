@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 describe("getLiveRanking — today", () => {
-  it("sortiert nach schnellster Zeit (beste Zeit pro Nutzer)", async () => {
+  it("sorts by fastest time, using each user’s best time", async () => {
     mockFindDailyChallengeForApp.mockResolvedValue({
       id: "daily-1",
       points: 100,
@@ -53,7 +53,7 @@ describe("getLiveRanking — today", () => {
     expect(rows[0].timeSeconds).toBe(90);
   });
 
-  it("getTodayRankNumber gibt Platz zurück", async () => {
+  it("getTodayRankNumber returns the place", async () => {
     mockFindDailyChallengeForApp.mockResolvedValue({ id: "d", points: 10 });
     mockSubmissionFindMany.mockResolvedValue([
       { userId: "a", timeTaken: 50, user: user("a", "A") },
@@ -78,7 +78,7 @@ describe("getLiveRanking — week/month", () => {
     vi.useRealTimers();
   });
 
-  it("zählt gelöste Daily-Challenges und bricht Gleichstand mit Punktsumme", async () => {
+  it("counts solved daily challenges and breaks ties by point total", async () => {
     mockSubmissionFindMany.mockResolvedValue([
       {
         userId: "u1",

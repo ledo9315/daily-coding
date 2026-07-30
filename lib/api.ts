@@ -27,8 +27,8 @@ export interface TodayChallenge {
   points: number;
   category: string;
   /**
-   * Status der heutigen (UTC) Abgabe des eingeloggten Nutzers; null wenn nicht
-   * eingeloggt oder noch nicht abgegeben.
+   * Status of the signed-in user's submission for today (UTC); null when not
+   * signed in or nothing submitted yet.
    */
   todayStatus: "completed" | "failed" | "pending" | null;
 }
@@ -36,24 +36,24 @@ export interface TodayChallenge {
 export interface UserStats {
   rank: string;
   points: string;
-  /** Prozentuale Rangentwicklung ggü. der Vorwoche (positiv = besser). */
+  /** Rank change against last week, in percent (positive = better). */
   rankTrendPercent: number;
-  /** Rangentwicklung in Plätzen ggü. der Vorwoche (positiv = besser). */
+  /** Rank change against last week, in places (positive = better). */
   rankTrendPlaces: number;
-  /** Prozentuale Punkteentwicklung ggü. dem Vormonat. */
+  /** Points change against last month, in percent. */
   pointsTrendPercent: number;
   streak: number;
   streakRecord: number;
   totalSolved: number;
-  /** Gesamtzahl registrierter Nutzer (für "Rang X von N"). */
+  /** Total number of registered users (for "rank X of N"). */
   totalUsers: number;
   level: number;
   levelMax: number;
   badges: number;
   badgesTotal: number;
-  /** Abgeschlossene Challenges im laufenden UTC-Monat (siehe `monthlyChallengeGoal`). */
+  /** Challenges completed in the running UTC month (see `monthlyChallengeGoal`). */
   monthlyChallengesSolved: number;
-  /** Soll = Anzahl Tage im laufenden UTC-Monat (ein Challenge-Ziel pro Kalendertag). */
+  /** Target = number of days in the running UTC month (one challenge per calendar day). */
   monthlyChallengeGoal: number;
 }
 
@@ -87,7 +87,7 @@ export interface UserProfile {
   stats: UserStats;
   achievements: Achievement[];
   challengeHistory: ChallengeHistoryEntry[];
-  /** UTC-Monatskalender: Abschlüsse pro Tag + Markierung der laufenden Streak-Serie. */
+  /** UTC month calendar: completions per day plus the running streak marked. */
   monthlyActivity: MonthlyActivity;
 }
 
@@ -101,14 +101,14 @@ export interface ChallengeTestCase {
   time?: string;
 }
 
-/** Zusatzinfos für die Erfolgs-UI nach erfolgreicher Abgabe. */
+/** Extra data for the success UI shown after a passing submission. */
 export interface SubmitCelebration {
   timeTakenSeconds: number;
   streak: number;
   streakRecord: number;
-  /** Ø Lösezeit (Sek.) aller heutigen Abgaben zu dieser Challenge (UTC-Tag), nur mit timeTaken. */
+  /** Mean solve time (seconds) across today's submissions (UTC day) for this challenge; only rows with timeTaken. */
   avgSolveTimeTodaySeconds: number | null;
-  /** Anzahl abgeschlossener Abgaben zu dieser Challenge am heutigen UTC-Tag. */
+  /** Number of completed submissions for this challenge on the current UTC day. */
   completionsToday: number;
 }
 
@@ -131,8 +131,8 @@ export interface DailyChallenge {
   /** Single-string fallback (same as starterCodes[defaultLanguage]). */
   starterCode: string;
   /**
-   * Wenn eingeloggt und für diese Challenge heute (UTC) bereits eine Submission existiert.
-   * Sonst null (auch wenn nicht eingeloggt).
+   * Set when signed in and a submission for this challenge already exists today
+   * (UTC). Otherwise null — including when not signed in.
    */
   todaySubmission: {
     status: "completed" | "failed" | "pending";
@@ -140,14 +140,14 @@ export interface DailyChallenge {
     code: string;
     language: string;
     /**
-     * Bewertete Testfälle dieser Abgabe. null bei Altdaten ohne gespeicherte
-     * Ergebnisse — dann greift die Vorlage der Challenge.
+     * Graded test cases of this submission. null for legacy rows without stored
+     * results — the challenge's template is used instead.
      */
     testResults: ChallengeTestCase[] | null;
   } | null;
   /**
-   * Serverseitiger Start der Bearbeitung (ISO). Quelle für die angezeigte
-   * verstrichene Zeit; null wenn nicht eingeloggt.
+   * Server-side start of work (ISO). Source for the elapsed time shown in the
+   * UI; null when not signed in.
    */
   startedAt: string | null;
 }
@@ -167,7 +167,7 @@ export interface CommunityFeedItem {
   points: number;
   time: string;
   createdAt: string;
-  /** Gesetzt, wenn diese Abgabe einen Levelaufstieg ausgelöst hat. */
+  /** Set when this submission triggered a level-up. */
   levelUp?: {
     previousLevel: number;
     newLevel: number;
@@ -212,7 +212,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
         message = parsed.error;
       }
     } catch {
-      /* Body ist kein JSON — Fallback bleibt */
+      /* Body is not JSON — keep the fallback message */
     }
     throw new Error(message);
   }
@@ -263,7 +263,7 @@ export function submitSolution(
     success: boolean;
     testCases: ChallengeTestCase[];
     language?: CodeLanguageId;
-    /** Ob Laufzeit/Kompilierung (Piston) erfolgreich war; bei Stub immer true. */
+    /** Whether runtime/compilation (Piston) succeeded; always true for the stub. */
     runtimeOk?: boolean;
     celebration?: SubmitCelebration;
   }> {
@@ -280,7 +280,7 @@ export function runTests(
 ): Promise<{
     testCases: ChallengeTestCase[];
     language?: CodeLanguageId;
-    /** Ob Laufzeit/Kompilierung erfolgreich; bei Stub immer true. */
+    /** Whether runtime/compilation succeeded; always true for the stub. */
     runtimeOk?: boolean;
   }> {
   return apiFetch(`/api/challenge/${challengeId}/run`, {

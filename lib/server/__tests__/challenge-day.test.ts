@@ -19,9 +19,9 @@ beforeEach(() => {
 });
 
 /**
- * #35: Die Prüfung „heute (UTC) für diese Challenge abgegeben?" lag doppelt
- * kopiert in der Submit- und der Daily-Route. Der Helper ist jetzt die einzige
- * Quelle — für Submit-Sperre, Daily-Antwort und Dashboard-Karte.
+ * #35: the check "submitted for this challenge today (UTC)?" was copied into both
+ * the submit and the daily route. The helper is now the single source — for the
+ * submit lock, the daily response and the dashboard card.
  */
 describe("findTodaySubmission", () => {
   it("limits the query to the current UTC day", async () => {
@@ -52,8 +52,8 @@ describe("findTodaySubmission", () => {
     });
   });
 
-  // #60: Ohne testResults zeigt die Seite nach dem Reload die leere Vorlage
-  // („0/5 bestanden") neben „Erfolgreich abgegeben".
+  // #60: without testResults the page shows the empty template ("0/5 passed") next
+  // to "successfully submitted" after a reload.
   it("includes the stored test results", async () => {
     await findTodaySubmission("user-1", "ch-1");
     expect(mockSubmissionFindFirst.mock.calls[0][0].select.testResults).toBe(true);

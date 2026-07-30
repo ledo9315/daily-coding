@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
 
-/** Start und Ende (exklusiv) des laufenden UTC-Kalendertags. */
+/** Start and end (exclusive) of the running UTC calendar day. */
 export function utcDayRange(now: Date = new Date()): { gte: Date; lt: Date } {
   const gte = startOfUtcDay(now);
   const lt = new Date(gte);
@@ -10,11 +10,11 @@ export function utcDayRange(now: Date = new Date()): { gte: Date; lt: Date } {
 }
 
 /**
- * Neueste Abgabe des laufenden UTC-Tags für diese Challenge, sonst null.
+ * Latest submission for this challenge on the running UTC day, otherwise null.
  *
- * Einzige Quelle für „heute schon abgegeben?" — genutzt von der Submit-Sperre,
- * der Challenge-API und der Karte auf der Startseite. Vorher lag die Prüfung
- * doppelt kopiert in zwei Routen.
+ * The single source for "already submitted today?" — used by the submit lock,
+ * the challenge API and the dashboard card. The check used to be copied into two
+ * routes.
  */
 export async function findTodaySubmission(userId: string, challengeId: string) {
   return prisma.submission.findFirst({
@@ -31,7 +31,7 @@ export async function findTodaySubmission(userId: string, challengeId: string) {
   });
 }
 
-/** Nach außen sichtbarer Abgabestatus; `skipped` gilt als offen. */
+/** Submission status exposed to clients; `skipped` counts as still open. */
 export function publicSubmissionStatus(
   status: "pending" | "completed" | "failed" | "skipped"
 ): "pending" | "completed" | "failed" {
@@ -41,9 +41,9 @@ export function publicSubmissionStatus(
 }
 
 /**
- * Position im Rotations-Pool, abgeleitet vom UTC-Kalendertag. Deterministisch:
- * derselbe Tag ergibt immer dieselbe Aufgabe — auch über mehrere Requests und
- * Serverinstanzen hinweg (kein Zufall, kein Serverzustand).
+ * Position in the rotation pool, derived from the UTC calendar day. Deterministic:
+ * the same day always yields the same challenge — across requests and across
+ * server instances, with no randomness and no server-side state.
  */
 export function rotationIndexForUtcDay(now: Date, poolSize: number): number {
   if (poolSize <= 0) return 0;
@@ -52,16 +52,16 @@ export function rotationIndexForUtcDay(now: Date, poolSize: number): number {
 }
 
 /**
- * Aufgabe des Tages.
+ * The challenge of the day.
  *
- * 1. Ist für den heutigen UTC-Tag ein `date` gesetzt, gewinnt diese Challenge —
- *    manuelle Planung über das Admin bleibt vorrangig.
- * 2. Sonst wird deterministisch aus dem Pool aktiver Aufgaben rotiert. Ohne
- *    diesen Schritt lieferte die App dauerhaft dieselbe Aufgabe, weil der Seed
- *    nur Daten in der Vergangenheit setzt (#67).
+ * 1. If a `date` falls on the current UTC day, that challenge wins — manual
+ *    scheduling through the admin panel keeps priority.
+ * 2. Otherwise rotate deterministically through the pool of active challenges.
+ *    Without this step the app served the same challenge forever, because the
+ *    seed only sets dates in the past (#67).
  *
- * ponytail: bei N Aufgaben wiederholt sich der Zyklus nach N Tagen — bewusst
- * akzeptiert, besser als Stillstand. Abhilfe ist mehr Inhalt, nicht mehr Code.
+ * ponytail: with N challenges the cycle repeats after N days — accepted on
+ * purpose, better than standing still. The cure is more content, not more code.
  */
 export async function findDailyChallengeForApp() {
   const forToday = await prisma.challenge.findFirst({
@@ -72,7 +72,7 @@ export async function findDailyChallengeForApp() {
 
   if (forToday) return forToday;
 
-  // Stabile Reihenfolge: sonst hängt die Rotation von der Laune der DB ab.
+  // Stable order: otherwise the rotation depends on whatever order the DB returns.
   const pool = await prisma.challenge.findMany({
     where: { isActive: true },
     orderBy: [{ date: "asc" }, { id: "asc" }],

@@ -50,7 +50,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 
-/** Abstand für stillen API-Check (neuer UTC-Tag / neue Challenge). */
+/** Interval for the silent API check that picks up a new UTC day / new challenge. */
 const CHALLENGE_POLL_MS = 60_000;
 
 export default function ChallengePage() {
@@ -85,7 +85,7 @@ export default function ChallengePage() {
     staleTime: CHALLENGE_POLL_MS,
   });
 
-  // Initialisiert Sources/Language/Outcome wenn eine neue Challenge kommt
+  // Initialises sources/language/outcome whenever a new challenge arrives
   useEffect(() => {
     if (!challenge) return;
 
@@ -109,9 +109,9 @@ export default function ChallengePage() {
         setSources({ ...challenge.starterCodes });
       }
 
-      // Bewertete Ergebnisse der heutigen Abgabe bevorzugen — sonst zeigte das
-      // Panel nach einem Reload die leere Vorlage („0/5") neben „Erfolgreich
-      // abgegeben". Altdaten ohne gespeicherte Ergebnisse fallen auf die Vorlage.
+      // Prefer the graded results of today's submission — otherwise the panel
+      // showed the empty template ("0/5") next to "successfully submitted" after
+      // a reload. Legacy rows without stored results fall back to the template.
       const storedResults = challenge.todaySubmission?.testResults;
       setTestCases(
         (storedResults?.length ? storedResults : challenge.testCases) as TestCase[]

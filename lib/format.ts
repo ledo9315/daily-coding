@@ -7,10 +7,10 @@ export function formatTime(seconds: number | null | undefined): string {
 }
 
 /**
- * Verstrichene Zeit seit `startedAtIso` im selben Format wie die Rangliste
- * (`formatTime`). Ohne oder mit ungültiger Startzeit "-".
- * ponytail: bewusst dasselbe M:SS-Format wie die Rangliste — ab einer Stunde
- * zählt es in Minuten weiter (125:03). Zwei Formate wären verwirrender.
+ * Elapsed time since `startedAtIso`, in the same format as the ranking
+ * (`formatTime`). Returns "-" when the start time is missing or invalid.
+ * ponytail: deliberately the same M:SS format as the ranking — past an hour it
+ * keeps counting in minutes (125:03). Two formats would confuse more than help.
  */
 export function formatElapsedSince(
   startedAtIso: string | null | undefined,
