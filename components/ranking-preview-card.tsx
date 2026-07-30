@@ -94,12 +94,12 @@ export function RankingPreviewCard({
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <p className="truncate text-lg font-sans uppercase">
+                <div className="flex min-w-0 items-baseline gap-2">
+                  <p className="min-w-0 truncate text-lg font-sans uppercase">
                     {user.name}
                   </p>
                   {user.level && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <span className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                       Lvl {user.level}
                     </span>
                   )}

@@ -48,3 +48,21 @@ describe("AchievementBadge", () => {
     expect(html).not.toContain("10/10");
   });
 });
+
+/**
+ * #79: the profile page was cut off on the right. Cause: `truncate` on a title inside
+ * nested flex containers without `min-w-0` — a flex item defaults to `min-width: auto`,
+ * so the title refused to shrink, and a grid track takes its minimum from `min-content`.
+ * The card therefore widened the whole page.
+ */
+describe("AchievementBadge on narrow screens", () => {
+  it("lets the title shrink and wrap instead of forcing the card wide", () => {
+    const html = render({
+      title: "Wochenend-Krieger mit einem sehr langen Namen",
+      unlocked: false,
+    });
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("flex-wrap");
+    expect(html).not.toContain("truncate");
+  });
+});
