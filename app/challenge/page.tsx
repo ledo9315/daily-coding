@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Header } from "@/components/header";
+import ChallengeLoading from "./loading";
 import { CodeEditor } from "@/components/code-editor";
 import { TestResults, type TestCase } from "@/components/test-results";
 import { SubmissionStatus } from "@/components/submission-status";
@@ -215,12 +216,7 @@ export default function ChallengePage() {
   };
 
   if (isLoadingChallenge) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-4">
-        <Header />
-        <p className="text-muted-foreground">Challenge wird geladen…</p>
-      </div>
-    );
+    return <ChallengeLoading />;
   }
 
   if (loadError || !challenge) {
