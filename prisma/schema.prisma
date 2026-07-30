@@ -89,8 +89,11 @@ model AchievementDef {
 /// Serverseitiger Startzeitpunkt der Bearbeitung. Entsteht beim ersten Abruf der
 /// Challenge und ist die einzige Quelle für die Lösezeit in der Rangliste —
 /// der Client darf sie nicht bestimmen.
-/// ponytail: kein Tagesschlüssel nötig, `Challenge.date` ist unique → eine
-/// Challenge gehört zu genau einem Tag.
+/// Gilt pro UTC-Tag: liegt `startedAt` vor dem heutigen Tagesbeginn, wird es beim
+/// ersten Abruf des Tages erneuert. Ein Tagesschlüssel in der Tabelle wäre
+/// sauberer, kostet aber eine Migration und ließe Altzeilen zurück.
+/// ponytail: Prüfung beim Lesen statt Spalte — umstellen, falls die Historie der
+/// Startzeitpunkte je gebraucht wird.
 model ChallengeStart {
   userId      String
   challengeId String
