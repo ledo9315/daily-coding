@@ -49,7 +49,7 @@ export const adminCreateChallengeSchema = z.object({
   }),
   supportedLanguages: z.array(codeLanguageZ).optional(),
   isActive: z.boolean().optional(),
-  /** z. B. Wert von `datetime-local` oder leer → kein Daily-Datum */
+  /** UTC-Tagesbeginn als ISO-String oder leer → kein Daily-Datum */
   dateIso: z.string().optional().nullable(),
 });
 
