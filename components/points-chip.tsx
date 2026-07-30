@@ -55,10 +55,15 @@ export function PointsChip({
     lg: "px-4 h-10 text-base border-2",
   };
 
+  /**
+   * One step below the sizes the coin used. Its 24-unit viewBox carried padding, so the
+   * glyph never filled the box; the star's 9x9 grid is edge to edge and would otherwise
+   * read as noticeably bigger at the same class.
+   */
   const iconSizes = {
-    sm: "h-3 w-3",
-    md: "h-4 w-4",
-    lg: "h-5 w-5",
+    sm: "h-2.5 w-2.5",
+    md: "h-3 w-3",
+    lg: "h-4 w-4",
   };
 
   return (
