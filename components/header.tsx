@@ -188,7 +188,7 @@ export function Header() {
                       <div className="flex items-center gap-2">
                         <p className="font-sans text-lg">{displayName}</p>
                         {level != null && (
-                          <span className="px-1.5 py-0.5 text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                          <span className="shrink-0 whitespace-nowrap border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                             LVL {level}
                           </span>
                         )}
