@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
+import {
+  findDailyChallengeForApp,
+  findTodaySubmission,
+  publicSubmissionStatus,
+} from "@/lib/server/challenge-day";
 import {
   normalizeStarterCodes,
   normalizeSupportedLanguages,
 } from "@/lib/challenge-languages";
 import { stripTestCaseSecretsForClient } from "@/lib/server/public-challenge";
-import { startOfUtcDay } from "@/lib/server/ranking-period";
 
 export async function GET() {
   const challenge = await findDailyChallengeForApp();
@@ -50,29 +53,16 @@ export async function GET() {
     });
     startedAt = start?.startedAt.toISOString() ?? null;
 
-    const dayStart = startOfUtcDay(new Date());
-    const dayEnd = new Date(dayStart);
-    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
-
-    const sub = await prisma.submission.findFirst({
-      where: {
-        userId,
-        challengeId: challenge.id,
-        createdAt: { gte: dayStart, lt: dayEnd },
-      },
-      select: { status: true, createdAt: true, code: true, language: true },
-      orderBy: { createdAt: "desc" },
-    });
+    const sub = await findTodaySubmission(userId, challenge.id);
 
     if (sub) {
       const submittedAt = sub.createdAt.toISOString();
-      const status =
-        sub.status === "completed"
-          ? "completed"
-          : sub.status === "failed"
-            ? "failed"
-            : "pending";
-      todaySubmission = { status, submittedAt, code: sub.code, language: sub.language };
+      todaySubmission = {
+        status: publicSubmissionStatus(sub.status),
+        submittedAt,
+        code: sub.code,
+        language: sub.language,
+      };
     }
   }
 

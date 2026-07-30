@@ -4,7 +4,7 @@ import Link from "next/link";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PointsChip } from "@/components/points-chip";
-import { ArrowRight, Tournament, Zap } from "@nsmr/pixelart-react";
+import { ArrowRight, Tournament, Zap, CheckDouble } from "@nsmr/pixelart-react";
 
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,11 @@ interface TodaysChallengeCardProps {
   difficulty: "easy" | "medium" | "hard";
   points: number;
   category: string;
+  /**
+   * Status der heutigen Abgabe. Ist eine vorhanden, sperrt die Challenge-Seite
+   * Editor, Tests und Abgabe — der Button darf dann kein Starten versprechen.
+   */
+  todayStatus?: "completed" | "failed" | "pending" | null;
   className?: string;
 }
 
@@ -23,8 +28,18 @@ export function TodaysChallengeCard({
   difficulty,
   points,
   category,
+  todayStatus = null,
   className,
 }: TodaysChallengeCardProps) {
+  const submittedToday = todayStatus != null;
+  // „gelöst" nur wenn wirklich bestanden — ein Fehlversuch sperrt ebenfalls,
+  // wäre aber falsch beschriftet.
+  const label = !submittedToday
+    ? "CHALLENGE STARTEN"
+    : todayStatus === "completed"
+      ? "BEREITS GELÖST — ANSEHEN"
+      : "BEREITS ABGEGEBEN — ANSEHEN";
+
   return (
     <div className={cn("pixel-box relative overflow-hidden p-6", className)}>
       <div className="flex items-center justify-between mb-4">
@@ -66,10 +81,19 @@ export function TodaysChallengeCard({
 
         <Link
           href="/challenge"
-          className="pixel-btn inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 group"
+          className={cn(
+            "pixel-btn inline-flex items-center gap-2 group",
+            submittedToday
+              ? "bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
+              : "bg-primary text-primary-foreground hover:bg-primary/90"
+          )}
         >
-          <Zap className="h-5 w-5" />
-          CHALLENGE STARTEN
+          {submittedToday ? (
+            <CheckDouble className="h-5 w-5" />
+          ) : (
+            <Zap className="h-5 w-5" />
+          )}
+          {label}
           <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
