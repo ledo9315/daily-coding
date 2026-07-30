@@ -57,3 +57,15 @@ export function authSessionCallback({
       : "user";
   return session;
 }
+
+/**
+ * Trifft auf jeden externen Provider zu — Google ist "oidc", GitHub "oauth".
+ * Bewusst als Ausschluss von "credentials" formuliert statt als Aufzählung:
+ * die Prüfung auf einen einzelnen Typ hatte Google-Logins übersehen.
+ * Type-Guard, damit `account` im Zweig danach als definiert gilt.
+ */
+export function isFederatedAccount<T extends { type?: string }>(
+  account: T | null | undefined
+): account is T {
+  return account != null && account.type !== "credentials";
+}
