@@ -3,6 +3,7 @@
  * Only these paths can be set through the API — no free-form values.
  */
 export const USER_AVATAR_PATHS = [
+  "/user/gpt.png",
   "/user/mike.png",
   "/user/christine.png",
   "/user/alex.png",
@@ -22,7 +23,6 @@ export const USER_AVATAR_PATHS = [
   "/user/rex.png",
   "/user/hopper.png",
   "/user/tom.png",
-  "/user/gpt.png",
 ] as const;
 
 export type UserAvatarPath = (typeof USER_AVATAR_PATHS)[number];
