@@ -74,19 +74,61 @@ export function buildUserAchievementsView(
   const nthDate = (list: CompletedSubmission[], n: number): Date | null =>
     list.length >= n ? list[n - 1].createdAt : null;
 
-  // id -> { unlocked by a derived rule, unlock date where derivable }
-  const inferred: Record<string, { unlocked: boolean; at: Date | null }> = {
-    "ach-1": { unlocked: totalSolved > 0, at: nthDate(byDate, 1) },
-    "ach-2": { unlocked: streakRecord >= STREAK_WEEK, at: null },
-    "ach-3": { unlocked: polyglotAt !== null, at: polyglotAt },
+  /**
+   * id -> { unlocked by a derived rule, unlock date where derivable, how far along }
+   *
+   * `current`/`target` are the same numbers the `unlocked` check already runs on — a
+   * locked achievement used to name its goal without ever saying where you stood (#96).
+   * The streak rules read the record rather than the running streak, so they carry a
+   * label; „5/7" alone would read as a series still going.
+   */
+  const inferred: Record<
+    string,
+    {
+      unlocked: boolean;
+      at: Date | null;
+      current: number;
+      target: number;
+      label?: string;
+    }
+  > = {
+    "ach-1": {
+      unlocked: totalSolved > 0,
+      at: nthDate(byDate, 1),
+      current: totalSolved,
+      target: 1,
+    },
+    "ach-2": {
+      unlocked: streakRecord >= STREAK_WEEK,
+      at: null,
+      current: streakRecord,
+      target: STREAK_WEEK,
+      label: "Rekord",
+    },
+    "ach-3": {
+      unlocked: polyglotAt !== null,
+      at: polyglotAt,
+      current: seenLanguages.size,
+      target: POLYGLOT_LANGUAGES,
+    },
     "ach-4": {
       unlocked: hardByDate.length >= HARD_SOLVED,
       at: nthDate(hardByDate, HARD_SOLVED),
+      current: hardByDate.length,
+      target: HARD_SOLVED,
     },
-    "ach-5": { unlocked: streakRecord >= STREAK_MONTH, at: null },
+    "ach-5": {
+      unlocked: streakRecord >= STREAK_MONTH,
+      at: null,
+      current: streakRecord,
+      target: STREAK_MONTH,
+      label: "Rekord",
+    },
     "ach-6": {
       unlocked: totalSolved >= NO_ERROR_SOLVED,
       at: nthDate(byDate, NO_ERROR_SOLVED),
+      current: totalSolved,
+      target: NO_ERROR_SOLVED,
     },
   };
 
@@ -107,6 +149,14 @@ export function buildUserAchievementsView(
       unlockedAt = formatDate(rule.at);
     }
 
+    // Only while locked, and only where the target has more than one step: "0/1" for
+    // „Erste Schritte" is noise, and a full bar next to the unlock date says less than
+    // the date does.
+    const progress =
+      !unlocked && rule && rule.target > 1
+        ? { current: rule.current, target: rule.target, ...(rule.label && { label: rule.label }) }
+        : undefined;
+
     return {
       id: def.id,
       title: def.title,
@@ -115,6 +165,7 @@ export function buildUserAchievementsView(
       unlocked,
       rarity: def.rarity,
       unlockedAt,
+      progress,
     };
   });
 
