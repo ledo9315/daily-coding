@@ -16,7 +16,7 @@ function formatDailyDateUtc(d: Date | null): string {
   }).format(d);
 }
 
-/** Gleiche Tagesgrenze wie `findDailyChallengeForApp` (UTC). */
+/** Same day boundary as `findDailyChallengeForApp` (UTC). */
 function isScheduledUtcToday(d: Date | null): boolean {
   if (!d) return false;
   const dayStart = startOfUtcDay(new Date());
