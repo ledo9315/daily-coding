@@ -32,9 +32,8 @@ beforeEach(() => {
 });
 
 /**
- * #35: Die Startseite muss wissen, ob die heutige Challenge schon abgegeben
- * wurde — sonst verspricht der Button „Challenge starten", was die Folgeseite
- * verweigert.
+ * #35: the dashboard needs to know whether today's challenge was already submitted —
+ * otherwise the button promises "start challenge" while the next page refuses.
  */
 describe("getTodayChallengeSummary", () => {
   it("reports no status without a user", async () => {

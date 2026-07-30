@@ -284,7 +284,7 @@ describe("submitSolution", () => {
     );
   });
 
-  // Regression zu #46: Die Lösezeit entsteht serverseitig, der Client schickt keine.
+  // Regression test for #46: the solve time is created server-side, the client sends none.
   it("sends no client-side solve duration in the submit body", async () => {
     mockOkResponse({ success: true, testCases: [] });
     await submitSolution("ch-1", "x", "javascript");

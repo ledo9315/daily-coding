@@ -38,8 +38,8 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
 
   // ─── Users ───────────────────────────────────────────────────────────────────
-  // Demo-Daten (Nutzer, Rankings, Submissions, Default-Admin) nur beim vollen Seed.
-  // Für Produktion: SEED_CONTENT_ONLY=true → nur Kategorien, Achievements, Challenges.
+  // Demo data (users, rankings, submissions, default admin) only on a full seed.
+  // For production set SEED_CONTENT_ONLY=true: categories, achievements, challenges only.
   const contentOnly = process.env.SEED_CONTENT_ONLY === "true";
 
   let anna!: { id: string }, tom!: { id: string }, max!: { id: string },
@@ -680,7 +680,7 @@ async function main() {
     },
   });
 
-  // ─── Weitere Challenges (LeetCode-/Codewars-Klassiker) ─────────────────────────
+  // ─── Further challenges (LeetCode / Codewars classics) ────────────────────────
 
   const twoSumFields = {
     supportedLanguages: [...supportedLangs],
@@ -1107,7 +1107,7 @@ async function main() {
     },
   });
 
-  // Diese Challenges werden nur angelegt (kein späterer Verweis nötig).
+  // These challenges are only created; nothing references them later.
   void [
     challengeTwoSum,
     challengeFizzBuzz,
@@ -1143,11 +1143,11 @@ async function main() {
     data: { emailVerified: true },
   });
 
-  // `isActive` bedeutet seit #67 „gehört zum Rotations-Pool", nicht „ist die
-  // heutige Aufgabe". Alle fertig ausgearbeiteten Aufgaben sind wählbar — sonst
-  // hätte die Rotation nur ein Element und die App zeigte dauerhaft dieselbe.
+  // Since #67, `isActive` means "part of the rotation pool", not "is today's
+  // challenge". Every finished challenge is eligible — otherwise the rotation would
+  // hold a single element and the app would serve the same challenge forever.
   await prisma.challenge.updateMany({ data: { isActive: true } });
-  // Explizites Datum gewinnt weiterhin: am Seed-Tag ist das die bekannte Aufgabe.
+  // An explicit date still wins: on the seed day that is the well-known challenge.
   await prisma.challenge.update({
     where: { id: challengeToday.id },
     data: { date: anchor },

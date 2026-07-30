@@ -86,14 +86,13 @@ model AchievementDef {
   createdAt    DateTime          @default(now())
 }
 
-/// Serverseitiger Startzeitpunkt der Bearbeitung. Entsteht beim ersten Abruf der
-/// Challenge und ist die einzige Quelle für die Lösezeit in der Rangliste —
-/// der Client darf sie nicht bestimmen.
-/// Gilt pro UTC-Tag: liegt `startedAt` vor dem heutigen Tagesbeginn, wird es beim
-/// ersten Abruf des Tages erneuert. Ein Tagesschlüssel in der Tabelle wäre
-/// sauberer, kostet aber eine Migration und ließe Altzeilen zurück.
-/// ponytail: Prüfung beim Lesen statt Spalte — umstellen, falls die Historie der
-/// Startzeitpunkte je gebraucht wird.
+/// Server-side start of work. Created on the first fetch of the challenge and the
+/// only source for the solve time in the ranking — the client must not decide it.
+/// Scoped per UTC day: if `startedAt` predates the start of today, it is renewed on
+/// the first fetch of the day. A day key in the table would be cleaner, but costs a
+/// migration and would leave stale rows behind.
+/// ponytail: checked on read instead of stored in a column — switch if the history
+/// of start times is ever needed.
 model ChallengeStart {
   userId      String
   challengeId String
@@ -133,13 +132,13 @@ model Challenge {
   hint        String?
   examples    Json         @default("[]")
   testCases   Json         @default("[]")
-  /// Optional: { "callableByLanguage": { "javascript": "fn", "typescript": "fn", "python": "sn_fn", "php": "fn" } } für stdin/stdout-Auswertung
+  /// Optional: { "callableByLanguage": { "javascript": "fn", "typescript": "fn", "python": "sn_fn", "php": "fn" } } for stdin/stdout grading
   evaluationConfig Json?
   /// @deprecated Prefer starterCodes; kept for seeds / legacy rows.
   starterCode String?
   /// All languages users may submit in for this challenge.
   supportedLanguages CodeLanguage[] @default([javascript, typescript, python, php])
-  /// Map language id → starter template (JSON object).
+  /// Map language id -> starter template (JSON object).
   starterCodes Json @default("{}")
   isActive    Boolean      @default(false)
   date        DateTime?    @unique

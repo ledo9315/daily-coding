@@ -82,7 +82,7 @@ function usesIoEvaluation(
 
 export type ChallengeExecutionMode = "run" | "submit";
 
-/** Summiert „123ms“-Zeiten aus Testfällen (Gesamtlaufzeit aller Läufe). */
+/** Sums the "123ms" durations of test cases into the total runtime of all runs. */
 export function sumDurationMsFromTestCases(cases: ChallengeTestCase[]): number {
   let sum = 0;
   for (const tc of cases) {
@@ -97,7 +97,7 @@ export function sumDurationMsFromTestCases(cases: ChallengeTestCase[]): number {
 export type ChallengeRunResult = {
   testCases: ChallengeTestCase[];
   runtimeOk: boolean;
-  /** Summe aller gemessenen Laufzeiten (Piston), für `Submission.timeTaken` (Sekunden). */
+  /** Sum of all measured runtimes (Piston), feeding `Submission.timeTaken` in seconds. */
   totalDurationMs: number;
 };
 
@@ -203,10 +203,10 @@ async function runPistonSmoke(
   const slots = list.length > 0 ? list : defaultSlots();
 
   if (mode === "submit") {
-    // Ohne echte I/O-Testfälle lässt sich eine Einreichung nicht auf Korrektheit
-    // prüfen. Kein Auto-Pass — sonst gäbe es volle Punkte für Code, der nur
-    // kompiliert. Betrifft fehlkonfigurierte Challenges (Seed-Demos ohne Config
-    // oder Admin-Challenges ohne Test-Cases).
+    // Without real I/O test cases a submission cannot be checked for
+    // correctness. No auto-pass — that would award full points for code that
+    // merely compiles. Affects misconfigured challenges: seed demos without a
+    // config, or admin-created challenges without test cases.
     const note =
       "Diese Challenge hat keine automatische Bewertung (Test-Cases mit Input/Expected) konfiguriert. Die Einreichung kann nicht gewertet werden.";
     return {

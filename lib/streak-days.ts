@@ -1,4 +1,4 @@
-/** YYYY-MM-DD in UTC für einen Zeitpunkt (für Mengen-Vergleiche). */
+/** YYYY-MM-DD in UTC for a point in time (used as a set key). */
 export function utcDayKey(d: Date): string {
   const y = d.getUTCFullYear();
   const m = String(d.getUTCMonth() + 1).padStart(2, "0");
@@ -7,10 +7,10 @@ export function utcDayKey(d: Date): string {
 }
 
 /**
- * Anzahl aufeinanderfolgender UTC-Tage endend bei `dayStartUtc`, an denen ein Eintrag in
- * `completedDays` liegt (Menge von `utcDayKey`).
+ * Number of consecutive UTC days ending at `dayStartUtc` that have an entry in
+ * `completedDays` (a set of `utcDayKey` values).
  */
-/** Alle `utcDayKey`-Tage der laufenden Serie rückwärts ab `dayStartUtc` (inkl. Starttag). */
+/** All `utcDayKey` days of the running streak, walking back from `dayStartUtc` (inclusive). */
 export function currentStreakDayKeys(
   dayStartUtc: Date,
   completedDays: Set<string>

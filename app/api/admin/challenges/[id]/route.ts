@@ -77,10 +77,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         { status: 400 },
       );
     }
-    // Auf UTC-Mitternacht normalisieren: die Uhrzeit hat keine Wirkung (die
-    // Tagesaufgabe gilt für den ganzen UTC-Tag), und ein Zeitstempel mitten am
-    // Tag würde den `@unique`-Constraint entwerten — dann wären zwei Aufgaben
-    // am selben Tag möglich und eine davon unsichtbar (#71).
+    // Normalise to UTC midnight: the time of day has no effect, since the daily
+    // challenge covers the whole UTC day, and a timestamp in the middle of the day
+    // would defeat the `@unique` constraint — two challenges could then share a day
+    // and one of them would be invisible (#71).
     date = startOfUtcDay(d);
   }
 

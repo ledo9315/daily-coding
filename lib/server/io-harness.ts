@@ -1,7 +1,8 @@
 import type { CodeLanguageId } from "@/lib/challenge-languages";
 
 /**
- * Vergleicht Programmausgabe mit Erwartung (trim, optional JSON-Normalisierung).
+ * Compares program output against the expectation (trimmed, optionally with JSON
+ * normalisation).
  */
 export function outputsMatch(actual: string, expected: string): boolean {
   const a = actual.trim();
@@ -17,7 +18,8 @@ export function outputsMatch(actual: string, expected: string): boolean {
 }
 
 /**
- * Rohes stdout von Piston (z. B. PHP-Notices vor der JSON-Zeile) auf die nutzbare JSON-Ausgabe reduzieren.
+ * Reduces raw Piston stdout — which may carry e.g. PHP notices before the JSON
+ * line — down to the usable JSON output.
  */
 export function extractIoProgramOutput(raw: string): string {
   const t = raw.trim();
@@ -47,7 +49,8 @@ export function extractIoProgramOutput(raw: string): string {
 }
 
 /**
- * User-Code zu einem vollständigen Programm: liest eine JSON-Zeile von stdin, ruft callable(data), schreibt JSON.stringify(result) nach stdout.
+ * Wraps user code into a complete program: reads one JSON line from stdin, calls
+ * callable(data), writes JSON.stringify(result) to stdout.
  */
 export function buildWrappedProgram(
   language: CodeLanguageId,

@@ -20,7 +20,7 @@ export function nextLevelThreshold(level: number): number {
   return Math.round(100 * (Math.pow(2, level) - 1));
 }
 
-/** Kurzer Stufenname für die UI (abhängig vom Level, nicht hardcodiert pro Screen). */
+/** Short tier name for the UI, derived from the level instead of hardcoded per screen. */
 export function levelTitleDe(level: number): string {
   const l = Math.max(1, Math.floor(level));
   if (l <= 1) return "Einsteiger";
@@ -30,7 +30,7 @@ export function levelTitleDe(level: number): string {
   return "Legende";
 }
 
-/** Level-Aufstieg im Feed: Stufenname bleibt in Klammern (z. B. „hat Level 3 (Aufsteiger) erreicht“). */
+/** Level-up in the feed: the tier name stays in parentheses (e.g. „hat Level 3 (Aufsteiger) erreicht“). */
 export function levelUpSentenceDe(level: number): string {
   const l = Math.max(1, Math.floor(level));
   return `hat Level ${l} (${levelTitleDe(l)}) erreicht`;

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-/** Summe der Challenge-Punkte aller abgeschlossenen Submissions pro User (Lifetime). */
+/** Lifetime sum of challenge points across a user's completed submissions. */
 export async function getLifetimePointsByUserIds(
   userIds: string[]
 ): Promise<Map<string, number>> {

@@ -51,7 +51,7 @@ export function RegisterForm() {
           verificationEmailSent = data.verificationEmailSent;
         }
       } catch {
-        /* keine JSON-Antwort (z. B. 500 HTML) */
+        /* not a JSON response, e.g. a 500 HTML page */
       }
 
       if (!res.ok) {

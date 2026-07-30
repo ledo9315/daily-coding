@@ -3,7 +3,8 @@ import { auth } from "@/auth";
 import { getUserRoleFromDb } from "@/lib/server/user-role";
 
 /**
- * Liefert die aktuelle Rolle aus der DB (für UI, z. B. Admin-Link im Header).
+ * Returns the current role from the DB, for UI decisions such as showing the
+ * admin link in the header.
  */
 export async function GET() {
   const session = await auth();

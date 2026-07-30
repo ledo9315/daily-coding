@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Installiert Laufzeiten über GET /api/v2/packages + POST /api/v2/packages.
- * Im pkgs/index heißt die Node-Runtime „node“, nicht „javascript“ — sonst 404 / leere Filter.
+ * Installs runtimes via GET /api/v2/packages + POST /api/v2/packages.
+ * In pkgs/index the Node runtime is called "node", not "javascript" — using the
+ * wrong name yields a 404 or an empty filter result.
  *
- * Env: PISTON_API_URL oder PISTON_URL (Standard http://127.0.0.1:2000)
+ * Env: PISTON_API_URL or PISTON_URL (defaults to http://127.0.0.1:2000)
  */
 const origin = (
   process.env.PISTON_API_URL ||
@@ -15,7 +16,7 @@ const origin = (
 const packagesUrl = `${origin}/api/v2/packages`;
 const runtimesUrl = `${origin}/api/v2/runtimes`;
 
-/** Unsere App-Sprache → Name in Piston pkgs/index (ppman) */
+/** Our app language id -> the name used in Piston's pkgs/index (ppman) */
 const RUNTIME_INSTALL = [
   { app: "javascript", pkg: "node" },
   { app: "typescript", pkg: "typescript" },
@@ -23,7 +24,7 @@ const RUNTIME_INSTALL = [
   { app: "php", pkg: "php" },
 ];
 
-/** Grober semver-Vergleich (höhere Version zuerst bei aufsteigendem sort) */
+/** Rough semver comparison — higher versions come first under an ascending sort */
 function compareSemverDesc(a, b) {
   const core = (v) => v.split("-")[0].split("+")[0];
   const pa = core(a)

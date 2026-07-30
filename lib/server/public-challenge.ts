@@ -1,8 +1,9 @@
 const VALID_STATUS = new Set(["pending", "passed", "failed"]);
 
 /**
- * Entfernt sensible Felder aus Testfällen für öffentliche Challenge-APIs (kein expected vor der Auswertung).
- * Setzt fehlendes `status` auf `pending`, damit Clients (z. B. TestResults) nicht crashen.
+ * Strips sensitive fields from test cases for the public challenge APIs — no
+ * `expected` before grading. Fills a missing `status` with `pending` so clients
+ * such as TestResults do not crash.
  */
 export function stripTestCaseSecretsForClient(raw: unknown): unknown {
   if (!Array.isArray(raw)) return raw;
