@@ -25,6 +25,9 @@ async function serverSolveDurationSeconds(
     select: { startedAt: true },
   });
   if (!start) return null;
+  // Startzeitpunkt aus einem Vortag ignorieren — sonst landet eine Lösezeit von
+  // vielen Stunden als Sortierschlüssel in der Rangliste (#68).
+  if (start.startedAt < utcDayRange().gte) return null;
   const seconds = Math.floor((Date.now() - start.startedAt.getTime()) / 1000);
   if (seconds < 0) return null;
   return Math.min(Math.max(1, seconds), MAX_SOLVE_DURATION_SECONDS);
