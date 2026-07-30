@@ -55,6 +55,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt: async ({ token, user, account, trigger, session }) => {
       // OAuth sign-in: find/create DB user and set DB-based token fields
       if (isFederatedAccount(account)) {
+        // NextAuth fills `token.picture` from the provider profile on its own. Drop it
+        // before anything else, so the URL cannot survive in the JWT via the error
+        // paths below — the avatar comes from the database or not at all (#86).
+        delete token.picture;
         try {
           const oauthAccount = {
             provider: account.provider,
@@ -68,7 +72,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const dbUser = email
             ? await findOrCreateOAuthUser(
-                { email, name: user?.name, image: user?.image },
+                // The provider's picture URL is deliberately not passed on (#86).
+                { email, name: user?.name },
                 oauthAccount
               )
             : await findOAuthUserByAccount(oauthAccount);
