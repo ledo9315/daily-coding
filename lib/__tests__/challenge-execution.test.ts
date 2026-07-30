@@ -9,10 +9,7 @@ vi.mock("@/lib/server/piston-runner", () => ({
 }));
 
 import { executeWithPiston } from "@/lib/server/piston-runner";
-import {
-  runChallengeTests,
-  sumDurationMsFromTestCases,
-} from "@/lib/server/challenge-execution";
+import { runChallengeTests } from "@/lib/server/challenge-execution";
 
 const mockExecute = vi.mocked(executeWithPiston);
 
@@ -40,18 +37,6 @@ function pistonFail(msg: string) {
 
 beforeEach(() => {
   mockExecute.mockReset();
-});
-
-describe("sumDurationMsFromTestCases", () => {
-  it("parses ms values and ignores em dash placeholders", () => {
-    expect(
-      sumDurationMsFromTestCases([
-        { id: 1, name: "a", status: "passed", time: "100ms" },
-        { id: 2, name: "b", status: "passed", time: "50ms" },
-        { id: 3, name: "c", status: "passed", time: "—" },
-      ])
-    ).toBe(150);
-  });
 });
 
 describe("runChallengeTests (IO evaluation)", () => {
@@ -84,19 +69,6 @@ describe("runChallengeTests (IO evaluation)", () => {
     expect(runtimeOk).toBe(true);
     expect(testCases.every((t) => t.status === "passed")).toBe(true);
     expect(mockExecute).toHaveBeenCalledTimes(2);
-  });
-
-  it("sums totalDurationMs across all IO runs", async () => {
-    mockExecute.mockResolvedValueOnce(pistonOk("[1]")).mockResolvedValueOnce(pistonOk("[99]"));
-
-    const { totalDurationMs } = await runChallengeTests(
-      ioChallenge,
-      "function solve(x){return x;}",
-      "javascript",
-      "submit"
-    );
-
-    expect(totalDurationMs).toBe(16);
   });
 
   it("sets runtimeOk=false when stdout differs from expected", async () => {

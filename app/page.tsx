@@ -112,10 +112,9 @@ export default async function DashboardPage() {
 
         <div className="mb-12">
           <RankingPreviewCard
-            title="TAGES-RANKING"
-            users={rankingPreview.today}
+            title="WOCHEN-RANKING"
+            users={rankingPreview.week}
             href="/ranking"
-            showTime
           />
         </div>
 

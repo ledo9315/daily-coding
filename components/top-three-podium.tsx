@@ -2,15 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import { avatarImageSrc } from "@/lib/avatar-src";
 import { cn } from "@/lib/utils";
-import { Clock, Trophy } from "@nsmr/pixelart-react";
+import { Trophy } from "@nsmr/pixelart-react";
 
 interface TopUser {
   name: string;
   avatar?: string;
   initials: string;
   points: number;
-  /** Used by variant="time" (the daily speed ranking). */
-  time?: string;
   level?: number;
 }
 
@@ -24,32 +22,15 @@ interface TopThreePodiumProps {
   second?: TopUser;
   third?: TopUser;
   className?: string;
-  /** Daily ranking: show the time instead of the identical challenge points. */
-  variant?: "points" | "time";
 }
 
 function PodiumMetric({
   user,
-  variant,
   pointsHighlight,
 }: {
   user: TopUser;
-  variant: "points" | "time";
   pointsHighlight?: boolean;
 }) {
-  if (variant === "time") {
-    return (
-      <div
-        className={cn(
-          "flex items-center justify-center gap-1.5 font-mono text-base tabular-nums tracking-tight",
-          pointsHighlight && "text-primary font-semibold",
-        )}
-      >
-        <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <span>{user.time ?? "—"}</span>
-      </div>
-    );
-  }
   return (
     <PointsChip
       points={user.points}
@@ -64,7 +45,6 @@ export function TopThreePodium({
   second,
   third,
   className,
-  variant = "points",
 }: TopThreePodiumProps) {
   const fallbackBase =
     "font-sans font-semibold tracking-tight bg-gradient-to-b from-zinc-600 to-zinc-900 text-zinc-100 ring-1 ring-inset ring-white/15";
@@ -93,7 +73,7 @@ export function TopThreePodium({
                 Level {second.level}
               </span>
             )}
-            <PodiumMetric user={second} variant={variant} />
+            <PodiumMetric user={second} />
           </div>
           <div className="mt-3 flex h-24 w-24 flex-col items-center justify-start rounded-none bg-zinc-400/20 pt-4">
             <Trophy className="h-8 w-8 text-zinc-400" />
@@ -125,7 +105,7 @@ export function TopThreePodium({
               Level {first.level}
             </span>
           )}
-          <PodiumMetric user={first} variant={variant} pointsHighlight />
+          <PodiumMetric user={first} pointsHighlight />
         </div>
         <div className="mt-3 flex h-32 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-500/20 pt-4">
           <Trophy className="h-8 w-8 text-amber-500" />
@@ -155,7 +135,7 @@ export function TopThreePodium({
                 Level {third.level}
               </span>
             )}
-            <PodiumMetric user={third} variant={variant} />
+            <PodiumMetric user={third} />
           </div>
           <div className="mt-3 flex h-16 w-24 flex-col items-center justify-start rounded-t-lg bg-amber-700/20 pt-2">
             <Trophy className="h-6 w-6 text-amber-700" />

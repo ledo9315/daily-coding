@@ -39,15 +39,14 @@ describe("GET /api/ranking", () => {
     userId: "user-1",
     rank: 1,
     user: { id: "user-1", name: "Alice", initials: "AL", avatar: "🐱" },
-    timeSeconds: 222 as number | null,
     points: 500,
-    challengesSolved: undefined as number | undefined,
+    challengesSolved: 3,
     ...overrides,
   });
 
-  it("returns 200 with mapped ranking entries for period=today", async () => {
+  it("returns 200 with mapped ranking entries for period=week", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([liveRow()]);
-    const res = await getRankingHandler(makeRequest("today"));
+    const res = await getRankingHandler(makeRequest("week"));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toHaveLength(1);
@@ -55,23 +54,30 @@ describe("GET /api/ranking", () => {
       rank: 1,
       name: "Alice",
       points: 500,
-      time: "3:42",
+      challengesSolved: 3,
     });
     expect(json[0]).toHaveProperty("level", 1);
-    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
   });
 
-  it("defaults to period=today when param is absent", async () => {
+  // #91: "today" is gone as a period. An absent, legacy or invalid value must not error.
+  it("defaults to period=week when param is absent", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([]);
     const res = await getRankingHandler(makeRequest());
     expect(res.status).toBe(200);
-    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
+  });
+
+  it("falls back to week for the retired today period", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([]);
+    const res = await getRankingHandler(makeRequest("today"));
+    expect(res.status).toBe(200);
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
   });
 
   it("uses period=week when specified", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([
       liveRow({
-        timeSeconds: null,
         points: 1200,
         challengesSolved: 5,
       }),
@@ -86,15 +92,15 @@ describe("GET /api/ranking", () => {
     expect(mockGetLiveRanking).toHaveBeenCalledWith("month");
   });
 
-  it("falls back to today for an invalid period", async () => {
+  it("falls back to week for an invalid period", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("invalid"));
-    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
   });
 
   it("omits time for week and month responses", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([
-      liveRow({ timeSeconds: null, challengesSolved: 3 }),
+      liveRow({ challengesSolved: 3 }),
     ]);
     const resWeek = await getRankingHandler(makeRequest("week"));
     expect((await resWeek.json())[0]).not.toHaveProperty("time");
@@ -102,26 +108,12 @@ describe("GET /api/ranking", () => {
 
   it("includes challengesSolved for week/month when present", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([
-      liveRow({ timeSeconds: null, challengesSolved: 4, points: 800 }),
+      liveRow({ challengesSolved: 4, points: 800 }),
     ]);
     const res = await getRankingHandler(makeRequest("month"));
     const row = (await res.json())[0];
     expect(row.challengesSolved).toBe(4);
     expect(row).not.toHaveProperty("time");
-  });
-
-  it("formats time for today when timeSeconds is null as '-' via formatTime", async () => {
-    mockGetLiveRanking.mockResolvedValueOnce([liveRow({ timeSeconds: null })]);
-    const res = await getRankingHandler(makeRequest("today"));
-    const json = await res.json();
-    expect(json[0].time).toBe("-");
-  });
-
-  it("formats timeSeconds as M:SS for today", async () => {
-    mockGetLiveRanking.mockResolvedValueOnce([liveRow({ timeSeconds: 263 })]);
-    const res = await getRankingHandler(makeRequest("today"));
-    const json = await res.json();
-    expect(json[0].time).toBe("4:23");
   });
 
   it("returns empty array when no entries exist", async () => {
@@ -131,10 +123,10 @@ describe("GET /api/ranking", () => {
     expect(json).toEqual([]);
   });
 
-  it("does not handle team period (falls back to today)", async () => {
+  it("does not handle team period (falls back to week)", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("team"));
-    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
   });
 });
 
@@ -145,25 +137,25 @@ describe("GET /api/ranking/preview", () => {
     userId: "user-bob",
     rank: 1,
     user: { id: "user-bob", name: "Bob", initials: "BO", avatar: "🐶" },
-    timeSeconds: 120,
     points: 300,
+    challengesSolved: 2,
   });
 
-  it("returns 200 with today preview", async () => {
+  it("returns 200 with the week preview", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([previewLiveRow()]);
     mockGetLifetimePointsByUserIds.mockResolvedValueOnce(new Map([["user-bob", 0]]));
     const res = await getRankingPreviewHandler();
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toHaveProperty("today");
-    expect(json.today).toHaveLength(1);
-    expect(json.today[0]).toMatchObject({
+    expect(json).toHaveProperty("week");
+    expect(json.week).toHaveLength(1);
+    expect(json.week[0]).toMatchObject({
       rank: 1,
       name: "Bob",
       points: 300,
-      time: "2:00",
+      challengesSolved: 2,
     });
-    expect(json.today[0]).toHaveProperty("level", 1);
+    expect(json.week[0]).toHaveProperty("level", 1);
   });
 
   it("does not include a team property", async () => {
@@ -183,27 +175,26 @@ describe("GET /api/ranking/preview", () => {
         initials: "U",
         avatar: "🐱",
       },
-      timeSeconds: 100 + i,
       points: 50,
     }));
     mockGetLiveRanking.mockResolvedValueOnce(six);
     mockGetLifetimePointsByUserIds.mockResolvedValue(new Map());
     const res = await getRankingPreviewHandler();
     const json = await res.json();
-    expect(json.today).toHaveLength(5);
+    expect(json.week).toHaveLength(5);
   });
 
-  it("returns empty today array when no entries", async () => {
+  it("returns an empty week array when no entries exist", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([]);
     const res = await getRankingPreviewHandler();
     const json = await res.json();
-    expect(json.today).toEqual([]);
+    expect(json.week).toEqual([]);
   });
 
   it("queries live ranking + lifetime points", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingPreviewHandler();
-    expect(mockGetLiveRanking).toHaveBeenCalledWith("today");
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("week");
     expect(mockGetLifetimePointsByUserIds).toHaveBeenCalled();
   });
 });

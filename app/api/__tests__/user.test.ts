@@ -214,7 +214,6 @@ describe("GET /api/user/profile", () => {
   const submission = {
     id: "sub-1",
     status: "completed",
-    timeTaken: 185,
     rank: 2,
     createdAt: new Date("2026-03-15T10:00:00Z"),
     challenge: {
@@ -298,28 +297,17 @@ describe("GET /api/user/profile", () => {
     });
   });
 
-  it("formats timeTaken as M:SS string", async () => {
+  // #91: the solve-time measurement is gone, so the history carries no duration.
+  it("returns no time in the challenge history", async () => {
     mockUserFindUnique.mockResolvedValueOnce({
       ...baseUser,
       achievements: [],
-      submissions: [{ ...submission, timeTaken: 185 }],
+      submissions: [submission],
     });
     mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
     const res = await getUserProfileHandler();
     const json = await res.json();
-    expect(json.challengeHistory[0].time).toBe("3:05");
-  });
-
-  it("formats null timeTaken as '-'", async () => {
-    mockUserFindUnique.mockResolvedValueOnce({
-      ...baseUser,
-      achievements: [],
-      submissions: [{ ...submission, timeTaken: null }],
-    });
-    mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
-    const res = await getUserProfileHandler();
-    const json = await res.json();
-    expect(json.challengeHistory[0].time).toBe("-");
+    expect(json.challengeHistory[0]).not.toHaveProperty("time");
   });
 
   it("returns the all-time place in the profile stats", async () => {
