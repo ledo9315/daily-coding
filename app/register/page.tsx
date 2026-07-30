@@ -22,7 +22,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
           <h1 className="mb-2 flex items-center justify-center gap-3 font-pixel text-2xl leading-tight tracking-tighter">
-            <span className="text-xl text-primary">{">_"}</span>
+            <span className="text-4xl text-primary">{">_"}</span>
             {/* Stacked and left-aligned, the same shape as the header on every
                 signed-in page — one logo, not two. */}
             <span className="text-left">
