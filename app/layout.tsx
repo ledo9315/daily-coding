@@ -26,8 +26,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Daily Dev - Daily Coding Challenges",
-  description: "Compete in daily coding challenges with your team",
+  // Same tagline as the mail footer, so the name reads identically everywhere (#109).
+  title: "Daily Coding – täglich eine Coding-Challenge",
+  description:
+    "Löse jeden Tag eine neue Coding-Challenge in JavaScript, TypeScript, Python oder PHP und steige im Ranking auf.",
   generator: "v0.app",
   icons: {
     icon: [

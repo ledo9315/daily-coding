@@ -28,7 +28,7 @@ async function send(to: string, subject: string, content: EmailContent): Promise
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
   const url = `${getAppUrl()}/auth/verify-email?token=${token}`;
-  await send(to, "E-Mail Adresse bestätigen – Daily Dev", {
+  await send(to, "E-Mail Adresse bestätigen – Daily Coding", {
     heading: "E-Mail bestätigen",
     lines: [
       "Fast fertig. Bestätige deine Adresse, dann kannst du mit der ersten Challenge anfangen.",
@@ -40,7 +40,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
 
 export async function sendPasswordResetEmail(to: string, token: string): Promise<void> {
   const url = `${getAppUrl()}/auth/reset-password?token=${token}`;
-  await send(to, "Passwort zurücksetzen – Daily Dev", {
+  await send(to, "Passwort zurücksetzen – Daily Coding", {
     heading: "Passwort zurücksetzen",
     lines: ["Du kannst hier ein neues Passwort für dein Konto setzen."],
     action: { label: "Neues Passwort setzen", url },
@@ -50,7 +50,7 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
 }
 
 export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
-  await send(to, "Willkommen bei Daily Dev!", {
+  await send(to, "Willkommen bei Daily Coding!", {
     heading: `Willkommen, ${name}`,
     lines: [
       "Jeden Tag wartet eine neue Coding-Challenge auf dich — in JavaScript, TypeScript, Python oder PHP.",
@@ -62,10 +62,10 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
 }
 
 export async function sendAccountDeletionEmail(to: string, name: string): Promise<void> {
-  await send(to, "Konto gelöscht – Daily Dev", {
+  await send(to, "Konto gelöscht – Daily Coding", {
     heading: "Konto gelöscht",
     lines: [
-      `Hallo ${name || "und tschüss"}, dein Daily-Dev-Konto wurde gelöscht.`,
+      `Hallo ${name || "und tschüss"}, dein Daily-Coding-Konto wurde gelöscht.`,
       "Deine Abgaben und dein Punktestand sind damit entfernt.",
     ],
     footer:
