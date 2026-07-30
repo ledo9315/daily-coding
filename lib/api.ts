@@ -139,6 +139,11 @@ export interface DailyChallenge {
     submittedAt: string;
     code: string;
     language: string;
+    /**
+     * Bewertete Testfälle dieser Abgabe. null bei Altdaten ohne gespeicherte
+     * Ergebnisse — dann greift die Vorlage der Challenge.
+     */
+    testResults: ChallengeTestCase[] | null;
   } | null;
   /**
    * Serverseitiger Start der Bearbeitung (ISO). Quelle für die angezeigte
