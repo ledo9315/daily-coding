@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { renderEmail } from "@/lib/server/email-template";
 
@@ -49,6 +49,38 @@ describe("branding", () => {
   it("declares the canonical site URL as metadataBase", () => {
     const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
     expect(layout).toContain('metadataBase: new URL("https://daily-coding.de")');
+  });
+
+  /**
+   * #113: `public/screen.png` was the image on the landing page. It showed the pre-#109
+   * brand name, Batman and a My-Little-Pony avatar — the protected characters #39 is about
+   * — and the daily ranking removed in #91. Replaced by a current screenshot; the guard is
+   * here so it cannot creep back into a hero or a metadata field.
+   */
+  it("renders no image file that is missing from public/", () => {
+    /**
+     * Only `src=` and `url:` — the places that actually load an image. A path compared
+     * against, like the rejected `/placeholder.svg` in `lib/avatar-src.ts`, is not a
+     * reference and must not trip this.
+     */
+    const asSource = /(?:src=|url:\s*)["'](\/[\w-]+\.(?:png|jpg|jpeg|svg|webp))["']/g;
+    const missing: string[] = [];
+    for (const root of ROOTS) {
+      for (const file of sourceFiles(resolve(process.cwd(), root))) {
+        for (const match of readFileSync(file, "utf8").matchAll(asSource)) {
+          if (!existsSync(resolve(process.cwd(), "public", match[1].slice(1)))) {
+            missing.push(`${file.replace(process.cwd() + "/", "")}: ${match[1]}`);
+          }
+        }
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it("declares an Open Graph image", () => {
+    const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
+    expect(layout).toContain('url: "/og.png"');
+    expect(layout).toContain('card: "summary_large_image"');
   });
 
   it("names the product in the mail layout", () => {
