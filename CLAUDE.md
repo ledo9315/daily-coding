@@ -32,6 +32,13 @@ pnpm piston:install         # Install language runtimes into the running Piston 
 
 **Local DB URL:** `postgresql://daily_dev:daily_dev_secret@localhost:5433/daily_dev`
 
+**PostgreSQL version:** the local image in `docker-compose.yml` must track the major
+version of the production database (Neon, currently 17). `pg_dump` refuses to run
+against a newer server, so a divergence means no usable backup of production. When
+Neon bumps its major version, bump the image too: the data directory in the
+`daily_dev_pgdata` volume is version-specific, so dump first, remove the volume,
+then restore (a dump from an older major restores into a newer one, not the reverse).
+
 ### Migration history
 
 `prisma/migrations` holds a single baseline, `0_init`, generated from the schema on
