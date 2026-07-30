@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Coin } from "@nsmr/pixelart-react";
 
 interface PointsChipProps {
   points: number;
@@ -8,6 +7,42 @@ interface PointsChipProps {
   className?: string;
 }
 
+/**
+ * Pixel star on a 9x9 grid, one `rect` per horizontal run.
+ *
+ * `@nsmr/pixelart-react` ships no plain star — only `MoonStar`/`MoonStars`, which mean
+ * something else. Drawing nine rectangles is cheaper than pulling in a second icon
+ * library for a single glyph, and `crispEdges` keeps the blocky look of the set.
+ */
+function PixelStar({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 9 9"
+      className={className}
+      fill="currentColor"
+      shapeRendering="crispEdges"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="4" y="0" width="1" height="1" />
+      <rect x="3" y="1" width="3" height="2" />
+      <rect x="0" y="3" width="9" height="1" />
+      <rect x="1" y="4" width="7" height="1" />
+      <rect x="2" y="5" width="5" height="2" />
+      <rect x="1" y="7" width="2" height="1" />
+      <rect x="6" y="7" width="2" height="1" />
+      <rect x="0" y="8" width="2" height="1" />
+      <rect x="7" y="8" width="2" height="1" />
+    </svg>
+  );
+}
+
+/**
+ * Points are a pure score: they are collected, never spent. There is no shop and no
+ * unlock priced in points, so the previous coin icon promised an economy that does not
+ * exist (#38). A star reads as "collected", and it collides with neither `Zap` (streak)
+ * nor `Trophy` (rank).
+ */
 export function PointsChip({
   points,
   size = "md",
@@ -37,10 +72,7 @@ export function PointsChip({
         className,
       )}
     >
-      <Coin
-        className={cn(iconSizes[size], "fill-current shrink-0")}
-        fill="currentColor"
-      />
+      <PixelStar className={cn(iconSizes[size], "shrink-0")} />
       <span className="translate-y-px font-sans">
         {points.toLocaleString("de-DE")}
       </span>
