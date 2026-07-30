@@ -112,7 +112,7 @@ Supported languages: `javascript`, `typescript`, `python`, `php` (matches `CodeL
 ## Testing conventions
 
 - Unit tests: Vitest, colocated in `__tests__/` next to the code under test
-- E2E tests: Playwright, under `e2e/`
+- No end-to-end tests exist. Playwright is not installed; `e2e/` does not exist.
 - Test environment is `node` (see `vitest.config.ts`) — no DOM globals by default
 - Path alias `@/` resolves to project root
 - `describe`/`it` descriptions in English (see language convention below)
