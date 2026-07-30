@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { isAllowedUserAvatarPath, USER_AVATAR_PATHS } from "@/lib/user-avatars";
+import {
+  isAllowedUserAvatarPath,
+  starterAvatarPath,
+  USER_AVATAR_PATHS,
+} from "@/lib/user-avatars";
 
 /** Width and height from the PNG header — bytes 16..24, no decoding needed. */
 function pngSize(file: string): { width: number; height: number } {
@@ -19,6 +23,32 @@ describe("isAllowedUserAvatarPath", () => {
   it("rejects arbitrary paths", () => {
     expect(isAllowedUserAvatarPath("/evil.png")).toBe(false);
     expect(isAllowedUserAvatarPath("/user/fake.png")).toBe(false);
+  });
+});
+
+describe("starterAvatarPath", () => {
+  it("returns a path from the list", () => {
+    expect(isAllowedUserAvatarPath(starterAvatarPath("max@example.com"))).toBe(true);
+  });
+
+  it("returns the same avatar for the same seed", () => {
+    expect(starterAvatarPath("max@example.com")).toBe(starterAvatarPath("max@example.com"));
+  });
+
+  it("spreads different seeds across the set", () => {
+    const seeds = Array.from({ length: 60 }, (_, i) => `user${i}@example.com`);
+    const distinct = new Set(seeds.map(starterAvatarPath));
+    // Not a uniformity claim — just that it is not one avatar for everybody, which is
+    // the whole reason for deriving it (#101).
+    expect(distinct.size).toBeGreaterThan(USER_AVATAR_PATHS.length / 2);
+  });
+
+  it("ignores case, so the same address cannot yield two avatars", () => {
+    expect(starterAvatarPath("Max@Example.com")).toBe(starterAvatarPath("max@example.com"));
+  });
+
+  it("still returns a valid path for an empty seed", () => {
+    expect(isAllowedUserAvatarPath(starterAvatarPath(""))).toBe(true);
   });
 });
 
