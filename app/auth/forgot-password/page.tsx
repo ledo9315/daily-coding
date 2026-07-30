@@ -52,9 +52,15 @@ export default function ForgotPasswordPage() {
 
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
-          <h1 className="text-2xl font-pixel mb-2 tracking-tighter">
-            <span className="text-xl font-pixel tracking-tighter text-primary">{">_"}</span>{" "}
-            DAILY CODING
+          <h1 className="mb-2 flex items-center justify-center gap-3 font-pixel text-2xl leading-tight tracking-tighter">
+            <span className="text-xl text-primary">{">_"}</span>
+            {/* Stacked and left-aligned, the same shape as the header on every
+                signed-in page — one logo, not two. */}
+            <span className="text-left">
+              DAILY
+              <br />
+              CODING
+            </span>
           </h1>
         </div>
 
