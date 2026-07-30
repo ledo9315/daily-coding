@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { SubmitCelebration } from "@/lib/api";
-import { Trophy, Zap } from "@nsmr/pixelart-react";
+import { Zap } from "@nsmr/pixelart-react";
 import { TestResults, type TestCase } from "@/components/test-results";
+import { PixelStar } from "@/components/points-chip";
 
 /** Own fullscreen canvas via `confetti.create` — more reliable than the global default canvas, which suffers from stacking issues in Next/Radix. */
 const CONFETTI_LAYER_Z = 10050;
@@ -140,7 +141,7 @@ export function ChallengeSuccessModal({
             <div className="grid grid-cols-1 gap-4">
               <div className="flex flex-col gap-2 rounded-none border border-amber-500/30 bg-amber-500/5 px-5 py-4 min-h-22 justify-center">
                 <span className="flex items-center gap-2 text-xs uppercase tracking-wider text-amber-600/90 dark:text-amber-400/90 font-semibold">
-                  <Trophy className="h-4 w-4 shrink-0" fill="currentColor" />
+                  <PixelStar className="h-3 w-3 shrink-0" />
                   Punkte
                 </span>
                 <span className="font-mono text-3xl sm:text-4xl tabular-nums text-amber-500 font-bold">
