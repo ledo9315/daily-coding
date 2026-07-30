@@ -25,6 +25,9 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
 });
 
+const OG_ALT =
+  "Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge";
+
 export const metadata: Metadata = {
   /**
    * Without this, Open-Graph and canonical URLs come out relative, and a relative URL in
@@ -40,6 +43,21 @@ export const metadata: Metadata = {
   title: "Daily Coding – täglich eine Coding-Challenge",
   description:
     "Löse jeden Tag eine neue Coding-Challenge in JavaScript, TypeScript, Python oder PHP und steige im Ranking auf.",
+  /**
+   * The card a shared link shows. `og.png` is the dashboard screenshot scaled to fit
+   * 1200x630 and padded with the background colour, not cropped — cropping to that ratio
+   * would have cut the logo off the top edge (#113).
+   *
+   * A static file rather than a generated one: the screenshot shows what the app actually
+   * looks like today, which a drawn card cannot.
+   */
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    siteName: "Daily Coding",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: OG_ALT }],
+  },
+  twitter: { card: "summary_large_image", images: [{ url: "/og.png", alt: OG_ALT }] },
   generator: "v0.app",
   icons: {
     icon: [
