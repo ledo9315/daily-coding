@@ -35,3 +35,6 @@ next-env.d.ts
 data/
 .pnpm-store/
 .worktrees
+
+# E-Mail-Vorschau (scripts/preview-emails.ts)
+.email-preview.html
