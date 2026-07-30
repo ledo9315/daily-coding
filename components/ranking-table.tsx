@@ -152,18 +152,25 @@ export function RankingTable({
                           {entry.initials}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">{entry.name}</p>
+                      <div className="min-w-0">
+                        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                          <p className="min-w-0 font-medium break-words">{entry.name}</p>
                           {entry.level && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                            /*
+                              `shrink-0` and `whitespace-nowrap`: as a shrinking flex item
+                              the badge broke into "Lvl" over "2" as soon as the name took
+                              the width (#79). Two words on two lines in a chip that small
+                              reads as broken, so it keeps its size and the name wraps.
+                            */
+                            <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
                               Lvl {entry.level}
                             </span>
                           )}
                         </div>
                         {entry.challengesSolved !== undefined && (
                           <p className="text-sm text-muted-foreground">
-                            {entry.challengesSolved} Challenges gelöst
+                            {entry.challengesSolved}{" "}
+                            {entry.challengesSolved === 1 ? "Challenge" : "Challenges"} gelöst
                           </p>
                         )}
                       </div>
