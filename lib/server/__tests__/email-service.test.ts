@@ -19,6 +19,7 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail,
   sendWelcomeEmail,
+  sendAccountDeletionEmail,
 } from "@/lib/server/email-service";
 
 beforeEach(() => vi.clearAllMocks());
@@ -61,5 +62,48 @@ describe("sendWelcomeEmail", () => {
         html: expect.stringContaining("Max"),
       })
     );
+  });
+});
+
+/** #105: design, a plain-text part, and an escaped name. */
+describe("every mail", () => {
+  it("sends a plain-text part alongside the HTML", async () => {
+    mockSend.mockResolvedValue({ data: { id: "e4" }, error: null });
+    await sendVerificationEmail("user@test.com", "tok");
+    const sent = mockSend.mock.calls[0][0] as { text: string; html: string };
+    // HTML-only mail is filtered as spam far more often.
+    expect(sent.text).toContain("https://app.example.com/auth/verify-email?token=tok");
+    expect(sent.text).not.toContain("<");
+  });
+
+  it("uses the project palette in the HTML part", async () => {
+    mockSend.mockResolvedValue({ data: { id: "e5" }, error: null });
+    await sendPasswordResetEmail("user@test.com", "tok");
+    const sent = mockSend.mock.calls[0][0] as { html: string };
+    expect(sent.html).toContain("#0d1117");
+    expect(sent.html).toContain("#c4fe4d");
+  });
+
+  it("escapes a name that contains markup instead of sending it as a link", async () => {
+    mockSend.mockResolvedValue({ data: { id: "e6" }, error: null });
+    await sendWelcomeEmail("user@test.com", '<a href="http://phish.example">Konto</a>');
+    const sent = mockSend.mock.calls[0][0] as { html: string };
+    /**
+     * The URL still appears as visible text, and some clients turn bare URLs into links
+     * on their own — that we cannot prevent. What we control is that we do not author the
+     * anchor ourselves, and the only href we emit is our own action link.
+     */
+    expect(sent.html).not.toContain('href="http://phish.example"');
+    expect(sent.html).toContain("&lt;a href=");
+    const hrefs = [...sent.html.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
+    expect(hrefs).toEqual(["https://app.example.com/challenge"]);
+  });
+
+  it("escapes the name in the deletion mail too", async () => {
+    mockSend.mockResolvedValue({ data: { id: "e7" }, error: null });
+    await sendAccountDeletionEmail("user@test.com", "<b>Max</b>");
+    const sent = mockSend.mock.calls[0][0] as { html: string; subject: string };
+    expect(sent.html).not.toContain("<b>Max</b>");
+    expect(sent.subject).toContain("gelöscht");
   });
 });

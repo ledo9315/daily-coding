@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { renderEmail, type EmailContent } from "@/lib/server/email-template";
 
 function getResend(): Resend {
   const apiKey = process.env.RESEND_API_KEY;
@@ -16,51 +17,58 @@ function getAppUrl(): string {
   return process.env.APP_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 }
 
+/**
+ * `renderEmail` escapes every piece of content, so names from the registration form are
+ * safe to pass through here — they used to be interpolated into the HTML raw (#105).
+ */
+async function send(to: string, subject: string, content: EmailContent): Promise<void> {
+  const { html, text } = renderEmail(content);
+  await getResend().emails.send({ from: getFrom(), to, subject, html, text });
+}
+
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
   const url = `${getAppUrl()}/auth/verify-email?token=${token}`;
-  const resend = getResend();
-  await resend.emails.send({
-    from: getFrom(),
-    to,
-    subject: "E-Mail Adresse bestätigen – Daily Dev",
-    html: `<p>Klicke auf den folgenden Link um deine E-Mail zu bestätigen:</p>
-<p><a href="${url}">${url}</a></p>
-<p>Dieser Link ist 24 Stunden gültig.</p>`,
+  await send(to, "E-Mail Adresse bestätigen – Daily Dev", {
+    heading: "E-Mail bestätigen",
+    lines: [
+      "Fast fertig. Bestätige deine Adresse, dann kannst du mit der ersten Challenge anfangen.",
+    ],
+    action: { label: "Adresse bestätigen", url },
+    footer: "Dieser Link ist 24 Stunden gültig.",
   });
 }
 
 export async function sendPasswordResetEmail(to: string, token: string): Promise<void> {
   const url = `${getAppUrl()}/auth/reset-password?token=${token}`;
-  const resend = getResend();
-  await resend.emails.send({
-    from: getFrom(),
-    to,
-    subject: "Passwort zurücksetzen – Daily Dev",
-    html: `<p>Klicke auf den folgenden Link um dein Passwort zurückzusetzen:</p>
-<p><a href="${url}">${url}</a></p>
-<p>Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail.</p>`,
+  await send(to, "Passwort zurücksetzen – Daily Dev", {
+    heading: "Passwort zurücksetzen",
+    lines: ["Du kannst hier ein neues Passwort für dein Konto setzen."],
+    action: { label: "Neues Passwort setzen", url },
+    footer:
+      "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail — dein Passwort bleibt unverändert.",
   });
 }
 
 export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
-  const resend = getResend();
-  await resend.emails.send({
-    from: getFrom(),
-    to,
-    subject: "Willkommen bei Daily Dev!",
-    html: `<p>Hey ${name},</p>
-<p>willkommen bei Daily Dev! Löse täglich Coding-Challenges und steige im Ranking auf.</p>`,
+  await send(to, "Willkommen bei Daily Dev!", {
+    heading: `Willkommen, ${name}`,
+    lines: [
+      "Jeden Tag wartet eine neue Coding-Challenge auf dich — in JavaScript, TypeScript, Python oder PHP.",
+      "Löse sie, sammle Punkte und halte deine Serie am Leben.",
+    ],
+    action: { label: "Zur heutigen Challenge", url: `${getAppUrl()}/challenge` },
+    footer: "Viel Erfolg.",
   });
 }
 
 export async function sendAccountDeletionEmail(to: string, name: string): Promise<void> {
-  const resend = getResend();
-  await resend.emails.send({
-    from: getFrom(),
-    to,
-    subject: "Konto erfolgreich geloescht - Daily Dev",
-    html: `<p>Hi ${name || "there"},</p>
-<p>dein Daily-Dev-Konto wurde erfolgreich geloescht.</p>
-<p>Wenn du das nicht selbst warst, kontaktiere uns bitte sofort.</p>`,
+  await send(to, "Konto gelöscht – Daily Dev", {
+    heading: "Konto gelöscht",
+    lines: [
+      `Hallo ${name || "und tschüss"}, dein Daily-Dev-Konto wurde gelöscht.`,
+      "Deine Abgaben und dein Punktestand sind damit entfernt.",
+    ],
+    footer:
+      "Wenn du das nicht selbst veranlasst hast, melde dich bitte sofort bei uns. Diese Adresse kann jederzeit für ein neues Konto verwendet werden.",
   });
 }
