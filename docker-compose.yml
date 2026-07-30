@@ -15,7 +15,9 @@ services:
       - /tmp:exec
 
   db:
-    image: postgres:16-alpine
+    # Hauptversion folgt der Produktionsdatenbank (Neon, aktuell 17). Weicht sie ab,
+    # kann pg_dump aus diesem Container nicht mehr gegen die Produktion arbeiten.
+    image: postgres:17-alpine
     container_name: daily-dev-db
     restart: unless-stopped
     environment:
