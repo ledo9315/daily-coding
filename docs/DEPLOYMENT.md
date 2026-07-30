@@ -1,6 +1,6 @@
 # Deployment
 
-This guide takes Daily Dev from the repo to a running production site. The app
+This guide takes Daily Coding from the repo to a running production site. The app
 is a Next.js 16 server app with Prisma/Postgres and a self-hosted **Piston**
 code-execution engine.
 

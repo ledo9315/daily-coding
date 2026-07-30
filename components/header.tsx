@@ -155,7 +155,7 @@ export function Header() {
             <span className="font-pixel text-xs text-foreground tracking-tight">
               DAILY
               <br />
-              DEV
+              CODING
             </span>
           </Link>
 

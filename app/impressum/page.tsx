@@ -3,7 +3,7 @@ import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingFooter } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Impressum – Daily Dev",
+  title: "Impressum – Daily Coding",
 };
 
 // ponytail: static legal text. Have it reviewed by a lawyer before launch.

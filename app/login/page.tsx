@@ -26,7 +26,7 @@ function LoginPageContent() {
             <span className="text-xl font-pixel tracking-tighter text-primary">
               {">_"}
             </span>{" "}
-            DAILY DEV
+            DAILY CODING
           </h1>
           <EncryptedText
             text="Logge dich ein um fortzufahren"
