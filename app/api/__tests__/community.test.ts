@@ -210,3 +210,39 @@ describe("GET /api/community/feed", () => {
     expect(json.nextCursor).toBe("sub-14");
   });
 });
+
+/**
+ * #122: the route used `include: { user: true }`, which loads the whole user row —
+ * `passwordHash`, `email`, `nameKey` — into a handler that answers a public feed. The
+ * response was always built from an explicit object, so nothing leaked; this pins the
+ * narrower query so a later `...submission.user` spread cannot turn it into a leak.
+ */
+describe("the feed query", () => {
+  it("selects only the three user fields the response uses", async () => {
+    mockFindMany.mockResolvedValueOnce([]);
+    await getCommunityFeedHandler(
+      new Request("http://localhost/api/community/feed") as never,
+    );
+
+    const args = mockFindMany.mock.calls[0][0] as {
+      include?: unknown;
+      select?: { user?: { select?: Record<string, boolean> } };
+    };
+    expect(args.include).toBeUndefined();
+    expect(Object.keys(args.select?.user?.select ?? {}).sort()).toEqual([
+      "avatar",
+      "initials",
+      "name",
+    ]);
+  });
+
+  it("never asks the database for the password hash or the email", async () => {
+    mockFindMany.mockResolvedValueOnce([]);
+    await getCommunityFeedHandler(
+      new Request("http://localhost/api/community/feed") as never,
+    );
+    const serialised = JSON.stringify(mockFindMany.mock.calls[0][0]);
+    expect(serialised).not.toContain("passwordHash");
+    expect(serialised).not.toContain("email");
+  });
+});
