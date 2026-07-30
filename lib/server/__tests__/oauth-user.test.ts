@@ -105,3 +105,47 @@ describe("findOrCreateOAuthUser", () => {
     expect(mockUserCreate).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * #107: rejecting is impossible on this path — the user is back from the provider and
+ * expects an account, with no form left to show an error in. So the name gets a counter.
+ */
+describe("findOrCreateOAuthUser and display names", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAccountFindUnique.mockResolvedValue(null);
+    mockUserCreate.mockResolvedValue({ id: "u-new", avatar: "/user/gpt.png" });
+  });
+
+  it("keeps the provider name when it is free", async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+
+    await findOrCreateOAuthUser({ email: "new@gmail.com", name: "Max Müller" }, account);
+
+    const data = mockUserCreate.mock.calls[0][0].data;
+    expect(data.name).toBe("Max Müller");
+    expect(data.nameKey).toBe("max müller");
+  });
+
+  it("appends a counter when the name is taken", async () => {
+    // First lookup is the email (no account), then "max müller", then "max müller 2".
+    mockUserFindUnique
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "someone-else" })
+      .mockResolvedValueOnce(null);
+
+    await findOrCreateOAuthUser({ email: "new@gmail.com", name: "Max Müller" }, account);
+
+    const data = mockUserCreate.mock.calls[0][0].data;
+    expect(data.name).toBe("Max Müller 2");
+    expect(data.nameKey).toBe("max müller 2");
+  });
+
+  it("falls back to the local part of the address when the provider sends no name", async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+
+    await findOrCreateOAuthUser({ email: "someone@gmail.com", name: null }, account);
+
+    expect(mockUserCreate.mock.calls[0][0].data.name).toBe("someone");
+  });
+});
