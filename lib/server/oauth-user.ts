@@ -1,10 +1,16 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * No `image` field on purpose. The provider sends a picture URL, but storing it would
+ * make every viewer of the feed, the ranking or the podium fetch that file straight
+ * from googleusercontent.com — handing a third party the IP of people who have no
+ * relationship with it (#86). New OAuth accounts start without an avatar and show
+ * their initials until one is picked from `USER_AVATAR_PATHS`.
+ */
 interface OAuthProfile {
   email: string;
   name: string | null | undefined;
-  image: string | null | undefined;
 }
 
 interface OAuthAccount {
@@ -85,7 +91,7 @@ export async function findOrCreateOAuthUser(
       email: profile.email,
       name,
       initials,
-      avatar: profile.image ?? "",
+      avatar: "",
       emailVerified: true, // OAuth providers pre-verify emails
       accounts: {
         create: {
