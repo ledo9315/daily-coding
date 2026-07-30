@@ -13,8 +13,10 @@ interface PointsChipProps {
  * `@nsmr/pixelart-react` ships no plain star — only `MoonStar`/`MoonStars`, which mean
  * something else. Drawing nine rectangles is cheaper than pulling in a second icon
  * library for a single glyph, and `crispEdges` keeps the blocky look of the set.
+ *
+ * Exported because the success modal labels its points with the same glyph (#37).
  */
-function PixelStar({ className }: { className?: string }) {
+export function PixelStar({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 9 9"

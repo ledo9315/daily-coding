@@ -14,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileAvatarPicker } from "@/components/profile-avatar-picker";
 import {
   Trophy,
+  Bookmark,
+  ArrowBarUp,
   Bullseye,
   Zap,
   CalendarToday,
@@ -37,7 +39,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 function resolveIcon(iconKey: string): React.ComponentType<{ className?: string }> {
-  return iconMap[iconKey] ?? Trophy;
+  return iconMap[iconKey] ?? Bookmark;
 }
 
 export default async function ProfilePage() {
@@ -103,11 +105,11 @@ export default async function ProfilePage() {
                 description={
                   profile.stats.rank !== "#-" ? `Heute ${profile.stats.rank}` : undefined
                 }
-                icon={Trophy}
+                icon={ArrowBarUp}
               />
               <StatsCard title="GELÖST" value={String(profile.stats.totalSolved)} icon={Bullseye} />
               <StatsCard title="REKORD" value={String(profile.stats.streakRecord)} icon={Zap} />
-              <StatsCard title="BADGES" value={`${profile.stats.badges}/${profile.stats.badgesTotal}`} icon={Trophy} />
+              <StatsCard title="BADGES" value={`${profile.stats.badges}/${profile.stats.badgesTotal}`} icon={Bookmark} />
             </div>
 
             <Card>
@@ -140,7 +142,7 @@ export default async function ProfilePage() {
             <Card>
               <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5 text-amber-500" />
+                  <Bookmark className="h-5 w-5 text-amber-500" />
                   Achievements
                 </CardTitle>
               </CardHeader>
