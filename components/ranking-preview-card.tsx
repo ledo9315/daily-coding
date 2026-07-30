@@ -99,7 +99,7 @@ export function RankingPreviewCard({
                     {user.name}
                   </p>
                   {user.level && (
-                    <span className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                    <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
                       Lvl {user.level}
                     </span>
                   )}
