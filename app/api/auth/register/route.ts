@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { createEmailVerificationToken } from "@/lib/server/auth-service";
 import { sendVerificationEmail } from "@/lib/server/email-service";
+import { starterAvatarPath } from "@/lib/user-avatars";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -43,7 +44,13 @@ export async function POST(request: NextRequest) {
     .slice(0, 2);
 
   const user = await prisma.user.create({
-    data: { email, passwordHash, name, initials, avatar: "" },
+    data: {
+      email,
+      passwordHash,
+      name,
+      initials,
+      avatar: starterAvatarPath(email),
+    },
   });
 
   let verificationEmailSent = true;
