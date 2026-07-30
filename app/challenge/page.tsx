@@ -11,6 +11,7 @@ import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { SolveElapsedTimer } from "@/components/solve-elapsed-timer";
+import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
 import {
   Card,
   CardContent,
@@ -289,16 +290,6 @@ export default function ChallengePage() {
           </div>
         </div>
 
-        {isSubmitLocked ? (
-          <p
-            className="mb-6 text-sm text-muted-foreground border-l-2 border-primary/60 pl-3 py-1 max-w-2xl"
-            role="status"
-          >
-            Du hast für diese Daily Challenge heute (UTC) bereits eine Lösung abgegeben. Testen
-            und erneutes Einreichen sind bis morgen (UTC) nicht möglich.
-          </p>
-        ) : null}
-
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="space-y-6">
             <Card>
@@ -378,6 +369,8 @@ export default function ChallengePage() {
                   </Button>
                 </div>
               </div>
+
+              {isSubmitLocked ? <SubmissionLockedBanner /> : null}
 
               {language ? (
                 <CodeEditor
