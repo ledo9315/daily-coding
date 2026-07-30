@@ -4,6 +4,7 @@ import { adminUpdateChallengeSchema } from "@/lib/admin/challenge-schema";
 import { challengeToFormInitial } from "@/lib/admin/map-challenge-to-form";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/server/admin-session";
+import { startOfUtcDay } from "@/lib/server/ranking-period";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -76,7 +77,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         { status: 400 },
       );
     }
-    date = d;
+    // Auf UTC-Mitternacht normalisieren: die Uhrzeit hat keine Wirkung (die
+    // Tagesaufgabe gilt für den ganzen UTC-Tag), und ein Zeitstempel mitten am
+    // Tag würde den `@unique`-Constraint entwerten — dann wären zwei Aufgaben
+    // am selben Tag möglich und eine davon unsichtbar (#71).
+    date = startOfUtcDay(d);
   }
 
   const supported =

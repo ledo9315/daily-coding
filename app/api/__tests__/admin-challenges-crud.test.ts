@@ -120,6 +120,42 @@ describe("/api/admin/challenges/[id]", () => {
     expect(mockChallengeUpdate).toHaveBeenCalled();
   });
 
+  // #71: Die Uhrzeit war wirkungslos, verschob aber den UTC-Tag. Der Server
+  // normalisiert jetzt selbst — auch bei direktem API-Aufruf.
+  it("PATCH normalises the daily date to UTC midnight", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "a1" } });
+    mockUserFindUnique.mockResolvedValueOnce({ role: "admin" });
+    mockFindUniqueChallenge.mockResolvedValueOnce({ id: "c1" });
+    mockCategoryFindUnique.mockResolvedValueOnce({ id: "cat-1" });
+    mockChallengeUpdate.mockResolvedValueOnce({});
+
+    const req = new NextRequest("http://localhost/api/admin/challenges/c1", {
+      method: "PATCH",
+      body: JSON.stringify({ ...patchBody, dateIso: "2026-07-30T18:00:00.000Z" }),
+      headers: { "Content-Type": "application/json" },
+    });
+    await patchOne(req, { params: Promise.resolve({ id: "c1" }) });
+
+    const stored = mockChallengeUpdate.mock.calls[0][0].data.date as Date;
+    expect(stored.toISOString()).toBe("2026-07-30T00:00:00.000Z");
+  });
+
+  it("PATCH keeps a null daily date", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "a1" } });
+    mockUserFindUnique.mockResolvedValueOnce({ role: "admin" });
+    mockFindUniqueChallenge.mockResolvedValueOnce({ id: "c1" });
+    mockCategoryFindUnique.mockResolvedValueOnce({ id: "cat-1" });
+    mockChallengeUpdate.mockResolvedValueOnce({});
+
+    const req = new NextRequest("http://localhost/api/admin/challenges/c1", {
+      method: "PATCH",
+      body: JSON.stringify({ ...patchBody, dateIso: null }),
+      headers: { "Content-Type": "application/json" },
+    });
+    await patchOne(req, { params: Promise.resolve({ id: "c1" }) });
+    expect(mockChallengeUpdate.mock.calls[0][0].data.date).toBeNull();
+  });
+
   it("DELETE returns 409 when submissions exist", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "a1" } });
     mockUserFindUnique.mockResolvedValueOnce({ role: "admin" });
