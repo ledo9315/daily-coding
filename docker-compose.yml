@@ -1,8 +1,8 @@
 services:
-  # Eigener Piston (opensource). Nach Start: pnpm piston:install (HTTP /api/v2/packages).
+  # Self-hosted Piston (open source). Once running: pnpm piston:install (HTTP /api/v2/packages).
   piston:
     image: ghcr.io/engineer-man/piston
-    # Image nur amd64; auf Apple Silicon (arm64) erzwingt das QEMU/Rosetta-Emulation.
+    # The image is amd64 only; on Apple Silicon (arm64) this forces QEMU/Rosetta emulation.
     platform: linux/amd64
     container_name: daily-dev-piston
     restart: unless-stopped
@@ -15,8 +15,8 @@ services:
       - /tmp:exec
 
   db:
-    # Hauptversion folgt der Produktionsdatenbank (Neon, aktuell 17). Weicht sie ab,
-    # kann pg_dump aus diesem Container nicht mehr gegen die Produktion arbeiten.
+    # The major version tracks the production database (Neon, currently 17). If they
+    # diverge, pg_dump from this container can no longer run against production.
     image: postgres:17-alpine
     container_name: daily-dev-db
     restart: unless-stopped

@@ -39,8 +39,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Admin-Rechte: nicht per JWT (nach DB-Änderung veraltet), sondern in
-  // requireAdminPage / requireAdminApi per Datenbank prüfen.
+  // Admin rights are not checked from the JWT — it goes stale after a role change in
+  // the DB. requireAdminPage / requireAdminApi check against the database instead.
 
   return NextResponse.next();
 }

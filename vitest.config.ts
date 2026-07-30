@@ -6,11 +6,11 @@ export default defineConfig({
     environment: "node",
     globals: true,
     /**
-     * @nsmr/pixelart-react ist `"type": "module"`, importiert intern aber ohne
-     * Dateiendung (`from './Icon'`). Node's ESM-Resolver lehnt das ab, Vites
-     * nicht — inline lassen, sonst ist jede Komponente mit Icons untestbar.
-     * Kann entfallen, wenn das Paket sein ESM-Bundle korrigiert.
-     */
+      * @nsmr/pixelart-react is `"type": "module"` but imports internally without a file
+      * extension (`from './Icon'`). Node's ESM resolver rejects that, Vite's does not —
+      * so keep it inlined, otherwise every component using icons is untestable.
+      * Can go once the package fixes its ESM bundle.
+      */
     server: { deps: { inline: ["@nsmr/pixelart-react"] } },
   },
   resolve: {
