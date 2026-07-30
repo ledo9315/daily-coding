@@ -29,13 +29,13 @@ const mockSubmissionAggregate = vi.fn();
 const mockSubmissionCount = vi.fn();
 const mockCreate = vi.fn();
 const mockChallengeStartFindUnique = vi.fn();
-const mockChallengeStartCreateMany = vi.fn();
+const mockChallengeStartUpsert = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     challengeStart: {
       findUnique: (...args: unknown[]) => mockChallengeStartFindUnique(...args),
-      createMany: (...args: unknown[]) => mockChallengeStartCreateMany(...args),
+      upsert: (...args: unknown[]) => mockChallengeStartUpsert(...args),
     },
     user: {
       findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
@@ -67,7 +67,7 @@ beforeEach(() => {
   mockAuth.mockResolvedValue(null);
   mockChallengeStartFindUnique.mockResolvedValue(null);
   mockChallengeFindMany.mockResolvedValue([]);
-  mockChallengeStartCreateMany.mockResolvedValue({ count: 1 });
+  mockChallengeStartUpsert.mockImplementation(async () => ({ startedAt: new Date() }));
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -221,16 +221,48 @@ describe("GET /api/challenge/daily", () => {
 
   // Regression zu #46: Die Startzeit muss serverseitig entstehen, damit die
   // Lösezeit nicht vom Client bestimmt wird.
-  it("records the solve start once for a logged-in user", async () => {
+  it("records the solve start for a logged-in user without one", async () => {
     mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    mockChallengeStartFindUnique.mockResolvedValueOnce(null);
     await getDailyHandler();
-    expect(mockChallengeStartCreateMany).toHaveBeenCalledWith(
+    expect(mockChallengeStartUpsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: [{ userId: "user-test", challengeId: "ch-1" }],
-        skipDuplicates: true,
+        where: { userId_challengeId: { userId: "user-test", challengeId: "ch-1" } },
+        create: { userId: "user-test", challengeId: "ch-1" },
       })
     );
+  });
+
+  // #68: Die Startzeit muss pro UTC-Tag gelten. Ohne Tagesbezug lief die
+  // verstrichene Zeit über Mitternacht hinweg weiter (98:31 bei 40 Minuten Tag).
+  it("renews a start timestamp from an earlier UTC day", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    const yesterday = new Date(Date.now() - 30 * 60 * 60 * 1000);
+    mockChallengeStartFindUnique.mockResolvedValueOnce({ startedAt: yesterday });
+    const renewed = new Date();
+    mockChallengeStartUpsert.mockResolvedValueOnce({ startedAt: renewed });
+
+    const res = await getDailyHandler();
+    const json = await res.json();
+
+    expect(mockChallengeStartUpsert).toHaveBeenCalledTimes(1);
+    expect(mockChallengeStartUpsert.mock.calls[0][0].update.startedAt).toBeInstanceOf(Date);
+    expect(json.startedAt).toBe(renewed.toISOString());
+  });
+
+  it("keeps a start timestamp from today untouched", async () => {
+    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
+    const earlierToday = new Date();
+    mockChallengeStartFindUnique.mockResolvedValueOnce({ startedAt: earlierToday });
+
+    const res = await getDailyHandler();
+    const json = await res.json();
+
+    expect(mockChallengeStartUpsert).not.toHaveBeenCalled();
+    expect(json.startedAt).toBe(earlierToday.toISOString());
   });
 
   // #60: Gespeicherte Testergebnisse der heutigen Abgabe mitliefern, sonst zeigt
@@ -296,7 +328,7 @@ describe("GET /api/challenge/daily", () => {
     mockAuth.mockResolvedValueOnce(null);
     mockFindFirst.mockResolvedValueOnce(activeChallenge);
     await getDailyHandler();
-    expect(mockChallengeStartCreateMany).not.toHaveBeenCalled();
+    expect(mockChallengeStartUpsert).not.toHaveBeenCalled();
   });
 });
 
@@ -515,6 +547,21 @@ describe("POST /api/challenge/[id]/submit", () => {
     const stored = mockCreate.mock.calls[0][0].data.timeTaken;
     expect(stored).toBeGreaterThanOrEqual(141);
     expect(stored).toBeLessThanOrEqual(144);
+  });
+
+  // #68: Ein Startzeitpunkt aus einem Vortag darf keine Müll-Lösezeit in die
+  // Rangliste schreiben.
+  it("ignores a start timestamp from an earlier UTC day", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockChallengeStartFindUnique.mockResolvedValueOnce({
+      startedAt: new Date(Date.now() - 30 * 60 * 60 * 1000),
+    });
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1", "code", "javascript"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
+    expect(stored).toBe(1); // Sandbox-Summe, nicht 108000
   });
 
   it("falls back to execution time when no start record exists", async () => {
