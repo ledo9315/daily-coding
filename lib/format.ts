@@ -6,6 +6,24 @@ export function formatTime(seconds: number | null | undefined): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/**
+ * Verstrichene Zeit seit `startedAtIso` im selben Format wie die Rangliste
+ * (`formatTime`). Ohne oder mit ungültiger Startzeit "-".
+ * ponytail: bewusst dasselbe M:SS-Format wie die Rangliste — ab einer Stunde
+ * zählt es in Minuten weiter (125:03). Zwei Formate wären verwirrender.
+ */
+export function formatElapsedSince(
+  startedAtIso: string | null | undefined,
+  now: Date = new Date()
+): string {
+  if (!startedAtIso) return "-";
+  const startedMs = new Date(startedAtIso).getTime();
+  if (Number.isNaN(startedMs)) return "-";
+  const seconds = Math.max(0, Math.floor((now.getTime() - startedMs) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${(seconds % 60).toString().padStart(2, "0")}`;
+}
+
 /** Formats a Date as "DD.MM.YYYY" (de-DE locale). */
 export function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("de-DE", {

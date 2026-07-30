@@ -29,6 +29,7 @@ export async function GET() {
   const session = await auth();
   const userId = session?.user?.id;
 
+  let startedAt: string | null = null;
   let todaySubmission: {
     status: "completed" | "failed" | "pending";
     submittedAt: string;
@@ -43,6 +44,11 @@ export async function GET() {
       data: [{ userId, challengeId: challenge.id }],
       skipDuplicates: true,
     });
+    const start = await prisma.challengeStart.findUnique({
+      where: { userId_challengeId: { userId, challengeId: challenge.id } },
+      select: { startedAt: true },
+    });
+    startedAt = start?.startedAt.toISOString() ?? null;
 
     const dayStart = startOfUtcDay(new Date());
     const dayEnd = new Date(dayStart);
@@ -87,5 +93,7 @@ export async function GET() {
     starterCode: starterCodes[defaultLanguage] ?? "",
     /** Eingeloggt: Abgabe heute (UTC) für diese Challenge, sonst null. */
     todaySubmission,
+    /** Serverseitiger Start der Bearbeitung (ISO), sonst null. */
+    startedAt,
   });
 }
