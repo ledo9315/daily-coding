@@ -9,7 +9,7 @@ export function LandingNavbar() {
             {">_"}
           </span>
           <span className="font-pixel text-xs text-foreground tracking-tight">
-            DAILY DEV
+            DAILY CODING
           </span>
         </Link>
         <div className="flex items-center gap-4">

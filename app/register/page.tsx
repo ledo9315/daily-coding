@@ -25,7 +25,7 @@ export default function RegisterPage() {
             <span className="text-xl font-pixel tracking-tighter text-primary">
               {">_"}
             </span>{" "}
-            DAILY DEV
+            DAILY CODING
           </h1>
           <EncryptedText
             text="Erstelle deinen Account"
@@ -38,7 +38,7 @@ export default function RegisterPage() {
             <CardTitle className="text-xl font-sans uppercase tracking-wide">
               Konto erstellen
             </CardTitle>
-            <CardDescription>Tritt der Daily Dev Community bei.</CardDescription>
+            <CardDescription>Tritt der Daily Coding Community bei.</CardDescription>
           </CardHeader>
           <CardContent>
             <RegisterForm />

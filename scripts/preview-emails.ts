@@ -15,7 +15,7 @@ const APP = "https://app.example.com";
 
 const MAILS: { subject: string; content: EmailContent }[] = [
   {
-    subject: "E-Mail Adresse bestätigen – Daily Dev",
+    subject: "E-Mail Adresse bestätigen – Daily Coding",
     content: {
       heading: "E-Mail bestätigen",
       lines: [
@@ -26,7 +26,7 @@ const MAILS: { subject: string; content: EmailContent }[] = [
     },
   },
   {
-    subject: "Passwort zurücksetzen – Daily Dev",
+    subject: "Passwort zurücksetzen – Daily Coding",
     content: {
       heading: "Passwort zurücksetzen",
       lines: ["Du kannst hier ein neues Passwort für dein Konto setzen."],
@@ -36,7 +36,7 @@ const MAILS: { subject: string; content: EmailContent }[] = [
     },
   },
   {
-    subject: "Willkommen bei Daily Dev!",
+    subject: "Willkommen bei Daily Coding!",
     content: {
       heading: "Willkommen, Lisa Müller",
       lines: [
@@ -48,11 +48,11 @@ const MAILS: { subject: string; content: EmailContent }[] = [
     },
   },
   {
-    subject: "Konto gelöscht – Daily Dev",
+    subject: "Konto gelöscht – Daily Coding",
     content: {
       heading: "Konto gelöscht",
       lines: [
-        "Hallo Lisa Müller, dein Daily-Dev-Konto wurde gelöscht.",
+        "Hallo Lisa Müller, dein Daily-Coding-Konto wurde gelöscht.",
         "Deine Abgaben und dein Punktestand sind damit entfernt.",
       ],
       footer:
