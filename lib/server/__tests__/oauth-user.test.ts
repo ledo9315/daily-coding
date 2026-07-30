@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { findOrCreateOAuthUser } from "@/lib/server/oauth-user";
+import { isAllowedUserAvatarPath, starterAvatarPath } from "@/lib/user-avatars";
 
 const mockAccountFindUnique = vi.fn();
 const mockAccountCreate = vi.fn();
@@ -49,14 +50,18 @@ describe("findOrCreateOAuthUser", () => {
     mockUserCreate.mockResolvedValue({ id: "u-new", avatar: "" });
   });
 
-  it("stores no avatar for a new account even when the provider sends a picture", async () => {
+  it("stores a local avatar for a new account, never the provider picture", async () => {
     await findOrCreateOAuthUser(
       withProviderPicture("https://lh3.googleusercontent.com/a/ACg8ocK=s96-c"),
       account,
     );
 
     expect(mockUserCreate).toHaveBeenCalledTimes(1);
-    expect(mockUserCreate.mock.calls[0][0].data.avatar).toBe("");
+    // #101 replaced the empty string with one of the bundled avatars. What #86 guards is
+    // unchanged: the stored value is a local path from the allow-list, never a URL.
+    const stored = mockUserCreate.mock.calls[0][0].data.avatar;
+    expect(isAllowedUserAvatarPath(stored)).toBe(true);
+    expect(stored).toBe(starterAvatarPath("someone@gmail.com"));
   });
 
   it("writes no external URL into avatar for a GitHub picture either", async () => {
