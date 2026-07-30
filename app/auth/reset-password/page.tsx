@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
         <div className="text-center">
           <h1 className="text-2xl font-pixel mb-2 tracking-tighter">
             <span className="text-xl font-pixel tracking-tighter text-primary">{">_"}</span>{" "}
-            DAILY DEV
+            DAILY CODING
           </h1>
         </div>
 

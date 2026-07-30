@@ -3,7 +3,7 @@ import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingFooter } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Datenschutzerklärung – Daily Dev",
+  title: "Datenschutzerklärung – Daily Coding",
 };
 
 export default function DatenschutzPage() {
@@ -49,7 +49,7 @@ export default function DatenschutzPage() {
               2. Verarbeitung bei Registrierung und Konto
             </h2>
             <p>
-              Zur Nutzung von Daily Dev legst du ein Nutzerkonto an. Dabei
+              Zur Nutzung von Daily Coding legst du ein Nutzerkonto an. Dabei
               verarbeiten wir deinen Namen, deine E-Mail-Adresse und dein
               Passwort. Das Passwort wird ausschließlich als kryptografischer
               Hash (bcrypt) gespeichert – es ist uns zu keiner Zeit im Klartext

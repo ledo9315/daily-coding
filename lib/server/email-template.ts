@@ -89,7 +89,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
     <td align="center" style="padding:32px 16px;">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:560px;max-width:100%;">
         <tr>
-          <td style="padding-bottom:20px;font-family:${FONT};font-size:18px;font-weight:bold;letter-spacing:2px;color:${ACCENT};">&gt;_ DAILY DEV</td>
+          <td style="padding-bottom:20px;font-family:${FONT};font-size:18px;font-weight:bold;letter-spacing:2px;color:${ACCENT};">&gt;_ DAILY CODING</td>
         </tr>
         <tr>
           <td bgcolor="${CARD}" style="background-color:${CARD};border:2px solid ${BORDER};border-bottom-width:4px;border-right-width:4px;padding:32px;">
@@ -100,7 +100,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
           </td>
         </tr>
         <tr>
-          <td style="padding-top:20px;font-family:${FONT};font-size:12px;line-height:18px;color:${MUTED};">Daily Dev — täglich eine Coding-Challenge.</td>
+          <td style="padding-top:20px;font-family:${FONT};font-size:12px;line-height:18px;color:${MUTED};">Daily Coding — täglich eine Coding-Challenge.</td>
         </tr>
       </table>
     </td>
@@ -110,7 +110,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
 </html>`;
 
   const text = [
-    ">_ DAILY DEV",
+    ">_ DAILY CODING",
     "",
     content.heading.toUpperCase(),
     "",
@@ -119,7 +119,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
     "",
     content.footer,
     "",
-    "Daily Dev — täglich eine Coding-Challenge.",
+    "Daily Coding — täglich eine Coding-Challenge.",
   ].join("\n");
 
   return { html, text };
