@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { SubmitCelebration } from "@/lib/api";
-import { formatTime } from "@/lib/format";
 import { Trophy, Zap } from "@nsmr/pixelart-react";
 import { TestResults, type TestCase } from "@/components/test-results";
 
@@ -138,15 +137,7 @@ export function ChallengeSuccessModal({
           </DialogHeader>
 
           <div className="grid gap-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2 rounded-none border border-primary/25 bg-primary/5 px-5 py-4 min-h-22 justify-center">
-                <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                  Deine Lösezeit
-                </span>
-                <span className="font-mono text-3xl sm:text-4xl tabular-nums text-primary font-bold tracking-tight">
-                  {formatTime(celebration.timeTakenSeconds)}
-                </span>
-              </div>
+            <div className="grid grid-cols-1 gap-4">
               <div className="flex flex-col gap-2 rounded-none border border-amber-500/30 bg-amber-500/5 px-5 py-4 min-h-22 justify-center">
                 <span className="flex items-center gap-2 text-xs uppercase tracking-wider text-amber-600/90 dark:text-amber-400/90 font-semibold">
                   <Trophy className="h-4 w-4 shrink-0" fill="currentColor" />
@@ -161,17 +152,6 @@ export function ChallengeSuccessModal({
             <p className="text-base sm:text-[1.05rem] leading-relaxed text-foreground border-l-4 border-primary/60 pl-4 py-1">
               {attemptLine}
             </p>
-
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 rounded-none border border-border/70 bg-secondary/50 px-5 py-4">
-              <span className="text-base font-semibold text-foreground">
-                Durchschnitt heute:
-              </span>
-              <span className="font-mono text-2xl sm:text-3xl tabular-nums text-foreground font-semibold">
-                {celebration.avgSolveTimeTodaySeconds != null
-                  ? formatTime(celebration.avgSolveTimeTodaySeconds)
-                  : "–"}
-              </span>
-            </div>
 
             <div className="flex gap-3 rounded-none border border-emerald-500/25 bg-emerald-500/5 px-5 py-4">
               <Zap className="h-6 w-6 shrink-0 text-emerald-500 mt-0.5" fill="currentColor" />

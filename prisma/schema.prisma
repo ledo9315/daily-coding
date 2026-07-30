@@ -26,7 +26,6 @@ enum SubmissionStatus {
 }
 
 enum RankingPeriod {
-  today
   week
   month
 }
@@ -69,7 +68,6 @@ model User {
   streak       Int          @default(0)
   streakRecord Int          @default(0)
   submissions    Submission[]
-  challengeStarts ChallengeStart[]
   achievements   UserAchievement[]
   rankingEntries RankingEntry[]
   createdAt    DateTime     @default(now())
@@ -84,23 +82,6 @@ model AchievementDef {
   rarity       AchievementRarity @default(common)
   userProgress UserAchievement[]
   createdAt    DateTime          @default(now())
-}
-
-/// Server-side start of work. Created on the first fetch of the challenge and the
-/// only source for the solve time in the ranking — the client must not decide it.
-/// Scoped per UTC day: if `startedAt` predates the start of today, it is renewed on
-/// the first fetch of the day. A day key in the table would be cleaner, but costs a
-/// migration and would leave stale rows behind.
-/// ponytail: checked on read instead of stored in a column — switch if the history
-/// of start times is ever needed.
-model ChallengeStart {
-  userId      String
-  challengeId String
-  startedAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
-  challenge   Challenge @relation(fields: [challengeId], references: [id])
-
-  @@id([userId, challengeId])
 }
 
 model UserAchievement {
@@ -143,7 +124,6 @@ model Challenge {
   isActive    Boolean      @default(false)
   date        DateTime?    @unique
   submissions Submission[]
-  starts      ChallengeStart[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -155,7 +135,6 @@ model Submission {
   code        String
   language    CodeLanguage     @default(javascript)
   status      SubmissionStatus @default(pending)
-  timeTaken   Int?
   rank        Int?
   testResults Json?
   user        User             @relation(fields: [userId], references: [id])
@@ -171,7 +150,6 @@ model RankingEntry {
   previousRank     Int?
   points           Int
   challengesSolved Int?
-  timeTaken        Int?
   periodDate       DateTime
   userId           String
   user             User          @relation(fields: [userId], references: [id])

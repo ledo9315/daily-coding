@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import {
   Trophy,
-  Clock,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -26,7 +25,6 @@ interface RankingEntry {
 
 interface RankingTableProps {
   entries: RankingEntry[];
-  showTime?: boolean;
   /** In the daily speed ranking every row has the same challenge points, so hide them. */
   showPoints?: boolean;
   currentUserId?: string;
@@ -76,52 +74,20 @@ function RankChange({
 
 export function RankingTable({
   entries,
-  showTime = false,
   showPoints = true,
 }: RankingTableProps) {
-  /** Time is the last column (daily ranking without points), so align it right. */
-  const timeColumnLast = showTime && !showPoints;
-
   return (
     <div className="overflow-hidden rounded-none border border-border">
       <div className="overflow-x-auto">
-        <table
-          className={cn(
-            "w-full",
-            timeColumnLast && "table-fixed",
-          )}
-        >
-          {timeColumnLast && (
-            <colgroup>
-              <col className="w-[4.75rem]" />
-              <col />
-              <col className="w-[6.25rem]" />
-            </colgroup>
-          )}
+        <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-secondary/50">
-              <th
-                className={cn(
-                  "px-4 py-3 text-left text-sm font-medium text-muted-foreground",
-                  !timeColumnLast && "w-16",
-                )}
-              >
+              <th className="w-16 px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Rang
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground min-w-0">
                 Nutzer
               </th>
-              {showTime && (
-                <th
-                  className={cn(
-                    "px-4 py-3 text-sm font-medium text-muted-foreground whitespace-nowrap",
-                    timeColumnLast ? "text-right" : "text-left",
-                    showPoints && "hidden md:table-cell",
-                  )}
-                >
-                  Zeit
-                </th>
-              )}
               {showPoints && (
                 <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground whitespace-nowrap">
                   Punkte
@@ -203,28 +169,6 @@ export function RankingTable({
                       </div>
                     </div>
                   </td>
-
-                  {showTime && (
-                    <td
-                      className={cn(
-                        "px-4 py-4 align-middle",
-                        timeColumnLast && "text-right tabular-nums",
-                        showPoints && "hidden md:table-cell",
-                      )}
-                    >
-                      {entry.time && (
-                        <div
-                          className={cn(
-                            "inline-flex items-center gap-1.5 text-md text-muted-foreground",
-                            timeColumnLast && "justify-end w-full",
-                          )}
-                        >
-                          <Clock className="h-4 w-4 shrink-0" />
-                          <span>{entry.time}</span>
-                        </div>
-                      )}
-                    </td>
-                  )}
 
                   {showPoints && (
                     <td className="px-4 py-4 text-right">

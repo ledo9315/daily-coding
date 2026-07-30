@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import {
   findDailyChallengeForApp,
   findTodaySubmission,
   publicSubmissionStatus,
-  utcDayRange,
 } from "@/lib/server/challenge-day";
 import {
   normalizeStarterCodes,
@@ -33,7 +31,6 @@ export async function GET() {
   const session = await auth();
   const userId = session?.user?.id;
 
-  let startedAt: string | null = null;
   let todaySubmission: {
     status: "completed" | "failed" | "pending";
     submittedAt: string;
@@ -44,24 +41,6 @@ export async function GET() {
   } | null = null;
 
   if (userId) {
-    // Start of work — scoped **per UTC day**. Within the day, polling and reloads
-    // leave it untouched; if it comes from an earlier day (the same challenge
-    // returns in the rotation cycle), it is renewed.
-    const existingStart = await prisma.challengeStart.findUnique({
-      where: { userId_challengeId: { userId, challengeId: challenge.id } },
-      select: { startedAt: true },
-    });
-    const start =
-      existingStart && existingStart.startedAt >= utcDayRange().gte
-        ? existingStart
-        : await prisma.challengeStart.upsert({
-            where: { userId_challengeId: { userId, challengeId: challenge.id } },
-            create: { userId, challengeId: challenge.id },
-            update: { startedAt: new Date() },
-            select: { startedAt: true },
-          });
-    startedAt = start.startedAt.toISOString();
-
     const sub = await findTodaySubmission(userId, challenge.id);
 
     if (sub) {
@@ -93,7 +72,5 @@ export async function GET() {
     starterCode: starterCodes[defaultLanguage] ?? "",
     /** When signed in: today's (UTC) submission for this challenge, else null. */
     todaySubmission,
-    /** Server-side start of work (ISO), else null. */
-    startedAt,
   });
 }

@@ -10,7 +10,6 @@ import { TopThreePodium } from "@/components/top-three-podium";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  CalendarToday,
   CalendarWeek,
   CalendarMonth,
 } from "@nsmr/pixelart-react";
@@ -19,7 +18,7 @@ import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { getRanking } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type Period = "today" | "week" | "month";
+type Period = "week" | "month";
 
 function TableRowSkeleton() {
   return (
@@ -76,12 +75,7 @@ function RankingSkeleton() {
 }
 
 export default function RankingPage() {
-  const [activeTab, setActiveTab] = useState<Period>("today");
-
-  const { data: todayRanking = [], isLoading: todayLoading } = useQuery({
-    queryKey: ["ranking", "today"],
-    queryFn: () => getRanking("today"),
-  });
+  const [activeTab, setActiveTab] = useState<Period>("week");
 
   const { data: weekRanking = [], isLoading: weekLoading } = useQuery({
     queryKey: ["ranking", "week"],
@@ -93,12 +87,9 @@ export default function RankingPage() {
     queryFn: () => getRanking("month"),
   });
 
-  const isLoading = todayLoading || weekLoading || monthLoading;
+  const isLoading = weekLoading || monthLoading;
 
-  const currentRanking =
-    activeTab === "today" ? todayRanking
-    : activeTab === "week" ? weekRanking
-    : monthRanking;
+  const currentRanking = activeTab === "week" ? weekRanking : monthRanking;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -137,10 +128,6 @@ export default function RankingPage() {
           className="space-y-6"
         >
           <TabsList className="w-full sm:w-auto sm:grid-cols-none rounded-none">
-            <TabsTrigger value="today" className="gap-2 cursor-pointer rounded-none text-md">
-              <CalendarToday className="h-4 w-4 hidden sm:block" fill="currentColor" />
-              Heute
-            </TabsTrigger>
             <TabsTrigger value="week" className="gap-2 cursor-pointer rounded-none text-md">
               <CalendarWeek className="h-4 w-4 hidden sm:block" fill="currentColor" />
               Woche
@@ -155,25 +142,6 @@ export default function RankingPage() {
             <RankingSkeleton />
           ) : (
             <>
-              <TabsContent value="today" className="space-y-8">
-                {todayRanking.length > 0 && (
-                  <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
-                    <CardHeader>
-                      <CardTitle className="text-center">Top 3 des Tages</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <TopThreePodium
-                        variant="time"
-                        first={todayRanking[0]}
-                        second={todayRanking[1]}
-                        third={todayRanking[2]}
-                      />
-                    </CardContent>
-                  </Card>
-                )}
-                <RankingTable entries={currentRanking} showTime showPoints={false} />
-              </TabsContent>
-
               <TabsContent value="week" className="space-y-8">
                 {weekRanking.length > 0 && (
                   <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">

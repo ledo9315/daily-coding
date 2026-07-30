@@ -82,23 +82,10 @@ function usesIoEvaluation(
 
 export type ChallengeExecutionMode = "run" | "submit";
 
-/** Sums the "123ms" durations of test cases into the total runtime of all runs. */
-export function sumDurationMsFromTestCases(cases: ChallengeTestCase[]): number {
-  let sum = 0;
-  for (const tc of cases) {
-    const t = tc.time?.trim();
-    if (!t || t === "—") continue;
-    const m = /^(\d+)ms$/i.exec(t);
-    if (m) sum += parseInt(m[1], 10);
-  }
-  return sum;
-}
 
 export type ChallengeRunResult = {
   testCases: ChallengeTestCase[];
   runtimeOk: boolean;
-  /** Sum of all measured runtimes (Piston), feeding `Submission.timeTaken` in seconds. */
-  totalDurationMs: number;
 };
 
 async function runPistonIoCases(
@@ -120,7 +107,6 @@ async function runPistonIoCases(
         },
       ],
       runtimeOk: false,
-      totalDurationMs: 0,
     };
   }
 
@@ -130,7 +116,6 @@ async function runPistonIoCases(
   const wrapped = buildWrappedProgram(language, code, callable);
   const results: ChallengeTestCase[] = [];
   let allPassed = true;
-  let totalDurationMs = 0;
 
   for (const tc of list) {
     if (tc.input == null || tc.expected == null) {
@@ -145,7 +130,6 @@ async function runPistonIoCases(
     }
 
     const piston = await executeWithPiston(language, wrapped, tc.input);
-    totalDurationMs += piston.durationMs;
     const timeStr = `${piston.durationMs}ms`;
 
     if (!piston.ok) {
@@ -188,7 +172,7 @@ async function runPistonIoCases(
     }
   }
 
-  return { testCases: results, runtimeOk: allPassed, totalDurationMs };
+  return { testCases: results, runtimeOk: allPassed };
 }
 
 async function runPistonSmoke(
@@ -198,7 +182,6 @@ async function runPistonSmoke(
   mode: ChallengeExecutionMode
 ): Promise<ChallengeRunResult> {
   const piston = await executeWithPiston(language, code, "");
-  const totalDurationMs = piston.durationMs;
   const list = parseTestCasesIo(challenge.testCases);
   const slots = list.length > 0 ? list : defaultSlots();
 
@@ -223,7 +206,6 @@ async function runPistonSmoke(
             : undefined,
       })),
       runtimeOk: false,
-      totalDurationMs,
     };
   }
 
@@ -248,7 +230,6 @@ async function runPistonSmoke(
   return {
     testCases: [first, ...rest],
     runtimeOk: piston.ok,
-    totalDurationMs,
   };
 }
 
@@ -264,14 +245,12 @@ export async function runChallengeTests(
       return {
         testCases,
         runtimeOk: true,
-        totalDurationMs: sumDurationMsFromTestCases(testCases),
       };
     }
     const testCases = stubRunResults(language);
     return {
       testCases,
       runtimeOk: true,
-      totalDurationMs: sumDurationMsFromTestCases(testCases),
     };
   }
 
@@ -293,7 +272,6 @@ export async function runChallengeTests(
         },
       ],
       runtimeOk: false,
-      totalDurationMs: 0,
     };
   }
 }

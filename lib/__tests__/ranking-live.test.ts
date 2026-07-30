@@ -15,7 +15,7 @@ vi.mock("@/lib/server/challenge-day", () => ({
   findDailyChallengeForApp: () => mockFindDailyChallengeForApp(),
 }));
 
-import { getLiveRanking, getTodayRankNumber } from "@/lib/server/ranking-live";
+import { getLiveRanking } from "@/lib/server/ranking-live";
 
 const user = (id: string, name: string) => ({
   id,
@@ -26,43 +26,6 @@ const user = (id: string, name: string) => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-});
-
-describe("getLiveRanking — today", () => {
-  it("sorts by fastest time, using each user’s best time", async () => {
-    mockFindDailyChallengeForApp.mockResolvedValue({
-      id: "daily-1",
-      points: 100,
-    });
-    mockSubmissionFindMany.mockResolvedValue([
-      {
-        userId: "slow",
-        timeTaken: 300,
-        user: user("slow", "Slow"),
-      },
-      {
-        userId: "fast",
-        timeTaken: 90,
-        user: user("fast", "Fast"),
-      },
-    ]);
-
-    const rows = await getLiveRanking("today");
-    expect(rows.map((r) => r.userId)).toEqual(["fast", "slow"]);
-    expect(rows[0].points).toBe(100);
-    expect(rows[0].timeSeconds).toBe(90);
-  });
-
-  it("getTodayRankNumber returns the place", async () => {
-    mockFindDailyChallengeForApp.mockResolvedValue({ id: "d", points: 10 });
-    mockSubmissionFindMany.mockResolvedValue([
-      { userId: "a", timeTaken: 50, user: user("a", "A") },
-      { userId: "b", timeTaken: 40, user: user("b", "B") },
-    ]);
-    await expect(getTodayRankNumber("a")).resolves.toBe(2);
-    await expect(getTodayRankNumber("b")).resolves.toBe(1);
-    await expect(getTodayRankNumber("nobody")).resolves.toBeNull();
-  });
 });
 
 describe("getLiveRanking — week/month", () => {
