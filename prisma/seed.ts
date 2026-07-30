@@ -7,6 +7,7 @@ import {
 } from "../lib/server/ranking-period";
 import { seedAchievementDefs } from "../lib/server/achievement-defs";
 import { starterAvatarPath } from "../lib/user-avatars";
+import { nameKeyOf } from "../lib/display-name";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 import bcrypt from "bcryptjs";
@@ -59,6 +60,7 @@ async function main() {
     create: {
       id: "user-admin",
       name: "Admin",
+      nameKey: nameKeyOf("Admin"),
       initials: "AD",
       avatar: starterAvatarPath("admin@dailydev.local"),
       email: "admin@dailydev.local",
@@ -75,6 +77,7 @@ async function main() {
     create: {
       id: "user-anna",
       name: "Anna Schmidt",
+      nameKey: nameKeyOf("Anna Schmidt"),
       initials: "AS",
       avatar: starterAvatarPath("anna.schmidt@company.com"),
       email: "anna.schmidt@company.com",
@@ -90,6 +93,7 @@ async function main() {
     create: {
       id: "user-tom",
       name: "Tom Weber",
+      nameKey: nameKeyOf("Tom Weber"),
       initials: "TW",
       avatar: starterAvatarPath("tom.weber@company.com"),
       email: "tom.weber@company.com",
@@ -105,6 +109,7 @@ async function main() {
     create: {
       id: "user-max",
       name: "Max Mustermann",
+      nameKey: nameKeyOf("Max Mustermann"),
       initials: "MM",
       avatar: starterAvatarPath("max.mustermann@company.com"),
       email: "max.mustermann@company.com",
@@ -120,6 +125,7 @@ async function main() {
     create: {
       id: "user-lisa",
       name: "Lisa Müller",
+      nameKey: nameKeyOf("Lisa Müller"),
       initials: "LM",
       avatar: starterAvatarPath("lisa.mueller@company.com"),
       email: "lisa.mueller@company.com",
@@ -135,6 +141,7 @@ async function main() {
     create: {
       id: "user-sarah",
       name: "Sarah Klein",
+      nameKey: nameKeyOf("Sarah Klein"),
       initials: "SK",
       avatar: starterAvatarPath("sarah.klein@company.com"),
       email: "sarah.klein@company.com",
@@ -150,6 +157,7 @@ async function main() {
     create: {
       id: "user-jan",
       name: "Jan Becker",
+      nameKey: nameKeyOf("Jan Becker"),
       initials: "JB",
       avatar: starterAvatarPath("jan.becker@company.com"),
       email: "jan.becker@company.com",
@@ -165,6 +173,7 @@ async function main() {
     create: {
       id: "user-julia",
       name: "Julia Fischer",
+      nameKey: nameKeyOf("Julia Fischer"),
       initials: "JF",
       avatar: starterAvatarPath("julia.fischer@company.com"),
       email: "julia.fischer@company.com",
@@ -180,6 +189,7 @@ async function main() {
     create: {
       id: "user-peter",
       name: "Peter Hoffmann",
+      nameKey: nameKeyOf("Peter Hoffmann"),
       initials: "PH",
       avatar: starterAvatarPath("peter.hoffmann@company.com"),
       email: "peter.hoffmann@company.com",
@@ -195,6 +205,7 @@ async function main() {
     create: {
       id: "user-maria",
       name: "Maria Wagner",
+      nameKey: nameKeyOf("Maria Wagner"),
       initials: "MW",
       avatar: starterAvatarPath("maria.wagner@company.com"),
       email: "maria.wagner@company.com",
@@ -210,6 +221,7 @@ async function main() {
     create: {
       id: "user-david",
       name: "David Schulz",
+      nameKey: nameKeyOf("David Schulz"),
       initials: "DS",
       avatar: starterAvatarPath("david.schulz@company.com"),
       email: "david.schulz@company.com",
