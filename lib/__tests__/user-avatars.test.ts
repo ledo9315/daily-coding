@@ -52,6 +52,27 @@ describe("starterAvatarPath", () => {
   });
 });
 
+describe("avatar paths written by the seed", () => {
+  /**
+   * The seed used to spell out paths like "/user/chibi1.png". Replacing the avatar set
+   * updated the allow-list but not those literals, so a seed kept writing references to
+   * files that no longer exist — 11 of 14 users ended up with a 404 as their avatar (#103).
+   *
+   * ponytail: reads the seed as text instead of importing it. `prisma/seed.ts` calls
+   * `main()` at import time and connects to a database; a regex over the source is what
+   * makes the guard possible at all.
+   */
+  it("only uses paths that are in the allow-list", () => {
+    const source = readFileSync(resolve(process.cwd(), "prisma", "seed.ts"), "utf8");
+    const referenced = [...source.matchAll(/["'](\/user\/[^"']+)["']/g)].map((m) => m[1]);
+
+    const unknown = referenced.filter((p) => !isAllowedUserAvatarPath(p));
+    expect(unknown, `seed references avatars that do not exist: ${unknown.join(", ")}`).toEqual(
+      []
+    );
+  });
+});
+
 describe("the avatar files themselves", () => {
   it.each([...USER_AVATAR_PATHS])("%s exists and is at most 256px", (path) => {
     const file = resolve(process.cwd(), "public", path.replace(/^\//, ""));
