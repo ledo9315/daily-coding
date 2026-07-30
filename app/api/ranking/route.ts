@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { formatTime } from "@/lib/format";
 import { calculateLevel } from "@/lib/level";
 import { getLiveRanking } from "@/lib/server/ranking-live";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const period = searchParams.get("period") ?? "today";
+  // "today" is no longer a period (#91). An unknown or legacy value falls back to the
+  // week rather than erroring, so an old bookmark or a cached client still gets a list.
+  const period = searchParams.get("period") ?? "week";
 
-  const validPeriods = ["today", "week", "month"] as const;
+  const validPeriods = ["week", "month"] as const;
   const selectedPeriod = validPeriods.includes(period as (typeof validPeriods)[number])
     ? (period as (typeof validPeriods)[number])
-    : "today";
+    : "week";
 
   const entries = await getLiveRanking(selectedPeriod);
   const userIds = entries.map((e) => e.userId);
@@ -27,10 +28,7 @@ export async function GET(request: NextRequest) {
         points: e.points,
         avatar: e.user.avatar,
         level,
-        ...(selectedPeriod === "today" ? { time: formatTime(e.timeSeconds) } : {}),
-        ...(e.challengesSolved !== undefined
-          ? { challengesSolved: e.challengesSolved }
-          : {}),
+        challengesSolved: e.challengesSolved,
       };
     })
   );

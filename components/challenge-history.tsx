@@ -11,7 +11,6 @@ interface ChallengeHistoryEntry {
   difficulty: "easy" | "medium" | "hard";
   status: "pending" | "completed" | "failed" | "skipped";
   points: number;
-  time?: string;
   rank?: number;
 }
 
@@ -74,12 +73,6 @@ export function ChallengeHistory({
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
                     <span>{entry.date}</span>
-                    {entry.time && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {entry.time}
-                      </span>
-                    )}
                     {entry.rank && <span>Rang #{entry.rank}</span>}
                   </div>
                 </div>

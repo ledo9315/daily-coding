@@ -28,15 +28,9 @@ const mockSubmissionFindMany = vi.fn();
 const mockSubmissionAggregate = vi.fn();
 const mockSubmissionCount = vi.fn();
 const mockCreate = vi.fn();
-const mockChallengeStartFindUnique = vi.fn();
-const mockChallengeStartUpsert = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    challengeStart: {
-      findUnique: (...args: unknown[]) => mockChallengeStartFindUnique(...args),
-      upsert: (...args: unknown[]) => mockChallengeStartUpsert(...args),
-    },
     user: {
       findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
       update: (...args: unknown[]) => mockUserUpdate(...args),
@@ -61,13 +55,10 @@ beforeEach(() => {
   mockUserFindUnique.mockResolvedValue({ id: "user-test", streakRecord: 0 });
   mockSubmissionFindFirst.mockResolvedValue(null);
   mockSubmissionFindMany.mockResolvedValue([{ createdAt: new Date() }]);
-  mockSubmissionAggregate.mockResolvedValue({ _avg: { timeTaken: 80 } });
   mockSubmissionCount.mockResolvedValue(3);
   mockUserUpdate.mockResolvedValue({ streak: 1, streakRecord: 1 });
   mockAuth.mockResolvedValue(null);
-  mockChallengeStartFindUnique.mockResolvedValue(null);
   mockChallengeFindMany.mockResolvedValue([]);
-  mockChallengeStartUpsert.mockImplementation(async () => ({ startedAt: new Date() }));
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -219,52 +210,6 @@ describe("GET /api/challenge/daily", () => {
     expect(mockSubmissionFindFirst).toHaveBeenCalled();
   });
 
-  // Regression test for #46: the start time must be created server-side, so the
-  // solve time is not decided by the client.
-  it("records the solve start for a logged-in user without one", async () => {
-    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    mockChallengeStartFindUnique.mockResolvedValueOnce(null);
-    await getDailyHandler();
-    expect(mockChallengeStartUpsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { userId_challengeId: { userId: "user-test", challengeId: "ch-1" } },
-        create: { userId: "user-test", challengeId: "ch-1" },
-      })
-    );
-  });
-
-  // #68: the start time must be scoped per UTC day. Without that, the elapsed time
-  // kept running across midnight (98:31 on a day that was 40 minutes old).
-  it("renews a start timestamp from an earlier UTC day", async () => {
-    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    const yesterday = new Date(Date.now() - 30 * 60 * 60 * 1000);
-    mockChallengeStartFindUnique.mockResolvedValueOnce({ startedAt: yesterday });
-    const renewed = new Date();
-    mockChallengeStartUpsert.mockResolvedValueOnce({ startedAt: renewed });
-
-    const res = await getDailyHandler();
-    const json = await res.json();
-
-    expect(mockChallengeStartUpsert).toHaveBeenCalledTimes(1);
-    expect(mockChallengeStartUpsert.mock.calls[0][0].update.startedAt).toBeInstanceOf(Date);
-    expect(json.startedAt).toBe(renewed.toISOString());
-  });
-
-  it("keeps a start timestamp from today untouched", async () => {
-    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    const earlierToday = new Date();
-    mockChallengeStartFindUnique.mockResolvedValueOnce({ startedAt: earlierToday });
-
-    const res = await getDailyHandler();
-    const json = await res.json();
-
-    expect(mockChallengeStartUpsert).not.toHaveBeenCalled();
-    expect(json.startedAt).toBe(earlierToday.toISOString());
-  });
-
   // #60: return the stored test results of today's submission, otherwise the page
   // shows the empty template after a reload.
   it("returns the stored test results of today's submission", async () => {
@@ -305,31 +250,6 @@ describe("GET /api/challenge/daily", () => {
 
   // #47: the start time is returned so the page can display the elapsed working
   // time — the server stays the source of truth.
-  it("returns startedAt for a logged-in user", async () => {
-    mockAuth.mockResolvedValueOnce({ user: { id: "user-test" } });
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    mockChallengeStartFindUnique.mockResolvedValueOnce({
-      startedAt: new Date("2026-07-30T10:00:00.000Z"),
-    });
-    const res = await getDailyHandler();
-    const json = await res.json();
-    expect(json.startedAt).toBe("2026-07-30T10:00:00.000Z");
-  });
-
-  it("returns startedAt null for anonymous visitors", async () => {
-    mockAuth.mockResolvedValueOnce(null);
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    const res = await getDailyHandler();
-    const json = await res.json();
-    expect(json.startedAt).toBeNull();
-  });
-
-  it("does not record a solve start for anonymous visitors", async () => {
-    mockAuth.mockResolvedValueOnce(null);
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    await getDailyHandler();
-    expect(mockChallengeStartUpsert).not.toHaveBeenCalled();
-  });
 });
 
 // ─── /api/challenge/today ─────────────────────────────────────────────────────
@@ -512,68 +432,19 @@ describe("POST /api/challenge/[id]/submit", () => {
           code: "my code",
           language: "typescript",
           status: "completed",
-          timeTaken: 1,
         }),
       })
     );
   });
 
-  // Regression test for #46: the solve time decides the ranking position, so it
-  // must not come from the client.
-  it("ignores a client-supplied solveDurationSeconds", async () => {
+  // #91: the solve-time measurement is gone; no duration may be written any more.
+  it("stores no timeTaken on a submission", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
-    mockChallengeStartFindUnique.mockResolvedValueOnce({
-      startedAt: new Date(Date.now() - 300_000), // vor 5 Minuten
-    });
-    mockCreate.mockResolvedValueOnce({});
-    await submitHandler(makeRequest("ch-1", "code", "javascript", { solveDurationSeconds: 1 }), {
-      params: Promise.resolve({ id: "ch-1" }),
-    });
-    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
-    expect(stored).not.toBe(1);
-    expect(stored).toBeGreaterThanOrEqual(299);
-    expect(stored).toBeLessThanOrEqual(302);
-  });
-
-  it("computes timeTaken from the server-side start record", async () => {
-    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
-    mockChallengeStartFindUnique.mockResolvedValueOnce({
-      startedAt: new Date(Date.now() - 142_000),
-    });
     mockCreate.mockResolvedValueOnce({});
     await submitHandler(makeRequest("ch-1", "code", "javascript"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
-    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
-    expect(stored).toBeGreaterThanOrEqual(141);
-    expect(stored).toBeLessThanOrEqual(144);
-  });
-
-  // #68: a start timestamp from an earlier day must not write a garbage solve time
-  // into the ranking.
-  it("ignores a start timestamp from an earlier UTC day", async () => {
-    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
-    mockChallengeStartFindUnique.mockResolvedValueOnce({
-      startedAt: new Date(Date.now() - 30 * 60 * 60 * 1000),
-    });
-    mockCreate.mockResolvedValueOnce({});
-    await submitHandler(makeRequest("ch-1", "code", "javascript"), {
-      params: Promise.resolve({ id: "ch-1" }),
-    });
-    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
-    expect(stored).toBe(1); // Sandbox-Summe, nicht 108000
-  });
-
-  it("falls back to execution time when no start record exists", async () => {
-    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
-    mockChallengeStartFindUnique.mockResolvedValueOnce(null);
-    mockCreate.mockResolvedValueOnce({});
-    await submitHandler(makeRequest("ch-1", "code", "javascript", { solveDurationSeconds: 5 }), {
-      params: Promise.resolve({ id: "ch-1" }),
-    });
-    const stored = mockCreate.mock.calls[0][0].data.timeTaken;
-    expect(stored).not.toBe(5);
-    expect(stored).toBe(1); // Sandbox-Summe des Stub-Runners
+    expect(mockCreate.mock.calls[0][0].data).not.toHaveProperty("timeTaken");
   });
 
   it("update streak and record after successful submission", async () => {
@@ -623,14 +494,11 @@ describe("POST /api/challenge/[id]/submit", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.celebration).toBeDefined();
-    expect(json.celebration).toMatchObject({
+    expect(json.celebration).toEqual({
       streak: 1,
       streakRecord: 1,
       completionsToday: 3,
-      avgSolveTimeTodaySeconds: 80,
     });
-    expect(typeof json.celebration.timeTakenSeconds).toBe("number");
-    expect(mockSubmissionAggregate).toHaveBeenCalled();
     expect(mockSubmissionCount).toHaveBeenCalled();
   });
 });

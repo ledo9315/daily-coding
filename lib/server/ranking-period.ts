@@ -27,8 +27,6 @@ export function getPeriodDateForRanking(
   now: Date = new Date()
 ): Date {
   switch (period) {
-    case "today":
-      return startOfUtcDay(now);
     case "week":
       return startOfUtcWeek(now);
     case "month":

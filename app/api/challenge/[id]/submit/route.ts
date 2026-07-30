@@ -7,32 +7,6 @@ import { runChallengeTests } from "@/lib/server/challenge-execution";
 import { findTodaySubmission, utcDayRange } from "@/lib/server/challenge-day";
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 
-const MAX_SOLVE_DURATION_SECONDS = 7 * 24 * 3600;
-
-/**
- * Solve time derived from the server-side start (`ChallengeStart`, written on the
- * first fetch of the challenge). Deliberately NOT from the request body: this time
- * decides the ranking position, and a client-supplied value could be anything.
- * Without a start time — e.g. a submission without a prior fetch — returns null,
- * and the sandbox runtime is used as an approximation instead.
- */
-async function serverSolveDurationSeconds(
-  userId: string,
-  challengeId: string
-): Promise<number | null> {
-  const start = await prisma.challengeStart.findUnique({
-    where: { userId_challengeId: { userId, challengeId } },
-    select: { startedAt: true },
-  });
-  if (!start) return null;
-  // Ignore a start time from an earlier day — otherwise a solve time of many
-  // hours ends up as the sort key in the ranking (#68).
-  if (start.startedAt < utcDayRange().gte) return null;
-  const seconds = Math.floor((Date.now() - start.startedAt.getTime()) / 1000);
-  if (seconds < 0) return null;
-  return Math.min(Math.max(1, seconds), MAX_SOLVE_DURATION_SECONDS);
-}
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -87,19 +61,12 @@ export async function POST(
     );
   }
 
-  const { testCases: testResults, runtimeOk, totalDurationMs } = await runChallengeTests(
+  const { testCases: testResults, runtimeOk } = await runChallengeTests(
     challenge,
     code,
     language,
     "submit"
   );
-
-  const solveSeconds = await serverSolveDurationSeconds(userId, challengeId);
-  const executionSeconds =
-    totalDurationMs > 0 ? Math.max(1, Math.ceil(totalDurationMs / 1000)) : null;
-
-  /** For the ranking: wall time since the server-side start, else the sandbox total. */
-  const timeTakenSeconds = solveSeconds ?? executionSeconds;
 
   await prisma.submission.create({
     data: {
@@ -108,17 +75,14 @@ export async function POST(
       code,
       language: language as CodeLanguage,
       status: runtimeOk ? "completed" : "failed",
-      timeTaken: timeTakenSeconds,
       testResults: testResults as unknown as Parameters<typeof prisma.submission.create>[0]["data"]["testResults"],
     },
   });
 
   let celebration:
     | {
-        timeTakenSeconds: number;
         streak: number;
         streakRecord: number;
-        avgSolveTimeTodaySeconds: number | null;
         completionsToday: number;
       }
     | undefined;
@@ -138,32 +102,13 @@ export async function POST(
       select: { streak: true, streakRecord: true },
     });
 
-    const today = utcDayRange();
-    const [avgAgg, completionsToday] = await Promise.all([
-      prisma.submission.aggregate({
-        where: {
-          challengeId,
-          status: "completed",
-          createdAt: today,
-          timeTaken: { not: null },
-        },
-        _avg: { timeTaken: true },
-      }),
-      prisma.submission.count({
-        where: {
-          challengeId,
-          status: "completed",
-          createdAt: today,
-        },
-      }),
-    ]);
+    const completionsToday = await prisma.submission.count({
+      where: { challengeId, status: "completed", createdAt: utcDayRange() },
+    });
 
-    const avg = avgAgg._avg.timeTaken;
     celebration = {
-      timeTakenSeconds: timeTakenSeconds ?? 0,
       streak: updated.streak,
       streakRecord: updated.streakRecord,
-      avgSolveTimeTodaySeconds: avg != null ? Math.round(avg) : null,
       completionsToday,
     };
   }

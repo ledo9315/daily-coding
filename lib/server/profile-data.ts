@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { calculateLevel, nextLevelThreshold } from "@/lib/level";
-import { formatTime, formatDate } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import type { UserProfile } from "@/lib/api";
 import { getAllTimeRankNumber } from "@/lib/server/user-points";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
@@ -104,7 +104,6 @@ export async function getUserProfileData(
           ? s.status
           : "skipped",
       points: s.challenge.points,
-      time: formatTime(s.timeTaken),
       rank: s.rank ?? undefined,
     })),
     monthlyActivity,

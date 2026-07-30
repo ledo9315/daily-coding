@@ -246,7 +246,7 @@ async function main() {
   const achievementDefs = [
     { id: "ach-1", title: "Erste Schritte",    description: "Erste Challenge abgeschlossen",        iconKey: "Check",        rarity: "common"    as const },
     { id: "ach-2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht",               iconKey: "CalendarWeek", rarity: "rare"      as const },
-    { id: "ach-3", title: "Blitzschnell",      description: "Challenge in unter 3 Minuten gelöst", iconKey: "Clock",        rarity: "rare"      as const },
+    { id: "ach-3", title: "Polyglott",         description: "In drei verschiedenen Sprachen gelöst", iconKey: "Code",       rarity: "rare"      as const },
     { id: "ach-4", title: "Code-Meister",      description: "10 schwere Challenges gelöst",         iconKey: "Trophy",       rarity: "epic"      as const },
     { id: "ach-5", title: "Unaufhaltsam",      description: "30 Tage Streak erreicht",              iconKey: "Zap",          rarity: "legendary" as const },
     { id: "ach-6", title: "Perfektionist",     description: "20 Challenges ohne Fehler",            iconKey: "Bullseye",     rarity: "epic"      as const },
@@ -1176,20 +1176,22 @@ async function main() {
   // ─── Submissions ─────────────────────────────────────────────────────────────
 
   if (!contentOnly) {
+  // max spans three languages so „Polyglott" (ach-3) is derivable from the data, not
+  // only granted by the explicit UserAchievement row above.
   const submissionData = [
-    { userId: max.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 323, rank: 8 },
-    { userId: max.id, challengeId: challengeBinarySearch.id, code: "// solved", status: "completed" as const, timeTaken: 192, rank: 3 },
-    { userId: max.id, challengeId: challengeBinaryTree.id, code: "// attempted", status: "failed" as const, timeTaken: 900 },
-    { userId: max.id, challengeId: challengeHashMap.id, code: "// solved", status: "completed" as const, timeTaken: 525, rank: 12 },
-    { userId: max.id, challengeId: challengeRecursion.id, code: "// solved", status: "completed" as const, timeTaken: 270, rank: 5 },
-    { userId: anna.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 263, rank: 1 },
-    { userId: tom.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 312, rank: 2 },
-    { userId: lisa.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 345, rank: 3 },
-    { userId: jan.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 362, rank: 4 },
-    { userId: sarah.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, timeTaken: 390, rank: 5 },
-    { userId: anna.id, challengeId: challengeStringReversal.id, code: "// solved", status: "completed" as const, timeTaken: 180, rank: 1 },
-    { userId: lisa.id, challengeId: challengeBinarySearch.id, code: "// solved", status: "completed" as const, timeTaken: 200, rank: 2 },
-    { userId: jan.id, challengeId: challengeHashMap.id, code: "// solved", status: "completed" as const, timeTaken: 400, rank: 5 },
+    { userId: max.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, language: "javascript" as const, rank: 8 },
+    { userId: max.id, challengeId: challengeBinarySearch.id, code: "// solved", status: "completed" as const, language: "python" as const, rank: 3 },
+    { userId: max.id, challengeId: challengeBinaryTree.id, code: "// attempted", status: "failed" as const, language: "python" as const },
+    { userId: max.id, challengeId: challengeHashMap.id, code: "// solved", status: "completed" as const, language: "php" as const, rank: 12 },
+    { userId: max.id, challengeId: challengeRecursion.id, code: "// solved", status: "completed" as const, language: "typescript" as const, rank: 5 },
+    { userId: anna.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, rank: 1 },
+    { userId: tom.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, rank: 2 },
+    { userId: lisa.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, rank: 3 },
+    { userId: jan.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, rank: 4 },
+    { userId: sarah.id, challengeId: challengeToday.id, code: "// solved", status: "completed" as const, rank: 5 },
+    { userId: anna.id, challengeId: challengeStringReversal.id, code: "// solved", status: "completed" as const, rank: 1 },
+    { userId: lisa.id, challengeId: challengeBinarySearch.id, code: "// solved", status: "completed" as const, rank: 2 },
+    { userId: jan.id, challengeId: challengeHashMap.id, code: "// solved", status: "completed" as const, rank: 5 },
   ];
 
   for (let i = 0; i < submissionData.length; i++) {
@@ -1197,31 +1199,6 @@ async function main() {
       where: { id: `sub-${i + 1}` },
       update: {},
       create: { id: `sub-${i + 1}`, ...submissionData[i] },
-    });
-  }
-
-  // ─── Ranking Entries (today) ──────────────────────────────────────────────────
-
-  const today = anchor;
-
-  const todayRankings = [
-    { userId: anna.id, rank: 1, previousRank: 1, points: 150, timeTaken: 263 },
-    { userId: tom.id, rank: 2, previousRank: 4, points: 145, timeTaken: 312 },
-    { userId: lisa.id, rank: 3, previousRank: 2, points: 140, timeTaken: 345 },
-    { userId: jan.id, rank: 4, previousRank: 3, points: 130, timeTaken: 362 },
-    { userId: sarah.id, rank: 5, previousRank: 7, points: 125, timeTaken: 390 },
-    { userId: max.id, rank: 6, previousRank: 5, points: 120, timeTaken: 435 },
-    { userId: julia.id, rank: 7, previousRank: 8, points: 115, timeTaken: 465 },
-    { userId: peter.id, rank: 8, previousRank: 6, points: 110, timeTaken: 500 },
-    { userId: maria.id, rank: 9, previousRank: 9, points: 105, timeTaken: 535 },
-    { userId: david.id, rank: 10, previousRank: 12, points: 100, timeTaken: 570 },
-  ];
-
-  for (const entry of todayRankings) {
-    await prisma.rankingEntry.upsert({
-      where: { userId_period_periodDate: { userId: entry.userId, period: "today", periodDate: today } },
-      update: {},
-      create: { period: "today", periodDate: today, ...entry },
     });
   }
 

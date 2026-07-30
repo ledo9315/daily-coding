@@ -10,7 +10,6 @@ import { SubmissionStatus } from "@/components/submission-status";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { CountdownTimer } from "@/components/countdown-timer";
-import { SolveElapsedTimer } from "@/components/solve-elapsed-timer";
 import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
 import {
   Card,
@@ -290,9 +289,6 @@ export default function ChallengePage() {
               <PointsChip points={challenge.points} variant="highlight" size="lg" />
               <CountdownTimer />
             </div>
-            {challenge.startedAt && !isSubmitLocked ? (
-              <SolveElapsedTimer startedAt={challenge.startedAt} />
-            ) : null}
           </div>
         </div>
 

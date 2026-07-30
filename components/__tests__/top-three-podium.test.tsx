@@ -9,7 +9,7 @@ import { TopThreePodium } from "@/components/top-three-podium";
  * passes index accesses (ranking[1], ranking[2]) and only checks for at least one
  * entry.
  */
-const first = { name: "Leonid", initials: "L", points: 100, level: 2, time: "30:21" };
+const first = { name: "Leonid", initials: "L", points: 100, level: 2 };
 const second = { name: "Lisa Müller", initials: "LM", points: 90, level: 2 };
 const third = { name: "Max Mustermann", initials: "MM", points: 80, level: 1 };
 
@@ -56,11 +56,4 @@ describe("TopThreePodium", () => {
     ).not.toThrow();
   });
 
-  it("shows the solve time instead of the points in variant='time'", () => {
-    const markup = renderToStaticMarkup(
-      <TopThreePodium first={first} variant="time" />,
-    );
-
-    expect(markup).toContain("30:21");
-  });
 });
