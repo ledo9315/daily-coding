@@ -6,13 +6,9 @@ function jsonPretty(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
-function formatDatetimeLocal(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const h = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  return `${y}-${m}-${day}T${h}:${min}`;
+/** UTC-Kalendertag als `YYYY-MM-DD` — passend für `<input type="date">`. */
+function formatUtcDay(d: Date): string {
+  return d.toISOString().slice(0, 10);
 }
 
 export type ChallengeFormInitial = {
@@ -34,7 +30,7 @@ export type ChallengeFormInitial = {
   starterPy: string;
   starterPhp: string;
   isActive: boolean;
-  dateLocal: string;
+  dateUtcDay: string;
 };
 
 export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
@@ -69,6 +65,6 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     starterPy: starters.python ?? "",
     starterPhp: starters.php ?? "",
     isActive: ch.isActive,
-    dateLocal: ch.date ? formatDatetimeLocal(new Date(ch.date)) : "",
+    dateUtcDay: ch.date ? formatUtcDay(new Date(ch.date)) : "",
   };
 }
