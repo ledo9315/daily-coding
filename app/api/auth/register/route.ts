@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { createEmailVerificationToken } from "@/lib/server/auth-service";
 import { sendVerificationEmail } from "@/lib/server/email-service";
 import { starterAvatarPath } from "@/lib/user-avatars";
+import { nameKeyOf, normaliseDisplayName } from "@/lib/display-name";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -35,8 +36,25 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  /**
+   * Rejected rather than silently renamed: this path has a form to show the error in.
+   * The OAuth path cannot do that and appends a counter instead (#107).
+   */
+  const displayName = normaliseDisplayName(name);
+  const nameKey = nameKeyOf(displayName);
+  if (!displayName) {
+    return NextResponse.json({ error: "Name darf nicht leer sein." }, { status: 400 });
+  }
+  const nameTaken = await prisma.user.findUnique({ where: { nameKey } });
+  if (nameTaken) {
+    return NextResponse.json(
+      { error: "Dieser Name ist schon vergeben." },
+      { status: 409 }
+    );
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
-  const initials = name
+  const initials = displayName
     .split(" ")
     .map((part: string) => part[0])
     .join("")
@@ -47,7 +65,8 @@ export async function POST(request: NextRequest) {
     data: {
       email,
       passwordHash,
-      name,
+      name: displayName,
+      nameKey,
       initials,
       avatar: starterAvatarPath(email),
     },

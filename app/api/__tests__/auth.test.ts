@@ -85,6 +85,35 @@ describe("POST /api/auth/register", () => {
     expect(json).toHaveProperty("error");
   });
 
+  /**
+   * #107: without this, two accounts could carry the same name, and with a starter avatar
+   * drawn from a set of 20 also the same picture — indistinguishable in the ranking.
+   */
+  it("returns 409 when the display name is already taken", async () => {
+    mockFindUnique.mockResolvedValueOnce(null); // email is free
+    mockFindUnique.mockResolvedValueOnce({ id: "existing-user" }); // nameKey is not
+    const res = await registerHandler(
+      makeRequest({ name: "Max Mustermann", email: "new@example.com", password: "securepassword" })
+    );
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ error: "Dieser Name ist schon vergeben." });
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("looks the name up case-insensitively and stores the key", async () => {
+    mockFindUnique.mockResolvedValue(null);
+    mockCreate.mockResolvedValueOnce({ id: "new-user" });
+    await registerHandler(
+      makeRequest({ name: "  Max   Mustermann ", email: "max@example.com", password: "securepassword" })
+    );
+    expect(mockFindUnique).toHaveBeenCalledWith({ where: { nameKey: "max mustermann" } });
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: "Max Mustermann", nameKey: "max mustermann" }),
+      })
+    );
+  });
+
   it("hashes the password (create is called with passwordHash, not plain password)", async () => {
     mockFindUnique.mockResolvedValueOnce(null);
     mockCreate.mockResolvedValueOnce({ id: "new-user" });
