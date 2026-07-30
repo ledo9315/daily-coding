@@ -20,42 +20,10 @@ import {
   readHeaderStats,
   writeHeaderStats,
 } from "@/lib/header-stats-cache";
-import {
-  Home,
-  Trophy,
-  User,
-  Tournament,
-  Zap,
-  Sliders,
-  Logout,
-} from "@nsmr/pixelart-react";
+import { User, Tournament, Zap, Sliders, Logout } from "@nsmr/pixelart-react";
+import { NAV_ITEMS } from "@/lib/navigation";
+import { MobileNav } from "@/components/mobile-nav";
 
-const navigation = [
-  {
-    name: "START",
-    href: "/",
-    icon: Home,
-    color: "border-primary bg-primary/20 text-primary",
-  },
-  {
-    name: "AUFGABE",
-    href: "/challenge",
-    icon: Tournament,
-    color: "border-chart-5 bg-chart-5/20 text-chart-5",
-  },
-  {
-    name: "RANGLISTE",
-    href: "/ranking",
-    icon: Trophy,
-    color: "border-accent bg-accent/20 text-accent",
-  },
-  {
-    name: "PROFIL",
-    href: "/profile",
-    icon: User,
-    color: "border-chart-2 bg-chart-2/20 text-chart-2",
-  },
-];
 
 export function Header() {
   const pathname = usePathname();
@@ -147,12 +115,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b-4 border-border bg-card">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
+        <div className="flex min-w-0 items-center gap-3 md:gap-8">
+          {/* Below md the nav bar is hidden; this is the only way in (#79). */}
+          <MobileNav isAdmin={isAdminFromDb} />
           <Link href="/" className="flex items-center gap-3 group">
             <span className="text-xl font-pixel tracking-tighter text-primary">
               {">_"}
             </span>
-            <span className="font-pixel text-xs text-foreground tracking-tight">
+            <span className="font-pixel text-[10px] leading-tight tracking-tight text-foreground sm:text-xs">
               DAILY
               <br />
               CODING
@@ -160,7 +130,7 @@ export function Header() {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {navigation.map((item) => {
+            {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -181,13 +151,15 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {status === "authenticated" && user ? (
             <>
-              <div className="pixel-box flex items-center gap-2 px-4 py-2 text-orange-500 border-2 border-orange-500/20">
+              <div className="pixel-box flex items-center gap-1.5 border-2 border-orange-500/20 px-2 py-2 text-orange-500 sm:gap-2 sm:px-4">
                 <Zap className="h-5 w-5 animate-pulse" />
                 <span className="text-xl font-sans">{streak ?? "—"}</span>
-                <span className="text-sm text-muted-foreground uppercase">
+                {/* Dropped on phones: the number carries the meaning, the label only fits
+                    once there is room for it. */}
+                <span className="hidden text-sm uppercase text-muted-foreground sm:inline">
                   STREAK
                 </span>
               </div>
@@ -262,10 +234,14 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="outline" asChild className="rounded-none border-2 font-sans uppercase">
+              <Button
+                variant="outline"
+                asChild
+                className="rounded-none border-2 px-3 font-sans uppercase sm:px-4"
+              >
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild className="rounded-none pixel-btn font-sans uppercase">
+              <Button asChild className="pixel-btn rounded-none px-3 font-sans uppercase sm:px-4">
                 <Link href="/register">Registrieren</Link>
               </Button>
             </div>

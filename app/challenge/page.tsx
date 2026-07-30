@@ -338,7 +338,7 @@ export default function ChallengePage() {
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-semibold">Code Editor</h2>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                   {language && challenge.supportedLanguages.length > 1 ? (
                     <Select
                       value={language}
@@ -347,7 +347,7 @@ export default function ChallengePage() {
                     >
                       <SelectTrigger
                         size="sm"
-                        className="rounded-none w-[180px] font-sans disabled:opacity-40"
+                        className="w-full rounded-none font-sans disabled:opacity-40 sm:w-[180px]"
                       >
                         <SelectValue placeholder="Sprache" />
                       </SelectTrigger>
