@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Trophy, Zap, Bullseye, Script } from "@nsmr/pixelart-react";
+import { Bookmark, ArrowBarUp, Bullseye, Script } from "@nsmr/pixelart-react";
 
 export type EventType =
   | "level-up"
@@ -31,7 +31,7 @@ export function FeedItem({ user, event }: FeedItemProps) {
     switch (type) {
       case "level-up":
         return {
-          icon: Zap,
+          icon: ArrowBarUp,
           color: "bg-green-500/10 text-green-500 border-green-500/20",
           cardBorder: "",
           badge: "Level-Aufstieg",
@@ -45,7 +45,7 @@ export function FeedItem({ user, event }: FeedItemProps) {
         };
       case "badge-earned":
         return {
-          icon: Trophy,
+          icon: Bookmark,
           color: "bg-purple-500/10 text-purple-500 border-purple-500/20",
           cardBorder: "",
           badge: "Abzeichen",
