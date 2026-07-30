@@ -1143,10 +1143,14 @@ async function main() {
     data: { emailVerified: true },
   });
 
-  await prisma.challenge.updateMany({ data: { isActive: false } });
+  // `isActive` bedeutet seit #67 „gehört zum Rotations-Pool", nicht „ist die
+  // heutige Aufgabe". Alle fertig ausgearbeiteten Aufgaben sind wählbar — sonst
+  // hätte die Rotation nur ein Element und die App zeigte dauerhaft dieselbe.
+  await prisma.challenge.updateMany({ data: { isActive: true } });
+  // Explizites Datum gewinnt weiterhin: am Seed-Tag ist das die bekannte Aufgabe.
   await prisma.challenge.update({
     where: { id: challengeToday.id },
-    data: { isActive: true, date: anchor },
+    data: { date: anchor },
   });
   await prisma.challenge.update({
     where: { id: challengeBinarySearch.id },

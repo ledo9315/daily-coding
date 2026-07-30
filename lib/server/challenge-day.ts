@@ -41,8 +41,27 @@ export function publicSubmissionStatus(
 }
 
 /**
- * Prefer the challenge whose `date` is on the current UTC calendar day;
- * otherwise the latest active challenge (e.g. fresh seed / dev).
+ * Position im Rotations-Pool, abgeleitet vom UTC-Kalendertag. Deterministisch:
+ * derselbe Tag ergibt immer dieselbe Aufgabe — auch über mehrere Requests und
+ * Serverinstanzen hinweg (kein Zufall, kein Serverzustand).
+ */
+export function rotationIndexForUtcDay(now: Date, poolSize: number): number {
+  if (poolSize <= 0) return 0;
+  const utcDayNumber = Math.floor(now.getTime() / 86_400_000);
+  return ((utcDayNumber % poolSize) + poolSize) % poolSize;
+}
+
+/**
+ * Aufgabe des Tages.
+ *
+ * 1. Ist für den heutigen UTC-Tag ein `date` gesetzt, gewinnt diese Challenge —
+ *    manuelle Planung über das Admin bleibt vorrangig.
+ * 2. Sonst wird deterministisch aus dem Pool aktiver Aufgaben rotiert. Ohne
+ *    diesen Schritt lieferte die App dauerhaft dieselbe Aufgabe, weil der Seed
+ *    nur Daten in der Vergangenheit setzt (#67).
+ *
+ * ponytail: bei N Aufgaben wiederholt sich der Zyklus nach N Tagen — bewusst
+ * akzeptiert, besser als Stillstand. Abhilfe ist mehr Inhalt, nicht mehr Code.
  */
 export async function findDailyChallengeForApp() {
   const forToday = await prisma.challenge.findFirst({
@@ -53,9 +72,14 @@ export async function findDailyChallengeForApp() {
 
   if (forToday) return forToday;
 
-  return prisma.challenge.findFirst({
+  // Stabile Reihenfolge: sonst hängt die Rotation von der Laune der DB ab.
+  const pool = await prisma.challenge.findMany({
     where: { isActive: true },
-    orderBy: { date: "desc" },
+    orderBy: [{ date: "asc" }, { id: "asc" }],
     include: { category: true },
   });
+
+  if (pool.length === 0) return null;
+
+  return pool[rotationIndexForUtcDay(new Date(), pool.length)];
 }

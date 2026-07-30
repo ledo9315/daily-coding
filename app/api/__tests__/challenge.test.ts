@@ -19,6 +19,7 @@ vi.mock("@/auth", () => ({
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindFirst = vi.fn();
+const mockChallengeFindMany = vi.fn();
 const mockFindUniqueChallenge = vi.fn();
 const mockUserFindUnique = vi.fn();
 const mockUserUpdate = vi.fn();
@@ -42,6 +43,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     challenge: {
       findFirst: (...args: unknown[]) => mockFindFirst(...args),
+      findMany: (...args: unknown[]) => mockChallengeFindMany(...args),
       findUnique: (...args: unknown[]) => mockFindUniqueChallenge(...args),
     },
     submission: {
@@ -64,6 +66,7 @@ beforeEach(() => {
   mockUserUpdate.mockResolvedValue({ streak: 1, streakRecord: 1 });
   mockAuth.mockResolvedValue(null);
   mockChallengeStartFindUnique.mockResolvedValue(null);
+  mockChallengeFindMany.mockResolvedValue([]);
   mockChallengeStartCreateMany.mockResolvedValue({ count: 1 });
 });
 
@@ -115,8 +118,9 @@ describe("GET /api/challenge/daily", () => {
     });
   });
 
-  it("returns 404 when no challenge for today and no active fallback", async () => {
-    mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+  it("returns 404 when nothing is scheduled and the rotation pool is empty", async () => {
+    mockFindFirst.mockResolvedValueOnce(null);
+    mockChallengeFindMany.mockResolvedValueOnce([]);
     const res = await getDailyHandler();
     expect(res.status).toBe(404);
     const json = await res.json();
@@ -142,17 +146,25 @@ describe("GET /api/challenge/daily", () => {
     expect(json.starterCode).toBe("function legacy() {}");
   });
 
-  it("tries UTC-day challenge first, then active fallback", async () => {
-    mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(activeChallenge);
+  // #67: Ohne Rotation lieferte die Rückfallebene dauerhaft dieselbe Aufgabe.
+  it("prefers the challenge scheduled for today over the rotation", async () => {
+    mockFindFirst.mockResolvedValueOnce(activeChallenge);
     await getDailyHandler();
-    expect(mockFindFirst).toHaveBeenCalledTimes(2);
     expect(mockFindFirst.mock.calls[0][0]).toMatchObject({
       where: { date: { gte: expect.any(Date), lt: expect.any(Date) } },
       include: { category: true },
     });
-    expect(mockFindFirst.mock.calls[1][0]).toMatchObject({
+    expect(mockChallengeFindMany).not.toHaveBeenCalled();
+  });
+
+  it("rotates over the active pool when nothing is scheduled for today", async () => {
+    mockFindFirst.mockResolvedValueOnce(null);
+    mockChallengeFindMany.mockResolvedValueOnce([activeChallenge]);
+    const res = await getDailyHandler();
+    expect(res.status).toBe(200);
+    expect(mockChallengeFindMany.mock.calls[0][0]).toMatchObject({
       where: { isActive: true },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "asc" }, { id: "asc" }],
       include: { category: true },
     });
   });
@@ -300,8 +312,9 @@ describe("GET /api/challenge/today", () => {
     expect(json.category).toBe("ARRAYS");
   });
 
-  it("returns 404 when no challenge for today and no active fallback", async () => {
-    mockFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+  it("returns 404 when nothing is scheduled and the rotation pool is empty", async () => {
+    mockFindFirst.mockResolvedValueOnce(null);
+    mockChallengeFindMany.mockResolvedValueOnce([]);
     const res = await getTodayHandler();
     expect(res.status).toBe(404);
   });
