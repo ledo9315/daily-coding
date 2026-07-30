@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { JWT } from "next-auth/jwt";
 import type { Session } from "next-auth";
-import { authJwtCallback, authSessionCallback } from "@/lib/auth-callbacks";
+import { authJwtCallback, authSessionCallback, isFederatedAccount } from "@/lib/auth-callbacks";
 
 describe("authJwtCallback", () => {
   it("copies user.id onto token when user is present", () => {
@@ -92,5 +92,18 @@ describe("authSessionCallback", () => {
     const out = authSessionCallback({ session, token });
     expect(out.user.id).toBe("old");
     expect(out.user.role).toBe("user");
+  });
+});
+
+describe("isFederatedAccount", () => {
+  it("treats Google (oidc) and GitHub (oauth) as federated", () => {
+    expect(isFederatedAccount({ type: "oidc" })).toBe(true);
+    expect(isFederatedAccount({ type: "oauth" })).toBe(true);
+  });
+
+  it("excludes credentials logins and missing accounts", () => {
+    expect(isFederatedAccount({ type: "credentials" })).toBe(false);
+    expect(isFederatedAccount(null)).toBe(false);
+    expect(isFederatedAccount(undefined)).toBe(false);
   });
 });

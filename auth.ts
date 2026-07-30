@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { authJwtCallback, authSessionCallback } from "@/lib/auth-callbacks";
+import { authJwtCallback, authSessionCallback, isFederatedAccount } from "@/lib/auth-callbacks";
 import { authorizeCredentials } from "@/lib/auth-credentials";
 import { findOrCreateOAuthUser, findOAuthUserByAccount } from "@/lib/server/oauth-user";
 
@@ -54,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     jwt: async ({ token, user, account, trigger, session }) => {
       // OAuth sign-in: find/create DB user and set DB-based token fields
-      if (account?.type === "oauth") {
+      if (isFederatedAccount(account)) {
         try {
           const oauthAccount = {
             provider: account.provider,
