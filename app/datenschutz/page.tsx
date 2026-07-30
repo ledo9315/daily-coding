@@ -84,12 +84,18 @@ export default function DatenschutzPage() {
             <p>
               Wenn du Coding-Challenges bearbeitest, speichern wir den von dir
               eingereichten Quellcode, die gewählte Programmiersprache, den
-              Lösungsstatus, benötigte Zeiten sowie daraus abgeleitete
-              Punkte-, Ranglisten- und Streak-Daten. Diese Daten sind für die
-              Kernfunktion der Plattform (Bewertung, Bestenliste, Fortschritt)
-              erforderlich. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO
-              sowie unser berechtigtes Interesse an einer funktionsfähigen
-              Plattform (Art. 6 Abs. 1 lit. f DSGVO).
+              Lösungsstatus sowie daraus abgeleitete Punkte-, Ranglisten- und
+              Streak-Daten. Diese Daten sind für die Kernfunktion der Plattform
+              (Bewertung, Bestenliste, Fortschritt) erforderlich.
+              Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie unser
+              berechtigtes Interesse an einer funktionsfähigen Plattform
+              (Art. 6 Abs. 1 lit. f DSGVO).
+            </p>
+            <p>
+              Für andere angemeldete Nutzer sichtbar sind dabei dein Name, dein
+              gewählter Avatar, dein Level und die von dir gelösten Challenges
+              — in der Bestenliste und im Community-Feed. Dein eingereichter
+              Quellcode ist für andere Nutzer nicht sichtbar.
             </p>
           </section>
 
@@ -100,8 +106,11 @@ export default function DatenschutzPage() {
             <p>
               Zur Bewertung deiner Lösungen wird der eingereichte Code in einer
               isolierten, selbst betriebenen Ausführungsumgebung (Sandbox)
-              ausgeführt. Der Code wird ausschließlich zum Zweck der Bewertung
-              verarbeitet und nicht an unbeteiligte Dritte weitergegeben.
+              ausgeführt. Diese läuft auf einem Server der Hetzner Online GmbH
+              in Nürnberg, die insoweit als Auftragsverarbeiter
+              (Art. 28 DSGVO) für uns tätig ist. Der Code wird ausschließlich
+              zum Zweck der Bewertung verarbeitet und nicht an unbeteiligte
+              Dritte weitergegeben.
             </p>
           </section>
 
@@ -114,8 +123,9 @@ export default function DatenschutzPage() {
               Passwort-Zurücksetzen, Willkommens- und
               Konto-Löschbestätigungen) setzen wir den Dienstleister Resend
               (Resend, Inc.) als Auftragsverarbeiter ein. Dabei wird deine
-              E-Mail-Adresse an den Dienstleister übermittelt. Rechtsgrundlage
-              ist Art. 6 Abs. 1 lit. b und lit. f DSGVO.
+              E-Mail-Adresse an den Dienstleister übermittelt; der Versand
+              erfolgt über dessen Infrastruktur in Irland. Rechtsgrundlage ist
+              Art. 6 Abs. 1 lit. b und lit. f DSGVO.
             </p>
           </section>
 
@@ -124,22 +134,39 @@ export default function DatenschutzPage() {
               7. Hosting und Datenbank
             </h2>
             <p>
-              Diese Website wird bei einem externen Dienstleister (Hosting)
-              betrieben; die Datenbank wird bei einem Datenbank-Dienstleister
-              gehostet. Diese verarbeiten die oben genannten Daten in unserem
+              Diese Website wird bei der Vercel Inc. betrieben; die Datenbank
+              wird bei Neon in einem Rechenzentrum in Frankfurt am Main
+              gehostet. Beide verarbeiten die oben genannten Daten in unserem
               Auftrag als Auftragsverarbeiter (Art. 28 DSGVO). Beim Aufruf der
               Website werden serverseitig technisch notwendige Zugriffsdaten
               (z. B. IP-Adresse, Zeitpunkt, aufgerufene Ressource) verarbeitet,
               um den sicheren und stabilen Betrieb zu gewährleisten
-              (Art. 6 Abs. 1 lit. f DSGVO). Sofern Daten außerhalb der EU/des
-              EWR verarbeitet werden, erfolgt dies auf Grundlage geeigneter
-              Garantien (z. B. EU-Standardvertragsklauseln).
+              (Art. 6 Abs. 1 lit. f DSGVO). Vercel Inc. und Resend, Inc. sind
+              US-Unternehmen; soweit dabei Daten außerhalb der EU/des EWR
+              verarbeitet werden, erfolgt dies auf Grundlage geeigneter
+              Garantien (z. B. EU-Standardvertragsklauseln). Die Datenbank und
+              die Ausführungsumgebung für Quellcode liegen innerhalb der EU.
             </p>
           </section>
 
           <section>
             <h2 className="font-heading text-base text-foreground mb-2">
-              8. Cookies
+              8. Reichweitenmessung
+            </h2>
+            <p>
+              Zur Auswertung der Seitennutzung setzen wir Vercel Web Analytics
+              der Vercel Inc. ein. Erhoben werden aufgerufene Seiten,
+              Verweisquelle, Gerätetyp und Land. Der Dienst arbeitet ohne
+              Cookies und ohne Speicherung deiner IP-Adresse; es werden keine
+              geräteübergreifenden Profile gebildet. Rechtsgrundlage ist unser
+              berechtigtes Interesse an der statistischen Auswertung der
+              Nutzung (Art. 6 Abs. 1 lit. f DSGVO).
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-heading text-base text-foreground mb-2">
+              9. Cookies
             </h2>
             <p>
               Wir verwenden ein technisch notwendiges Cookie, um deine
@@ -152,7 +179,7 @@ export default function DatenschutzPage() {
 
           <section>
             <h2 className="font-heading text-base text-foreground mb-2">
-              9. Speicherdauer
+              10. Speicherdauer
             </h2>
             <p>
               Wir speichern deine Daten, solange dein Konto besteht. Du kannst
@@ -165,7 +192,7 @@ export default function DatenschutzPage() {
 
           <section>
             <h2 className="font-heading text-base text-foreground mb-2">
-              10. Deine Rechte
+              11. Deine Rechte
             </h2>
             <p>
               Dir stehen im Rahmen der gesetzlichen Vorgaben die folgenden
@@ -181,7 +208,7 @@ export default function DatenschutzPage() {
 
           <section>
             <h2 className="font-heading text-base text-foreground mb-2">
-              11. Beschwerderecht
+              12. Beschwerderecht
             </h2>
             <p>
               Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu
