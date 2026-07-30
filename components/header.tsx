@@ -16,6 +16,11 @@ import {
 import { cn } from "@/lib/utils";
 import { USER_STATS_CHANGED_EVENT } from "@/lib/user-stats-events";
 import {
+  clearHeaderStats,
+  readHeaderStats,
+  writeHeaderStats,
+} from "@/lib/header-stats-cache";
+import {
   Home,
   Trophy,
   User,
@@ -55,17 +60,40 @@ const navigation = [
 export function Header() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const [streak, setStreak] = useState<number | null>(null);
-  const [level, setLevel] = useState<number | null>(null);
-  const [isAdminFromDb, setIsAdminFromDb] = useState(false);
+  /**
+   * Seeded from the module cache, not from null: this component remounts on every
+   * navigation, and starting empty made the streak flash "—" until the API answered
+   * (#42). Reading in the initialiser means the very first render already has the
+   * value — an effect would run after the browser had a chance to paint the dash.
+   */
+  const [streak, setStreak] = useState<number | null>(() => readHeaderStats().streak);
+  const [level, setLevel] = useState<number | null>(() => readHeaderStats().level);
+  const [isAdminFromDb, setIsAdminFromDb] = useState(() => readHeaderStats().isAdmin);
 
   useEffect(() => {
-    if (status !== "authenticated") {
+    if (status === "unauthenticated") {
       setStreak(null);
       setLevel(null);
       setIsAdminFromDb(false);
+      // Without this, the next person to sign in on this tab would briefly see the
+      // previous account's streak.
+      clearHeaderStats();
       return;
     }
+    // "loading" is not "signed out": keep the cached values instead of wiping them,
+    // otherwise a full page load would throw away what we are trying to preserve.
+    if (status !== "authenticated") return;
+
+    const userId = session?.user?.id;
+    if (!userId) return;
+
+    // Cached values belong to someone else — show the dash rather than their numbers.
+    if (readHeaderStats().userId !== userId) {
+      setStreak(null);
+      setLevel(null);
+      setIsAdminFromDb(false);
+    }
+
     let cancelled = false;
 
     function loadHeaderStats() {
@@ -73,15 +101,23 @@ export function Header() {
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (cancelled || !data) return;
-          if (typeof data.streak === "number") setStreak(data.streak);
-          if (typeof data.level === "number") setLevel(data.level);
+          if (typeof data.streak === "number") {
+            setStreak(data.streak);
+            writeHeaderStats(userId, { streak: data.streak });
+          }
+          if (typeof data.level === "number") {
+            setLevel(data.level);
+            writeHeaderStats(userId, { level: data.level });
+          }
         })
         .catch(() => {});
       fetch("/api/user/me")
         .then((r) => (r.ok ? r.json() : null))
         .then((data: { role?: string } | null) => {
           if (cancelled || !data) return;
-          setIsAdminFromDb(data.role === "admin");
+          const isAdmin = data.role === "admin";
+          setIsAdminFromDb(isAdmin);
+          writeHeaderStats(userId, { isAdmin });
         })
         .catch(() => {});
     }
@@ -92,7 +128,7 @@ export function Header() {
       cancelled = true;
       window.removeEventListener(USER_STATS_CHANGED_EVENT, loadHeaderStats);
     };
-  }, [status, pathname]);
+  }, [status, pathname, session?.user?.id]);
 
   const user = session?.user;
   const displayName = user?.name?.toUpperCase() ?? "";
