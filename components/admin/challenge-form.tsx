@@ -76,7 +76,7 @@ export function AdminChallengeForm({
       "<?php\n\nfunction solve($arr) {\n    // …\n}\n",
   );
   const [isActive, setIsActive] = useState(initial?.isActive ?? false);
-  const [dateLocal, setDateLocal] = useState(initial?.dateLocal ?? "");
+  const [dateUtcDay, setDateUtcDay] = useState(initial?.dateUtcDay ?? "");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -125,7 +125,9 @@ export function AdminChallengeForm({
       },
       supportedLanguages: ["javascript", "typescript", "python", "php"] as const,
       isActive,
-      dateIso: dateLocal ? new Date(dateLocal).toISOString() : null,
+      // Als UTC-Tag interpretieren, nicht als lokale Zeit: sonst landet die
+      // Aufgabe für Zeitzonen östlich von UTC am Vortag (#71).
+      dateIso: dateUtcDay ? `${dateUtcDay}T00:00:00.000Z` : null,
     };
 
     setPending(true);
@@ -275,20 +277,22 @@ export function AdminChallengeForm({
             onCheckedChange={(c) => setIsActive(c === true)}
           />
           <Label htmlFor="active" className="cursor-pointer">
-            Aktiv (Fallback für Daily, wenn kein Datum passt)
+            Aktiv (Teil der täglichen Rotation)
           </Label>
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="date">Daily-Datum (optional, UTC interpretiert)</Label>
+          <Label htmlFor="date">Daily-Datum (optional, UTC-Tag)</Label>
           <Input
             id="date"
-            type="datetime-local"
-            value={dateLocal}
-            onChange={(e) => setDateLocal(e.target.value)}
+            type="date"
+            value={dateUtcDay}
+            onChange={(e) => setDateUtcDay(e.target.value)}
             className="rounded-none max-w-md"
           />
           <p className="text-xs text-muted-foreground">
-            Nur ein Challenge-Eintrag pro Zeitstempel möglich (unique).
+            Der Tag gilt ganztägig in UTC — eine Uhrzeit gibt es bewusst nicht. Pro
+            UTC-Tag ist nur eine Aufgabe möglich. Ohne Datum nimmt die Aufgabe an
+            der täglichen Rotation teil.
           </p>
         </div>
       </div>
