@@ -26,6 +26,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  /**
+   * Without this, Open-Graph and canonical URLs come out relative, and a relative URL in
+   * metadata is useless — the readers are Slack, WhatsApp and search engines, all of them
+   * outside the site. A shared link then has no preview card (#111).
+   *
+   * Written out rather than read from `APP_URL`: this is the *canonical* address, which
+   * stays the production one even in a preview deployment. A shared link should not point
+   * at a throwaway preview host.
+   */
+  metadataBase: new URL("https://daily-coding.de"),
   // Same tagline as the mail footer, so the name reads identically everywhere (#109).
   title: "Daily Coding – täglich eine Coding-Challenge",
   description:
