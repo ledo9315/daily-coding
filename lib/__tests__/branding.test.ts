@@ -38,6 +38,19 @@ describe("branding", () => {
     expect(offenders).toEqual([]);
   });
 
+  /**
+   * #111: without `metadataBase`, Next.js emits relative Open-Graph and canonical URLs,
+   * and a relative URL in metadata is worthless — Slack, WhatsApp and search engines read
+   * it from the outside. A shared link then has no preview card.
+   *
+   * ponytail: reads the file as text. `app/layout.tsx` imports globals.css and next/font,
+   * neither of which loads in the node test environment.
+   */
+  it("declares the canonical site URL as metadataBase", () => {
+    const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
+    expect(layout).toContain('metadataBase: new URL("https://daily-coding.de")');
+  });
+
   it("names the product in the mail layout", () => {
     const { html, text } = renderEmail({ heading: "Test", lines: [], footer: "" });
     expect(html).toContain("DAILY CODING");
