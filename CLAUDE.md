@@ -32,6 +32,20 @@ pnpm piston:install         # Install language runtimes into the running Piston 
 
 **Local DB URL:** `postgresql://daily_dev:daily_dev_secret@localhost:5433/daily_dev`
 
+### Migration history
+
+`prisma/migrations` holds a single baseline, `0_init`, generated from the schema on
+2026-07-30. The previous 18 migrations were not replayable — several hand-written
+directory names lacked a time component (`20260406_category_table`), and since `_`
+sorts after digits, they ran out of creation order: one migration dropped a default
+on `Submission.updatedAt` ten migrations before that column was created.
+
+Both the local and the Neon database were marked as having applied the baseline via
+`prisma migrate resolve --applied 0_init`; no data was touched. Consequence: history
+before 2026-07-30 is gone, and the baseline is the oldest reachable point. Never edit
+`0_init/migration.sql` — Prisma verifies checksums of applied migrations and both
+environments would fail.
+
 ## Architecture
 
 **Stack:** Next.js 16 App Router · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui (Radix) · Framer Motion · PostgreSQL (Docker) + Prisma ORM · Vitest · NextAuth v5 (JWT strategy, credentials provider)
