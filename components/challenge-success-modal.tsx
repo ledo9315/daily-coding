@@ -16,7 +16,7 @@ import { formatTime } from "@/lib/format";
 import { Trophy, Zap } from "@nsmr/pixelart-react";
 import { TestResults, type TestCase } from "@/components/test-results";
 
-/** Eigener Fullscreen-Canvas per `confetti.create` — zuverlässiger als der globale Default-Canvas (Stacking in Next/Radix). */
+/** Own fullscreen canvas via `confetti.create` — more reliable than the global default canvas, which suffers from stacking issues in Next/Radix. */
 const CONFETTI_LAYER_Z = 10050;
 const MODAL_ABOVE_Z = 10060;
 
@@ -84,10 +84,10 @@ export function ChallengeSuccessModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   celebration: SubmitCelebration | null;
-  /** Anzahl Klicks auf „Test ausführen“ vor der finalen Abgabe. */
+  /** Number of "run tests" clicks before the final submission. */
   testRunsBeforeSubmit: number;
   pointsEarned: number;
-  /** Optional: gleiche Testdetails wie in der Seitenleiste (Input / Erwartet / Erhalten). */
+  /** Optional: the same test details as the sidebar (input / expected / actual). */
   testCases?: TestCase[];
 }) {
   const [confettiCanvas, setConfettiCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -100,7 +100,7 @@ export function ChallengeSuccessModal({
       ? "Mit 1 Testlauf!"
       : `Mit ${testRunsBeforeSubmit} Testläufen!`;
 
-  /** `streak` / `streakRecord`: aufeinanderfolgende UTC-Tage mit gelöster Challenge; Rekord = längste Serie je. */
+  /** `streak` / `streakRecord`: consecutive UTC days with a solved challenge; the record is the longest streak ever. */
   const streakLine =
     celebration.streakRecord > celebration.streak
       ? `${celebration.streak}-tägige Gewinnserie! Dein Rekord: ${celebration.streakRecord} Tage.`

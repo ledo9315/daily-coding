@@ -9,7 +9,7 @@ interface TopUser {
   avatar?: string;
   initials: string;
   points: number;
-  /** Für variant="time" (Tages-Speed-Ranking). */
+  /** Used by variant="time" (the daily speed ranking). */
   time?: string;
   level?: number;
 }
@@ -17,14 +17,14 @@ interface TopUser {
 interface TopThreePodiumProps {
   first: TopUser;
   /**
-   * Plätze 2 und 3 fehlen, solange noch nicht genug Leute gelöst haben. Die
-   * Rangliste übergibt Indexzugriffe (`ranking[1]`), die dann `undefined` sind —
-   * als erforderliche Props deklariert riss das die ganze Seite mit (#81).
+   * Places 2 and 3 are missing until enough people have solved the challenge. The
+   * ranking page passes index accesses (`ranking[1]`) that are then `undefined` —
+   * declared as required props, that took the whole page down (#81).
    */
   second?: TopUser;
   third?: TopUser;
   className?: string;
-  /** Tages-Ranking: Zeit statt identischer Challenge-Punkte. */
+  /** Daily ranking: show the time instead of the identical challenge points. */
   variant?: "points" | "time";
 }
 

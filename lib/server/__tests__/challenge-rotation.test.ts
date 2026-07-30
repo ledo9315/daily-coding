@@ -19,26 +19,26 @@ import {
 } from "@/lib/server/challenge-day";
 
 /**
- * #67: Ohne Rotation lieferte die App dauerhaft dieselbe Aufgabe, weil der Seed
- * nur Daten in der Vergangenheit setzt und die Rückfallebene immer die neueste
- * aktive Challenge nahm.
+ * #67: without rotation the app served the same challenge forever, because the seed
+ * only sets dates in the past and the fallback always picked the newest active
+ * challenge.
  */
 describe("rotationIndexForUtcDay", () => {
   const poolSize = 15;
 
-  it("liefert für denselben Tag immer denselben Index", () => {
+  it("returns the same index for the same day", () => {
     const a = rotationIndexForUtcDay(new Date("2026-07-30T00:00:01.000Z"), poolSize);
     const b = rotationIndexForUtcDay(new Date("2026-07-30T23:59:59.000Z"), poolSize);
     expect(a).toBe(b);
   });
 
-  it("liefert für aufeinanderfolgende Tage verschiedene Indizes", () => {
+  it("returns different indices for consecutive days", () => {
     const d30 = rotationIndexForUtcDay(new Date("2026-07-30T12:00:00.000Z"), poolSize);
     const d31 = rotationIndexForUtcDay(new Date("2026-07-31T12:00:00.000Z"), poolSize);
     expect(d30).not.toBe(d31);
   });
 
-  it("bleibt innerhalb des Pools und läuft zyklisch um", () => {
+  it("stays within the pool and wraps around", () => {
     for (let day = 0; day < 40; day++) {
       const date = new Date(Date.UTC(2026, 6, 30) + day * 86_400_000);
       const index = rotationIndexForUtcDay(date, poolSize);
@@ -53,7 +53,7 @@ describe("rotationIndexForUtcDay", () => {
     expect(afterCycle).toBe(start);
   });
 
-  it("liefert 0 bei leerem Pool statt NaN", () => {
+  it("returns 0 for an empty pool instead of NaN", () => {
     expect(rotationIndexForUtcDay(new Date("2026-07-30T00:00:00.000Z"), 0)).toBe(0);
   });
 });
@@ -71,22 +71,22 @@ describe("findDailyChallengeForApp", () => {
     mockFindMany.mockResolvedValue(pool);
   });
 
-  it("bevorzugt eine explizit für heute geplante Challenge", async () => {
+  it("prefers a challenge explicitly scheduled for today", async () => {
     mockFindFirst.mockResolvedValueOnce({ id: "geplant", title: "Geplant" });
     const found = await findDailyChallengeForApp();
     expect(found?.id).toBe("geplant");
-    // Kein Pool-Abruf, wenn manuell geplant wurde.
+    // No pool query when something was scheduled manually.
     expect(mockFindMany).not.toHaveBeenCalled();
   });
 
-  it("rotiert deterministisch, wenn für heute nichts geplant ist", async () => {
+  it("rotates deterministically when nothing is scheduled for today", async () => {
     const first = await findDailyChallengeForApp();
     const second = await findDailyChallengeForApp();
     expect(first?.id).toBe(second?.id);
     expect(pool.map((c) => c.id)).toContain(first?.id);
   });
 
-  it("holt den Pool in stabiler Reihenfolge", async () => {
+  it("queries the pool in a stable order", async () => {
     await findDailyChallengeForApp();
     expect(mockFindMany.mock.calls[0][0].orderBy).toEqual([
       { date: "asc" },
@@ -95,7 +95,7 @@ describe("findDailyChallengeForApp", () => {
     expect(mockFindMany.mock.calls[0][0].where).toEqual({ isActive: true });
   });
 
-  it("liefert null bei leerem Pool statt zu werfen", async () => {
+  it("returns null for an empty pool instead of throwing", async () => {
     mockFindMany.mockResolvedValueOnce([]);
     expect(await findDailyChallengeForApp()).toBeNull();
   });

@@ -8,21 +8,20 @@ import { cn } from "@/lib/utils";
 const HIDDEN_STORAGE_KEY = "dcc:hideSolveTimer";
 
 interface SolveElapsedTimerProps {
-  /** Serverseitiger Startzeitpunkt (ISO) aus der Challenge-API. */
+  /** Server-side start time (ISO) as returned by the challenge API. */
   startedAt: string;
   className?: string;
 }
 
 /**
- * Verstrichene Bearbeitungszeit. Die Zahl geht in die Rangliste ein, deshalb ist
- * sie sichtbar — ausblendbar bleibt sie trotzdem, weil eine tickende Uhr beim
- * Lernen Druck erzeugt.
+ * Elapsed working time. The number feeds the ranking, which is why it is shown at
+ * all — it stays collapsible because a ticking clock adds pressure while learning.
  */
 export function SolveElapsedTimer({ startedAt, className }: SolveElapsedTimerProps) {
   const [elapsed, setElapsed] = useState(() => formatElapsedSince(startedAt));
   const [hidden, setHidden] = useState(false);
 
-  // Erst nach dem Mount lesen — localStorage existiert beim Server-Render nicht.
+  // Read only after mount — localStorage does not exist during server rendering.
   useEffect(() => {
     setHidden(window.localStorage.getItem(HIDDEN_STORAGE_KEY) === "true");
   }, []);

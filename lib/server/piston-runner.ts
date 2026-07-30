@@ -1,6 +1,6 @@
 import type { CodeLanguageId } from "@/lib/challenge-languages";
 
-/** Lokal: docker compose → Piston auf Port 2000. Öffentliche EMKC-API ist whitelist-only → nicht mehr Default. */
+/** Locally: docker compose serves Piston on port 2000. The public EMKC API is whitelist-only, so it is no longer the default. */
 const DEFAULT_PISTON_ORIGIN = "http://127.0.0.1:2000";
 
 type PistonRuntimeInfo = {
@@ -31,9 +31,9 @@ type PistonExecuteResponse = {
 const runtimeCache = new Map<string, PistonRuntimeInfo[]>();
 
 /**
- * Optionaler Bearer-Token für einen abgesicherten, öffentlich erreichbaren
- * Piston-Endpunkt (Reverse Proxy verlangt den Header). Ohne PISTON_API_TOKEN
- * werden keine Auth-Header gesendet (lokale Entwicklung).
+ * Optional bearer token for a hardened, publicly reachable Piston endpoint,
+ * where a reverse proxy requires the header. Without PISTON_API_TOKEN no auth
+ * headers are sent, which is the local development case.
  */
 function pistonAuthHeaders(): Record<string, string> {
   const token = process.env.PISTON_API_TOKEN;
@@ -41,8 +41,8 @@ function pistonAuthHeaders(): Record<string, string> {
 }
 
 /**
- * Self-host: PISTON_API_URL = Ursprung, z. B. http://127.0.0.1:2000 → /api/v2/runtimes
- * Legacy (EMKC): …/api/v2/piston → …/runtimes unter diesem Prefix
+ * Self-hosted: PISTON_API_URL is the origin, e.g. http://127.0.0.1:2000 -> /api/v2/runtimes
+ * Legacy (EMKC): …/api/v2/piston -> …/runtimes below that prefix
  */
 export function pistonHttpEndpoints(rawBase: string): {
   runtimes: string;
@@ -71,12 +71,12 @@ export async function fetchPistonRuntimes(
     throw new Error(`Piston runtimes: HTTP ${res.status} ${text.slice(0, 200)}`);
   }
   const list = (await res.json()) as PistonRuntimeInfo[];
-  // Leere Liste nicht cachen — sonst bleibt sie nach `pnpm piston:install` für immer leer.
+  // Never cache an empty list — it would stay empty forever after `pnpm piston:install`.
   if (list.length > 0) runtimeCache.set(runtimesUrl, list);
   return list;
 }
 
-/** Für Tests oder nach Wechsel der Piston-URL */
+/** For tests, or after the Piston URL changes */
 export function clearPistonRuntimeCache(): void {
   runtimeCache.clear();
 }

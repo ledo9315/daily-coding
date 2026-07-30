@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Impressum – Daily Dev",
 };
 
-// ponytail: statischer Rechtstext. Vor dem Launch juristisch prüfen lassen.
+// ponytail: static legal text. Have it reviewed by a lawyer before launch.
 export default function ImpressumPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

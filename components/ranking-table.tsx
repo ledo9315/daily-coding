@@ -27,7 +27,7 @@ interface RankingEntry {
 interface RankingTableProps {
   entries: RankingEntry[];
   showTime?: boolean;
-  /** Bei Tages-Speed-Ranking überall gleiche Challenge-Punkte — dann ausblenden. */
+  /** In the daily speed ranking every row has the same challenge points, so hide them. */
   showPoints?: boolean;
   currentUserId?: string;
 }
@@ -79,7 +79,7 @@ export function RankingTable({
   showTime = false,
   showPoints = true,
 }: RankingTableProps) {
-  /** Zeit ist die letzte Spalte (Tages-Ranking ohne Punkte) — Inhalt rechts ausrichten. */
+  /** Time is the last column (daily ranking without points), so align it right. */
   const timeColumnLast = showTime && !showPoints;
 
   return (

@@ -4,7 +4,7 @@ import { computeLevelUpBySubmissionId } from "@/lib/server/community-feed-level"
 describe("computeLevelUpBySubmissionId", () => {
   const u = "user-a";
 
-  it("ist leer, wenn die Seitenzeile nicht in der chronologischen Liste vorkommt", () => {
+  it("is empty when the page row does not appear in the chronological list", () => {
     const page = [{ id: "s1", userId: u, challenge: { points: 100 } }];
     const chronological = [
       { id: "other", userId: u, challenge: { points: 100 } },
@@ -12,7 +12,7 @@ describe("computeLevelUpBySubmissionId", () => {
     expect(computeLevelUpBySubmissionId(page, chronological).size).toBe(0);
   });
 
-  it("meldet Levelaufstieg, wenn diese Submission die Schwelle überschreitet", () => {
+  it("reports a level-up when this submission crosses the threshold", () => {
     const chronological = [
       { id: "a", userId: u, challenge: { points: 50 } },
       { id: "b", userId: u, challenge: { points: 60 } },
@@ -22,7 +22,7 @@ describe("computeLevelUpBySubmissionId", () => {
     expect(m.get("b")).toEqual({ previousLevel: 1, newLevel: 2 });
   });
 
-  it("meldet keinen Aufstieg, wenn das Level gleich bleibt", () => {
+  it("reports no level-up when the level stays the same", () => {
     const chronological = [
       { id: "a", userId: u, challenge: { points: 20 } },
       { id: "b", userId: u, challenge: { points: 20 } },
@@ -31,7 +31,7 @@ describe("computeLevelUpBySubmissionId", () => {
     expect(computeLevelUpBySubmissionId(page, chronological).size).toBe(0);
   });
 
-  it("trennt Nutzer: fremde Submissions zählen nicht zur Punktesumme", () => {
+  it("keeps users apart: submissions from others do not add to the point total", () => {
     const chronological = [
       { id: "a", userId: "other", challenge: { points: 500 } },
       { id: "b", userId: u, challenge: { points: 150 } },

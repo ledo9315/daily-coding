@@ -7,8 +7,8 @@ export type SubmissionPointsRow = {
 };
 
 /**
- * Für jede Zeile der Feed-Seite: Prüft, ob diese abgeschlossene Submission den
- * Levelwechsel ausgelöst hat (Lifetime-Punkte vorher vs. nachher).
+ * For every row of a feed page: checks whether this completed submission caused
+ * the level change, comparing lifetime points before and after.
  */
 export function computeLevelUpBySubmissionId(
   pageRows: SubmissionPointsRow[],

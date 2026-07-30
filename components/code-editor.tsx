@@ -27,7 +27,7 @@ interface CodeEditorProps {
   value?: string;
   defaultValue?: string;
   fileName?: string;
-  /** Syntax-Highlighting / Sprachmodus (Monaco). */
+  /** Syntax highlighting / language mode (Monaco). */
   language?: CodeLanguageId;
   onChange?: (value: string) => void;
   className?: string;

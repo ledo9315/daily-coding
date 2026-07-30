@@ -15,8 +15,8 @@ interface TodaysChallengeCardProps {
   points: number;
   category: string;
   /**
-   * Status der heutigen Abgabe. Ist eine vorhanden, sperrt die Challenge-Seite
-   * Editor, Tests und Abgabe — der Button darf dann kein Starten versprechen.
+   * Status of today's submission. Once one exists, the challenge page locks the
+   * editor, the tests and submitting — so the button must not promise a start.
    */
   todayStatus?: "completed" | "failed" | "pending" | null;
   className?: string;
@@ -32,8 +32,8 @@ export function TodaysChallengeCard({
   className,
 }: TodaysChallengeCardProps) {
   const submittedToday = todayStatus != null;
-  // „gelöst" nur wenn wirklich bestanden — ein Fehlversuch sperrt ebenfalls,
-  // wäre aber falsch beschriftet.
+  // Say "solved" only when it actually passed — a failed attempt locks the page
+  // just the same, but would be labelled wrongly.
   const label = !submittedToday
     ? "CHALLENGE STARTEN"
     : todayStatus === "completed"

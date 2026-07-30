@@ -32,7 +32,7 @@ describe("formatDate", () => {
   });
 });
 
-// #47: verstrichene Bearbeitungszeit auf der Aufgabenseite.
+// #47: elapsed working time on the challenge page.
 describe("formatElapsedSince", () => {
   const start = "2026-07-30T10:00:00.000Z";
 

@@ -10,11 +10,11 @@ import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 const MAX_SOLVE_DURATION_SECONDS = 7 * 24 * 3600;
 
 /**
- * Lösezeit aus dem serverseitigen Startzeitpunkt (`ChallengeStart`, gesetzt beim
- * ersten Abruf der Challenge). Bewusst NICHT aus dem Request-Body: die Zeit
- * entscheidet über die Platzierung in der Rangliste, ein Client-Wert wäre frei
- * wählbar. Ohne Startzeitpunkt (z. B. Abgabe ohne vorherigen Abruf) → null,
- * dann greift die Sandbox-Laufzeit als Näherung.
+ * Solve time derived from the server-side start (`ChallengeStart`, written on the
+ * first fetch of the challenge). Deliberately NOT from the request body: this time
+ * decides the ranking position, and a client-supplied value could be anything.
+ * Without a start time — e.g. a submission without a prior fetch — returns null,
+ * and the sandbox runtime is used as an approximation instead.
  */
 async function serverSolveDurationSeconds(
   userId: string,
@@ -25,8 +25,8 @@ async function serverSolveDurationSeconds(
     select: { startedAt: true },
   });
   if (!start) return null;
-  // Startzeitpunkt aus einem Vortag ignorieren — sonst landet eine Lösezeit von
-  // vielen Stunden als Sortierschlüssel in der Rangliste (#68).
+  // Ignore a start time from an earlier day — otherwise a solve time of many
+  // hours ends up as the sort key in the ranking (#68).
   if (start.startedAt < utcDayRange().gte) return null;
   const seconds = Math.floor((Date.now() - start.startedAt.getTime()) / 1000);
   if (seconds < 0) return null;
@@ -98,7 +98,7 @@ export async function POST(
   const executionSeconds =
     totalDurationMs > 0 ? Math.max(1, Math.ceil(totalDurationMs / 1000)) : null;
 
-  /** Rangliste: Wandzeit seit dem serverseitigen Start; sonst Sandbox-Summe. */
+  /** For the ranking: wall time since the server-side start, else the sandbox total. */
   const timeTakenSeconds = solveSeconds ?? executionSeconds;
 
   await prisma.submission.create({

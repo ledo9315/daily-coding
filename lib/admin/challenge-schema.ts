@@ -3,7 +3,7 @@ import { CODE_LANGUAGES } from "@/lib/challenge-languages";
 
 const codeLanguageZ = z.enum(CODE_LANGUAGES);
 
-/** Payload vom Admin-Formular / API zum Anlegen einer Challenge. */
+/** Payload sent by the admin form / API to create a challenge. */
 export const adminCreateChallengeSchema = z.object({
   id: z
     .string()
@@ -49,13 +49,13 @@ export const adminCreateChallengeSchema = z.object({
   }),
   supportedLanguages: z.array(codeLanguageZ).optional(),
   isActive: z.boolean().optional(),
-  /** UTC-Tagesbeginn als ISO-String oder leer → kein Daily-Datum */
+  /** Start of the UTC day as an ISO string, or empty for no daily date */
   dateIso: z.string().optional().nullable(),
 });
 
 export type AdminCreateChallengeInput = z.infer<typeof adminCreateChallengeSchema>;
 
-/** Gleiche Felder wie Create, aber ohne id (steht in der URL). */
+/** Same fields as create, minus the id — that one lives in the URL. */
 export const adminUpdateChallengeSchema = adminCreateChallengeSchema.omit({
   id: true,
 });
