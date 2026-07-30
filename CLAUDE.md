@@ -132,7 +132,14 @@ German — do not translate these:
 - Achievement titles quoted inside comments (`„Blitzschnell“`), because they name
   a user-visible string
 
+The convention covers config files too, not just `app/`, `lib/`, `components/`: check
+`vitest.config.ts`, `prisma.config.ts`, `middleware.ts`, `docker-compose.yml`,
+`pnpm-workspace.yaml`, `.github/workflows/`, `.env.example`. Scoping the sweep to the
+source directories is what let German comments survive in all of them.
+
 There is no lint rule for this — umlaut heuristics trip over proper nouns and over
-the German UI strings that are supposed to stay. When translating an old comment,
+the German UI strings that are supposed to stay. A keyword list is not enough either:
+lines like `// Gleiche Tagesgrenze wie …` and `# Nach Start: …` contain neither an
+umlaut nor a common stop word. Read the candidate files rather than trusting a grep. When translating an old comment,
 keep the *why*: a comment that only restates what the code does is worth deleting
 rather than translating.

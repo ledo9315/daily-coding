@@ -16,7 +16,7 @@ jobs:
       NEXTAUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
-      # Version kommt aus "packageManager" in package.json — einzige Quelle.
+      # Version comes from "packageManager" in package.json — the single source.
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -33,7 +33,7 @@ jobs:
       DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
     steps:
       - uses: actions/checkout@v4
-      # Version kommt aus "packageManager" in package.json — einzige Quelle.
+      # Version comes from "packageManager" in package.json — the single source.
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -64,7 +64,7 @@ jobs:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
     steps:
       - uses: actions/checkout@v4
-      # Version kommt aus "packageManager" in package.json — einzige Quelle.
+      # Version comes from "packageManager" in package.json — the single source.
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -85,7 +85,7 @@ jobs:
       NEXTAUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
-      # Version kommt aus "packageManager" in package.json — einzige Quelle.
+      # Version comes from "packageManager" in package.json — the single source.
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
