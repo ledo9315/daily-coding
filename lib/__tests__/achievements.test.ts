@@ -135,4 +135,90 @@ describe("buildUserAchievementsView", () => {
     expect(achievements[0].unlocked).toBe(true);
     expect(achievements[0].unlockedAt).toBeDefined();
   });
+
+  /** #96: locked achievements name their target but not the current standing. */
+  describe("progress", () => {
+    const solved = (n: number, difficulty?: string) =>
+      Array.from({ length: n }, (_, i) => ({
+        createdAt: new Date(2026, 0, i + 1),
+        challenge: { difficulty },
+      }));
+
+    it("counts hard challenges towards ach-4", () => {
+      const { achievements } = buildUserAchievementsView(
+        [def("ach-4")],
+        [],
+        [...solved(3, "hard"), ...solved(5, "easy")]
+      );
+      expect(achievements[0].progress).toEqual({ current: 3, target: 10 });
+    });
+
+    it("counts distinct languages towards ach-3", () => {
+      const { achievements } = buildUserAchievementsView(
+        [def("ach-3")],
+        [],
+        [
+          { createdAt: new Date(2026, 0, 1), language: "python" },
+          { createdAt: new Date(2026, 0, 2), language: "python" },
+          { createdAt: new Date(2026, 0, 3), language: "php" },
+        ]
+      );
+      expect(achievements[0].progress).toEqual({ current: 2, target: 3 });
+    });
+
+    it("labels the streak achievements as a record, because that is what they measure", () => {
+      const { achievements } = buildUserAchievementsView(
+        [def("ach-2"), def("ach-5")],
+        [],
+        [],
+        5
+      );
+      expect(achievements[0].progress).toEqual({
+        current: 5,
+        target: 7,
+        label: "Rekord",
+      });
+      expect(achievements[1].progress).toEqual({
+        current: 5,
+        target: 30,
+        label: "Rekord",
+      });
+    });
+
+    it("omits progress once unlocked — the unlock date says more than a full bar", () => {
+      const { achievements } = buildUserAchievementsView(
+        [def("ach-4")],
+        [],
+        solved(10, "hard")
+      );
+      expect(achievements[0].unlocked).toBe(true);
+      expect(achievements[0].progress).toBeUndefined();
+    });
+
+    it("omits progress for ach-1, whose target is a single challenge", () => {
+      const { achievements } = buildUserAchievementsView([def("ach-1")], [], []);
+      expect(achievements[0].unlocked).toBe(false);
+      expect(achievements[0].progress).toBeUndefined();
+    });
+
+    it("omits progress for a definition without a rule", () => {
+      const { achievements } = buildUserAchievementsView(
+        [def("ach-99")],
+        [],
+        solved(4)
+      );
+      expect(achievements[0].progress).toBeUndefined();
+    });
+
+    it("stays below the target while locked, so a bar can never overflow", () => {
+      const { achievements } = buildUserAchievementsView(
+        [def("ach-6")],
+        [],
+        solved(19)
+      );
+      const progress = achievements[0].progress;
+      expect(progress).toEqual({ current: 19, target: 20 });
+      expect(progress!.current).toBeLessThan(progress!.target);
+    });
+  });
 });

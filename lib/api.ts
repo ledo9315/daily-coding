@@ -64,6 +64,12 @@ export interface Achievement {
   unlocked: boolean;
   rarity: "common" | "rare" | "epic" | "legendary";
   unlockedAt?: string;
+  /**
+   * How far along a locked achievement is. Absent once unlocked, and absent for targets
+   * of one, where a bar would say nothing (#96). `label` prefixes the numbers when the
+   * value is not a plain count — the streak achievements measure a record.
+   */
+  progress?: { current: number; target: number; label?: string };
 }
 
 export interface ChallengeHistoryEntry {

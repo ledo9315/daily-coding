@@ -154,6 +154,7 @@ export default async function ProfilePage() {
                     unlocked={achievement.unlocked}
                     rarity={achievement.rarity}
                     unlockedAt={achievement.unlockedAt}
+                    progress={achievement.progress}
                   />
                 ))}
               </CardContent>
