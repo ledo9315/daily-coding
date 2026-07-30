@@ -5,6 +5,7 @@ import {
   findDailyChallengeForApp,
   findTodaySubmission,
   publicSubmissionStatus,
+  utcDayRange,
 } from "@/lib/server/challenge-day";
 import {
   normalizeStarterCodes,
@@ -43,17 +44,23 @@ export async function GET() {
   } | null = null;
 
   if (userId) {
-    // Startzeit der Bearbeitung: nur beim ersten Abruf, spätere Aufrufe (Polling,
-    // Reload) lassen sie unverändert — `skipDuplicates` gegen den Primärschlüssel.
-    await prisma.challengeStart.createMany({
-      data: [{ userId, challengeId: challenge.id }],
-      skipDuplicates: true,
-    });
-    const start = await prisma.challengeStart.findUnique({
+    // Startzeit der Bearbeitung — gilt **pro UTC-Tag**. Innerhalb des Tages
+    // lassen Polling und Reload sie unverändert; stammt sie aus einem früheren
+    // Tag (dieselbe Aufgabe kommt im Rotationszyklus wieder), wird sie erneuert.
+    const existingStart = await prisma.challengeStart.findUnique({
       where: { userId_challengeId: { userId, challengeId: challenge.id } },
       select: { startedAt: true },
     });
-    startedAt = start?.startedAt.toISOString() ?? null;
+    const start =
+      existingStart && existingStart.startedAt >= utcDayRange().gte
+        ? existingStart
+        : await prisma.challengeStart.upsert({
+            where: { userId_challengeId: { userId, challengeId: challenge.id } },
+            create: { userId, challengeId: challenge.id },
+            update: { startedAt: new Date() },
+            select: { startedAt: true },
+          });
+    startedAt = start.startedAt.toISOString();
 
     const sub = await findTodaySubmission(userId, challenge.id);
 
