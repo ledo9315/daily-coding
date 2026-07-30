@@ -24,8 +24,17 @@ export async function GET(request: Request) {
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    include: {
-      user: true,
+    /**
+     * `select`, not `include: { user: true }`. The response only ever contained name,
+     * initials and avatar, but the whole row — `passwordHash`, `email`, `nameKey` — was
+     * being loaded into the memory of a route that answers a feed. Nothing leaked; the
+     * point is that what is never loaded cannot be handed out by a later change (#122).
+     */
+    select: {
+      id: true,
+      userId: true,
+      createdAt: true,
+      user: { select: { name: true, initials: true, avatar: true } },
       challenge: { select: { title: true, points: true } },
     },
   });
