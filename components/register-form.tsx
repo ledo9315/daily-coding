@@ -8,8 +8,22 @@ import { toast } from "sonner";
 import { ArrowRight, Lock, Mail, User } from "@nsmr/pixelart-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { OAuthButtons } from "@/components/auth/oauth-buttons";
 
-export function RegisterForm() {
+interface RegisterFormProps {
+  githubEnabled?: boolean;
+  googleEnabled?: boolean;
+}
+
+/**
+ * The provider buttons belong here as much as on the login form: `findOrCreateOAuthUser`
+ * creates an account for a first-time provider sign-in, so registering via GitHub or Google
+ * already worked — it was only invisible on the page new visitors land on (#137).
+ */
+export function RegisterForm({
+  githubEnabled = false,
+  googleEnabled = false,
+}: RegisterFormProps) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -85,7 +99,8 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <div className="relative">
@@ -150,12 +165,15 @@ export function RegisterForm() {
         {!isLoading && <ArrowRight className="h-4 w-4" />}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        Bereits ein Konto?{" "}
-        <Link href="/login" className="text-primary hover:underline">
-          Einloggen
-        </Link>
-      </p>
-    </form>
+        <p className="text-center text-sm text-muted-foreground">
+          Bereits ein Konto?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Einloggen
+          </Link>
+        </p>
+      </form>
+
+      <OAuthButtons githubEnabled={githubEnabled} googleEnabled={googleEnabled} />
+    </div>
   );
 }

@@ -45,7 +45,10 @@ export default function RegisterPage() {
             <CardDescription>Tritt der Daily Coding Community bei.</CardDescription>
           </CardHeader>
           <CardContent>
-            <RegisterForm />
+            <RegisterForm
+              githubEnabled={process.env.NEXT_PUBLIC_GITHUB_ENABLED === "true"}
+              googleEnabled={process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true"}
+            />
           </CardContent>
         </Card>
       </div>
