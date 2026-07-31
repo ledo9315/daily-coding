@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { LandingPage } from "@/components/landing/landing-page";
+import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
@@ -33,7 +34,12 @@ export default async function DashboardPage() {
    * convince, and `/` is the URL they arrive on — a redirect handed crawlers a login form
    * on the canonical URL of the site (#130).
    */
-  if (!session?.user?.id) return <LandingPage />;
+  if (!session?.user?.id) {
+    // Same source as the signed-in dashboard, so the badge on the landing names the challenge
+    // a visitor actually gets when they sign up.
+    const daily = await findDailyChallengeForApp();
+    return <LandingPage todaysChallengeTitle={daily?.title ?? null} />;
+  }
   const userId = session.user.id;
   const userEmail = session.user.email ?? null;
 
