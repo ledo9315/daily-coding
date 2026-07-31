@@ -224,7 +224,7 @@ export function Header() {
                   <DropdownMenuSeparator className="bg-border" />
                   <DropdownMenuItem
                     className="rounded-none text-lg text-destructive focus:text-destructive cursor-pointer"
-                    onSelect={() => signOut({ callbackUrl: "/landing" })}
+                    onSelect={() => signOut({ callbackUrl: "/" })}
                   >
                     <Logout className="mr-2 h-5 w-5" />
                     ABMELDEN
