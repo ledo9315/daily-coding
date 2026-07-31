@@ -2,32 +2,27 @@ import { Lock } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Explains the lock right where it is visible — above the greyed-out editor. The
- * earlier hint sat at the top of the page and was scrolled out of view by the time
- * you reached the editor, leaving nothing but a dead grey box.
+ * Labels the lock right where it is visible — above the greyed-out editor. The earlier
+ * hint sat at the top of the page and was scrolled out of view by the time you reached
+ * the editor, leaving nothing but a dead grey box (#36).
  *
- * Deliberately mentions that testing is locked too: it is not only submitting,
- * but also "run tests", the language picker and the editor itself.
+ * One line on purpose: the sentence that used to spell out the scope and the deadline
+ * doubled what the page already shows — the countdown in the header, "Erfolgreich
+ * abgegeben" in the status panel, and four visibly dead controls.
  */
 export function SubmissionLockedBanner({ className }: { className?: string }) {
   return (
     <div
       role="status"
       className={cn(
-        "flex items-start gap-3 border-2 border-primary/60 bg-primary/10 px-4 py-3",
+        "flex items-center gap-3 border-2 border-primary/60 bg-primary/10 px-4 py-3",
         className
       )}
     >
-      <Lock className="mt-0.5 h-5 w-5 shrink-0 text-primary" fill="currentColor" />
-      <div className="space-y-1">
-        <p className="font-pixel text-sm uppercase tracking-wider text-primary">
-          Bereits abgegeben
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Du hast diese Daily Challenge heute (UTC) bereits abgegeben. Editor, Tests und
-          erneutes Einreichen sind bis morgen (UTC) gesperrt.
-        </p>
-      </div>
+      <Lock className="h-5 w-5 shrink-0 text-primary" fill="currentColor" />
+      <p className="font-pixel text-sm uppercase tracking-wider text-primary">
+        Bereits abgegeben
+      </p>
     </div>
   );
 }
