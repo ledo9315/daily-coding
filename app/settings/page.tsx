@@ -24,7 +24,7 @@ export default async function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground">
-            Aendere dein Passwort oder lösche dein Konto.
+            Ändere dein Passwort oder lösche dein Konto.
           </CardContent>
         </Card>
 
