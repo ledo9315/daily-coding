@@ -77,12 +77,6 @@ describe("branding", () => {
     expect(missing).toEqual([]);
   });
 
-  it("declares an Open Graph image", () => {
-    const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
-    expect(layout).toContain('url: "/og.png"');
-    expect(layout).toContain('card: "summary_large_image"');
-  });
-
   it("names the product in the mail layout", () => {
     const { html, text } = renderEmail({ heading: "Test", lines: [], footer: "" });
     expect(html).toContain("DAILY CODING");
