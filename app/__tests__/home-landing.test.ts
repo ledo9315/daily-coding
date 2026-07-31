@@ -24,8 +24,9 @@ describe("home page for visitors without a session", () => {
 
   it("renders the landing instead", () => {
     expect(homePage).toContain("LandingPage");
-    // Rendered, not redirected to: the point is a 200 on the apex URL.
-    expect(homePage).toMatch(/<LandingPage\s*\/>/);
+    // Rendered, not redirected to: the point is a 200 on the apex URL. Matched without the
+    // closing slash, because the element carries props now (the daily title for the badge).
+    expect(homePage).toMatch(/return <LandingPage[\s/>]/);
   });
 
   it("still sends a signed-out session to the login form", () => {
