@@ -35,7 +35,7 @@ export function RegisterForm({
     const params = new URLSearchParams(window.location.search);
     if (params.get("accountDeleted") !== "1") return;
 
-    toast.success("Account erfolgreich geloescht", {
+    toast.success("Account erfolgreich gelöscht", {
       description: "Du kannst jederzeit ein neues Konto erstellen.",
     });
     router.replace("/register");

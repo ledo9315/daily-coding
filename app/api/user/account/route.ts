@@ -12,7 +12,7 @@ export async function DELETE(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Ungueltiger JSON-Body." }, { status: 400 });
+    return NextResponse.json({ error: "Ungültiger JSON-Body." }, { status: 400 });
   }
 
   const confirmText =
@@ -26,7 +26,7 @@ export async function DELETE(request: Request) {
 
   if (confirmText !== "KONTO LÖSCHEN") {
     return NextResponse.json(
-      { error: "Bitte bestaetige mit KONTO LÖSCHEN." },
+      { error: "Bitte bestätige mit KONTO LÖSCHEN." },
       { status: 400 }
     );
   }
