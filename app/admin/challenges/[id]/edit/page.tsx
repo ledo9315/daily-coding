@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminPage } from "@/lib/server/require-admin-page";
 
 export const metadata = {
-  title: "Challenge bearbeiten | Admin",
+  title: "Challenge bearbeiten",
 };
 
 type PageProps = { params: Promise<{ id: string }> };

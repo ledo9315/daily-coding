@@ -26,7 +26,7 @@ function isScheduledUtcToday(d: Date | null): boolean {
 }
 
 export const metadata = {
-  title: "Challenges verwalten | Admin",
+  title: "Challenges verwalten",
 };
 
 export default async function AdminChallengesPage() {
