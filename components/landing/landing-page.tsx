@@ -1,8 +1,10 @@
 import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingHero } from "@/components/landing/hero";
-import { LandingFeatures } from "@/components/landing/features";
 import { LandingCTA } from "@/components/landing/cta";
 import { LandingFooter } from "@/components/landing/footer";
+import { AmbientGlow } from "@/components/landing/ambient-glow";
+import { LandingFeatures } from "@/components/landing/features";
+import { LandingRoutine } from "@/components/landing/routine";
 import { LandingCodeDemo } from "@/components/landing/code-demo";
 
 /**
@@ -24,7 +26,18 @@ export function LandingPage({
       <main>
         <LandingHero todaysChallengeTitle={todaysChallengeTitle} />
         <LandingFeatures />
-        <LandingCodeDemo />
+        {/*
+          One section for both, because each one of its own needed `overflow-hidden` and cut the
+          ambient bloom at the boundary — a visible seam between two blocks that share the same
+          background anyway. Two blooms at different heights, as in the hero, because the merged
+          block is tall.
+        */}
+        <section id="features" className="relative overflow-hidden bg-card/50">
+          <AmbientGlow side="right" className="top-[22%]" />
+          <AmbientGlow side="left" className="top-[62%]" />
+          <LandingRoutine />
+          <LandingCodeDemo />
+        </section>
         <LandingCTA />
       </main>
       <LandingFooter />
