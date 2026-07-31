@@ -7,6 +7,14 @@ import { getMsUntilNextUtcMidnight } from "@/lib/utc-midnight";
 
 interface CountdownTimerProps {
   className?: string;
+  /**
+   * `inline` is the small widget next to a heading (challenge page, today's card). `display`
+   * makes the clock the focal point of a section: digit plates in the pixel face.
+   *
+   * The landing used to scale the inline variant up by 1.5, which magnified a widget instead
+   * of showing a clock — the pixel icon and the 12px labels grew along with it.
+   */
+  variant?: "inline" | "display";
 }
 
 function formatTime(ms: number) {
@@ -21,7 +29,10 @@ function formatTime(ms: number) {
   };
 }
 
-export function CountdownTimer({ className }: CountdownTimerProps) {
+export function CountdownTimer({
+  className,
+  variant = "inline",
+}: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState(() => getMsUntilNextUtcMidnight());
 
   useEffect(() => {
@@ -33,6 +44,18 @@ export function CountdownTimer({ className }: CountdownTimerProps) {
   }, []);
 
   const { hours, minutes, seconds } = formatTime(timeLeft);
+
+  if (variant === "display") {
+    return (
+      <div className={cn("flex items-start gap-2 sm:gap-4", className)}>
+        <TimePlate value={hours} label="Std" />
+        <Colon />
+        <TimePlate value={minutes} label="Min" />
+        <Colon />
+        <TimePlate value={seconds} label="Sek" />
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
@@ -56,5 +79,33 @@ function TimeBlock({ value, label }: { value: string; label: string }) {
       </span>
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>
+  );
+}
+
+/**
+ * `tabular-nums` matters more here than in the small variant: the plate must not twitch in
+ * width once a second. The pixel face is monospaced anyway, the class is the guarantee.
+ */
+function TimePlate({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <span className="rounded-lg border border-border bg-card/80 px-4 py-3 font-heading text-3xl leading-none tabular-nums text-foreground shadow-lg backdrop-blur-sm sm:px-6 sm:py-5 sm:text-5xl">
+        {value}
+      </span>
+      <span className="font-code text-xs uppercase tracking-[0.2em] text-muted-foreground">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function Colon() {
+  return (
+    <span
+      aria-hidden
+      className="font-heading text-2xl leading-none text-primary/60 sm:text-4xl mt-3 sm:mt-5"
+    >
+      :
+    </span>
   );
 }

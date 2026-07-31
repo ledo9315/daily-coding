@@ -30,8 +30,12 @@ describe("LandingCodeDemo", () => {
   });
 
   it("keeps the headline and the claim next to it", () => {
-    expect(html).toContain("ECHTE ERGEBNISSE");
-    expect(html).toContain("Lieblingssprache");
+    expect(html).toContain("OB ES PASST");
+    // The old copy promised "nutze deine vorhandenen Tools" — there is no CLI and no API.
+    // What the section may claim is that run and submit execute the same cases:
+    // `runPistonIoCases` is not even passed the mode.
+    expect(html).toContain("Dieselben Testfälle");
+    expect(html).not.toContain("vorhandenen Tools");
   });
 
   it("shows a body that actually differs per language", () => {
