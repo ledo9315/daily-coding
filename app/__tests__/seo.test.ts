@@ -33,7 +33,8 @@ describe("sitemap.xml", () => {
 
   it("lists exactly the pages a visitor can reach without an account", () => {
     expect(urls).toEqual([
-      `${SITE}/landing`,
+      // The landing lives on the apex URL since #130 — `/landing` only redirects there.
+      `${SITE}/`,
       `${SITE}/login`,
       `${SITE}/register`,
       `${SITE}/impressum`,
