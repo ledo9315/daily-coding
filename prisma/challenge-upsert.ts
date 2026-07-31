@@ -7,7 +7,7 @@ export type ChallengeSeed = Prisma.ChallengeUncheckedCreateInput & { id: string 
  * Upsert arguments derived from one payload, so `update` cannot drift from `create`.
  *
  * The seed used to hand-write `update: { ...xFields }` per challenge, listing only the
- * mechanical fields. Prose — title, description, hint, examples — sat in `create` alone, so a
+ * mechanical fields. Prose — title, description, hints, examples — sat in `create` alone, so a
  * re-seed left existing rows untouched and every challenge kept the text it was born with.
  *
  * `isActive` and `date` are deliberately not updated: those are set in the admin UI, and `date`

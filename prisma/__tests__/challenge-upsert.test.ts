@@ -12,7 +12,7 @@ const binarySearch = {
   difficulty: "easy" as const,
   points: 120,
   categoryId: "cat-algorithmen",
-  hint: "Halbiere den Suchbereich.",
+  hints: [{ title: "Ansatz", body: "Halbiere den Suchbereich." }],
   examples: [{ input: "[1,3,5]", output: "1" }],
   isActive: false,
   date: new Date("2026-07-30T00:00:00.000Z"),
@@ -31,7 +31,7 @@ describe("challengeUpsertArgs", () => {
     expect(update).toMatchObject({
       title: "Binary Search",
       description: "Gib den Index von target zurück.",
-      hint: "Halbiere den Suchbereich.",
+      hints: [{ title: "Ansatz", body: "Halbiere den Suchbereich." }],
       examples: [{ input: "[1,3,5]", output: "1" }],
       points: 120,
     });
