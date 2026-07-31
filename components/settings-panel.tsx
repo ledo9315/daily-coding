@@ -26,7 +26,7 @@ export function SettingsPanel() {
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("Passwort-Wiederholung stimmt nicht ueberein.");
+      toast.error("Passwort-Wiederholung stimmt nicht überein.");
       return;
     }
 
@@ -51,7 +51,7 @@ export function SettingsPanel() {
       setConfirmPassword("");
       toast.success("Passwort wurde erfolgreich aktualisiert.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Passwort-Aenderung fehlgeschlagen.");
+      toast.error(error instanceof Error ? error.message : "Passwort-Änderung fehlgeschlagen.");
     } finally {
       setChangingPassword(false);
     }
@@ -79,13 +79,13 @@ export function SettingsPanel() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(
-          typeof data.error === "string" ? data.error : "Konto konnte nicht geloescht werden."
+          typeof data.error === "string" ? data.error : "Konto konnte nicht gelöscht werden."
         );
       }
 
       await signOut({ callbackUrl: "/register?accountDeleted=1" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Konto-Loeschung fehlgeschlagen.");
+      toast.error(error instanceof Error ? error.message : "Konto-Löschung fehlgeschlagen.");
       setDeletingAccount(false);
     }
   }
@@ -94,7 +94,7 @@ export function SettingsPanel() {
     <div className="grid gap-6 lg:grid-cols-2">
       <Card className="pixel-box bg-card">
         <CardHeader>
-          <CardTitle className="font-sans uppercase tracking-wide">Passwort aendern</CardTitle>
+          <CardTitle className="font-sans uppercase tracking-wide">Passwort ändern</CardTitle>
           <CardDescription>
             Wenn dein Konto bereits ein Passwort hat, gib zuerst dein aktuelles Passwort ein.
           </CardDescription>
@@ -150,7 +150,7 @@ export function SettingsPanel() {
         <CardContent>
           <form className="space-y-4" onSubmit={onDeleteAccount}>
             <div className="space-y-2">
-              <Label htmlFor="deleteConfirmText">Zur Bestaetigung KONTO LÖSCHEN eingeben</Label>
+              <Label htmlFor="deleteConfirmText">Zur Bestätigung KONTO LÖSCHEN eingeben</Label>
               <Input
                 id="deleteConfirmText"
                 value={deleteConfirmText}
