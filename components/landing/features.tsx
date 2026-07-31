@@ -1,110 +1,112 @@
 "use client";
 
-import { Zap, Trophy, Script, Bullseye } from "@nsmr/pixelart-react";
-import { CardSpotlight } from "@/components/ui/card-spotlight";
+import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 
+/**
+ * The day, as a timed sequence instead of four feature cards.
+ *
+ * What this product actually has is a clock: the task changes at midnight UTC, testing is free,
+ * submitting happens once. That is a real sequence, so a time column carries information rather
+ * than decorating one.
+ *
+ * Every line is verifiable in the code: the daily is derived from the UTC calendar day
+ * (`lib/server/challenge-day.ts`), `/api/challenge/[id]/run` has no limit, a second submission is
+ * refused with 409 even after a failed one, and the streak counts consecutive UTC days with a
+ * passing submission (`lib/server/streak.ts`).
+ */
+const DAY = [
+  {
+    when: "00:00 UTC",
+    what: "Neue Aufgabe",
+    detail:
+      "Für alle dieselbe. Sie ergibt sich aus dem Kalendertag, nicht aus deinem Profil.",
+  },
+  {
+    when: "danach",
+    what: "Testen",
+    detail:
+      "Im Browser, in JavaScript, TypeScript, Python oder PHP. So oft du willst.",
+  },
+  {
+    when: "einmal",
+    what: "Abgeben",
+    detail: "Ein Versuch. Bestanden oder nicht, damit ist der Tag erledigt.",
+  },
+  {
+    when: "23:59 UTC",
+    what: "Streak",
+    detail: "Ein gelöster Tag verlängert ihn. Ein übersprungener setzt ihn auf null.",
+  },
+];
+
+const container: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120 } },
+};
+
 export function LandingFeatures() {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
-
   return (
-    <section id="features" className="py-24 bg-card/50">
+    <section className="border-y border-border bg-[#020912]">
       <motion.div
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+        className="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        variants={containerVariants}
+        variants={container}
       >
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <h2 className="font-heading text-3xl sm:text-4xl mb-4">
-            DEINE ROUTINE, DEIN FORTSCHRITT
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Streaks, XP und Bestenliste – gamifiziert, damit du dranbleibst und
-            deine Skills Schritt für Schritt ausbaust.
+        <motion.div variants={item} className="max-w-2xl">
+          <p className="font-code text-xs uppercase tracking-[0.2em] text-primary">
+            Von Mitternacht zu Mitternacht
           </p>
+          <h2 className="mt-4 font-heading text-2xl leading-tight sm:text-3xl">
+            EIN TAG AUF
+            <br />
+            DAILY CODING
+          </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
-              <div className="h-12 w-12 flex items-center justify-center rounded-full mb-4 text-primary relative z-10">
-                <Zap className="h-8 w-8" />
+        <div className="mt-14 border-t border-border">
+          {DAY.map((step) => (
+            <motion.div
+              key={step.what}
+              variants={item}
+              className="grid grid-cols-1 gap-2 border-b border-border py-6 sm:grid-cols-[9rem_1fr] sm:gap-8"
+            >
+              <span className="font-code text-sm text-primary sm:pt-1">
+                {step.when}
+              </span>
+              <div className="sm:flex sm:items-baseline sm:gap-6">
+                <h3 className="font-heading text-base sm:w-40 sm:shrink-0">
+                  {step.what}
+                </h3>
+                <p className="mt-2 text-lg text-muted-foreground sm:mt-0">
+                  {step.detail}
+                </p>
               </div>
-              <h3 className="font-heading text-lg mb-2 relative z-10">
-                Täglicher Streak
-              </h3>
-              <p className="text-sm text-muted-foreground relative z-10">
-                Baue eine Gewohnheit auf, indem du jeden Tag codest.
-              </p>
-            </CardSpotlight>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
-              <div className="h-12 w-12 flex items-center justify-center bg-accent/10 rounded-full mb-4 text-accent relative z-10">
-                <Trophy className="h-8 w-8" />
-              </div>
-              <h3 className="font-heading text-lg mb-2 relative z-10">
-                Bestenlisten
-              </h3>
-              <p className="text-sm text-muted-foreground relative z-10">
-                Vergleiche dich mit anderen – von heute bis zum Monatsranking.
-              </p>
-            </CardSpotlight>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
-              <div className="h-12 w-12 flex items-center justify-center bg-chart-4/10 rounded-full mb-4 text-chart-4 relative z-10">
-                <Script className="h-8 w-8" />
-              </div>
-              <h3 className="font-heading text-lg mb-2 relative z-10">
-                Community-Feed
-              </h3>
-              <p className="text-sm text-muted-foreground relative z-10">
-                Kurzer Überblick, was in der Community gerade passiert – zum
-                Mitfeiern und Ideen holen.
-              </p>
-            </CardSpotlight>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
-              <div className="h-12 w-12 flex items-center justify-center bg-success/10 rounded-full mb-4 text-success relative z-10">
-                <Bullseye className="h-8 w-8" />
-              </div>
-              <h3 className="font-heading text-lg mb-2 relative z-10">
-                Skill-Wachstum
-              </h3>
-              <p className="text-sm text-muted-foreground relative z-10">
-                Meistere Algorithmen und Datenstrukturen, Schritt für Schritt.
-              </p>
-            </CardSpotlight>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
+
+      {/*
+        Closes the section rather than heading it. The table walks from 00:00 to 23:59, so the
+        picture is the moment right after the last row: midnight arriving. Full-bleed, outside the
+        container, so the section's own bottom border becomes the edge of the picture.
+      */}
+      <Image
+        src="/pixel/banner.webp"
+        alt="Nachtszene als Pixelgrafik: links eine Werkstatt mit grün leuchtendem Fenster, in der Mitte ein kahler Baum auf einem Hügel, rechts ein Uhrturm vor dem Vollmond, dessen Zeiger auf Mitternacht stehen"
+        width={2172}
+        height={724}
+        sizes="100vw"
+        className="block h-auto w-full [image-rendering:pixelated]"
+      />
     </section>
   );
 }

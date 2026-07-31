@@ -38,3 +38,6 @@ data/
 
 # E-Mail-Vorschau (scripts/preview-emails.ts)
 .email-preview.html
+
+# Playwright-MCP schreibt hier Konsolenprotokolle, Seitenabbilder und Screenshots ab
+.playwright-mcp/

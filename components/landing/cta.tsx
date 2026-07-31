@@ -2,43 +2,50 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { CountdownTimer } from "@/components/countdown-timer";
 
+/**
+ * Closes with the running clock, and nothing else.
+ *
+ * Replaces a card inside a section with a centred slogan and a giant "?" at ten percent opacity,
+ * the shape every landing page ends in. The counter says what that copy was reaching for, only
+ * true and live: the next task arrives at midnight UTC, the same one for everybody.
+ *
+ * The midnight artwork was briefly here too and gave the section two focal points, which left the
+ * day timeline above with none. It closes that section now. `CountdownTimer` is the component the
+ * challenge page already uses.
+ */
 export function LandingCTA() {
   return (
-    <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-primary/5 scanlines opacity-50" />
+    <section className="relative overflow-hidden">
+      <div className="scanlines absolute inset-0 bg-primary/5 opacity-50" />
 
       <motion.div
-        className="relative mx-auto max-w-4xl px-4 text-center"
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        className="relative mx-auto flex max-w-3xl flex-col items-center px-4 py-28 text-center"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="pixel-box bg-card p-12 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <span className="font-heading text-9xl">?</span>
-          </div>
+        <p className="font-code text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          00:00 UTC, für alle gleichzeitig
+        </p>
 
-          <h2 className="font-heading text-3xl sm:text-4xl mb-6">
-            BEREIT, DEINE SKILLS ZU DEBUGGEN?
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Schließe dich anderen Nutzern an und löse tägliche Challenges.
-            Kostenlos für Einzelpersonen.
-          </p>
+        <CountdownTimer className="mt-6 scale-125 sm:scale-150" />
 
-          <Link
-            href="/join?token=123124"
-            className="pixel-btn bg-primary text-primary-foreground text-xl px-8 py-4 inline-block hover:scale-105 transition-transform"
-          >
-            CHALLENGE ANNEHMEN
-          </Link>
+        <h2 className="mt-14 font-heading text-2xl leading-tight sm:text-3xl">
+          SEI MORGEN DABEI
+        </h2>
+        <p className="mt-4 max-w-md text-lg text-muted-foreground">
+          Oder fang mit der von heute an. Sie läuft noch.
+        </p>
 
-          <p className="mt-6 text-sm text-muted-foreground">
-            Keine Kreditkarte erforderlich • Sofortiger Zugang
-          </p>
-        </div>
+        <Link
+          href="/join?token=123124"
+          className="pixel-btn mt-8 inline-block bg-primary px-8 py-4 text-xl text-primary-foreground transition-transform hover:scale-105"
+        >
+          CHALLENGE ANNEHMEN
+        </Link>
       </motion.div>
     </section>
   );
