@@ -26,7 +26,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const OG_ALT =
-  "Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge";
+  "Der Schriftzug DAILY CODING im Pixel-Stil mit dem Satz „Jeden Tag eine neue " +
+  "Coding-Challenge“, daneben ein Code-Fenster, ein Pokal und ein Blitz als Pixelgrafik";
 
 export const metadata: Metadata = {
   /**
@@ -55,20 +56,23 @@ export const metadata: Metadata = {
   description:
     "Löse jeden Tag eine neue Coding-Challenge in JavaScript, TypeScript, Python oder PHP und steige im Ranking auf.",
   /**
-   * The card a shared link shows. `og.png` is the dashboard screenshot scaled to fit
-   * 1200x630 and padded with the background colour, not cropped — cropping to that ratio
-   * would have cut the logo off the top edge (#113).
+   * The card a shared link shows: a drawn brand card in the palette of the app, replacing
+   * the padded dashboard screenshot that stood here before (#113).
    *
-   * A static file rather than a generated one: the screenshot shows what the app actually
-   * looks like today, which a drawn card cannot.
+   * Exactly 1200x630, the ratio every platform lays the card out for, and 127 KB. Size is
+   * the reason the source export was scaled down: WhatsApp drops the preview above roughly
+   * 300 KB, and a chat message is how a link like this travels.
    */
   openGraph: {
     type: "website",
     locale: "de_DE",
     siteName: "Daily Coding",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: OG_ALT }],
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: OG_ALT }],
   },
-  twitter: { card: "summary_large_image", images: [{ url: "/og.png", alt: OG_ALT }] },
+  twitter: {
+    card: "summary_large_image",
+    images: [{ url: "/og-image.jpg", alt: OG_ALT }],
+  },
   generator: "v0.app",
   icons: {
     icon: [
