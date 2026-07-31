@@ -9,7 +9,17 @@ import { EncryptedText } from "../ui/encrypted-text";
 import { FlickeringGrid } from "../ui/flickering-grid";
 import { motion, Variants } from "framer-motion";
 
-export function LandingHero() {
+/**
+ * `todaysChallengeTitle` comes from the server. The badge used to hardcode
+ * "Array Manipulation" — the one element on the page that claims to be live, and it would
+ * have claimed the same thing forever. Null when the rotation pool is empty: a badge that
+ * announces nothing is worse than no badge.
+ */
+export function LandingHero({
+  todaysChallengeTitle,
+}: {
+  todaysChallengeTitle: string | null;
+}) {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -56,16 +66,18 @@ export function LandingHero() {
         animate="visible"
         variants={containerVariants}
       >
-        <motion.div
-          variants={itemVariants}
-          className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm"
-        >
-          <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <EncryptedText
-            text="Heutige Challenge: Array Manipulation"
-            revealDelayMs={40}
-          />
-        </motion.div>
+        {todaysChallengeTitle ? (
+          <motion.div
+            variants={itemVariants}
+            className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm"
+          >
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            <EncryptedText
+              text={`Heutige Challenge: ${todaysChallengeTitle}`}
+              revealDelayMs={40}
+            />
+          </motion.div>
+        ) : null}
 
         <motion.h1
           variants={itemVariants}
