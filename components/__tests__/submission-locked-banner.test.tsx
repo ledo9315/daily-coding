@@ -7,23 +7,17 @@ import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
  * #36: the editor was greyed out and locked with no explanation where the lock was
  * visible. The hint sat at the top of the page and was long out of view by the time
  * you scrolled down to the editor.
+ *
+ * The banner has since been trimmed to its label. The two assertions on the wording —
+ * that testing is locked too, and that the lock lasts until tomorrow (UTC) — are gone
+ * with the sentence they guarded; what remains is that the lock is named at all, in a
+ * region a screen reader announces.
  */
 describe("SubmissionLockedBanner", () => {
   const markup = renderToStaticMarkup(<SubmissionLockedBanner />);
 
   it("mentions that a submission was made", () => {
     expect(markup).toMatch(/abgegeben/i);
-  });
-
-  it("mentions that testing is locked too", () => {
-    // Without this part you are left guessing why "run tests" does nothing.
-    expect(markup).toMatch(/test/i);
-    expect(markup).toMatch(/gesperrt|nicht möglich/i);
-  });
-
-  it("mentions how long the lock lasts", () => {
-    expect(markup).toMatch(/morgen/i);
-    expect(markup).toMatch(/UTC/);
   });
 
   it("is marked up as a status message for screen readers", () => {
