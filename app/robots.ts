@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL, PUBLIC_PATHS, PRIVATE_PATHS } from "@/lib/site";
+import { SITE_URL, PRIVATE_PATHS } from "@/lib/site";
 
 /**
- * `/robots.txt` used to answer 404 (#114). Everything except the pages in `PUBLIC_PATHS`
- * sits behind the login, so a crawler that follows those links only ever reaches the login
- * form — the exclusions save it the trip and keep the login URLs out of the index.
+ * `/robots.txt` used to answer 404 (#114). The exclusions are the paths behind the login: a
+ * crawler that follows them only ever reaches the login form, so the trip is wasted.
+ *
+ * `/login` and `/register` are deliberately *not* excluded — they are legitimate pages, they
+ * just have nothing to index, which is why the sitemap leaves them out instead (#132).
  */
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -16,6 +18,3 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
-
-// Re-exported for the test, which asserts the two lists do not drift apart.
-export { PUBLIC_PATHS };
