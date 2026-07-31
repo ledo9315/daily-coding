@@ -11,6 +11,7 @@ import { nameKeyOf } from "../lib/display-name";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 import bcrypt from "bcryptjs";
+import { challengeUpsertArgs } from "./challenge-upsert";
 
 loadEnv({ path: resolve(process.cwd(), ".env") });
 loadEnv({ path: resolve(process.cwd(), ".env.local"), override: true });
@@ -284,51 +285,8 @@ async function main() {
 
   const supportedLangs = ["javascript", "typescript", "python", "php"] as const;
 
-  const challengeToday = await prisma.challenge.upsert({
-    where: { id: "challenge-array-manipulation" },
-    update: {
-      supportedLanguages: [...supportedLangs],
-      evaluationConfig: {
-        callableByLanguage: {
-          javascript: "transformArray",
-          typescript: "transformArray",
-          python: "transform_array",
-          php: "transformArray",
-        },
-      },
-      testCases: [
-        {
-          id: 1,
-          name: "Einfaches Array",
-          input: "[1,2,3,4,5]",
-          expected: "[1,3,6,10,15]",
-        },
-        { id: 2, name: "Leeres Array", input: "[]", expected: "[]" },
-        {
-          id: 3,
-          name: "Negative Zahlen",
-          input: "[-1,-2,-3]",
-          expected: "[-1,-3,-6]",
-        },
-        {
-          id: 4,
-          name: "Gemischte Werte",
-          input: "[5,-2,3,1]",
-          expected: "[5,3,6,7]",
-        },
-        { id: 5, name: "Ein Element", input: "[42]", expected: "[42]" },
-      ],
-      starterCodes: {
-        javascript: "function transformArray(arr) {\n  // Your solution here\n}",
-        typescript:
-          "function transformArray(arr: number[]): number[] {\n  // Your solution here\n  return arr;\n}",
-        python:
-          "def transform_array(arr):\n    # Your solution here\n    pass\n",
-        php: "<?php\n\nfunction transformArray($arr) {\n    // Your solution here\n}\n",
-      },
-      starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
-    },
-    create: {
+  const challengeToday = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-array-manipulation",
       title: "Array Manipulation Challenge",
       description: "Implementiere eine Funktion transformArray(arr), die ein Array von Zahlen nimmt und ein neues Array zurückgibt, bei dem jedes Element die kumulative Summe aller vorherigen Elemente (inklusive sich selbst) enthält.",
@@ -382,8 +340,8 @@ async function main() {
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
       isActive: true,
       date: anchor,
-    },
-  });
+    }),
+  );
 
   const binarySearchFields = {
     supportedLanguages: [...supportedLangs],
@@ -415,10 +373,8 @@ async function main() {
       "function binarySearch(data) {\n  const { arr, target } = data;\n  // Your solution here\n  return -1;\n}",
   };
 
-  const challengeBinarySearch = await prisma.challenge.upsert({
-    where: { id: "challenge-binary-search" },
-    update: { ...binarySearchFields },
-    create: {
+  const challengeBinarySearch = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-binary-search",
       title: "Binary Search",
       description:
@@ -434,8 +390,8 @@ async function main() {
       ...binarySearchFields,
       isActive: false,
       date: addUtcDays(anchor, -1),
-    },
-  });
+    }),
+  );
 
   const stringReversalFields = {
     supportedLanguages: [...supportedLangs],
@@ -464,10 +420,8 @@ async function main() {
     starterCode: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
   };
 
-  const challengeStringReversal = await prisma.challenge.upsert({
-    where: { id: "challenge-string-reversal" },
-    update: { ...stringReversalFields },
-    create: {
+  const challengeStringReversal = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-string-reversal",
       title: "String Reversal",
       description:
@@ -483,8 +437,8 @@ async function main() {
       ...stringReversalFields,
       isActive: false,
       date: addUtcDays(anchor, -2),
-    },
-  });
+    }),
+  );
 
   const hashMapFields = {
     supportedLanguages: [...supportedLangs],
@@ -532,10 +486,8 @@ async function main() {
     starterCode: "function hashMap(operations) {\n  // Your solution here\n  return [];\n}",
   };
 
-  const challengeHashMap = await prisma.challenge.upsert({
-    where: { id: "challenge-hashmap" },
-    update: { ...hashMapFields },
-    create: {
+  const challengeHashMap = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-hashmap",
       title: "Hash Map Implementation",
       description:
@@ -553,8 +505,8 @@ async function main() {
       ...hashMapFields,
       isActive: false,
       date: addUtcDays(anchor, -3),
-    },
-  });
+    }),
+  );
 
   const recursionFields = {
     supportedLanguages: [...supportedLangs],
@@ -583,10 +535,8 @@ async function main() {
     starterCode: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
   };
 
-  const challengeRecursion = await prisma.challenge.upsert({
-    where: { id: "challenge-recursion" },
-    update: { ...recursionFields },
-    create: {
+  const challengeRecursion = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-recursion",
       title: "Recursion Basics",
       description:
@@ -602,8 +552,8 @@ async function main() {
       ...recursionFields,
       isActive: false,
       date: addUtcDays(anchor, -4),
-    },
-  });
+    }),
+  );
 
   const binaryTreeFields = {
     supportedLanguages: [...supportedLangs],
@@ -655,10 +605,8 @@ async function main() {
     starterCode: "function inorderTraversal(root) {\n  // Your solution here\n  return [];\n}",
   };
 
-  const challengeBinaryTree = await prisma.challenge.upsert({
-    where: { id: "challenge-binary-tree" },
-    update: { ...binaryTreeFields },
-    create: {
+  const challengeBinaryTree = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-binary-tree",
       title: "Binary Tree Traversal",
       description:
@@ -676,8 +624,8 @@ async function main() {
       ...binaryTreeFields,
       isActive: false,
       date: addUtcDays(anchor, -5),
-    },
-  });
+    }),
+  );
 
   // ─── Further challenges (LeetCode / Codewars classics) ────────────────────────
 
@@ -711,10 +659,8 @@ async function main() {
       "function twoSum(data) {\n  const { nums, target } = data;\n  // Your solution here\n  return [];\n}",
   };
 
-  const challengeTwoSum = await prisma.challenge.upsert({
-    where: { id: "challenge-two-sum" },
-    update: { ...twoSumFields },
-    create: {
+  const challengeTwoSum = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-two-sum",
       title: "Two Sum",
       description:
@@ -727,8 +673,8 @@ async function main() {
       ...twoSumFields,
       isActive: false,
       date: addUtcDays(anchor, -6),
-    },
-  });
+    }),
+  );
 
   const fizzBuzzFields = {
     supportedLanguages: [...supportedLangs],
@@ -762,10 +708,8 @@ async function main() {
     starterCode: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
   };
 
-  const challengeFizzBuzz = await prisma.challenge.upsert({
-    where: { id: "challenge-fizzbuzz" },
-    update: { ...fizzBuzzFields },
-    create: {
+  const challengeFizzBuzz = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-fizzbuzz",
       title: "FizzBuzz",
       description:
@@ -778,8 +722,8 @@ async function main() {
       ...fizzBuzzFields,
       isActive: false,
       date: addUtcDays(anchor, -7),
-    },
-  });
+    }),
+  );
 
   const validParenthesesFields = {
     supportedLanguages: [...supportedLangs],
@@ -807,10 +751,8 @@ async function main() {
     starterCode: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
   };
 
-  const challengeValidParentheses = await prisma.challenge.upsert({
-    where: { id: "challenge-valid-parentheses" },
-    update: { ...validParenthesesFields },
-    create: {
+  const challengeValidParentheses = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-valid-parentheses",
       title: "Valid Parentheses",
       description:
@@ -826,8 +768,8 @@ async function main() {
       ...validParenthesesFields,
       isActive: false,
       date: addUtcDays(anchor, -8),
-    },
-  });
+    }),
+  );
 
   const countVowelsFields = {
     supportedLanguages: [...supportedLangs],
@@ -855,10 +797,8 @@ async function main() {
     starterCode: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
   };
 
-  const challengeCountVowels = await prisma.challenge.upsert({
-    where: { id: "challenge-count-vowels" },
-    update: { ...countVowelsFields },
-    create: {
+  const challengeCountVowels = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-count-vowels",
       title: "Count Vowels",
       description:
@@ -871,8 +811,8 @@ async function main() {
       ...countVowelsFields,
       isActive: false,
       date: addUtcDays(anchor, -9),
-    },
-  });
+    }),
+  );
 
   const maxSubArrayFields = {
     supportedLanguages: [...supportedLangs],
@@ -900,10 +840,8 @@ async function main() {
     starterCode: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
   };
 
-  const challengeMaxSubArray = await prisma.challenge.upsert({
-    where: { id: "challenge-max-subarray" },
-    update: { ...maxSubArrayFields },
-    create: {
+  const challengeMaxSubArray = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-max-subarray",
       title: "Maximum Subarray",
       description:
@@ -916,8 +854,8 @@ async function main() {
       ...maxSubArrayFields,
       isActive: false,
       date: addUtcDays(anchor, -10),
-    },
-  });
+    }),
+  );
 
   const isAnagramFields = {
     supportedLanguages: [...supportedLangs],
@@ -949,10 +887,8 @@ async function main() {
       "function isAnagram(data) {\n  const { s, t } = data;\n  // Your solution here\n  return false;\n}",
   };
 
-  const challengeIsAnagram = await prisma.challenge.upsert({
-    where: { id: "challenge-valid-anagram" },
-    update: { ...isAnagramFields },
-    create: {
+  const challengeIsAnagram = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-valid-anagram",
       title: "Valid Anagram",
       description:
@@ -965,8 +901,8 @@ async function main() {
       ...isAnagramFields,
       isActive: false,
       date: addUtcDays(anchor, -11),
-    },
-  });
+    }),
+  );
 
   const digitalRootFields = {
     supportedLanguages: [...supportedLangs],
@@ -994,10 +930,8 @@ async function main() {
     starterCode: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
   };
 
-  const challengeDigitalRoot = await prisma.challenge.upsert({
-    where: { id: "challenge-digital-root" },
-    update: { ...digitalRootFields },
-    create: {
+  const challengeDigitalRoot = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-digital-root",
       title: "Digital Root",
       description:
@@ -1010,8 +944,8 @@ async function main() {
       ...digitalRootFields,
       isActive: false,
       date: addUtcDays(anchor, -12),
-    },
-  });
+    }),
+  );
 
   const moveZeroesFields = {
     supportedLanguages: [...supportedLangs],
@@ -1039,10 +973,8 @@ async function main() {
     starterCode: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
   };
 
-  const challengeMoveZeroes = await prisma.challenge.upsert({
-    where: { id: "challenge-move-zeroes" },
-    update: { ...moveZeroesFields },
-    create: {
+  const challengeMoveZeroes = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-move-zeroes",
       title: "Move Zeroes",
       description:
@@ -1055,8 +987,8 @@ async function main() {
       ...moveZeroesFields,
       isActive: false,
       date: addUtcDays(anchor, -13),
-    },
-  });
+    }),
+  );
 
   const romanToIntFields = {
     supportedLanguages: [...supportedLangs],
@@ -1084,10 +1016,8 @@ async function main() {
     starterCode: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",
   };
 
-  const challengeRomanToInt = await prisma.challenge.upsert({
-    where: { id: "challenge-roman-to-integer" },
-    update: { ...romanToIntFields },
-    create: {
+  const challengeRomanToInt = await prisma.challenge.upsert(
+    challengeUpsertArgs({
       id: "challenge-roman-to-integer",
       title: "Roman to Integer",
       description:
@@ -1103,8 +1033,8 @@ async function main() {
       ...romanToIntFields,
       isActive: false,
       date: addUtcDays(anchor, -14),
-    },
-  });
+    }),
+  );
 
   // These challenges are only created; nothing references them later.
   void [
@@ -1146,6 +1076,13 @@ async function main() {
   // challenge". Every finished challenge is eligible — otherwise the rotation would
   // hold a single element and the app would serve the same challenge forever.
   await prisma.challenge.updateMany({ data: { isActive: true } });
+  /**
+   * `Challenge.date` is unique and the dates below are handed out one row at a time. Seeding
+   * again on a later day shifts every date by the number of days passed, so the row about to
+   * receive `anchor - 1` still holds `anchor` — the second update collides and the seed dies
+   * halfway through. Clearing the column first makes the reassignment order-independent.
+   */
+  await prisma.challenge.updateMany({ data: { date: null } });
   // An explicit date still wins: on the seed day that is the well-known challenge.
   await prisma.challenge.update({
     where: { id: challengeToday.id },
