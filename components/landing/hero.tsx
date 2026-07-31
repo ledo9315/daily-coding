@@ -79,12 +79,18 @@ export function LandingHero({
           </motion.div>
         ) : null}
 
+        {/*
+          "VERBESSERE DEINE CODING-SKILLS" was the one line on this page that any of the dozen
+          other exercise sites could have written, almost word for word Codewars' subline. This
+          one nobody else can: the product is a single task per calendar day, and that is the
+          whole reason to stay. The subline below carries the contrast to the endless libraries.
+        */}
         <motion.h1
           variants={itemVariants}
           className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6"
         >
-          VERBESSERE DEINE <br />
-          <span className="text-chart-5 retro-glow">CODING-SKILLS</span> <br />
+          EINE AUFGABE <br />
+          <span className="text-chart-5 retro-glow">JEDEN TAG</span> <br />
         </motion.h1>
 
         <motion.p
@@ -109,7 +115,9 @@ export function LandingHero({
             href="#features"
             className="pixel-btn bg-card hover:bg-muted min-w-50 text-center"
           >
-            FEATURES ANSEHEN
+            {/* Named after its target: the anchor now sits on the day timeline. It said
+                "FEATURES ANSEHEN" and led to something that was never a feature list. */}
+            SO LÄUFT EIN TAG
           </Link>
         </motion.div>
 
@@ -131,15 +139,19 @@ export function LandingHero({
           <div className="flex flex-col items-center gap-2">
             <Code2 className="h-8 w-8 text-primary" />
             <span className="font-heading text-lg">TÄGLICHE AUFGABEN</span>
+            {/* The three difficulties the seed actually uses, instead of "kuratiert". */}
             <span className="text-muted-foreground text-sm">
-              Kuratierte Coding-Probleme
+              Leicht, mittel, schwer im Wechsel
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <Trophy className="h-8 w-8 text-accent" />
-            <span className="font-heading text-lg">GAMIFICATION</span>
+            {/* "GAMIFICATION" was the only piece of English jargon left on the page, and it
+                named the mechanism instead of what it does for you. "XP" was the only place in
+                the project that called them that; app, ranking and the cards say Punkte. */}
+            <span className="font-heading text-lg">PUNKTE UND LEVEL</span>
             <span className="text-muted-foreground text-sm">
-              XP, Streaks &amp; Abzeichen
+              Streaks, Abzeichen, Wertungen
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
