@@ -79,8 +79,8 @@ export function LandingHero() {
           variants={itemVariants}
           className="mx-auto max-w-2xl text-xl text-muted-foreground mb-10"
         >
-          Tägliche Challenges, XP und Streaks – plus Bestenliste und
-          Community-Feed. So bleibst du dran und siehst deinen Fortschritt.
+          Keine Sammlung mit Tausenden Aufgaben, in der du nicht weißt, wo du
+          anfangen sollst. Eine Aufgabe am Tag: die, die heute für alle gilt.
         </motion.p>
 
         <motion.div
