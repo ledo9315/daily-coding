@@ -27,7 +27,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const OG_ALT =
   "Der Schriftzug DAILY CODING im Pixel-Stil mit dem Satz „Jeden Tag eine neue " +
-  "Coding-Challenge“, daneben ein Code-Fenster, ein Pokal und ein Blitz als Pixelgrafik";
+  "Coding-Challenge“, daneben ein Code-Fenster und ein Pokal als Pixelgrafik";
 
 export const metadata: Metadata = {
   /**
