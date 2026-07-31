@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
@@ -41,6 +42,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 function resolveIcon(iconKey: string): React.ComponentType<{ className?: string }> {
   return iconMap[iconKey] ?? Bookmark;
 }
+
+export const metadata: Metadata = { title: "Profil" };
 
 export default async function ProfilePage() {
   const session = await auth();

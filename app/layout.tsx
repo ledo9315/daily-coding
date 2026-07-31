@@ -39,8 +39,19 @@ export const metadata: Metadata = {
    * at a throwaway preview host.
    */
   metadataBase: new URL("https://daily-coding.de"),
+  /**
+   * `template` composes every other page's title, so no page repeats the brand by hand.
+   * Three different suffix styles had grown before that — `– Daily Coding`, `| Admin` and
+   * none at all (#131).
+   *
+   * The default is the landing's title: `/` renders the landing for visitors without a
+   * session, and that is the page a search result points at.
+   */
   // Same tagline as the mail footer, so the name reads identically everywhere (#109).
-  title: "Daily Coding – täglich eine Coding-Challenge",
+  title: {
+    default: "Daily Coding – täglich eine Coding-Challenge",
+    template: "%s · Daily Coding",
+  },
   description:
     "Löse jeden Tag eine neue Coding-Challenge in JavaScript, TypeScript, Python oder PHP und steige im Ranking auf.",
   /**
