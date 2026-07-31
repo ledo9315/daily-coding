@@ -167,14 +167,20 @@ export function LandingCodeDemo() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
           >
+            {/*
+              "Nutze deine vorhandenen Tools" was not true: there is no CLI and no API, code runs
+              in the editor on the challenge page. What is true is the thing a visitor wants to
+              know before signing up — the same test cases that grade the submission run
+              beforehand, as often as you like.
+            */}
             <h2 className="font-heading text-3xl sm:text-4xl">
-              REALER CODE, <br />
-              <span className="text-chart-5 retro-glow">ECHTE ERGEBNISSE</span>
+              SOFORT SEHEN, <br />
+              <span className="text-chart-5 retro-glow">OB ES PASST</span>
             </h2>
             <p className="text-xl text-muted-foreground">
-              Keine Drag &amp; Drop Puzzles. Löse echte Probleme in deiner
-              Lieblingssprache. Nutze deine vorhandenen Tools oder unseren
-              integrierten Editor.
+              Dieselben Testfälle, die später deine Abgabe bewerten, laufen
+              vorher im Browser. So oft du willst, in JavaScript, TypeScript,
+              Python oder PHP.
             </p>
           </motion.div>
 
@@ -208,6 +214,7 @@ export function LandingCodeDemo() {
               <TerminalAnimationContainer className="max-w-xl px-0 pt-0 md:pt-0">
                 <TerminalAnimationWindow
                   /* Darker than the page and than `bg-card`, so the window reads as a screen. */
+                  backgroundColor="#020203"
                   className="h-[22rem] rounded-xl border border-border shadow-2xl"
                   minHeight="0"
                 >

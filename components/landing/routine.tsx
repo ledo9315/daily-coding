@@ -7,6 +7,13 @@ import { motion, Variants } from "framer-motion";
 /**
  * What accumulates across days. The look is deliberate and unchanged; the content is not.
  *
+ * Headed with verbs, not nouns. "Level", "Bestenlisten", "Community-Feed" and "Monatsübersicht"
+ * are the names of database fields, and a card headed with one reads like documentation, which is
+ * why it sounded like placeholder text. Each card now opens with what you do and puts the
+ * mechanism in the body, the pattern Codewars uses on its own landing page. Short titles are a
+ * constraint, not a preference: in the pixel face
+ * "Monatsübersicht" overran the card width, and eleven characters is where a title stops wrapping.
+ *
  * Everything it used to say was already said above it: the intro repeated the hero's USP and the
  * timeline's "one task, one attempt", the streak card repeated the timeline's last row almost word
  * for word, and "Algorithmen und Datenstrukturen, in vier Sprachen" repeated both the hero trio
@@ -56,11 +63,11 @@ export function LandingRoutine() {
       >
         <motion.div variants={itemVariants} className="text-center mb-16">
           <h2 className="font-heading text-3xl sm:text-4xl mb-4">
-            WAS SICH ANSAMMELT
+            AUS TAGEN WIRD KÖNNEN
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Ein Tag ist schnell vorbei. Das hier bleibt und wächst, solange du
-            dabei bist.
+            Eine einzelne Aufgabe ist morgen vergessen. Das hier bleibt und
+            zeigt dir, wie weit du gekommen bist.
           </p>
         </motion.div>
 
@@ -71,11 +78,12 @@ export function LandingRoutine() {
                 <ArrowBarUp className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Level
+                Steig auf
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Punkte summieren sich. 100 für Level 2, danach verdoppelt sich
-                jede Schwelle: Einsteiger, Aufsteiger, Experte, Meister, Legende.
+                Punkte für jede gelöste Aufgabe, Level für gesammelte Punkte.
+                Von Einsteiger bis Legende, und jede Stufe liegt doppelt so weit
+                wie die vorige.
               </p>
             </CardSpotlight>
           </motion.div>
@@ -86,10 +94,10 @@ export function LandingRoutine() {
                 <Trophy className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Bestenlisten
+                Miss dich
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Woche und Monat, sortiert nach gelösten Aufgaben. Bei
+                Wochen- und Monatswertung nach gelösten Aufgaben. Bei
                 Gleichstand entscheiden die Punkte.
               </p>
             </CardSpotlight>
@@ -101,11 +109,11 @@ export function LandingRoutine() {
                 <Script className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Community-Feed
+                Schau rein
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Wer gelöst hat, wer ein Level erreicht hat, wer ein Abzeichen
-                bekommen hat.
+                Wer heute gelöst hat, wer aufgestiegen ist, wer ein Abzeichen
+                geholt hat. Dieselbe Aufgabe, viele Leute.
               </p>
             </CardSpotlight>
           </motion.div>
@@ -116,10 +124,11 @@ export function LandingRoutine() {
                 <Calendar className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Monatsübersicht
+                Sieh zurück
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Ein Kalender deiner gelösten Tage. Lücken siehst du sofort.
+                Ein Kalender deiner gelösten Tage. Du siehst sofort, wo du dran
+                geblieben bist.
               </p>
             </CardSpotlight>
           </motion.div>

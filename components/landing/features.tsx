@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 
 /**
@@ -52,7 +51,13 @@ const item: Variants = {
 
 export function LandingFeatures() {
   return (
-    <section className="border-y border-border bg-[#020912]">
+    /* Only a top border: the countdown section below shares this background, and a line between
+       them would split what is meant to read as one block.
+
+       `id="features"` is the hero button's target. It lived on the section that is currently
+       commented out in `landing-page.tsx`; if that one comes back, one of the two has to give up
+       the anchor. */
+    <section id="features" className="border-t border-border bg-[#020912]">
       <motion.div
         className="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8"
         initial="hidden"
@@ -94,19 +99,6 @@ export function LandingFeatures() {
         </div>
       </motion.div>
 
-      {/*
-        Closes the section rather than heading it. The table walks from 00:00 to 23:59, so the
-        picture is the moment right after the last row: midnight arriving. Full-bleed, outside the
-        container, so the section's own bottom border becomes the edge of the picture.
-      */}
-      <Image
-        src="/pixel/banner.webp"
-        alt="Nachtszene als Pixelgrafik: links eine Werkstatt mit grün leuchtendem Fenster, in der Mitte ein kahler Baum auf einem Hügel, rechts ein Uhrturm vor dem Vollmond, dessen Zeiger auf Mitternacht stehen"
-        width={2172}
-        height={724}
-        sizes="100vw"
-        className="block h-auto w-full [image-rendering:pixelated]"
-      />
     </section>
   );
 }
