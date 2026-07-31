@@ -5,15 +5,15 @@
  */
 export const SITE_URL = "https://daily-coding.de";
 
-/** Reachable without an account — the only pages worth putting in a sitemap (#114). */
-export const PUBLIC_PATHS = [
-  // The landing itself since #130; `/landing` now only redirects here.
-  "/",
-  "/login",
-  "/register",
-  "/impressum",
-  "/datenschutz",
-] as const;
+/**
+ * The pages worth recommending in the sitemap: those that carry content. The landing sits
+ * on the apex URL since #130.
+ *
+ * This used to be `PUBLIC_PATHS`, "reachable without an account" — a different question,
+ * and answering it put `/login` and `/register` in the sitemap, which recommends a sign-in
+ * form for indexing (#132). Both stay crawlable; they are simply not recommended.
+ */
+export const SITEMAP_PATHS = ["/", "/impressum", "/datenschutz"] as const;
 
 /**
  * Behind the login. Kept in step with `PROTECTED_PATHS` in `middleware.ts` plus the API
