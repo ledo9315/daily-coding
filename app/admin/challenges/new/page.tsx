@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminPage } from "@/lib/server/require-admin-page";
 
 export const metadata = {
-  title: "Neue Aufgabe | Admin",
+  title: "Neue Aufgabe",
 };
 
 export default async function AdminNewChallengePage() {

@@ -3,7 +3,9 @@ import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingFooter } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Impressum – Daily Coding",
+  title: "Impressum",
+  description: "Anbieterkennzeichnung und Kontaktdaten für daily-coding.de.",
+  alternates: { canonical: "/impressum" },
 };
 
 // ponytail: static legal text. Have it reviewed by a lawyer before launch.

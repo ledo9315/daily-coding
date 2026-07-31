@@ -3,7 +3,10 @@ import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingFooter } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Datenschutzerklärung – Daily Coding",
+  title: "Datenschutzerklärung",
+  description:
+    "Welche Daten Daily Coding verarbeitet, zu welchem Zweck, an welche Dienstleister sie gehen und welche Rechte du hast.",
+  alternates: { canonical: "/datenschutz" },
 };
 
 export default function DatenschutzPage() {

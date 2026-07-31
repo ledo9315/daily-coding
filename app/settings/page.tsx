@@ -1,10 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Header } from "@/components/header";
 import { SettingsPanel } from "@/components/settings-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = { title: "Einstellungen" };
 
 export default async function SettingsPage() {
   const session = await auth();
