@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         id: data.id,
         title: data.title,
         description: data.description,
-        hint: data.hint ?? null,
+        hints: data.hints,
         difficulty: data.difficulty,
         points: data.points,
         categoryId: data.categoryId,

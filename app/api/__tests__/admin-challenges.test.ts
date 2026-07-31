@@ -34,6 +34,7 @@ const validBody = {
   points: 50,
   categoryId: "cat-x",
   examples: [{ input: "1", output: "2" }],
+  hints: [{ title: "Ansatz", body: "Modulo." }],
   testCases: [{ name: "A", input: "i", expected: "o" }],
   evaluationConfig: {
     callableByLanguage: {

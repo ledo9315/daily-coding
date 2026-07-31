@@ -10,6 +10,7 @@ import { SubmissionStatus } from "@/components/submission-status";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { CountdownTimer } from "@/components/countdown-timer";
+import { ChallengeHints } from "@/components/challenge-hints";
 import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
 import {
   Card,
@@ -24,7 +25,6 @@ import {
   Play,
   ArrowRight,
   Alert as AlertIcon,
-  Lightbulb,
   BookOpen,
 } from "@nsmr/pixelart-react";
 import { EncryptedText } from "@/components/ui/encrypted-text";
@@ -302,7 +302,8 @@ export default function ChallengePage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <CardDescription className="text-lg text-muted-foreground">
+                {/* pre-wrap, so a description may use paragraphs — nothing parses Markdown. */}
+                <CardDescription className="whitespace-pre-wrap text-lg text-muted-foreground">
                   {challenge.description}
                 </CardDescription>
 
@@ -322,16 +323,7 @@ export default function ChallengePage() {
                   ))}
                 </div>
 
-                <div className="flex items-start gap-2 border border-amber-500/30 bg-amber-500/10 p-4">
-                  <Lightbulb
-                    className="mt-0.5 h-5 w-5 shrink-0 text-accent"
-                    fill="currentColor"
-                  />
-                  <div>
-                    <h4 className="font-medium text-accent">Hinweis</h4>
-                    <p className="text-base text-accent/90">{challenge.hint}</p>
-                  </div>
-                </div>
+                <ChallengeHints hints={challenge.hints} />
               </CardContent>
             </Card>
 

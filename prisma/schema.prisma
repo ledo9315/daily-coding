@@ -112,7 +112,8 @@ model Challenge {
   points      Int
   categoryId  String
   category    Category     @relation(fields: [categoryId], references: [id])
-  hint        String?
+  /// Staged hints, unfolded one at a time: [{ "title": "Die Idee", "body": "…" }]
+  hints       Json         @default("[]")
   examples    Json         @default("[]")
   testCases   Json         @default("[]")
   /// Optional: { "callableByLanguage": { "javascript": "fn", "typescript": "fn", "python": "sn_fn", "php": "fn" } } for stdin/stdout grading
