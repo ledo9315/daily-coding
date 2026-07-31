@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Code2, MessagesSquare, Trophy } from "lucide-react";
+import { Code2, TrendingUp, Trophy } from "lucide-react";
 import { Meteors } from "../ui/meteors";
 import Image from "next/image";
 import { BorderBeam } from "../ui/border-beam";
@@ -139,14 +139,16 @@ export function LandingHero({
             <Trophy className="h-8 w-8 text-accent" />
             <span className="font-heading text-lg">GAMIFICATION</span>
             <span className="text-muted-foreground text-sm">
-              XP, Streaks & Abzeichen
+              XP, Streaks &amp; Abzeichen
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <MessagesSquare className="h-8 w-8 text-chart-4" />
-            <span className="font-heading text-lg">COMMUNITY</span>
+            {/* chart-1 rather than the chart-4 red the community slot had: red reads as a
+                warning, and this one is about growing. */}
+            <TrendingUp className="h-8 w-8 text-chart-1" />
+            <span className="font-heading text-lg">SKILL-WACHSTUM</span>
             <span className="text-muted-foreground text-sm">
-              Feed und Aktivität
+              Algorithmen und Datenstrukturen
             </span>
           </div>
         </motion.div>
