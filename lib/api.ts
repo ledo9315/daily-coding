@@ -2,8 +2,10 @@
 
 import type { CodeLanguageId, StarterCodesMap } from "@/lib/challenge-languages";
 import type { MonthlyActivity } from "@/lib/monthly-activity";
+import type { ChallengeHint } from "@/lib/challenge-hints";
 
 export type { CodeLanguageId, StarterCodesMap };
+export type { ChallengeHint };
 export type { MonthlyActivity, MonthlyActivityDayCell } from "@/lib/monthly-activity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -120,7 +122,8 @@ export interface DailyChallenge {
   difficulty: "easy" | "medium" | "hard";
   points: number;
   category: string;
-  hint: string;
+  /** Staged help, unfolded one step at a time. Empty when the challenge offers none. */
+  hints: ChallengeHint[];
   examples: Array<{ input: string; output: string }>;
   testCases: ChallengeTestCase[];
   /** Languages accepted for this challenge (run + submit). */

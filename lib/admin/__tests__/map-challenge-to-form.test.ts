@@ -15,7 +15,7 @@ describe("challengeToFormInitial", () => {
     difficulty: "easy" as const,
     points: 100,
     categoryId: "cat-1",
-    hint: null,
+    hints: [],
     examples: [],
     testCases: [],
     evaluationConfig: null,

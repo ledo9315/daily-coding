@@ -44,6 +44,7 @@ const patchBody = {
   points: 10,
   categoryId: "cat-1",
   examples: [],
+  hints: [],
   testCases: [{ name: "t", input: "1", expected: "1" }],
   evaluationConfig: {
     callableByLanguage: {

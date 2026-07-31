@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CODE_LANGUAGES } from "@/lib/challenge-languages";
+import { HINT_TITLE_MAX } from "@/lib/challenge-hints";
 
 const codeLanguageZ = z.enum(CODE_LANGUAGES);
 
@@ -12,7 +13,13 @@ export const adminCreateChallengeSchema = z.object({
     .regex(/^[a-z0-9-]+$/u, "Nur Kleinbuchstaben, Ziffern und Bindestrich."),
   title: z.string().min(1).max(200),
   description: z.string().min(1).max(50000),
-  hint: z.string().max(10000).optional().nullable(),
+  /** Staged hints. Required rather than defaulted: an omitted field would silently clear them. */
+  hints: z.array(
+    z.object({
+      title: z.string().min(1).max(HINT_TITLE_MAX),
+      body: z.string().min(1).max(10000),
+    }),
+  ),
   difficulty: z.enum(["easy", "medium", "hard"]),
   points: z.number().int().min(1).max(100000),
   categoryId: z.string().min(1),
