@@ -293,7 +293,7 @@ async function main() {
       difficulty: "medium",
       points: 150,
       categoryId: catAlgorithmen.id,
-      hint: "Versuche die Lösung mit O(n) Zeitkomplexität und O(1) zusätzlichem Speicher zu implementieren.",
+      hints: [{ title: "Ansatz", body: "Versuche die Lösung mit O(n) Zeitkomplexität und O(1) zusätzlichem Speicher zu implementieren." }],
       examples: [
         { input: "[1, 2, 3, 4, 5]", output: "[1, 3, 6, 10, 15]" },
         { input: "[5, -2, 3, 1]", output: "[5, 3, 6, 7]" },
@@ -378,11 +378,43 @@ async function main() {
       id: "challenge-binary-search",
       title: "Binary Search",
       description:
-        "Implementiere binarySearch(data) mit data = { arr, target }: Gib den Index von target im aufsteigend sortierten Array arr zurück – oder -1, wenn target nicht enthalten ist.",
+        "Implementiere binarySearch(data) mit data = { arr, target }.\n\n" +
+        "arr ist aufsteigend sortiert. Gib den Index von target zurück – oder -1, wenn " +
+        "target nicht enthalten ist.\n\n" +
+        "Die binäre Suche nutzt aus, dass das Array sortiert ist: statt jedes Element zu " +
+        "prüfen, halbiert sie den Suchbereich mit jedem Vergleich. Das ist O(log n) statt " +
+        "O(n) – bei einer Million Einträgen rund 20 Schritte statt einer Million. Ein " +
+        "indexOf besteht die Tests, geht aber an der Aufgabe vorbei.",
       difficulty: "easy",
       points: 120,
       categoryId: catAlgorithmen.id,
-      hint: "Teile den Suchbereich in der Mitte und grenze ihn iterativ ein (O(log n)).",
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Vergleiche target mit dem Element in der Mitte. Ist das zu groß, kann target " +
+            "nur links davon liegen; ist es zu klein, nur rechts. Jeder Vergleich wirft " +
+            "also die Hälfte des Bereichs weg.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Halte den Suchbereich in zwei Indizes: low = 0 und high = arr.length - 1. " +
+            "Solange low <= high, berechne mid = Math.floor((low + high) / 2). Trifft " +
+            "arr[mid] das Ziel, gib mid zurück. Ist arr[mid] kleiner, suche rechts weiter " +
+            "(low = mid + 1), sonst links (high = mid - 1).",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die Grenze muss über mid hinaus wandern (mid + 1 bzw. mid - 1). Bleibt sie " +
+            "auf mid stehen, schrumpft der Bereich irgendwann nicht mehr und die Schleife " +
+            "läuft endlos.\n\n" +
+            "Und mid gehört in jeden Durchlauf neu berechnet, nicht vor die Schleife.\n\n" +
+            "Endet die Schleife ohne Treffer, ist die Antwort -1 – das deckt auch das " +
+            "leere Array ab.",
+        },
+      ],
       examples: [
         { input: '{ "arr": [1,3,5,7,9], "target": 5 }', output: "2" },
         { input: '{ "arr": [1,3,5,7,9], "target": 4 }', output: "-1" },
@@ -429,7 +461,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hint: "Nutze einen Zwei-Zeiger-Ansatz oder kehre die Zeichen direkt um.",
+      hints: [{ title: "Ansatz", body: "Nutze einen Zwei-Zeiger-Ansatz oder kehre die Zeichen direkt um." }],
       examples: [
         { input: '"hello"', output: '"olleh"' },
         { input: '"racecar"', output: '"racecar"' },
@@ -495,7 +527,7 @@ async function main() {
       difficulty: "medium",
       points: 150,
       categoryId: catDatenstrukturen.id,
-      hint: "Verwende intern eine Map bzw. ein Dictionary und laufe die Operationen der Reihe nach durch.",
+      hints: [{ title: "Ansatz", body: "Verwende intern eine Map bzw. ein Dictionary und laufe die Operationen der Reihe nach durch." }],
       examples: [
         {
           input: '[["set","a",1],["get","a"],["get","b"]]',
@@ -544,7 +576,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      hint: "fibonacci(n) = fibonacci(n-1) + fibonacci(n-2), mit fibonacci(0) = 0 und fibonacci(1) = 1.",
+      hints: [{ title: "Ansatz", body: "fibonacci(n) = fibonacci(n-1) + fibonacci(n-2), mit fibonacci(0) = 0 und fibonacci(1) = 1." }],
       examples: [
         { input: "5", output: "5" },
         { input: "10", output: "55" },
@@ -614,7 +646,7 @@ async function main() {
       difficulty: "hard",
       points: 200,
       categoryId: catBaeume.id,
-      hint: "In-order: erst den linken Teilbaum, dann die Wurzel, dann den rechten Teilbaum besuchen.",
+      hints: [{ title: "Ansatz", body: "In-order: erst den linken Teilbaum, dann die Wurzel, dann den rechten Teilbaum besuchen." }],
       examples: [
         {
           input: '{ "val": 2, "left": { "val": 1 }, "right": { "val": 3 } }',
@@ -668,7 +700,7 @@ async function main() {
       difficulty: "medium",
       points: 150,
       categoryId: catAlgorithmen.id,
-      hint: "Speichere gesehene Werte in einer Map: für jedes Element prüfst du, ob target - element bereits vorkam.",
+      hints: [{ title: "Ansatz", body: "Speichere gesehene Werte in einer Map: für jedes Element prüfst du, ob target - element bereits vorkam." }],
       examples: [{ input: '{ "nums": [2,7,11,15], "target": 9 }', output: "[0,1]" }],
       ...twoSumFields,
       isActive: false,
@@ -717,7 +749,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      hint: "Prüfe zuerst auf teilbar durch 15, dann durch 3, dann durch 5.",
+      hints: [{ title: "Ansatz", body: "Prüfe zuerst auf teilbar durch 15, dann durch 3, dann durch 5." }],
       examples: [{ input: "5", output: '["1","2","Fizz","4","Buzz"]' }],
       ...fizzBuzzFields,
       isActive: false,
@@ -760,7 +792,7 @@ async function main() {
       difficulty: "medium",
       points: 150,
       categoryId: catDatenstrukturen.id,
-      hint: "Nutze einen Stack: öffnende Klammern legst du ab, bei schließenden muss die oberste passen.",
+      hints: [{ title: "Ansatz", body: "Nutze einen Stack: öffnende Klammern legst du ab, bei schließenden muss die oberste passen." }],
       examples: [
         { input: '"()[]{}"', output: "true" },
         { input: '"([)]"', output: "false" },
@@ -806,7 +838,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hint: "Wandle den String in Kleinbuchstaben um und prüfe jedes Zeichen gegen die Vokalmenge.",
+      hints: [{ title: "Ansatz", body: "Wandle den String in Kleinbuchstaben um und prüfe jedes Zeichen gegen die Vokalmenge." }],
       examples: [{ input: '"hello"', output: "2" }],
       ...countVowelsFields,
       isActive: false,
@@ -849,7 +881,7 @@ async function main() {
       difficulty: "medium",
       points: 150,
       categoryId: catAlgorithmen.id,
-      hint: "Kadane: laufe einmal durch und entscheide je Element, ob du die bisherige Summe fortführst oder neu beginnst.",
+      hints: [{ title: "Ansatz", body: "Kadane: laufe einmal durch und entscheide je Element, ob du die bisherige Summe fortführst oder neu beginnst." }],
       examples: [{ input: "[-2,1,-3,4,-1,2,1,-5,4]", output: "6" }],
       ...maxSubArrayFields,
       isActive: false,
@@ -896,7 +928,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hint: "Sortiere beide Strings und vergleiche – oder zähle die Buchstabenhäufigkeiten.",
+      hints: [{ title: "Ansatz", body: "Sortiere beide Strings und vergleiche – oder zähle die Buchstabenhäufigkeiten." }],
       examples: [{ input: '{ "s": "listen", "t": "silent" }', output: "true" }],
       ...isAnagramFields,
       isActive: false,
@@ -939,7 +971,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      hint: "Wiederhole die Quersumme, bis das Ergebnis kleiner als 10 ist.",
+      hints: [{ title: "Ansatz", body: "Wiederhole die Quersumme, bis das Ergebnis kleiner als 10 ist." }],
       examples: [{ input: "942", output: "6" }],
       ...digitalRootFields,
       isActive: false,
@@ -982,7 +1014,7 @@ async function main() {
       difficulty: "easy",
       points: 100,
       categoryId: catDatenstrukturen.id,
-      hint: "Sammle zuerst alle Nicht-Null-Werte, fülle danach mit Nullen auf.",
+      hints: [{ title: "Ansatz", body: "Sammle zuerst alle Nicht-Null-Werte, fülle danach mit Nullen auf." }],
       examples: [{ input: "[0,1,0,3,12]", output: "[1,3,12,0,0]" }],
       ...moveZeroesFields,
       isActive: false,
@@ -1025,7 +1057,7 @@ async function main() {
       difficulty: "medium",
       points: 150,
       categoryId: catStrings.id,
-      hint: "Gehe von links nach rechts: ist der aktuelle Wert kleiner als der nächste, ziehe ihn ab, sonst addiere ihn.",
+      hints: [{ title: "Ansatz", body: "Gehe von links nach rechts: ist der aktuelle Wert kleiner als der nächste, ziehe ihn ab, sonst addiere ihn." }],
       examples: [
         { input: '"IX"', output: "9" },
         { input: '"MCMXCIV"', output: "1994" },

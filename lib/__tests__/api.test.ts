@@ -246,7 +246,7 @@ describe("getDailyChallenge", () => {
       difficulty: "easy" as const,
       points: 50,
       category: "Basics",
-      hint: "Use modulo",
+      hints: [{ title: "Ansatz", body: "Use modulo" }],
       examples: [{ input: "15", output: "FizzBuzz" }],
       testCases: [],
       supportedLanguages: ["javascript", "typescript", "python", "php"] as const,

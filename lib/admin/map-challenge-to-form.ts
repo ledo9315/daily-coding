@@ -1,5 +1,6 @@
 import type { Challenge } from "@/lib/generated/prisma/client";
 import { parseEvaluationConfig } from "@/lib/server/challenge-execution";
+import { normalizeHints } from "@/lib/challenge-hints";
 
 function jsonPretty(value: unknown): string {
   if (value === null || value === undefined) return "[]";
@@ -15,7 +16,7 @@ export type ChallengeFormInitial = {
   id: string;
   title: string;
   description: string;
-  hint: string;
+  hintsJson: string;
   difficulty: "easy" | "medium" | "hard";
   points: number;
   categoryId: string;
@@ -50,7 +51,7 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     id: ch.id,
     title: ch.title,
     description: ch.description,
-    hint: ch.hint ?? "",
+    hintsJson: jsonPretty(normalizeHints(ch.hints)),
     difficulty: ch.difficulty,
     points: ch.points,
     categoryId: ch.categoryId,

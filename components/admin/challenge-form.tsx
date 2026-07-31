@@ -22,6 +22,12 @@ const DEFAULT_EXAMPLES = `[
   { "input": "[1, 2, 3]", "output": "[1, 3, 6]" }
 ]`;
 
+const DEFAULT_HINTS = `[
+  { "title": "Die Idee", "body": "Was ist der Kerngedanke?" },
+  { "title": "Umsetzung", "body": "Wie sieht das im Code aus?" },
+  { "title": "Fallstricke", "body": "Woran scheitern die meisten?" }
+]`;
+
 const DEFAULT_TESTS = `[
   { "id": 1, "name": "Beispiel", "input": "[1,2,3]", "expected": "[1,3,6]" }
 ]`;
@@ -42,7 +48,6 @@ export function AdminChallengeForm({
   const [id, setId] = useState(initial?.id ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [hint, setHint] = useState(initial?.hint ?? "");
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
     initial?.difficulty ?? "medium",
   );
@@ -53,6 +58,7 @@ export function AdminChallengeForm({
   const [examplesJson, setExamplesJson] = useState(
     initial?.examplesJson ?? DEFAULT_EXAMPLES,
   );
+  const [hintsJson, setHintsJson] = useState(initial?.hintsJson ?? DEFAULT_HINTS);
   const [testsJson, setTestsJson] = useState(
     initial?.testsJson ?? DEFAULT_TESTS,
   );
@@ -82,6 +88,7 @@ export function AdminChallengeForm({
     e.preventDefault();
     let examples: unknown;
     let testCases: unknown;
+    let hints: unknown;
     try {
       examples = JSON.parse(examplesJson);
     } catch {
@@ -94,8 +101,14 @@ export function AdminChallengeForm({
       toast.error("Testfälle (JSON) sind ungültig.");
       return;
     }
-    if (!Array.isArray(examples) || !Array.isArray(testCases)) {
-      toast.error("Beispiele und Testfälle müssen JSON-Arrays sein.");
+    try {
+      hints = JSON.parse(hintsJson);
+    } catch {
+      toast.error("Hinweise (JSON) sind ungültig.");
+      return;
+    }
+    if (!Array.isArray(examples) || !Array.isArray(testCases) || !Array.isArray(hints)) {
+      toast.error("Beispiele, Testfälle und Hinweise müssen JSON-Arrays sein.");
       return;
     }
 
@@ -103,7 +116,7 @@ export function AdminChallengeForm({
       ...(mode === "create" ? { id: id.trim() } : {}),
       title: title.trim(),
       description: description.trim(),
-      hint: hint.trim() || null,
+      hints,
       difficulty,
       points,
       categoryId,
@@ -203,22 +216,13 @@ export function AdminChallengeForm({
           />
         </div>
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="desc">Beschreibung (Markdown möglich als Text)</Label>
+          <Label htmlFor="desc">Beschreibung (Absätze bleiben erhalten)</Label>
           <Textarea
             id="desc"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="rounded-none min-h-[120px]"
             required
-          />
-        </div>
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="hint">Hinweis (optional)</Label>
-          <Textarea
-            id="hint"
-            value={hint}
-            onChange={(e) => setHint(e.target.value)}
-            className="rounded-none min-h-[72px]"
           />
         </div>
         <div className="space-y-2">
@@ -304,6 +308,18 @@ export function AdminChallengeForm({
           onChange={(e) => setExamplesJson(e.target.value)}
           className="rounded-none font-mono text-xs min-h-[100px]"
         />
+      </div>
+      <div className="space-y-2">
+        <Label>Hinweise (JSON-Array: title / body, leeres Array für keine)</Label>
+        <Textarea
+          value={hintsJson}
+          onChange={(e) => setHintsJson(e.target.value)}
+          className="rounded-none font-mono text-xs min-h-[120px]"
+        />
+        <p className="text-xs text-muted-foreground">
+          Werden einzeln aufgeklappt. Vom Groben zum Konkreten sortieren – der letzte
+          Schritt darf die typischen Fehler nennen.
+        </p>
       </div>
       <div className="space-y-2">
         <Label>Testfälle (JSON-Array)</Label>

@@ -71,7 +71,7 @@ const activeChallenge = {
   points: 200,
   categoryId: "cat-arrays",
   category: { id: "cat-arrays", name: "Arrays", createdAt: new Date() },
-  hint: "Use a hash map",
+  hints: [{ title: "Ansatz", body: "Use a hash map" }],
   examples: [{ input: "[2,7,11,15], 9", output: "[0,1]" }],
   testCases: [{ id: 1, name: "T1", status: "pending" }],
   starterCode: "function twoSum(nums, target) {}",
@@ -99,7 +99,7 @@ describe("GET /api/challenge/daily", () => {
       title: "Two Sum",
       difficulty: "medium",
       points: 200,
-      hint: "Use a hash map",
+      hints: [{ title: "Ansatz", body: "Use a hash map" }],
       defaultLanguage: "javascript",
       supportedLanguages: ["javascript", "typescript", "python", "php"],
       todaySubmission: null,
@@ -118,11 +118,12 @@ describe("GET /api/challenge/daily", () => {
     expect(json).toHaveProperty("error");
   });
 
-  it("returns empty string for null hint", async () => {
-    mockFindFirst.mockResolvedValueOnce({ ...activeChallenge, hint: null });
+  it("returns an empty list when the hints column holds no array", async () => {
+    // Legacy rows and hand-edited records reach the client too; the accordion maps over this.
+    mockFindFirst.mockResolvedValueOnce({ ...activeChallenge, hints: null });
     const res = await getDailyHandler();
     const json = await res.json();
-    expect(json.hint).toBe("");
+    expect(json.hints).toEqual([]);
   });
 
   it("fills starterCodes from legacy starterCode when JSON map empty", async () => {
