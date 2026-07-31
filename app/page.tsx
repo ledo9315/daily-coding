@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { LandingPage } from "@/components/landing/landing-page";
 import { Header } from "@/components/header";
 import { TodaysChallengeCard } from "@/components/todays-challenge-card";
 import { RankingPreviewCard } from "@/components/ranking-preview-card";
@@ -19,7 +20,12 @@ import {
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login?callbackUrl=/");
+  /**
+   * Rendered, not redirected to. A visitor without a session is the one this page has to
+   * convince, and `/` is the URL they arrive on — a redirect handed crawlers a login form
+   * on the canonical URL of the site (#130).
+   */
+  if (!session?.user?.id) return <LandingPage />;
   const userId = session.user.id;
   const userEmail = session.user.email ?? null;
 

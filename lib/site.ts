@@ -7,7 +7,8 @@ export const SITE_URL = "https://daily-coding.de";
 
 /** Reachable without an account — the only pages worth putting in a sitemap (#114). */
 export const PUBLIC_PATHS = [
-  "/landing",
+  // The landing itself since #130; `/landing` now only redirects here.
+  "/",
   "/login",
   "/register",
   "/impressum",
