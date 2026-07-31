@@ -1,4 +1,5 @@
 # Daily Coding
+<img width="800" height="462" alt="dashboard" src="https://github.com/user-attachments/assets/726bd133-a25e-449b-805d-e0420d553243" />
 
 Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bewertet gegen echte Testfälle in einer Sandbox. Mit Bestenliste, Streaks, Levels und Abzeichen.
 
