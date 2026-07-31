@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { LandingPage } from "@/components/landing/landing-page";
@@ -17,6 +18,13 @@ import {
   getTodayChallengeSummary,
   getUserStatsData,
 } from "@/lib/server/dashboard-data";
+
+/**
+ * Title and description stay the site-wide default from the root layout: for anyone without
+ * a session this route *is* the landing, and that is what a search result shows (#130).
+ * Only the canonical URL was missing (#131).
+ */
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function DashboardPage() {
   const session = await auth();
