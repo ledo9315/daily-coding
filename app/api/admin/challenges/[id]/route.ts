@@ -95,7 +95,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       data: {
         title: data.title,
         description: data.description,
-        hint: data.hint ?? null,
+        hints: data.hints,
         difficulty: data.difficulty,
         points: data.points,
         categoryId: data.categoryId,

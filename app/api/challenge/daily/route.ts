@@ -10,6 +10,7 @@ import {
   normalizeSupportedLanguages,
 } from "@/lib/challenge-languages";
 import { stripTestCaseSecretsForClient } from "@/lib/server/public-challenge";
+import { normalizeHints } from "@/lib/challenge-hints";
 
 export async function GET() {
   const challenge = await findDailyChallengeForApp();
@@ -62,7 +63,7 @@ export async function GET() {
     difficulty: challenge.difficulty,
     points: challenge.points,
     category: challenge.category.name,
-    hint: challenge.hint ?? "",
+    hints: normalizeHints(challenge.hints),
     examples: challenge.examples,
     testCases: stripTestCaseSecretsForClient(challenge.testCases),
     supportedLanguages,
