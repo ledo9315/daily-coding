@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   CODE_LANGUAGES,
   languageFileName,
+  languageLabel,
   type CodeLanguageId,
 } from "@/lib/challenge-languages";
 import {
@@ -237,7 +238,11 @@ const POINTS = 120;
  * where it can be checked.
  */
 export const terminalTabs: TabContent[] = CODE_LANGUAGES.map((lang) => ({
-  label: lang,
+  /*
+    The registry label, not the id: `cpp` and `csharp` are what the database calls them, and
+    reading an internal identifier off a landing page is a small broken promise.
+  */
+  label: languageLabel(lang),
   command: `daily test --lang=${lang}`,
   lines: [
     { text: "", delay: 60 },
@@ -364,8 +369,10 @@ export function LandingCodeDemo() {
                     </TerminalAnimationTrailingPrompt>
                   </TerminalAnimationContent>
 
-                  <div className="flex justify-center pb-6">
-                    <TerminalAnimationTabList className="inline-flex items-center gap-0 rounded-lg border border-border bg-muted/50 px-1 py-1">
+                  {/* Ten languages no longer fit on one line, so the row wraps instead of
+                      running past the window's edge. */}
+                  <div className="flex justify-center px-4 pb-6">
+                    <TerminalAnimationTabList className="flex max-w-full flex-wrap items-center justify-center gap-y-1 rounded-lg border border-border bg-muted/50 px-1 py-1">
                       {terminalTabs.map((tab, i) => (
                         <TerminalAnimationTabTrigger
                           className={cn(
