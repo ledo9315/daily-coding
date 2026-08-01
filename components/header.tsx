@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -156,7 +157,26 @@ export function Header() {
             <>
               <div className="pixel-box flex items-center gap-1.5 border-2 border-orange-500/20 px-2 py-2 text-orange-500 sm:gap-2 sm:px-4">
                 <Zap className="h-5 w-5 animate-pulse" />
-                <span className="text-xl font-sans">{streak ?? "—"}</span>
+                {/*
+                  A dash reads as a value: "your streak is nothing". It is not, it is a number
+                  that has not arrived yet — the cache is empty on a first visit and after a
+                  switch of account.
+
+                  The span keeps the exact classes it had, and the spinner sits inside it as an
+                  inline glyph sized in `em`. A reserved minimum width would be wrong here: the
+                  box is as wide as its content, so padding it out for the loading state made
+                  the whole card 12px wider for good.
+                */}
+                <span className="text-xl font-sans">
+                  {streak === null ? (
+                    <Spinner
+                      className="inline size-[1em] align-[-0.125em]"
+                      aria-label="Streak wird geladen"
+                    />
+                  ) : (
+                    streak
+                  )}
+                </span>
                 {/* Dropped on phones: the number carries the meaning, the label only fits
                     once there is room for it. */}
                 <span className="hidden text-sm uppercase text-muted-foreground sm:inline">
@@ -168,7 +188,10 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-12 w-12 border-2 border-border p-0 hover:border-primary hover:bg-primary/20 cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                    /* `pixel-box` rather than a hand-written shadow: same class the streak card
+                       uses, so the two never drift apart. It brings the 2px border along, which
+                       was already there. */
+                    className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-primary/20 cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
                   >
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage src={avatar || undefined} alt={displayName} />
@@ -231,6 +254,23 @@ export function Header() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            </>
+          ) : status === "loading" ? (
+            /*
+              "loading" is not "signed out". Every full page load and every hot reload starts
+              here, and the two states used to share a branch — so the dashboard, a page one
+              cannot reach without an account, briefly offered Login and Registrieren.
+
+              Placeholders in the shape of what follows: the streak card and the square avatar.
+              Same sizes, so the header does not jump once the session resolves.
+            */
+            <>
+              <div
+                className="h-12 w-[114px] animate-pulse border-2 border-orange-500/20 bg-muted/40"
+                aria-hidden
+              />
+              <div className="h-12 w-12 animate-pulse border-2 border-border bg-muted/40" aria-hidden />
+              <span className="sr-only">Anmeldung wird geprüft</span>
             </>
           ) : (
             <div className="flex items-center gap-2">
