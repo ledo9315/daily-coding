@@ -2,28 +2,11 @@ import Link from "next/link";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { ChallengeRowActions } from "@/components/admin/challenge-row-actions";
+import { ChallengeOrderControls } from "@/components/admin/challenge-order-controls";
 import { prisma } from "@/lib/prisma";
 import { requireAdminPage } from "@/lib/server/require-admin-page";
-import { compareChallengesBySchedule } from "@/lib/server/challenge-admin-sort";
-import { startOfUtcDay } from "@/lib/server/ranking-period";
-
-function formatDailyDateUtc(d: Date | null): string {
-  if (!d) return "—";
-  return new Intl.DateTimeFormat("de-DE", {
-    timeZone: "UTC",
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(d);
-}
-
-/** Same day boundary as `findDailyChallengeForApp` (UTC). */
-function isScheduledUtcToday(d: Date | null): boolean {
-  if (!d) return false;
-  const dayStart = startOfUtcDay(new Date());
-  const dayEnd = new Date(dayStart);
-  dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
-  return d >= dayStart && d < dayEnd;
-}
+import { buildAdminOrder } from "@/lib/server/challenge-admin-sort";
+import { ringLabel } from "@/lib/server/challenge-ring";
 
 export const metadata = {
   title: "Challenges verwalten",
@@ -31,14 +14,18 @@ export const metadata = {
 
 export default async function AdminChallengesPage() {
   await requireAdminPage("/admin/challenges");
-  const rows = await prisma.challenge.findMany({
-    orderBy: { id: "asc" },
-    include: {
-      category: { select: { name: true } },
-      _count: { select: { submissions: true } },
-    },
-  });
-  const challenges = [...rows].sort(compareChallengesBySchedule);
+
+  const [rows, state] = await Promise.all([
+    prisma.challenge.findMany({
+      include: {
+        category: { select: { name: true } },
+        _count: { select: { submissions: true } },
+      },
+    }),
+    prisma.rotationState.findUnique({ where: { id: "current" } }),
+  ]);
+
+  const { active, inactive } = buildAdminOrder(rows, state?.challengeId ?? null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,9 +37,8 @@ export default async function AdminChallengesPage() {
               Challenges
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Sortierung: zuerst kommende Dailys (heute und Zukunft, UTC,
-              frühestes oben), dann vergangene Termine, zuletzt ohne Datum.
-              Badge „Heute“ = gleicher UTC-Kalendertag wie die Live-Daily.
+              Die Reihenfolge ist der Ablauf: oben läuft heute, darunter folgt Tag
+              für Tag der Rest. Nach der letzten geht es wieder oben los.
             </p>
           </div>
           <Button asChild className="rounded-none pixel-btn w-fit">
@@ -64,64 +50,116 @@ export default async function AdminChallengesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b-2 border-border bg-muted/40 text-left">
-                <th className="p-3 font-sans uppercase tracking-wide">ID</th>
+                <th className="p-3 font-sans uppercase tracking-wide w-[130px]">Wann</th>
                 <th className="p-3 font-sans uppercase tracking-wide">Titel</th>
-                <th className="p-3 font-sans uppercase tracking-wide">Kategorie</th>
                 <th className="p-3 font-sans uppercase tracking-wide">Diff</th>
                 <th className="p-3 font-sans uppercase tracking-wide">Pkt</th>
-                <th className="p-3 font-sans uppercase tracking-wide min-w-[160px]">
-                  Daily-Datum (UTC)
-                </th>
-                <th className="p-3 font-sans uppercase tracking-wide">Aktiv</th>
                 <th className="p-3 font-sans uppercase tracking-wide">Abgaben</th>
+                <th className="p-3 font-sans uppercase tracking-wide w-[120px]">
+                  Reihenfolge
+                </th>
                 <th className="p-3 font-sans uppercase tracking-wide w-[200px]">
                   Aktionen
                 </th>
               </tr>
             </thead>
             <tbody>
-              {challenges.length === 0 ? (
+              {active.length === 0 && inactive.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
                     Noch keine Challenges.
                   </td>
                 </tr>
-              ) : (
-                challenges.map((c) => (
-                  <tr
-                    key={c.id}
-                    className="border-b border-border hover:bg-muted/20"
-                  >
-                    <td className="p-3 font-mono text-xs align-top max-w-[140px] break-all">
-                      {c.id}
-                    </td>
-                    <td className="p-3 align-top">{c.title}</td>
-                    <td className="p-3 align-top">{c.category.name}</td>
-                    <td className="p-3 align-top uppercase">{c.difficulty}</td>
-                    <td className="p-3 align-top">{c.points}</td>
-                    <td className="p-3 align-top whitespace-nowrap">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono text-xs">
-                          {formatDailyDateUtc(c.date)}
-                        </span>
-                        {isScheduledUtcToday(c.date) && (
-                          <span className="inline-block w-fit rounded-none border border-primary/60 bg-primary/10 px-1.5 py-0.5 text-[10px] font-sans uppercase tracking-wide text-primary">
-                            Heute (UTC)
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-3 align-top">{c.isActive ? "Ja" : "Nein"}</td>
-                    <td className="p-3 align-top">{c._count.submissions}</td>
-                    <td className="p-3 align-top">
-                      <ChallengeRowActions
-                        challengeId={c.id}
-                        submissionCount={c._count.submissions}
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
+              ) : null}
+
+              {active.map((c, i) => (
+                <tr
+                  key={c.id}
+                  className={`border-b border-border hover:bg-muted/20 ${
+                    i === 0 ? "bg-primary/5" : ""
+                  }`}
+                >
+                  <td className="p-3 align-top whitespace-nowrap">
+                    <span
+                      className={
+                        i === 0
+                          ? "inline-block rounded-none border border-primary/60 bg-primary/10 px-1.5 py-0.5 text-[11px] font-sans uppercase tracking-wide text-primary"
+                          : "text-muted-foreground"
+                      }
+                    >
+                      {ringLabel(i)}
+                    </span>
+                  </td>
+                  <td className="p-3 align-top">
+                    <div>{c.title}</div>
+                    <div className="text-xs text-muted-foreground">{c.category.name}</div>
+                  </td>
+                  <td className="p-3 align-top uppercase">{c.difficulty}</td>
+                  <td className="p-3 align-top">{c.points}</td>
+                  <td className="p-3 align-top">{c._count.submissions}</td>
+                  <td className="p-3 align-top">
+                    <ChallengeOrderControls
+                      challengeId={c.id}
+                      /*
+                        Neighbours in the displayed list, not in stored order: at the wrap point
+                        the two differ, and what the admin means is always what they see.
+
+                        Row 0 is live and cannot take part. The pointer remembers the challenge,
+                        not the slot, so moving the live row wrote to the database and changed
+                        nothing on screen — it stayed on top because the list rotates around it.
+                        Row 1 may not swap upwards for the same reason: it would not become
+                        today's, it would land at the far end of the list.
+                      */
+                      swapUpWith={i <= 1 ? null : active[i - 1].id}
+                      swapDownWith={
+                        i === 0 || i === active.length - 1 ? null : active[i + 1].id
+                      }
+                      isLive={i === 0}
+                      isNextUp={i === 1}
+                    />
+                  </td>
+                  <td className="p-3 align-top">
+                    <ChallengeRowActions
+                      challengeId={c.id}
+                      submissionCount={c._count.submissions}
+                    />
+                  </td>
+                </tr>
+              ))}
+
+              {inactive.length > 0 ? (
+                <tr className="border-b border-border bg-muted/30">
+                  <td colSpan={7} className="px-3 py-2 text-xs uppercase tracking-wide text-muted-foreground">
+                    Nicht im Ablauf ({inactive.length})
+                  </td>
+                </tr>
+              ) : null}
+
+              {inactive.map((c) => (
+                <tr key={c.id} className="border-b border-border opacity-50 hover:opacity-100">
+                  <td className="p-3 align-top text-muted-foreground whitespace-nowrap">
+                    Inaktiv
+                  </td>
+                  <td className="p-3 align-top">
+                    <div>{c.title}</div>
+                    <div className="text-xs text-muted-foreground">{c.category.name}</div>
+                  </td>
+                  <td className="p-3 align-top uppercase">{c.difficulty}</td>
+                  <td className="p-3 align-top">{c.points}</td>
+                  <td className="p-3 align-top">{c._count.submissions}</td>
+                  <td className="p-3 align-top">
+                    {/* Ordering an inactive challenge is meaningless: it is not in the ring.
+                        It takes its place by position once it is switched on. */}
+                    <span className="text-xs text-muted-foreground">—</span>
+                  </td>
+                  <td className="p-3 align-top">
+                    <ChallengeRowActions
+                      challengeId={c.id}
+                      submissionCount={c._count.submissions}
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

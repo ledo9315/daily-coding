@@ -1109,36 +1109,43 @@ async function main() {
   // hold a single element and the app would serve the same challenge forever.
   await prisma.challenge.updateMany({ data: { isActive: true } });
   /**
-   * `Challenge.date` is unique and the dates below are handed out one row at a time. Seeding
-   * again on a later day shifts every date by the number of days passed, so the row about to
-   * receive `anchor - 1` still holds `anchor` — the second update collides and the seed dies
-   * halfway through. Clearing the column first makes the reassignment order-independent.
+   * The order of the daily ring. `Challenge.date` is deprecated and stays null: the ring has no
+   * dates, it has an order plus a pointer at where it stands.
+   *
+   * The six named challenges take the front so a seeded database has a predictable first week;
+   * everything else follows in id order. Positions are not unique, but handing out distinct ones
+   * keeps the arrows in the admin panel meaningful from the start.
    */
   await prisma.challenge.updateMany({ data: { date: null } });
-  // An explicit date still wins: on the seed day that is the well-known challenge.
-  await prisma.challenge.update({
-    where: { id: challengeToday.id },
-    data: { date: anchor },
+  const ringOrder = [
+    challengeToday.id,
+    challengeBinarySearch.id,
+    challengeStringReversal.id,
+    challengeHashMap.id,
+    challengeRecursion.id,
+    challengeBinaryTree.id,
+  ];
+  for (const [index, id] of ringOrder.entries()) {
+    await prisma.challenge.update({ where: { id }, data: { position: index } });
+  }
+  const rest = await prisma.challenge.findMany({
+    where: { id: { notIn: ringOrder } },
+    orderBy: { id: "asc" },
+    select: { id: true },
   });
-  await prisma.challenge.update({
-    where: { id: challengeBinarySearch.id },
-    data: { date: addUtcDays(anchor, -1) },
-  });
-  await prisma.challenge.update({
-    where: { id: challengeStringReversal.id },
-    data: { date: addUtcDays(anchor, -2) },
-  });
-  await prisma.challenge.update({
-    where: { id: challengeHashMap.id },
-    data: { date: addUtcDays(anchor, -3) },
-  });
-  await prisma.challenge.update({
-    where: { id: challengeRecursion.id },
-    data: { date: addUtcDays(anchor, -4) },
-  });
-  await prisma.challenge.update({
-    where: { id: challengeBinaryTree.id },
-    data: { date: addUtcDays(anchor, -5) },
+  for (const [index, c] of rest.entries()) {
+    await prisma.challenge.update({
+      where: { id: c.id },
+      data: { position: ringOrder.length + index },
+    });
+  }
+
+  // The ring starts on the well-known challenge, so a fresh database serves the same daily the
+  // dashboard fixtures and the landing badge talk about.
+  await prisma.rotationState.upsert({
+    where: { id: "current" },
+    create: { id: "current", challengeId: challengeToday.id, position: 0, day: anchor },
+    update: { challengeId: challengeToday.id, position: 0, day: anchor },
   });
 
   // ─── Submissions ─────────────────────────────────────────────────────────────
