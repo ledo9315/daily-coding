@@ -4,17 +4,24 @@ import { prisma } from "@/lib/prisma";
 import { createEmailVerificationToken } from "@/lib/server/auth-service";
 import { sendVerificationEmail } from "@/lib/server/email-service";
 import { starterAvatarPath } from "@/lib/user-avatars";
-import { nameKeyOf, normaliseDisplayName } from "@/lib/display-name";
+import {
+  displayNameValidationError,
+  nameKeyOf,
+  normaliseDisplayName,
+} from "@/lib/display-name";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { email, password, name } = body as {
-    email?: string;
-    password?: string;
-    name?: string;
-  };
+  const body = (await request.json()) as Record<string, unknown>;
+  const { email, password, name } = body;
 
-  if (!email || !password || !name) {
+  if (
+    typeof email !== "string" ||
+    typeof password !== "string" ||
+    typeof name !== "string" ||
+    !email ||
+    !password ||
+    !name
+  ) {
     return NextResponse.json(
       { error: "E-Mail, Passwort und Name sind erforderlich." },
       { status: 400 }
@@ -28,6 +35,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const displayNameError = displayNameValidationError(name);
+  if (displayNameError) {
+    return NextResponse.json({ error: displayNameError }, { status: 400 });
+  }
+
+  const displayName = normaliseDisplayName(name);
+
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return NextResponse.json(
@@ -40,11 +54,7 @@ export async function POST(request: NextRequest) {
    * Rejected rather than silently renamed: this path has a form to show the error in.
    * The OAuth path cannot do that and appends a counter instead (#107).
    */
-  const displayName = normaliseDisplayName(name);
   const nameKey = nameKeyOf(displayName);
-  if (!displayName) {
-    return NextResponse.json({ error: "Name darf nicht leer sein." }, { status: 400 });
-  }
   const nameTaken = await prisma.user.findUnique({ where: { nameKey } });
   if (nameTaken) {
     return NextResponse.json(

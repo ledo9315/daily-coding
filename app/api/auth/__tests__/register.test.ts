@@ -48,9 +48,23 @@ describe("POST /api/auth/register", () => {
 
   it("returns 409 when email already exists", async () => {
     mockFindUnique.mockResolvedValueOnce({ id: "existing" });
-    const res = await POST(makeRequest({ email: "a@b.de", password: "secret1234", name: "A" }));
+    const res = await POST(makeRequest({ email: "a@b.de", password: "secret1234", name: "Anna" }));
     expect(res.status).toBe(409);
   });
+
+  it.each([".", "---", "🎮", "A"])(
+    "returns 400 without querying the database for invalid name %s",
+    async (name) => {
+      const res = await POST(makeRequest({ email: "a@b.de", password: "secret1234", name }));
+
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({
+        error: "Name muss mindestens zwei Buchstaben oder Zahlen enthalten.",
+      });
+      expect(mockFindUnique).not.toHaveBeenCalled();
+      expect(mockCreate).not.toHaveBeenCalled();
+    }
+  );
 
   it("creates user and sends verification email on success", async () => {
     mockFindUnique.mockResolvedValueOnce(null);

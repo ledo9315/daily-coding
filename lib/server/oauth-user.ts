@@ -1,7 +1,11 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { starterAvatarPath } from "@/lib/user-avatars";
-import { nameKeyOf, uniqueDisplayName } from "@/lib/display-name";
+import {
+  displayNameValidationError,
+  nameKeyOf,
+  uniqueDisplayName,
+} from "@/lib/display-name";
 
 /**
  * No `image` field on purpose. The provider sends a picture URL, but storing it would
@@ -85,8 +89,12 @@ export async function findOrCreateOAuthUser(
    * here. The user comes back from Google or GitHub expecting an account, and there is no
    * form left to show an error in. The registration form does reject (#107).
    */
+  const emailName = profile.email.split("@")[0];
+  const baseName = [profile.name ?? "", emailName, "User"].find(
+    (candidate) => displayNameValidationError(candidate) === null
+  )!;
   const name = await uniqueDisplayName(
-    profile.name ?? profile.email.split("@")[0],
+    baseName,
     async (key) => (await prisma.user.findUnique({ where: { nameKey: key } })) !== null
   );
   const initials = name

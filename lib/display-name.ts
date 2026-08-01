@@ -17,6 +17,29 @@ export function normaliseDisplayName(name: string): string {
   return name.trim().replace(/\s+/g, " ");
 }
 
+export const DISPLAY_NAME_MAX_LENGTH = 50;
+
+/**
+ * Display names may contain punctuation, spaces and emoji, but those decorations must not
+ * be the whole identity. Requiring two Unicode letters or numbers keeps short real names
+ * such as "Li" while rejecting placeholders such as ".", "---" or a lone emoji.
+ */
+export function displayNameValidationError(name: string): string | null {
+  const displayName = normaliseDisplayName(name);
+
+  if (!displayName) return "Name darf nicht leer sein.";
+  if ([...displayName].length > DISPLAY_NAME_MAX_LENGTH) {
+    return `Name darf höchstens ${DISPLAY_NAME_MAX_LENGTH} Zeichen lang sein.`;
+  }
+
+  const lettersOrNumbers = displayName.match(/[\p{L}\p{N}]/gu)?.length ?? 0;
+  if (lettersOrNumbers < 2) {
+    return "Name muss mindestens zwei Buchstaben oder Zahlen enthalten.";
+  }
+
+  return null;
+}
+
 const MAX_ATTEMPTS = 50;
 
 /**

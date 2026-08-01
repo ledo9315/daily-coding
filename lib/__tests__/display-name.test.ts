@@ -1,5 +1,29 @@
 import { describe, it, expect } from "vitest";
-import { nameKeyOf, uniqueDisplayName } from "@/lib/display-name";
+import {
+  displayNameValidationError,
+  nameKeyOf,
+  uniqueDisplayName,
+} from "@/lib/display-name";
+
+describe("displayNameValidationError", () => {
+  it.each([".", "---", "_ _", "🎮", "A"])(
+    "rejects a name without at least two letters or numbers: %s",
+    (name) => {
+      expect(displayNameValidationError(name)).toMatch(/zwei Buchstaben oder Zahlen/);
+    }
+  );
+
+  it("rejects names longer than 50 normalised characters", () => {
+    expect(displayNameValidationError("A".repeat(51))).toMatch(/höchstens 50 Zeichen/);
+  });
+
+  it.each(["Li", "O’Neil", "Müller-Lüdenscheidt", "coder42", "李雷"])(
+    "accepts a meaningful display name: %s",
+    (name) => {
+      expect(displayNameValidationError(name)).toBeNull();
+    }
+  );
+});
 
 describe("nameKeyOf", () => {
   it("folds case, because the header renders names in capitals", () => {
