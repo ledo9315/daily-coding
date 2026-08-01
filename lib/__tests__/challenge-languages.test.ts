@@ -70,7 +70,7 @@ describe("parseCodeLanguage", () => {
   });
 
   it("returns null for unknown language", () => {
-    expect(parseCodeLanguage("rust", allowed)).toBeNull();
+    expect(parseCodeLanguage("cobol", allowed)).toBeNull();
   });
 });
 
@@ -81,7 +81,7 @@ describe("normalizeSupportedLanguages", () => {
   });
 
   it("filters to known languages only", () => {
-    expect(normalizeSupportedLanguages(["javascript", "rust"])).toEqual([
+    expect(normalizeSupportedLanguages(["javascript", "cobol"])).toEqual([
       "javascript",
     ]);
   });

@@ -237,6 +237,53 @@ function goLiteral(kind: ScalarKind, value: number | boolean | string): string {
   return kind === "string" ? quoteStringLiteral(String(value)) : String(value);
 }
 
+/*
+  Rust escapes a code point as \u{XXXX}, with the braces — the \uXXXX that Java, Go, C++ and C#
+  share is a syntax error there.
+*/
+function rustStringLiteral(str: string): string {
+  let out = '"';
+  for (const ch of str) {
+    const code = ch.codePointAt(0)!;
+    if (ch === '"') out += '\\"';
+    else if (ch === "\\") out += "\\\\";
+    else if (ch === "\n") out += "\\n";
+    else if (ch === "\r") out += "\\r";
+    else if (ch === "\t") out += "\\t";
+    else if (code < 0x20 || code > 0x7e) out += `\\u{${code.toString(16)}}`;
+    else out += ch;
+  }
+  return `${out}"`;
+}
+
+/** i64 for every integer: Rust will not coerce, so the literal's type must match the signature. */
+const RUST_TYPE: Record<ScalarKind, string> = {
+  int: "i64",
+  long: "i64",
+  double: "f64",
+  bool: "bool",
+  string: "String",
+};
+
+function rustLiteral(kind: ScalarKind, value: number | boolean | string): string {
+  if (kind === "string") return `${rustStringLiteral(String(value))}.to_string()`;
+  return String(value);
+}
+
+/** Rust declarations for one test case, plus the names to pass. */
+export function buildRustArguments(input: string): { decls: string[]; names: string[] } {
+  const args = inferArguments(input, "Rust");
+  const decls = args.map(({ name, shape }) => {
+    if (shape.kind === "array") {
+      const t = RUST_TYPE[shape.elem];
+      const items = shape.values.map((v) => rustLiteral(shape.elem, v)).join(", ");
+      return `    let ${name}: Vec<${t}> = vec![${items}];`;
+    }
+    return `    let ${name}: ${RUST_TYPE[shape.kind]} = ${rustLiteral(shape.kind, shape.value)};`;
+  });
+  return { decls, names: args.map((a) => a.name) };
+}
+
 const CSHARP_TYPE: Record<ScalarKind, string> = {
   int: "int",
   long: "long",
@@ -586,6 +633,65 @@ ${indented}
 ${decls.join("\n")}
         Console.Write(__json(${callable}(${names.join(", ")})));
     }
+}
+`;
+    }
+    case "rust": {
+      if (input == null) {
+        throw new Error("Rust-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+      }
+      const { decls, names } = buildRustArguments(input);
+      /*
+        The solution goes first and the harness follows, so line numbers need no correction —
+        Rust has no class to nest in and does not care about declaration order.
+
+        Serialisation is a trait rather than overloads: Rust has neither those nor a JSON crate
+        in Piston's image, but a blanket impl for Vec<T> covers nesting in one line.
+      */
+      return `${trimmed}
+
+trait ToJson {
+    fn to_json(&self) -> String;
+}
+
+impl ToJson for i64 {
+    fn to_json(&self) -> String { self.to_string() }
+}
+impl ToJson for f64 {
+    fn to_json(&self) -> String { self.to_string() }
+}
+impl ToJson for bool {
+    fn to_json(&self) -> String { self.to_string() }
+}
+impl ToJson for String {
+    fn to_json(&self) -> String { __json_str(self) }
+}
+impl<T: ToJson> ToJson for Vec<T> {
+    fn to_json(&self) -> String {
+        let parts: Vec<String> = self.iter().map(|x| x.to_json()).collect();
+        format!("[{}]", parts.join(","))
+    }
+}
+
+fn __json_str(s: &str) -> String {
+    let mut out = String::from("\\"");
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\\\\""),
+            '\\\\' => out.push_str("\\\\\\\\"),
+            '\\n' => out.push_str("\\\\n"),
+            '\\r' => out.push_str("\\\\r"),
+            '\\t' => out.push_str("\\\\t"),
+            _ => out.push(c),
+        }
+    }
+    out.push('"');
+    out
+}
+
+fn main() {
+${decls.join("\n")}
+    print!("{}", ${callable}(${names.join(", ")}).to_json());
 }
 `;
     }

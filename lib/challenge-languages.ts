@@ -9,6 +9,7 @@ export const CODE_LANGUAGES = [
   "go",
   "cpp",
   "csharp",
+  "rust",
 ] as const;
 export type CodeLanguageId = (typeof CODE_LANGUAGES)[number];
 
@@ -180,6 +181,23 @@ export const LANGUAGES: Record<CodeLanguageId, LanguageSpec> = {
     compilerBanner: /^Microsoft \(R\) Visual C# Compiler.*\n(Copyright .*\n)?\n?/u,
     starter:
       "// Implement your solution\nstatic int[] Solve(int[] arr) {\n    return arr;\n}\n",
+  },
+  rust: {
+    id: "rust",
+    label: "Rust",
+    monacoId: "rust",
+    editorFile: "main.rs",
+    /*
+      With the extension, unlike Java, Go and C++. Piston appends one for those and rustc reports
+      against whatever it was handed — `main` without a suffix would put a file the user never
+      saw into every error message.
+    */
+    pistonFile: "main.rs",
+    pistonPackage: "rust",
+    typed: true,
+    compiledInRunStep: false,
+    starter:
+      "// Implement your solution\nfn solve(arr: Vec<i64>) -> Vec<i64> {\n    arr\n}\n",
   },
 };
 

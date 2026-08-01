@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   outputsMatch,
   buildGoArguments,
+  buildRustArguments,
   buildJavaArguments,
   buildWrappedProgram,
   extractIoProgramOutput,
@@ -84,6 +85,27 @@ describe("buildWrappedProgram", () => {
     expect(src).toContain("def g(x):");
     expect(src).toContain("json.loads(_raw)");
     expect(src).toContain("g(_data)");
+  });
+
+  it("Rust: solution first, serialisation by trait", () => {
+    const src = buildWrappedProgram(
+      "rust",
+      "fn max_sub_array(nums: Vec<i64>) -> i64 { nums[0] }",
+      "max_sub_array",
+      "[-2,1,-3]"
+    );
+    // No class to nest in, so the solution starts at line 1 and needs no offset correction.
+    expect(src.startsWith("fn max_sub_array")).toBe(true);
+    expect(src).toContain("let __input: Vec<i64> = vec![-2, 1, -3];");
+    expect(src).toContain("max_sub_array(__input).to_json()");
+    // A blanket impl covers nesting, which overloads cannot do in one line.
+    expect(src).toContain("impl<T: ToJson> ToJson for Vec<T>");
+  });
+
+  it("Rust: escapes a code point with braces", () => {
+    // \uXXXX is a syntax error in Rust; the other typed languages all take it.
+    const { decls } = buildRustArguments('"a\u00e4"');
+    expect(decls[0]).toContain("\\u{e4}");
   });
 
   it("C#: one serialiser with ordered type tests, no System.Text.Json", () => {
