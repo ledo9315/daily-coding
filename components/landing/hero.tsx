@@ -83,7 +83,7 @@ export function LandingHero({
           variants={itemVariants}
           className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6"
         >
-          EINE AUFGABE <br />
+          EINE CHALLENGE<br />
           <span className="text-chart-5 retro-glow">JEDEN TAG</span> <br />
         </motion.h1>
 
