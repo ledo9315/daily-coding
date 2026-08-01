@@ -48,6 +48,7 @@ enum CodeLanguage {
   typescript
   python
   php
+  java
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────

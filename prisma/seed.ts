@@ -314,6 +314,13 @@ async function main() {
   // ─── Challenges ───────────────────────────────────────────────────────────────
 
   const supportedLangs = ["javascript", "typescript", "python", "php"] as const;
+  /*
+    Java needs the shape of a test case to be expressible as typed parameters, so it is opt-in
+    per challenge rather than part of the default four. Hash Map (values of mixed type in one
+    array) and Binary Tree Traversal (a recursive node structure) stay without it — offering a
+    language whose submission cannot pass is worse than not offering it.
+  */
+  const langsWithJava = [...supportedLangs, "java"] as const;
 
   const challengeToday = await prisma.challenge.upsert(
     challengeUpsertArgs({
@@ -366,6 +373,7 @@ async function main() {
           typescript: "transformArray",
           python: "transform_array",
           php: "transformArray",
+          java: "transformArray",
         },
       },
       testCases: [
@@ -390,7 +398,7 @@ async function main() {
         },
         { id: 5, name: "Ein Element", input: "[42]", expected: "[42]" },
       ],
-      supportedLanguages: [...supportedLangs],
+      supportedLanguages: [...langsWithJava],
       starterCodes: {
         javascript: "function transformArray(arr) {\n  // Your solution here\n}",
         typescript:
@@ -398,6 +406,7 @@ async function main() {
         python:
           "def transform_array(arr):\n    # Your solution here\n    pass\n",
         php: "<?php\n\nfunction transformArray($arr) {\n    // Your solution here\n}\n",
+        java: "static int[] transformArray(int[] arr) {\n    // Your solution here\n    return new int[]{};\n}\n",
       },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
       isActive: true,
@@ -406,13 +415,14 @@ async function main() {
   );
 
   const binarySearchFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "binarySearch",
         typescript: "binarySearch",
         python: "binary_search",
         php: "binarySearch",
+        java: "binarySearch",
       },
     },
     testCases: [
@@ -430,6 +440,7 @@ async function main() {
       python:
         'def binary_search(data):\n    arr, target = data["arr"], data["target"]\n    # Your solution here\n    return -1\n',
       php: "<?php\n\nfunction binarySearch($data) {\n    $arr = $data['arr'];\n    $target = $data['target'];\n    // Your solution here\n    return -1;\n}\n",
+      java: "static int binarySearch(int[] arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
     },
     starterCode:
       "function binarySearch(data) {\n  const { arr, target } = data;\n  // Your solution here\n  return -1;\n}",
@@ -488,13 +499,14 @@ async function main() {
   );
 
   const stringReversalFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "reverseString",
         typescript: "reverseString",
         python: "reverse_string",
         php: "reverseString",
+        java: "reverseString",
       },
     },
     testCases: [
@@ -510,6 +522,7 @@ async function main() {
         "function reverseString(s: string): string {\n  // Your solution here\n  return s;\n}",
       python: "def reverse_string(s):\n    # Your solution here\n    return s\n",
       php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
+      java: "static String reverseString(String s) {\n    // Your solution here\n    return s;\n}\n",
     },
     starterCode: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
   };
@@ -675,13 +688,14 @@ async function main() {
   );
 
   const recursionFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "fibonacci",
         typescript: "fibonacci",
         python: "fibonacci",
         php: "fibonacci",
+        java: "fibonacci",
       },
     },
     testCases: [
@@ -697,6 +711,7 @@ async function main() {
         "function fibonacci(n: number): number {\n  // Your solution here\n  return 0;\n}",
       python: "def fibonacci(n):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
+      java: "static int fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
     },
     starterCode: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -867,13 +882,14 @@ async function main() {
   // ─── Further challenges (LeetCode / Codewars classics) ────────────────────────
 
   const twoSumFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "twoSum",
         typescript: "twoSum",
         python: "two_sum",
         php: "twoSum",
+        java: "twoSum",
       },
     },
     testCases: [
@@ -891,6 +907,7 @@ async function main() {
       python:
         'def two_sum(data):\n    nums, target = data["nums"], data["target"]\n    # Your solution here\n    return []\n',
       php: "<?php\n\nfunction twoSum($data) {\n    $nums = $data['nums'];\n    $target = $data['target'];\n    // Your solution here\n    return [];\n}\n",
+      java: "static int[] twoSum(int[] nums, int target) {\n    // Your solution here\n    return new int[]{};\n}\n",
     },
     starterCode:
       "function twoSum(data) {\n  const { nums, target } = data;\n  // Your solution here\n  return [];\n}",
@@ -948,13 +965,14 @@ async function main() {
   );
 
   const fizzBuzzFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "fizzBuzz",
         typescript: "fizzBuzz",
         python: "fizz_buzz",
         php: "fizzBuzz",
+        java: "fizzBuzz",
       },
     },
     testCases: [
@@ -975,6 +993,7 @@ async function main() {
       typescript: "function fizzBuzz(n: number): string[] {\n  // Your solution here\n  return [];\n}",
       python: "def fizz_buzz(n):\n    # Your solution here\n    return []\n",
       php: "<?php\n\nfunction fizzBuzz($n) {\n    // Your solution here\n    return [];\n}\n",
+      java: "static String[] fizzBuzz(int n) {\n    // Your solution here\n    return new String[]{};\n}\n",
     },
     starterCode: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
   };
@@ -1026,13 +1045,14 @@ async function main() {
   );
 
   const validParenthesesFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "isValid",
         typescript: "isValid",
         python: "is_valid",
         php: "isValid",
+        java: "isValid",
       },
     },
     testCases: [
@@ -1047,6 +1067,7 @@ async function main() {
       typescript: "function isValid(s: string): boolean {\n  // Your solution here\n  return false;\n}",
       python: "def is_valid(s):\n    # Your solution here\n    return False\n",
       php: "<?php\n\nfunction isValid($s) {\n    // Your solution here\n    return false;\n}\n",
+      java: "static boolean isValid(String s) {\n    // Your solution here\n    return false;\n}\n",
     },
     starterCode: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
   };
@@ -1109,13 +1130,14 @@ async function main() {
   );
 
   const countVowelsFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "countVowels",
         typescript: "countVowels",
         python: "count_vowels",
         php: "countVowels",
+        java: "countVowels",
       },
     },
     testCases: [
@@ -1130,6 +1152,7 @@ async function main() {
       typescript: "function countVowels(s: string): number {\n  // Your solution here\n  return 0;\n}",
       python: "def count_vowels(s):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction countVowels($s) {\n    // Your solution here\n    return 0;\n}\n",
+      java: "static int countVowels(String s) {\n    // Your solution here\n    return 0;\n}\n",
     },
     starterCode: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -1182,13 +1205,14 @@ async function main() {
   );
 
   const maxSubArrayFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "maxSubArray",
         typescript: "maxSubArray",
         python: "max_sub_array",
         php: "maxSubArray",
+        java: "maxSubArray",
       },
     },
     testCases: [
@@ -1203,6 +1227,7 @@ async function main() {
       typescript: "function maxSubArray(nums: number[]): number {\n  // Your solution here\n  return 0;\n}",
       python: "def max_sub_array(nums):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction maxSubArray($nums) {\n    // Your solution here\n    return 0;\n}\n",
+      java: "static int maxSubArray(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
     },
     starterCode: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -1262,13 +1287,14 @@ async function main() {
   );
 
   const isAnagramFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "isAnagram",
         typescript: "isAnagram",
         python: "is_anagram",
         php: "isAnagram",
+        java: "isAnagram",
       },
     },
     testCases: [
@@ -1286,6 +1312,7 @@ async function main() {
       python:
         'def is_anagram(data):\n    s, t = data["s"], data["t"]\n    # Your solution here\n    return False\n',
       php: "<?php\n\nfunction isAnagram($data) {\n    $s = $data['s'];\n    $t = $data['t'];\n    // Your solution here\n    return false;\n}\n",
+      java: "static boolean isAnagram(String s, String t) {\n    // Your solution here\n    return false;\n}\n",
     },
     starterCode:
       "function isAnagram(data) {\n  const { s, t } = data;\n  // Your solution here\n  return false;\n}",
@@ -1343,13 +1370,14 @@ async function main() {
   );
 
   const digitalRootFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "digitalRoot",
         typescript: "digitalRoot",
         python: "digital_root",
         php: "digitalRoot",
+        java: "digitalRoot",
       },
     },
     testCases: [
@@ -1364,6 +1392,7 @@ async function main() {
       typescript: "function digitalRoot(n: number): number {\n  // Your solution here\n  return 0;\n}",
       python: "def digital_root(n):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction digitalRoot($n) {\n    // Your solution here\n    return 0;\n}\n",
+      java: "static int digitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
     },
     starterCode: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -1421,13 +1450,14 @@ async function main() {
   );
 
   const moveZeroesFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "moveZeroes",
         typescript: "moveZeroes",
         python: "move_zeroes",
         php: "moveZeroes",
+        java: "moveZeroes",
       },
     },
     testCases: [
@@ -1442,6 +1472,7 @@ async function main() {
       typescript: "function moveZeroes(nums: number[]): number[] {\n  // Your solution here\n  return nums;\n}",
       python: "def move_zeroes(nums):\n    # Your solution here\n    return nums\n",
       php: "<?php\n\nfunction moveZeroes($nums) {\n    // Your solution here\n    return $nums;\n}\n",
+      java: "static int[] moveZeroes(int[] nums) {\n    // Your solution here\n    return nums;\n}\n",
     },
     starterCode: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
   };
@@ -1498,13 +1529,14 @@ async function main() {
   );
 
   const romanToIntFields = {
-    supportedLanguages: [...supportedLangs],
+    supportedLanguages: [...langsWithJava],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "romanToInt",
         typescript: "romanToInt",
         python: "roman_to_int",
         php: "romanToInt",
+        java: "romanToInt",
       },
     },
     testCases: [
@@ -1519,6 +1551,7 @@ async function main() {
       typescript: "function romanToInt(s: string): number {\n  // Your solution here\n  return 0;\n}",
       python: "def roman_to_int(s):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction romanToInt($s) {\n    // Your solution here\n    return 0;\n}\n",
+      java: "static int romanToInt(String s) {\n    // Your solution here\n    return 0;\n}\n",
     },
     starterCode: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",
   };

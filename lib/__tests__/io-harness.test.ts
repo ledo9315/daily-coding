@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   outputsMatch,
+  buildJavaArguments,
   buildWrappedProgram,
   extractIoProgramOutput,
 } from "@/lib/server/io-harness";
@@ -30,6 +31,34 @@ describe("outputsMatch", () => {
   });
 });
 
+describe("buildJavaArguments", () => {
+  it("turns object keys into one typed parameter each, in key order", () => {
+    // This is what makes binarySearch(int[] arr, int target) read like Java rather than like a
+    // bag of values — and it fixes the argument order the harness passes.
+    const { decls, names } = buildJavaArguments('{"arr":[1,3,5],"target":5}');
+    expect(names).toEqual(["arr", "target"]);
+    expect(decls[0]).toContain("int[] arr = new int[]{1,3,5};");
+    expect(decls[1]).toContain("int target = 5;");
+  });
+
+  it("passes a bare value as a single parameter", () => {
+    expect(buildJavaArguments('"hello"').decls[0]).toContain('String __input = "hello";');
+    expect(buildJavaArguments("5").decls[0]).toContain("int __input = 5;");
+    expect(buildJavaArguments("[]").decls[0]).toContain("int[] __input = new int[]{};");
+  });
+
+  it("escapes strings so a quote cannot end the literal", () => {
+    expect(buildJavaArguments('"a\\"b"').decls[0]).toContain('"a\\"b"');
+  });
+
+  it("rejects shapes it cannot type", () => {
+    // Hash Map's [["set","a",1]] and the Binary Tree's nested nodes land here. They must fail
+    // loudly rather than compile into something that quietly returns the wrong answer.
+    expect(() => buildJavaArguments('[["set","a",1]]')).toThrow();
+    expect(() => buildJavaArguments('{"val":1,"left":null}')).toThrow();
+  });
+});
+
 describe("buildWrappedProgram", () => {
   it("wraps JavaScript with stdin/stdout harness", () => {
     const src = buildWrappedProgram("javascript", "function f(a){return a;}", "f");
@@ -54,6 +83,29 @@ describe("buildWrappedProgram", () => {
     expect(src).toContain("def g(x):");
     expect(src).toContain("json.loads(_raw)");
     expect(src).toContain("g(_data)");
+  });
+
+  it("Java: wraps the method in class Main and bakes the input in", () => {
+    const src = buildWrappedProgram(
+      "java",
+      "static int maxSubArray(int[] nums) { return 0; }",
+      "maxSubArray",
+      "[-2,1,-3]"
+    );
+    expect(src).toContain("public class Main {");
+    expect(src).toContain("static int maxSubArray(int[] nums)");
+    expect(src).toContain("int[] __input = new int[]{-2,1,-3};");
+    expect(src).toContain("__out(maxSubArray(__input));");
+    // Nothing is read at runtime: Piston's image has no JSON library to read it with.
+    expect(src).not.toContain("System.in");
+  });
+
+  it("Java: refuses to build without a test input", () => {
+    // Every other language produces one program for all cases; Java's differs per case, so a
+    // missing input is a programming error rather than something to paper over.
+    expect(() => buildWrappedProgram("java", "static int f(int n) { return n; }", "f")).toThrow(
+      /Testeingabe/u
+    );
   });
 
   it("PHP: invokes callable with json_decode and echo", () => {

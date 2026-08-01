@@ -22,6 +22,7 @@ const RUNTIME_INSTALL = [
   { app: "typescript", pkg: "typescript" },
   { app: "python", pkg: "python" },
   { app: "php", pkg: "php" },
+  { app: "java", pkg: "java" },
 ];
 
 /** Rough semver comparison — higher versions come first under an ascending sort */

@@ -1,5 +1,5 @@
 /** Supported programming languages (must match Prisma enum `CodeLanguage`). */
-export const CODE_LANGUAGES = ["javascript", "typescript", "python", "php"] as const;
+export const CODE_LANGUAGES = ["javascript", "typescript", "python", "php", "java"] as const;
 export type CodeLanguageId = (typeof CODE_LANGUAGES)[number];
 
 /** Per-language starters returned for a challenge (keys ⊆ CodeLanguageId). */
@@ -10,6 +10,7 @@ const LABELS: Record<CodeLanguageId, string> = {
   typescript: "TypeScript",
   python: "Python",
   php: "PHP",
+  java: "Java",
 };
 
 const FILENAMES: Record<CodeLanguageId, string> = {
@@ -17,6 +18,13 @@ const FILENAMES: Record<CodeLanguageId, string> = {
   typescript: "solution.ts",
   python: "main.py",
   php: "main.php",
+  /*
+    Not a free choice: javac derives the file name from the public class, and the harness wraps
+    everything in `public class Main`. Piston is handed a file without extension and appends
+    `.java` itself, so its error messages already say Main.java — editor and compiler agree
+    without any rewriting.
+  */
+  java: "Main.java",
 };
 
 export function languageLabel(lang: CodeLanguageId): string {
@@ -35,6 +43,8 @@ function fallbackStarter(lang: CodeLanguageId): string {
       return "// Implement your solution\n";
     case "php":
       return "<?php\n\n// Implement your solution\nfunction solve($data) {\n}\n";
+    case "java":
+      return "// Implement your solution\nstatic int solve(int[] arr) {\n    return 0;\n}\n";
     default:
       return "// Implement your solution\n";
   }
