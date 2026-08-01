@@ -38,6 +38,17 @@ describe("buildWrappedProgram", () => {
     expect(src).toContain("f(data)");
   });
 
+  it("TypeScript: declares require and process, which Piston's image lacks", () => {
+    // Without the declarations every TypeScript submission failed to compile with TS2580 and
+    // came back as 0/5 — a compiler error where a test result belonged.
+    const src = buildWrappedProgram("typescript", "function f(a: number): number { return a; }", "f");
+    expect(src).toContain("declare function require(");
+    expect(src).toContain("declare const process:");
+    expect(src).toContain("f(data)");
+    // No blanket switch-off: the user's own type errors must still be reported.
+    expect(src).not.toContain("@ts-nocheck");
+  });
+
   it("Python: invokes callable with JSON-loaded input", () => {
     const src = buildWrappedProgram("python", "def g(x):\n    return x", "g");
     expect(src).toContain("def g(x):");
