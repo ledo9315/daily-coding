@@ -107,11 +107,48 @@ const SOLUTIONS: Record<
       "}",
     ],
   },
+  ruby: {
+    ms: [31, 26, 27, 25, 22],
+    entry: "binary_search",
+    code: [
+      "def binary_search(data)",
+      "  arr, target = data['arr'], data['target']",
+      "  low, high = 0, arr.length - 1",
+      "  while low <= high",
+      "    mid = (low + high) / 2",
+      "    return mid if arr[mid] == target",
+      "    arr[mid] < target ? low = mid + 1 : high = mid - 1",
+      "  end",
+      "  -1",
+      "end",
+    ],
+  },
   /*
-    The millisecond values are not decoration. Java compiles on every single test case, which
-    costs well over a second each — showing 12 ms like JavaScript would promise something the
-    platform does not deliver.
+    The millisecond values are not decoration. Java and Go compile on every single test case,
+    which costs a second or more each — showing 12 ms like JavaScript would promise something
+    the platform does not deliver.
   */
+  go: {
+    ms: [640, 590, 610, 580, 600],
+    entry: "binarySearch",
+    code: [
+      "func binarySearch(arr []int, target int) int {",
+      "\tlow, high := 0, len(arr)-1",
+      "\tfor low <= high {",
+      "\t\tmid := (low + high) / 2",
+      "\t\tif arr[mid] == target {",
+      "\t\t\treturn mid",
+      "\t\t}",
+      "\t\tif arr[mid] < target {",
+      "\t\t\tlow = mid + 1",
+      "\t\t} else {",
+      "\t\t\thigh = mid - 1",
+      "\t\t}",
+      "\t}",
+      "\treturn -1",
+      "}",
+    ],
+  },
   java: {
     ms: [1480, 1390, 1420, 1360, 1410],
     entry: "binarySearch",

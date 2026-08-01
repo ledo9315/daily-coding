@@ -5,6 +5,7 @@ import { isCodeExecutionEnabled } from "@/lib/server/code-execution-flag";
 import {
   buildWrappedProgram,
   extractIoProgramOutput,
+  GO_HARNESS_LINE_OFFSET,
   JAVA_HARNESS_LINE_OFFSET,
   outputsMatch,
 } from "@/lib/server/io-harness";
@@ -100,14 +101,17 @@ export type ChallengeRunResult = {
  */
 function withEditorFileName(message: string, language: CodeLanguageId): string {
   /*
-    Java already names the file the editor shows — Main.java — but counts lines from the top of
-    the generated program, three above the user's first line. An error pointing three lines
-    below the actual mistake is worse than no line number at all.
+    Java and Go already name the file the editor shows, but both count lines from the top of the
+    generated program — three above the user's first line for Java, eight for Go. An error
+    pointing below the actual mistake is worse than no line number at all.
   */
-  if (language === "java") {
-    return message.replaceAll(/\bMain\.java:(\d+)\b/gu, (whole, digits: string) => {
-      const line = Number(digits) - JAVA_HARNESS_LINE_OFFSET;
-      return line >= 1 ? `Main.java:${line}` : whole;
+  if (language === "java" || language === "go") {
+    const offset = language === "java" ? JAVA_HARNESS_LINE_OFFSET : GO_HARNESS_LINE_OFFSET;
+    const file = language === "java" ? "Main.java" : "main.go";
+    const pattern = new RegExp(`\\b${file.replace(".", "\\.")}:(\\d+)\\b`, "gu");
+    return message.replaceAll(pattern, (whole, digits: string) => {
+      const line = Number(digits) - offset;
+      return line >= 1 ? `${file}:${line}` : whole;
     });
   }
   const name = languageFileName(language);
@@ -155,9 +159,9 @@ async function runPistonIoCases(
     }
 
     /*
-      Built per case, not once: the Java harness bakes the input in as typed literals rather
-      than parsing it at runtime, so the program differs from case to case. The other languages
-      ignore the argument and produce the same string every time.
+      Built per case, not once: the Java and Go harnesses bake the input in as typed literals
+      rather than parsing it at runtime, so the program differs from case to case. The other
+      languages ignore the argument and produce the same string every time.
     */
     const wrapped = buildWrappedProgram(language, code, callable, tc.input);
     const piston = await executeWithPiston(language, wrapped, tc.input);

@@ -42,6 +42,7 @@ const validBody = {
       typescript: "f",
       python: "f",
       php: "f",
+      ruby: "f",
     },
   },
   starterCodes: {
@@ -49,6 +50,7 @@ const validBody = {
     typescript: "t",
     python: "p",
     php: "x",
+    ruby: "r",
   },
 };
 

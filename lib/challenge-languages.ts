@@ -1,5 +1,13 @@
 /** Supported programming languages (must match Prisma enum `CodeLanguage`). */
-export const CODE_LANGUAGES = ["javascript", "typescript", "python", "php", "java"] as const;
+export const CODE_LANGUAGES = [
+  "javascript",
+  "typescript",
+  "python",
+  "php",
+  "java",
+  "ruby",
+  "go",
+] as const;
 export type CodeLanguageId = (typeof CODE_LANGUAGES)[number];
 
 /** Per-language starters returned for a challenge (keys ⊆ CodeLanguageId). */
@@ -11,6 +19,8 @@ const LABELS: Record<CodeLanguageId, string> = {
   python: "Python",
   php: "PHP",
   java: "Java",
+  ruby: "Ruby",
+  go: "Go",
 };
 
 const FILENAMES: Record<CodeLanguageId, string> = {
@@ -25,6 +35,8 @@ const FILENAMES: Record<CodeLanguageId, string> = {
     without any rewriting.
   */
   java: "Main.java",
+  ruby: "main.rb",
+  go: "main.go",
 };
 
 export function languageLabel(lang: CodeLanguageId): string {
@@ -45,6 +57,10 @@ function fallbackStarter(lang: CodeLanguageId): string {
       return "<?php\n\n// Implement your solution\nfunction solve($data) {\n}\n";
     case "java":
       return "// Implement your solution\nstatic int solve(int[] arr) {\n    return 0;\n}\n";
+    case "ruby":
+      return "# Implement your solution\ndef solve(data)\n  nil\nend\n";
+    case "go":
+      return "// Implement your solution\nfunc solve(arr []int) []int {\n\treturn arr\n}\n";
     default:
       return "// Implement your solution\n";
   }
