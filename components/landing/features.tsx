@@ -3,7 +3,7 @@
 // Hidden with the banner below: import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-// Hidden with the bloom below: import { AmbientGlow } from "@/components/landing/ambient-glow";
+import { AmbientGlow } from "@/components/landing/ambient-glow";
 
 /**
  * The day, as a timed sequence instead of four feature cards.
@@ -69,6 +69,14 @@ export function LandingFeatures() {
         artwork below it would compete with the picture. Same numbers there, so both black
         sections move at the same rate.
       */}
+      <FlickeringGrid
+        className="absolute inset-0 z-0 mask-[radial-gradient(900px_300px_at_50%_100%,white,transparent)]"
+        squareSize={6}
+        gridGap={1}
+        color="#C4FE4D"
+        maxOpacity={0.08}
+        flickerChance={0.03}
+      />
       <div className="relative">
         {/*
           One bloom, on the side the grey section below does not start on, and inside the table
@@ -79,15 +87,8 @@ export function LandingFeatures() {
           colour than chart-5, and on `#020912` a haze reads much more readily than it does on the
           grey `bg-card/50`. The violet stays with the grey section in between.
         */}
-        {/* <AmbientGlow side="left" className="bg-primary/8" /> */}
-        <FlickeringGrid
-          className="absolute inset-0 z-0 mask-[radial-gradient(700px_260px_at_center,white,transparent)]"
-          squareSize={6}
-          gridGap={1}
-          color="#C4FE4D"
-          maxOpacity={0.06}
-          flickerChance={0.03}
-        />
+        <AmbientGlow side="left" className="bg-primary/6" />
+        <AmbientGlow side="right" className="bg-primary/10" />
         <motion.div
           className="relative mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8"
           initial="hidden"
