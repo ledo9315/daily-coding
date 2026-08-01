@@ -1,12 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockChallengeFindFirst = vi.fn();
+const mockChallengeFindMany = vi.fn();
 const mockSubmissionFindFirst = vi.fn();
+
+/** The ring stands on `ch-1`, on the day the test runs: the pointer must not advance here. */
+const startOfTodayUtc = () => {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+};
+const rotationState = {
+  id: "current",
+  challengeId: "ch-1",
+  position: 0,
+  get day() {
+    return startOfTodayUtc();
+  },
+};
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     challenge: {
       findFirst: (...args: unknown[]) => mockChallengeFindFirst(...args),
+      findMany: (...args: unknown[]) => mockChallengeFindMany(...args),
+    },
+    // The daily comes from the ring now: pool plus pointer, no date lookup.
+    rotationState: {
+      findUnique: () => Promise.resolve(rotationState),
+      update: () => Promise.resolve(rotationState),
+      create: () => Promise.resolve(rotationState),
     },
     submission: {
       findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
@@ -28,6 +51,7 @@ const challenge = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockChallengeFindFirst.mockResolvedValue(challenge);
+  mockChallengeFindMany.mockResolvedValue([{ ...challenge, position: 0, isActive: true }]);
   mockSubmissionFindFirst.mockResolvedValue(null);
 });
 
