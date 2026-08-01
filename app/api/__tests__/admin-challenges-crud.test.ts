@@ -52,9 +52,10 @@ const patchBody = {
       typescript: "f",
       python: "f",
       php: "f",
+      ruby: "f",
     },
   },
-  starterCodes: { javascript: "j", typescript: "t", python: "p", php: "x" },
+  starterCodes: { javascript: "j", typescript: "t", python: "p", php: "x", ruby: "r" },
   dateIso: null,
 };
 

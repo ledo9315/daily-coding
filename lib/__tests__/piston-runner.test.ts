@@ -54,6 +54,26 @@ describe("pistonHttpEndpoints", () => {
   });
 });
 
+describe("executeWithPiston: Go", () => {
+  it("tells a rejected build apart from a panic — both exit 2", async () => {
+    mockPiston("go", {
+      stderr: "# command-line-arguments\n./main.go:24:9: undefined: strconv\n",
+      code: 2,
+    });
+    const build = await executeWithPiston("go", "package main", "");
+    expect(build.compileFailed).toBe(true);
+    expect(build.compileOutput).toContain("undefined: strconv");
+
+    clearPistonRuntimeCache();
+    mockPiston("go", {
+      stderr: "panic: runtime error: index out of range [0]\n\ngoroutine 1 [running]:\n",
+      code: 2,
+    });
+    const panic = await executeWithPiston("go", "package main", "");
+    expect(panic.compileFailed).toBe(false);
+  });
+});
+
 describe("executeWithPiston: Java", () => {
   const COMPILE_ERROR =
     "Main.java:5: error: cannot find symbol\n        retrun best;\n        ^\n1 error\nerror: compilation failed\n";

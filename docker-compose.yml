@@ -8,13 +8,18 @@ services:
     restart: unless-stopped
     privileged: true
     environment:
-      # Piston's default ceiling is 3000 ms of CPU per run, and javac plus JVM startup alone burn
-      # roughly 2500-3100 ms — Java submissions were killed with SIGKILL and an empty output at
-      # random. These two values are the *upper bound* a request may ask for, not the default
-      # every program gets: piston-runner.ts sends 3000 ms for the interpreted languages and the
-      # full budget only for Java.
+      # Piston's default ceiling is 3000 ms of CPU per run. Compilation happens inside the run
+      # step, and javac plus JVM startup alone burn 2500-3100 ms, the Go toolchain about 1700 —
+      # submissions were killed with SIGKILL and an empty output at random. These two values are
+      # the *upper bound* a request may ask for, not the default every program gets:
+      # piston-runner.ts asks for the full budget only for Java and Go, the interpreted
+      # languages send no limit at all.
       PISTON_RUN_TIMEOUT: "15000"
       PISTON_RUN_CPU_TIME: "15000"
+      # Go's runtime starts a thread per core and aborts under Piston's default cap of 64
+      # processes — every successful Go program died with "Sandbox keeper received fatal
+      # signal 6" while compile errors came back normally, which is a confusing way to learn it.
+      PISTON_MAX_PROCESS_COUNT: "256"
     ports:
       - "2000:2000"
     volumes:

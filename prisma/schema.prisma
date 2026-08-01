@@ -49,6 +49,8 @@ enum CodeLanguage {
   python
   php
   java
+  ruby
+  go
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────

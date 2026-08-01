@@ -313,14 +313,15 @@ async function main() {
 
   // ─── Challenges ───────────────────────────────────────────────────────────────
 
-  const supportedLangs = ["javascript", "typescript", "python", "php"] as const;
+  const supportedLangs = ["javascript", "typescript", "python", "php", "ruby"] as const;
   /*
-    Java needs the shape of a test case to be expressible as typed parameters, so it is opt-in
-    per challenge rather than part of the default four. Hash Map (values of mixed type in one
-    array) and Binary Tree Traversal (a recursive node structure) stay without it — offering a
-    language whose submission cannot pass is worse than not offering it.
+    Java and Go need the shape of a test case to be expressible as typed parameters, so both are
+    opt-in per challenge rather than part of the base set. Hash Map (values of mixed type in one
+    array) and Binary Tree Traversal (a recursive node structure) stay without them — offering a
+    language whose submission cannot pass is worse than not offering it. The two share one list
+    because the limit is the same: it comes from the test data, not from the language.
   */
-  const langsWithJava = [...supportedLangs, "java"] as const;
+  const langsWithTypes = [...supportedLangs, "java", "go"] as const;
 
   const challengeToday = await prisma.challenge.upsert(
     challengeUpsertArgs({
@@ -372,8 +373,10 @@ async function main() {
           javascript: "transformArray",
           typescript: "transformArray",
           python: "transform_array",
+          ruby: "transform_array",
           php: "transformArray",
           java: "transformArray",
+          go: "transformArray",
         },
       },
       testCases: [
@@ -398,7 +401,7 @@ async function main() {
         },
         { id: 5, name: "Ein Element", input: "[42]", expected: "[42]" },
       ],
-      supportedLanguages: [...langsWithJava],
+      supportedLanguages: [...langsWithTypes],
       starterCodes: {
         javascript: "function transformArray(arr) {\n  // Your solution here\n}",
         typescript:
@@ -407,6 +410,8 @@ async function main() {
           "def transform_array(arr):\n    # Your solution here\n    pass\n",
         php: "<?php\n\nfunction transformArray($arr) {\n    // Your solution here\n}\n",
         java: "static int[] transformArray(int[] arr) {\n    // Your solution here\n    return new int[]{};\n}\n",
+        go: "func transformArray(arr []int) []int {\n\t// Your solution here\n\treturn []int{}\n}\n",
+        ruby: "def transform_array(arr)\n  # Your solution here\n  []\nend\n",
       },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
       isActive: true,
@@ -415,14 +420,16 @@ async function main() {
   );
 
   const binarySearchFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "binarySearch",
         typescript: "binarySearch",
         python: "binary_search",
+        ruby: "binary_search",
         php: "binarySearch",
         java: "binarySearch",
+        go: "binarySearch",
       },
     },
     testCases: [
@@ -441,6 +448,8 @@ async function main() {
         'def binary_search(data):\n    arr, target = data["arr"], data["target"]\n    # Your solution here\n    return -1\n',
       php: "<?php\n\nfunction binarySearch($data) {\n    $arr = $data['arr'];\n    $target = $data['target'];\n    // Your solution here\n    return -1;\n}\n",
       java: "static int binarySearch(int[] arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
+      go: "func binarySearch(arr []int, target int) int {\n\t// Your solution here\n\treturn -1\n}\n",
+      ruby: "def binary_search(data)\n  arr, target = data['arr'], data['target']\n  # Your solution here\n  -1\nend\n",
     },
     starterCode:
       "function binarySearch(data) {\n  const { arr, target } = data;\n  // Your solution here\n  return -1;\n}",
@@ -499,14 +508,16 @@ async function main() {
   );
 
   const stringReversalFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "reverseString",
         typescript: "reverseString",
         python: "reverse_string",
+        ruby: "reverse_string",
         php: "reverseString",
         java: "reverseString",
+        go: "reverseString",
       },
     },
     testCases: [
@@ -523,6 +534,8 @@ async function main() {
       python: "def reverse_string(s):\n    # Your solution here\n    return s\n",
       php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
       java: "static String reverseString(String s) {\n    // Your solution here\n    return s;\n}\n",
+      go: "func reverseString(s string) string {\n\t// Your solution here\n\treturn s\n}\n",
+      ruby: "def reverse_string(s)\n  # Your solution here\n  s\nend\n",
     },
     starterCode: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
   };
@@ -586,6 +599,7 @@ async function main() {
         javascript: "hashMap",
         typescript: "hashMap",
         python: "hash_map",
+        ruby: "hash_map",
         php: "hashMap",
       },
     },
@@ -621,6 +635,7 @@ async function main() {
       typescript: "function hashMap(operations: any[]): any[] {\n  // Your solution here\n  return [];\n}",
       python: "def hash_map(operations):\n    # Your solution here\n    return []\n",
       php: "<?php\n\nfunction hashMap($operations) {\n    // Your solution here\n    return [];\n}\n",
+      ruby: "def hash_map(operations)\n  # Your solution here\n  []\nend\n",
     },
     starterCode: "function hashMap(operations) {\n  // Your solution here\n  return [];\n}",
   };
@@ -688,14 +703,16 @@ async function main() {
   );
 
   const recursionFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "fibonacci",
         typescript: "fibonacci",
         python: "fibonacci",
+        ruby: "fibonacci",
         php: "fibonacci",
         java: "fibonacci",
+        go: "fibonacci",
       },
     },
     testCases: [
@@ -712,6 +729,8 @@ async function main() {
       python: "def fibonacci(n):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
+      go: "func fibonacci(n int) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      ruby: "def fibonacci(n)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -778,6 +797,7 @@ async function main() {
         javascript: "inorderTraversal",
         typescript: "inorderTraversal",
         python: "inorder_traversal",
+        ruby: "inorder_traversal",
         php: "inorderTraversal",
       },
     },
@@ -817,6 +837,7 @@ async function main() {
         "function inorderTraversal(root: any): number[] {\n  // Your solution here\n  return [];\n}",
       python: "def inorder_traversal(root):\n    # Your solution here\n    return []\n",
       php: "<?php\n\nfunction inorderTraversal($root) {\n    // Your solution here\n    return [];\n}\n",
+      ruby: "def inorder_traversal(root)\n  # Your solution here\n  []\nend\n",
     },
     starterCode: "function inorderTraversal(root) {\n  // Your solution here\n  return [];\n}",
   };
@@ -882,14 +903,16 @@ async function main() {
   // ─── Further challenges (LeetCode / Codewars classics) ────────────────────────
 
   const twoSumFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "twoSum",
         typescript: "twoSum",
         python: "two_sum",
+        ruby: "two_sum",
         php: "twoSum",
         java: "twoSum",
+        go: "twoSum",
       },
     },
     testCases: [
@@ -908,6 +931,8 @@ async function main() {
         'def two_sum(data):\n    nums, target = data["nums"], data["target"]\n    # Your solution here\n    return []\n',
       php: "<?php\n\nfunction twoSum($data) {\n    $nums = $data['nums'];\n    $target = $data['target'];\n    // Your solution here\n    return [];\n}\n",
       java: "static int[] twoSum(int[] nums, int target) {\n    // Your solution here\n    return new int[]{};\n}\n",
+      go: "func twoSum(nums []int, target int) []int {\n\t// Your solution here\n\treturn []int{}\n}\n",
+      ruby: "def two_sum(data)\n  nums, target = data['nums'], data['target']\n  # Your solution here\n  []\nend\n",
     },
     starterCode:
       "function twoSum(data) {\n  const { nums, target } = data;\n  // Your solution here\n  return [];\n}",
@@ -965,14 +990,16 @@ async function main() {
   );
 
   const fizzBuzzFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "fizzBuzz",
         typescript: "fizzBuzz",
         python: "fizz_buzz",
+        ruby: "fizz_buzz",
         php: "fizzBuzz",
         java: "fizzBuzz",
+        go: "fizzBuzz",
       },
     },
     testCases: [
@@ -994,6 +1021,8 @@ async function main() {
       python: "def fizz_buzz(n):\n    # Your solution here\n    return []\n",
       php: "<?php\n\nfunction fizzBuzz($n) {\n    // Your solution here\n    return [];\n}\n",
       java: "static String[] fizzBuzz(int n) {\n    // Your solution here\n    return new String[]{};\n}\n",
+      go: "func fizzBuzz(n int) []string {\n\t// Your solution here\n\treturn []string{}\n}\n",
+      ruby: "def fizz_buzz(n)\n  # Your solution here\n  []\nend\n",
     },
     starterCode: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
   };
@@ -1045,14 +1074,16 @@ async function main() {
   );
 
   const validParenthesesFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "isValid",
         typescript: "isValid",
         python: "is_valid",
+        ruby: "is_valid",
         php: "isValid",
         java: "isValid",
+        go: "isValid",
       },
     },
     testCases: [
@@ -1068,6 +1099,8 @@ async function main() {
       python: "def is_valid(s):\n    # Your solution here\n    return False\n",
       php: "<?php\n\nfunction isValid($s) {\n    // Your solution here\n    return false;\n}\n",
       java: "static boolean isValid(String s) {\n    // Your solution here\n    return false;\n}\n",
+      go: "func isValid(s string) bool {\n\t// Your solution here\n\treturn false\n}\n",
+      ruby: "def is_valid(s)\n  # Your solution here\n  false\nend\n",
     },
     starterCode: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
   };
@@ -1130,14 +1163,16 @@ async function main() {
   );
 
   const countVowelsFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "countVowels",
         typescript: "countVowels",
         python: "count_vowels",
+        ruby: "count_vowels",
         php: "countVowels",
         java: "countVowels",
+        go: "countVowels",
       },
     },
     testCases: [
@@ -1153,6 +1188,8 @@ async function main() {
       python: "def count_vowels(s):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction countVowels($s) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int countVowels(String s) {\n    // Your solution here\n    return 0;\n}\n",
+      go: "func countVowels(s string) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      ruby: "def count_vowels(s)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -1205,14 +1242,16 @@ async function main() {
   );
 
   const maxSubArrayFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "maxSubArray",
         typescript: "maxSubArray",
         python: "max_sub_array",
+        ruby: "max_sub_array",
         php: "maxSubArray",
         java: "maxSubArray",
+        go: "maxSubArray",
       },
     },
     testCases: [
@@ -1228,6 +1267,8 @@ async function main() {
       python: "def max_sub_array(nums):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction maxSubArray($nums) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int maxSubArray(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
+      go: "func maxSubArray(nums []int) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      ruby: "def max_sub_array(nums)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -1287,14 +1328,16 @@ async function main() {
   );
 
   const isAnagramFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "isAnagram",
         typescript: "isAnagram",
         python: "is_anagram",
+        ruby: "is_anagram",
         php: "isAnagram",
         java: "isAnagram",
+        go: "isAnagram",
       },
     },
     testCases: [
@@ -1313,6 +1356,8 @@ async function main() {
         'def is_anagram(data):\n    s, t = data["s"], data["t"]\n    # Your solution here\n    return False\n',
       php: "<?php\n\nfunction isAnagram($data) {\n    $s = $data['s'];\n    $t = $data['t'];\n    // Your solution here\n    return false;\n}\n",
       java: "static boolean isAnagram(String s, String t) {\n    // Your solution here\n    return false;\n}\n",
+      go: "func isAnagram(s string, t string) bool {\n\t// Your solution here\n\treturn false\n}\n",
+      ruby: "def is_anagram(data)\n  s, t = data['s'], data['t']\n  # Your solution here\n  false\nend\n",
     },
     starterCode:
       "function isAnagram(data) {\n  const { s, t } = data;\n  // Your solution here\n  return false;\n}",
@@ -1370,14 +1415,16 @@ async function main() {
   );
 
   const digitalRootFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "digitalRoot",
         typescript: "digitalRoot",
         python: "digital_root",
+        ruby: "digital_root",
         php: "digitalRoot",
         java: "digitalRoot",
+        go: "digitalRoot",
       },
     },
     testCases: [
@@ -1393,6 +1440,8 @@ async function main() {
       python: "def digital_root(n):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction digitalRoot($n) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int digitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
+      go: "func digitalRoot(n int) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      ruby: "def digital_root(n)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
   };
@@ -1450,14 +1499,16 @@ async function main() {
   );
 
   const moveZeroesFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "moveZeroes",
         typescript: "moveZeroes",
         python: "move_zeroes",
+        ruby: "move_zeroes",
         php: "moveZeroes",
         java: "moveZeroes",
+        go: "moveZeroes",
       },
     },
     testCases: [
@@ -1473,6 +1524,8 @@ async function main() {
       python: "def move_zeroes(nums):\n    # Your solution here\n    return nums\n",
       php: "<?php\n\nfunction moveZeroes($nums) {\n    // Your solution here\n    return $nums;\n}\n",
       java: "static int[] moveZeroes(int[] nums) {\n    // Your solution here\n    return nums;\n}\n",
+      go: "func moveZeroes(nums []int) []int {\n\t// Your solution here\n\treturn nums\n}\n",
+      ruby: "def move_zeroes(nums)\n  # Your solution here\n  nums\nend\n",
     },
     starterCode: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
   };
@@ -1529,14 +1582,16 @@ async function main() {
   );
 
   const romanToIntFields = {
-    supportedLanguages: [...langsWithJava],
+    supportedLanguages: [...langsWithTypes],
     evaluationConfig: {
       callableByLanguage: {
         javascript: "romanToInt",
         typescript: "romanToInt",
         python: "roman_to_int",
+        ruby: "roman_to_int",
         php: "romanToInt",
         java: "romanToInt",
+        go: "romanToInt",
       },
     },
     testCases: [
@@ -1552,6 +1607,8 @@ async function main() {
       python: "def roman_to_int(s):\n    # Your solution here\n    return 0\n",
       php: "<?php\n\nfunction romanToInt($s) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int romanToInt(String s) {\n    // Your solution here\n    return 0;\n}\n",
+      go: "func romanToInt(s string) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      ruby: "def roman_to_int(s)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",
   };

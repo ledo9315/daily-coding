@@ -66,7 +66,9 @@ export function AdminChallengeForm({
   const [fnTs, setFnTs] = useState(initial?.fnTs ?? "solve");
   const [fnPy, setFnPy] = useState(initial?.fnPy ?? "solve");
   const [fnPhp, setFnPhp] = useState(initial?.fnPhp ?? "solve");
+  const [fnRuby, setFnRuby] = useState(initial?.fnRuby ?? "solve");
   const [fnJava, setFnJava] = useState(initial?.fnJava ?? "");
+  const [fnGo, setFnGo] = useState(initial?.fnGo ?? "");
   const [starterJs, setStarterJs] = useState(
     initial?.starterJs ??
       "function solve(arr) {\n  // …\n  return arr;\n}",
@@ -82,7 +84,11 @@ export function AdminChallengeForm({
     initial?.starterPhp ??
       "<?php\n\nfunction solve($arr) {\n    // …\n}\n",
   );
+  const [starterRuby, setStarterRuby] = useState(
+    initial?.starterRuby ?? "def solve(arr)\n  # …\n  arr\nend\n",
+  );
   const [starterJava, setStarterJava] = useState(initial?.starterJava ?? "");
+  const [starterGo, setStarterGo] = useState(initial?.starterGo ?? "");
   const [isActive, setIsActive] = useState(initial?.isActive ?? false);
   const [dateUtcDay, setDateUtcDay] = useState(initial?.dateUtcDay ?? "");
 
@@ -115,14 +121,21 @@ export function AdminChallengeForm({
     }
 
     /*
-      Java only counts as supported when a method name is filled in. Its harness cannot type
-      every input shape, and a language in the dropdown whose submission always fails is worse
-      than one that is missing.
+      Java and Go only count as supported when a function name is filled in. Their harnesses
+      cannot type every input shape, and a language in the dropdown whose submission always
+      fails is worse than one that is missing.
     */
     const javaFn = fnJava.trim();
-    const supportedLanguages = javaFn
-      ? (["javascript", "typescript", "python", "php", "java"] as const)
-      : (["javascript", "typescript", "python", "php"] as const);
+    const goFn = fnGo.trim();
+    const supportedLanguages = [
+      "javascript",
+      "typescript",
+      "python",
+      "php",
+      "ruby",
+      ...(javaFn ? (["java"] as const) : []),
+      ...(goFn ? (["go"] as const) : []),
+    ] as const;
 
     const payload = {
       ...(mode === "create" ? { id: id.trim() } : {}),
@@ -140,7 +153,9 @@ export function AdminChallengeForm({
           typescript: fnTs.trim(),
           python: fnPy.trim(),
           php: fnPhp.trim(),
+          ruby: fnRuby.trim(),
           ...(javaFn ? { java: javaFn } : {}),
+          ...(goFn ? { go: goFn } : {}),
         },
       },
       starterCodes: {
@@ -148,7 +163,9 @@ export function AdminChallengeForm({
         typescript: starterTs,
         python: starterPy,
         php: starterPhp,
+        ruby: starterRuby,
         ...(javaFn ? { java: starterJava } : {}),
+        ...(goFn ? { go: starterGo } : {}),
       },
       supportedLanguages,
       isActive,
@@ -382,6 +399,15 @@ export function AdminChallengeForm({
           />
         </div>
         <div className="space-y-2">
+          <Label htmlFor="fruby">Funktionsname Ruby</Label>
+          <Input
+            id="fruby"
+            value={fnRuby}
+            onChange={(e) => setFnRuby(e.target.value)}
+            className="rounded-none font-mono text-sm"
+          />
+        </div>
+        <div className="space-y-2">
           <Label htmlFor="fjava">Funktionsname Java</Label>
           <Input
             id="fjava"
@@ -393,6 +419,17 @@ export function AdminChallengeForm({
           <p className="text-xs text-muted-foreground">
             Leer lassen, wenn die Testfälle Typen mischen oder verschachtelt sind.
           </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="fgo">Funktionsname Go</Label>
+          <Input
+            id="fgo"
+            value={fnGo}
+            onChange={(e) => setFnGo(e.target.value)}
+            placeholder="leer = kein Go"
+            className="rounded-none font-mono text-sm"
+          />
+          <p className="text-xs text-muted-foreground">Dieselbe Einschränkung wie bei Java.</p>
         </div>
       </div>
 
@@ -431,6 +468,14 @@ export function AdminChallengeForm({
           />
         </div>
         <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">Ruby</p>
+          <Textarea
+            value={starterRuby}
+            onChange={(e) => setStarterRuby(e.target.value)}
+            className="rounded-none font-mono text-xs min-h-[100px]"
+          />
+        </div>
+        <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
             Java — nur die Methode, ohne Klasse. Der Harness umschließt sie mit
             <span className="font-mono"> public class Main</span>.
@@ -438,6 +483,16 @@ export function AdminChallengeForm({
           <Textarea
             value={starterJava}
             onChange={(e) => setStarterJava(e.target.value)}
+            className="rounded-none font-mono text-xs min-h-[100px]"
+          />
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Go — nur die Funktion, ohne <span className="font-mono">package main</span>.
+          </p>
+          <Textarea
+            value={starterGo}
+            onChange={(e) => setStarterGo(e.target.value)}
             className="rounded-none font-mono text-xs min-h-[100px]"
           />
         </div>
