@@ -128,6 +128,21 @@ const SOLUTIONS: Record<
     which costs a second or more each — showing 12 ms like JavaScript would promise something
     the platform does not deliver.
   */
+  rust: {
+    ms: [1240, 1180, 1210, 1160, 1195],
+    entry: "binary_search",
+    code: [
+      "fn binary_search(arr: Vec<i64>, target: i64) -> i64 {",
+      "    let (mut low, mut high) = (0i64, arr.len() as i64 - 1);",
+      "    while low <= high {",
+      "        let mid = (low + high) / 2;",
+      "        if arr[mid as usize] == target { return mid; }",
+      "        if arr[mid as usize] < target { low = mid + 1 } else { high = mid - 1 }",
+      "    }",
+      "    -1",
+      "}",
+    ],
+  },
   csharp: {
     ms: [510, 470, 480, 465, 475],
     entry: "BinarySearch",
