@@ -11,6 +11,11 @@ vi.mock("@/lib/auth-session", () => ({
   getSessionUserId: vi.fn().mockResolvedValue({ userId: "user-test" }),
 }));
 
+const mockCheckRateLimit = vi.fn();
+vi.mock("@/lib/server/rate-limiter", () => ({
+  checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
+}));
+
 const mockAuth = vi.fn();
 vi.mock("@/auth", () => ({
   auth: () => mockAuth(),
@@ -60,6 +65,7 @@ vi.mock("@/lib/prisma", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockCheckRateLimit.mockResolvedValue(true);
   mockUserFindUnique.mockResolvedValue({ id: "user-test", streakRecord: 0 });
   mockSubmissionFindFirst.mockResolvedValue(null);
   mockSubmissionFindMany.mockResolvedValue([{ createdAt: new Date() }]);
@@ -312,11 +318,58 @@ describe("POST /api/challenge/[id]/run", () => {
   }
 
   it("returns 404 when challenge does not exist", async () => {
-    mockFindUniqueChallenge.mockResolvedValueOnce(null);
+    mockChallengeFindMany.mockResolvedValueOnce([]);
     const res = await runTestsHandler(makeRequest("missing"), {
       params: Promise.resolve({ id: "missing" }),
     });
     expect(res.status).toBe(404);
+  });
+
+  it("does not run a real but non-daily challenge", async () => {
+    const res = await runTestsHandler(makeRequest("future-challenge"), {
+      params: Promise.resolve({ id: "future-challenge" }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("rejects oversized source code before execution", async () => {
+    const res = await runTestsHandler(makeRequest("ch-1", "x".repeat(50_001)), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(413);
+  });
+
+  it("measures the source-code limit in UTF-8 bytes", async () => {
+    const res = await runTestsHandler(makeRequest("ch-1", "ä".repeat(25_001)), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(413);
+  });
+
+  it("rejects a declared oversized request before parsing or rate-limit storage", async () => {
+    const request = new NextRequest("http://localhost/api/challenge/ch-1/run", {
+      method: "POST",
+      body: "{}",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": "350001",
+      },
+    });
+
+    const res = await runTestsHandler(request, {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+
+    expect(res.status).toBe(413);
+    expect(mockCheckRateLimit).not.toHaveBeenCalled();
+  });
+
+  it("rate-limits expensive code execution", async () => {
+    mockCheckRateLimit.mockResolvedValueOnce(false);
+    const res = await runTestsHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(429);
   });
 
   it("returns 400 when language is not allowed", async () => {
@@ -399,13 +452,30 @@ describe("POST /api/challenge/[id]/submit", () => {
   });
 
   it("returns 404 when challenge does not exist", async () => {
-    mockFindUniqueChallenge.mockResolvedValueOnce(null);
+    mockChallengeFindMany.mockResolvedValueOnce([]);
     const res = await submitHandler(makeRequest("nonexistent"), {
       params: Promise.resolve({ id: "nonexistent" }),
     });
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json).toHaveProperty("error");
+  });
+
+  it("does not accept a non-daily challenge", async () => {
+    const res = await submitHandler(makeRequest("old-challenge"), {
+      params: Promise.resolve({ id: "old-challenge" }),
+    });
+    expect(res.status).toBe(404);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("rate-limits submissions per authenticated user", async () => {
+    mockCheckRateLimit.mockResolvedValueOnce(false);
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(429);
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 
   it("returns 401 when session user is not in database", async () => {
@@ -442,6 +512,7 @@ describe("POST /api/challenge/[id]/submit", () => {
           code: "my code",
           language: "typescript",
           status: "completed",
+          submissionDay: expect.any(Date),
         }),
       })
     );

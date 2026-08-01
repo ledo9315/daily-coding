@@ -5,8 +5,8 @@ import { getUserProfileData } from "@/lib/server/profile-data";
 export async function GET() {
   const result = await getSessionUserId();
   if (result.error) return result.error;
-  const { userId, userEmail } = result;
-  const data = await getUserProfileData(userId, userEmail);
+  const { userId } = result;
+  const data = await getUserProfileData(userId);
   if (!data) {
     return NextResponse.json(
       {

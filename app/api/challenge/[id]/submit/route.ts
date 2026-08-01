@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CodeLanguage } from "@/lib/generated/prisma/client";
+import { CodeLanguage, Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
 import { runChallengeTests } from "@/lib/server/challenge-execution";
-import { findTodaySubmission, utcDayRange } from "@/lib/server/challenge-day";
+import {
+  findDailyChallengeForApp,
+  findTodaySubmission,
+  utcDayRange,
+} from "@/lib/server/challenge-day";
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
+import { checkRateLimit } from "@/lib/server/rate-limiter";
+import {
+  codeExceedsLimit,
+  MAX_CHALLENGE_REQUEST_BYTES,
+  requestBodyExceedsLimit,
+} from "@/lib/server/request-security";
 
 export async function POST(
   request: NextRequest,
@@ -30,11 +40,22 @@ export async function POST(
   }
 
   const { id: challengeId } = await params;
+  if (requestBodyExceedsLimit(request, MAX_CHALLENGE_REQUEST_BYTES)) {
+    return NextResponse.json({ error: "Code ist zu lang." }, { status: 413 });
+  }
+
+  if (!(await checkRateLimit(`challenge-submit:${userId}`, 5, 60_000))) {
+    return NextResponse.json({ error: "Zu viele Abgaben. Bitte kurz warten." }, { status: 429 });
+  }
+
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const code: string = typeof body.code === "string" ? body.code : "";
+  if (codeExceedsLimit(code)) {
+    return NextResponse.json({ error: "Code ist zu lang." }, { status: 413 });
+  }
 
-  const challenge = await prisma.challenge.findUnique({ where: { id: challengeId } });
-  if (!challenge) {
+  const challenge = await findDailyChallengeForApp();
+  if (!challenge || challenge.id !== challengeId) {
     return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
   }
 
@@ -49,7 +70,7 @@ export async function POST(
     );
   }
 
-  const alreadyToday = await findTodaySubmission(userId, challengeId);
+  const alreadyToday = await findTodaySubmission(userId);
 
   if (alreadyToday) {
     return NextResponse.json(
@@ -68,16 +89,27 @@ export async function POST(
     "submit"
   );
 
-  await prisma.submission.create({
-    data: {
-      userId,
-      challengeId,
-      code,
-      language: language as CodeLanguage,
-      status: runtimeOk ? "completed" : "failed",
-      testResults: testResults as unknown as Parameters<typeof prisma.submission.create>[0]["data"]["testResults"],
-    },
-  });
+  try {
+    await prisma.submission.create({
+      data: {
+        userId,
+        challengeId,
+        code,
+        language: language as CodeLanguage,
+        status: runtimeOk ? "completed" : "failed",
+        submissionDay: utcDayRange().gte,
+        testResults: testResults as unknown as Parameters<typeof prisma.submission.create>[0]["data"]["testResults"],
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return NextResponse.json(
+        { error: "Du hast diese Challenge heute (UTC) bereits abgegeben." },
+        { status: 409 }
+      );
+    }
+    throw error;
+  }
 
   let celebration:
     | {

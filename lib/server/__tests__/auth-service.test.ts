@@ -5,6 +5,7 @@ const mockDeleteMany = vi.fn();
 const mockFindUnique = vi.fn();
 const mockDelete = vi.fn();
 const mockUpdate = vi.fn();
+const mockUpdateMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -19,10 +20,19 @@ vi.mock("@/lib/prisma", () => ({
       deleteMany: (...a: unknown[]) => mockDeleteMany(...a),
       findUnique: (...a: unknown[]) => mockFindUnique(...a),
       update: (...a: unknown[]) => mockUpdate(...a),
+      updateMany: (...a: unknown[]) => mockUpdateMany(...a),
     },
     user: {
       update: (...a: unknown[]) => mockUpdate(...a),
     },
+    $transaction: (callback: (tx: unknown) => unknown) =>
+      callback({
+        passwordResetToken: {
+          findUnique: (...a: unknown[]) => mockFindUnique(...a),
+          updateMany: (...a: unknown[]) => mockUpdateMany(...a),
+        },
+        user: { update: (...a: unknown[]) => mockUpdate(...a) },
+      }),
   },
 }));
 
@@ -30,8 +40,7 @@ import {
   createEmailVerificationToken,
   verifyEmailToken,
   createPasswordResetToken,
-  validatePasswordResetToken,
-  markPasswordResetTokenUsed,
+  consumePasswordResetToken,
 } from "@/lib/server/auth-service";
 
 beforeEach(() => vi.clearAllMocks());
@@ -100,10 +109,10 @@ describe("createPasswordResetToken", () => {
   });
 });
 
-describe("validatePasswordResetToken", () => {
+describe("consumePasswordResetToken", () => {
   it("returns error when token not found", async () => {
     mockFindUnique.mockResolvedValueOnce(null);
-    expect(await validatePasswordResetToken("x")).toEqual({ error: "Token ungültig." });
+    expect(await consumePasswordResetToken("x", "hash")).toEqual({ error: "Token ungültig." });
   });
 
   it("returns error when token already used", async () => {
@@ -113,7 +122,7 @@ describe("validatePasswordResetToken", () => {
       used: true,
       expiresAt: new Date(Date.now() + 60_000),
     });
-    expect(await validatePasswordResetToken("t")).toEqual({
+    expect(await consumePasswordResetToken("t", "hash")).toEqual({
       error: "Token wurde bereits verwendet.",
     });
   });
@@ -125,27 +134,42 @@ describe("validatePasswordResetToken", () => {
       used: false,
       expiresAt: new Date(Date.now() - 1000),
     });
-    expect(await validatePasswordResetToken("t")).toEqual({ error: "Token abgelaufen." });
+    expect(await consumePasswordResetToken("t", "hash")).toEqual({ error: "Token abgelaufen." });
   });
 
-  it("returns userId for valid token", async () => {
+  it("claims the token conditionally and updates the password in one transaction", async () => {
     mockFindUnique.mockResolvedValueOnce({
       token: "t",
       userId: "u1",
       used: false,
       expiresAt: new Date(Date.now() + 60_000),
     });
-    expect(await validatePasswordResetToken("t")).toEqual({ userId: "u1" });
-  });
-});
-
-describe("markPasswordResetTokenUsed", () => {
-  it("calls prisma.passwordResetToken.update with used: true", async () => {
+    mockUpdateMany.mockResolvedValueOnce({ count: 1 });
     mockUpdate.mockResolvedValueOnce({});
-    await markPasswordResetTokenUsed("t");
-    expect(mockUpdate).toHaveBeenCalledWith({
-      where: { token: "t" },
+
+    expect(await consumePasswordResetToken("t", "new-hash")).toEqual({ success: true });
+    expect(mockUpdateMany).toHaveBeenCalledWith({
+      where: { token: "t", used: false, expiresAt: { gte: expect.any(Date) } },
       data: { used: true },
     });
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "u1" },
+      data: { passwordHash: "new-hash" },
+    });
+  });
+
+  it("rejects a concurrent second consumer", async () => {
+    mockFindUnique.mockResolvedValueOnce({
+      token: "t",
+      userId: "u1",
+      used: false,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+    mockUpdateMany.mockResolvedValueOnce({ count: 0 });
+
+    expect(await consumePasswordResetToken("t", "hash")).toEqual({
+      error: "Token wurde bereits verwendet.",
+    });
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });

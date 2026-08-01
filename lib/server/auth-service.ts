@@ -41,16 +41,27 @@ export async function createPasswordResetToken(userId: string): Promise<string> 
   return token;
 }
 
-export async function validatePasswordResetToken(
-  token: string
-): Promise<{ userId: string } | { error: string }> {
-  const record = await prisma.passwordResetToken.findUnique({ where: { token } });
-  if (!record) return { error: "Token ungültig." };
-  if (record.used) return { error: "Token wurde bereits verwendet." };
-  if (record.expiresAt < new Date()) return { error: "Token abgelaufen." };
-  return { userId: record.userId };
-}
+export async function consumePasswordResetToken(
+  token: string,
+  passwordHash: string,
+  now: Date = new Date()
+): Promise<{ success: true } | { error: string }> {
+  return prisma.$transaction(async (tx) => {
+    const record = await tx.passwordResetToken.findUnique({ where: { token } });
+    if (!record) return { error: "Token ungültig." };
+    if (record.used) return { error: "Token wurde bereits verwendet." };
+    if (record.expiresAt < now) return { error: "Token abgelaufen." };
 
-export async function markPasswordResetTokenUsed(token: string): Promise<void> {
-  await prisma.passwordResetToken.update({ where: { token }, data: { used: true } });
+    const claimed = await tx.passwordResetToken.updateMany({
+      where: { token, used: false, expiresAt: { gte: now } },
+      data: { used: true },
+    });
+    if (claimed.count !== 1) return { error: "Token wurde bereits verwendet." };
+
+    await tx.user.update({
+      where: { id: record.userId },
+      data: { passwordHash },
+    });
+    return { success: true };
+  });
 }

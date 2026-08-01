@@ -8,6 +8,7 @@ vi.mock("@/lib/auth-session", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    $transaction: vi.fn().mockResolvedValue([]),
     user: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
@@ -55,7 +56,7 @@ function makeRequest(body: object) {
 describe("DELETE /api/user/account", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetSession.mockResolvedValue({ userId: "u-1", userEmail: null });
+    mockGetSession.mockResolvedValue({ userId: "u-1" });
     mockFindUnique.mockResolvedValue({
       id: "u-1",
       passwordHash: "old-hash",
@@ -106,17 +107,23 @@ describe("DELETE /api/user/account", () => {
     expect(prisma.account.deleteMany).toHaveBeenCalledWith({ where: { userId: "u-1" } });
     expect(mockDeleteUser).toHaveBeenCalledWith({ where: { id: "u-1" } });
     expect(mockSendAccountDeletionEmail).toHaveBeenCalledWith("u1@example.com", "User One");
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("still requires the password when an account also has OAuth linked", async () => {
+    const res = await DELETE(makeRequest({ confirmText: "KONTO LÖSCHEN" }));
+
+    expect(res.status).toBe(400);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
   it("allows deleting oauth-only user without password", async () => {
     mockFindUnique.mockResolvedValueOnce({
       id: "u-1",
-      passwordHash: "old-hash",
+      passwordHash: null,
       email: "u1@example.com",
       name: "User One",
     } as never);
-    mockAccountFindFirst.mockResolvedValueOnce({ id: "acc-1" } as never);
-
     const res = await DELETE(makeRequest({ confirmText: "KONTO LÖSCHEN" }));
 
     expect(res.status).toBe(200);

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
+import { passwordValidationError } from "@/lib/password-policy";
 
 export async function PATCH(request: Request) {
   const result = await getSessionUserId();
@@ -23,24 +24,16 @@ export async function PATCH(request: Request) {
       ? (body as { newPassword: unknown }).newPassword
       : undefined;
 
-  if (typeof newPassword !== "string" || newPassword.length < 8) {
-    return NextResponse.json(
-      { error: "Neues Passwort muss mindestens 8 Zeichen lang sein." },
-      { status: 400 }
-    );
+  if (typeof newPassword !== "string") {
+    return NextResponse.json({ error: "Neues Passwort fehlt." }, { status: 400 });
   }
+  const passwordError = passwordValidationError(newPassword);
+  if (passwordError) return NextResponse.json({ error: passwordError }, { status: 400 });
 
-  const user = result.userEmail
-    ? await prisma.user.findFirst({
-        where: {
-          OR: [{ id: result.userId }, { email: result.userEmail }],
-        },
-        select: { id: true, passwordHash: true },
-      })
-    : await prisma.user.findUnique({
-        where: { id: result.userId },
-        select: { id: true, passwordHash: true },
-      });
+  const user = await prisma.user.findUnique({
+    where: { id: result.userId },
+    select: { id: true, passwordHash: true },
+  });
 
   if (!user) {
     return NextResponse.json(
@@ -69,7 +62,7 @@ export async function PATCH(request: Request) {
     }
   }
 
-  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const passwordHash = await bcrypt.hash(newPassword, 12);
   await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
 
   return NextResponse.json({ success: true });

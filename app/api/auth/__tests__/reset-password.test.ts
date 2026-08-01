@@ -1,18 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const mockValidatePasswordResetToken = vi.fn();
-const mockMarkPasswordResetTokenUsed = vi.fn();
-const mockUpdate = vi.fn();
+const mockConsumePasswordResetToken = vi.fn();
+const mockCheckRateLimit = vi.fn();
 
 vi.mock("@/lib/server/auth-service", () => ({
-  validatePasswordResetToken: (...a: unknown[]) => mockValidatePasswordResetToken(...a),
-  markPasswordResetTokenUsed: (...a: unknown[]) => mockMarkPasswordResetTokenUsed(...a),
-}));
-vi.mock("@/lib/prisma", () => ({
-  prisma: { user: { update: (...a: unknown[]) => mockUpdate(...a) } },
+  consumePasswordResetToken: (...a: unknown[]) => mockConsumePasswordResetToken(...a),
 }));
 vi.mock("bcryptjs", () => ({
   default: { hash: vi.fn().mockResolvedValue("newhash") },
+}));
+vi.mock("@/lib/server/rate-limiter", () => ({
+  checkRateLimit: (...a: unknown[]) => mockCheckRateLimit(...a),
 }));
 
 import { POST } from "@/app/api/auth/reset-password/route";
@@ -26,7 +24,10 @@ function makeRequest(body: object) {
   });
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockCheckRateLimit.mockResolvedValue(true);
+});
 
 describe("POST /api/auth/reset-password", () => {
   it("returns 400 for missing fields", async () => {
@@ -40,22 +41,27 @@ describe("POST /api/auth/reset-password", () => {
   });
 
   it("returns 400 when token is invalid", async () => {
-    mockValidatePasswordResetToken.mockResolvedValueOnce({ error: "Token ungültig." });
+    mockConsumePasswordResetToken.mockResolvedValueOnce({ error: "Token ungültig." });
     const res = await POST(makeRequest({ token: "bad", password: "newpassword1" }));
     expect(res.status).toBe(400);
   });
 
-  it("updates password hash and marks token used on success", async () => {
-    mockValidatePasswordResetToken.mockResolvedValueOnce({ userId: "u1" });
-    mockMarkPasswordResetTokenUsed.mockResolvedValueOnce(undefined);
-    mockUpdate.mockResolvedValueOnce({});
+  it("rate-limits expensive password hashing by client", async () => {
+    mockCheckRateLimit.mockResolvedValueOnce(false);
+
+    const res = await POST(
+      makeRequest({ token: "bad", password: "newpassword1" })
+    );
+
+    expect(res.status).toBe(429);
+    expect(mockConsumePasswordResetToken).not.toHaveBeenCalled();
+  });
+
+  it("atomically consumes the token with the new password hash", async () => {
+    mockConsumePasswordResetToken.mockResolvedValueOnce({ success: true });
 
     const res = await POST(makeRequest({ token: "good", password: "newpassword1" }));
     expect(res.status).toBe(200);
-    expect(mockMarkPasswordResetTokenUsed).toHaveBeenCalledWith("good");
-    expect(mockUpdate).toHaveBeenCalledWith({
-      where: { id: "u1" },
-      data: { passwordHash: "newhash" },
-    });
+    expect(mockConsumePasswordResetToken).toHaveBeenCalledWith("good", "newhash");
   });
 });

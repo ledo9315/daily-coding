@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { verifyEmailToken } from "@/lib/server/auth-service";
+import { emailAddressValidationError, normaliseEmailAddress } from "@/lib/email-address";
+import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { requestClientIdentity } from "@/lib/server/request-security";
 
 type CredentialsInput = Partial<
   Record<"email" | "password" | "rememberMe" | "verificationToken", unknown>
@@ -38,7 +41,8 @@ function mapUserToSessionUser(
 }
 
 export async function authorizeCredentials(
-  credentials: CredentialsInput | undefined
+  credentials: CredentialsInput | undefined,
+  request?: Request
 ): Promise<SessionUser | null> {
   const verificationToken = credentials?.verificationToken as string | undefined;
   if (verificationToken) {
@@ -56,8 +60,14 @@ export async function authorizeCredentials(
   const rememberMe = credentials?.rememberMe === "true";
 
   if (!email || !password) return null;
+  if (emailAddressValidationError(email)) return null;
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const canonicalEmail = normaliseEmailAddress(email);
+  const client = request ? requestClientIdentity(request) : "unknown";
+  if (!(await checkRateLimit(`login-ip:${client}`, 30, 15 * 60 * 1000))) return null;
+  if (!(await checkRateLimit(`login:${canonicalEmail}`, 10, 15 * 60 * 1000))) return null;
+
+  const user = await prisma.user.findUnique({ where: { email: canonicalEmail } });
   if (!user || !user.passwordHash) return null;
 
   const valid = await bcrypt.compare(password, user.passwordHash);

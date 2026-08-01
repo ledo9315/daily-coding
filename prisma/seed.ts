@@ -1861,7 +1861,11 @@ async function main() {
     await prisma.submission.upsert({
       where: { id: `sub-${i + 1}` },
       update: {},
-      create: { id: `sub-${i + 1}`, ...submissionData[i] },
+      create: {
+        id: `sub-${i + 1}`,
+        ...submissionData[i],
+        submissionDay: new Date(anchor.getTime() + i),
+      },
     });
   }
 

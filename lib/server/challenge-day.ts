@@ -17,9 +17,13 @@ export function utcDayRange(now: Date = new Date()): { gte: Date; lt: Date } {
  * the challenge API and the dashboard card. The check used to be copied into two
  * routes.
  */
-export async function findTodaySubmission(userId: string, challengeId: string) {
+export async function findTodaySubmission(userId: string, challengeId?: string) {
   return prisma.submission.findFirst({
-    where: { userId, challengeId, createdAt: utcDayRange() },
+    where: {
+      userId,
+      ...(challengeId ? { challengeId } : {}),
+      createdAt: utcDayRange(),
+    },
     select: {
       id: true,
       status: true,
