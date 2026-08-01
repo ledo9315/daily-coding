@@ -62,6 +62,17 @@ const SOLUTIONS: Record<CodeLanguageId, { code: string; callable: string }> = {
         best = max(best, cur)
     return best`,
   },
+  java: {
+    callable: "maxSubArray",
+    code: `static int maxSubArray(int[] nums) {
+    int best = nums[0], cur = nums[0];
+    for (int i = 1; i < nums.length; i++) {
+        cur = Math.max(nums[i], cur + nums[i]);
+        best = Math.max(best, cur);
+    }
+    return best;
+}`,
+  },
   php: {
     callable: "maxSubArray",
     code: `<?php
@@ -92,7 +103,7 @@ describe.each(Object.keys(SOLUTIONS) as CodeLanguageId[])("Piston: %s", (languag
       return;
     }
 
-    const program = buildWrappedProgram(language, code, callable);
+    const program = buildWrappedProgram(language, code, callable, stdin);
     const result = await executeWithPiston(language, program, stdin);
 
     // The message matters more than the assertion: a compile error is why nothing ran.

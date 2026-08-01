@@ -26,10 +26,13 @@ export type ChallengeFormInitial = {
   fnTs: string;
   fnPy: string;
   fnPhp: string;
+  /** Empty when the challenge has no Java support — see the schema for why that is a state. */
+  fnJava: string;
   starterJs: string;
   starterTs: string;
   starterPy: string;
   starterPhp: string;
+  starterJava: string;
   isActive: boolean;
   dateUtcDay: string;
 };
@@ -61,10 +64,13 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     fnTs: typeof cbl?.typescript === "string" ? cbl.typescript : "solve",
     fnPy: typeof cbl?.python === "string" ? cbl.python : "solve",
     fnPhp: typeof cbl?.php === "string" ? cbl.php : "solve",
+    // No "solve" fallback: an invented name would turn every edit into a Java-enabled challenge.
+    fnJava: typeof cbl?.java === "string" ? cbl.java : "",
     starterJs: starters.javascript ?? "",
     starterTs: starters.typescript ?? "",
     starterPy: starters.python ?? "",
     starterPhp: starters.php ?? "",
+    starterJava: starters.java ?? "",
     isActive: ch.isActive,
     dateUtcDay: ch.date ? formatUtcDay(new Date(ch.date)) : "",
   };

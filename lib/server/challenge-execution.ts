@@ -5,6 +5,7 @@ import { isCodeExecutionEnabled } from "@/lib/server/code-execution-flag";
 import {
   buildWrappedProgram,
   extractIoProgramOutput,
+  JAVA_HARNESS_LINE_OFFSET,
   outputsMatch,
 } from "@/lib/server/io-harness";
 import { executeWithPiston } from "@/lib/server/piston-runner";
@@ -98,6 +99,17 @@ export type ChallengeRunResult = {
  * `solution.ts`, and a line number is only useful next to a file the user recognises.
  */
 function withEditorFileName(message: string, language: CodeLanguageId): string {
+  /*
+    Java already names the file the editor shows — Main.java — but counts lines from the top of
+    the generated program, three above the user's first line. An error pointing three lines
+    below the actual mistake is worse than no line number at all.
+  */
+  if (language === "java") {
+    return message.replaceAll(/\bMain\.java:(\d+)\b/gu, (whole, digits: string) => {
+      const line = Number(digits) - JAVA_HARNESS_LINE_OFFSET;
+      return line >= 1 ? `Main.java:${line}` : whole;
+    });
+  }
   const name = languageFileName(language);
   return message.replaceAll("main.ts.ts", name).replaceAll(/\bmain\.(ts|js|py|php)\b/gu, name);
 }
@@ -127,7 +139,6 @@ async function runPistonIoCases(
   let list = parseTestCasesIo(challenge.testCases);
   if (list.length === 0) list = defaultSlots();
 
-  const wrapped = buildWrappedProgram(language, code, callable);
   const results: ChallengeTestCase[] = [];
   let allPassed = true;
 
@@ -143,6 +154,12 @@ async function runPistonIoCases(
       continue;
     }
 
+    /*
+      Built per case, not once: the Java harness bakes the input in as typed literals rather
+      than parsing it at runtime, so the program differs from case to case. The other languages
+      ignore the argument and produce the same string every time.
+    */
+    const wrapped = buildWrappedProgram(language, code, callable, tc.input);
     const piston = await executeWithPiston(language, wrapped, tc.input);
     const timeStr = `${piston.durationMs}ms`;
 

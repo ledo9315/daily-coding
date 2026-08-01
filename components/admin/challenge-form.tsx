@@ -66,6 +66,7 @@ export function AdminChallengeForm({
   const [fnTs, setFnTs] = useState(initial?.fnTs ?? "solve");
   const [fnPy, setFnPy] = useState(initial?.fnPy ?? "solve");
   const [fnPhp, setFnPhp] = useState(initial?.fnPhp ?? "solve");
+  const [fnJava, setFnJava] = useState(initial?.fnJava ?? "");
   const [starterJs, setStarterJs] = useState(
     initial?.starterJs ??
       "function solve(arr) {\n  // …\n  return arr;\n}",
@@ -81,6 +82,7 @@ export function AdminChallengeForm({
     initial?.starterPhp ??
       "<?php\n\nfunction solve($arr) {\n    // …\n}\n",
   );
+  const [starterJava, setStarterJava] = useState(initial?.starterJava ?? "");
   const [isActive, setIsActive] = useState(initial?.isActive ?? false);
   const [dateUtcDay, setDateUtcDay] = useState(initial?.dateUtcDay ?? "");
 
@@ -112,6 +114,16 @@ export function AdminChallengeForm({
       return;
     }
 
+    /*
+      Java only counts as supported when a method name is filled in. Its harness cannot type
+      every input shape, and a language in the dropdown whose submission always fails is worse
+      than one that is missing.
+    */
+    const javaFn = fnJava.trim();
+    const supportedLanguages = javaFn
+      ? (["javascript", "typescript", "python", "php", "java"] as const)
+      : (["javascript", "typescript", "python", "php"] as const);
+
     const payload = {
       ...(mode === "create" ? { id: id.trim() } : {}),
       title: title.trim(),
@@ -128,6 +140,7 @@ export function AdminChallengeForm({
           typescript: fnTs.trim(),
           python: fnPy.trim(),
           php: fnPhp.trim(),
+          ...(javaFn ? { java: javaFn } : {}),
         },
       },
       starterCodes: {
@@ -135,8 +148,9 @@ export function AdminChallengeForm({
         typescript: starterTs,
         python: starterPy,
         php: starterPhp,
+        ...(javaFn ? { java: starterJava } : {}),
       },
-      supportedLanguages: ["javascript", "typescript", "python", "php"] as const,
+      supportedLanguages,
       isActive,
       // Interpret this as a UTC day, not as local time: otherwise the challenge
       // lands on the previous day for time zones east of UTC (#71).
@@ -367,6 +381,19 @@ export function AdminChallengeForm({
             className="rounded-none font-mono text-sm"
           />
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="fjava">Funktionsname Java</Label>
+          <Input
+            id="fjava"
+            value={fnJava}
+            onChange={(e) => setFnJava(e.target.value)}
+            placeholder="leer = kein Java"
+            className="rounded-none font-mono text-sm"
+          />
+          <p className="text-xs text-muted-foreground">
+            Leer lassen, wenn die Testfälle Typen mischen oder verschachtelt sind.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -400,6 +427,17 @@ export function AdminChallengeForm({
           <Textarea
             value={starterPhp}
             onChange={(e) => setStarterPhp(e.target.value)}
+            className="rounded-none font-mono text-xs min-h-[100px]"
+          />
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Java — nur die Methode, ohne Klasse. Der Harness umschließt sie mit
+            <span className="font-mono"> public class Main</span>.
+          </p>
+          <Textarea
+            value={starterJava}
+            onChange={(e) => setStarterJava(e.target.value)}
             className="rounded-none font-mono text-xs min-h-[100px]"
           />
         </div>
