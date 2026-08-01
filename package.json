@@ -5,7 +5,7 @@
   "packageManager": "pnpm@11.17.0",
   "scripts": {
     "postinstall": "prisma generate",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && node scripts/deploy-migrations.mjs && next build",
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
