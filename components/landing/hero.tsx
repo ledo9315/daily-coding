@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Code2, TrendingUp, Trophy } from "lucide-react";
+import { Code, TrendingUp, Zap } from "@nsmr/pixelart-react";
 import { Meteors } from "../ui/meteors";
 import Image from "next/image";
 import { BorderBeam } from "../ui/border-beam";
@@ -79,12 +79,6 @@ export function LandingHero({
           </motion.div>
         ) : null}
 
-        {/*
-          "VERBESSERE DEINE CODING-SKILLS" was the one line on this page that any of the dozen
-          other exercise sites could have written, almost word for word Codewars' subline. This
-          one nobody else can: the product is a single task per calendar day, and that is the
-          whole reason to stay. The subline below carries the contrast to the endless libraries.
-        */}
         <motion.h1
           variants={itemVariants}
           className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6"
@@ -115,8 +109,6 @@ export function LandingHero({
             href="#features"
             className="pixel-btn bg-card hover:bg-muted min-w-50 text-center"
           >
-            {/* Named after its target: the anchor now sits on the day timeline. It said
-                "FEATURES ANSEHEN" and led to something that was never a feature list. */}
             SO LÄUFT EIN TAG
           </Link>
         </motion.div>
@@ -137,27 +129,21 @@ export function LandingHero({
           className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-5xl mx-auto border-t border-border pt-8"
         >
           <div className="flex flex-col items-center gap-2">
-            <Code2 className="h-8 w-8 text-primary" />
+            <Code className="h-8 w-8 text-chart-1" />
             <span className="font-heading text-lg">TÄGLICHE AUFGABEN</span>
-            {/* The three difficulties the seed actually uses, instead of "kuratiert". */}
             <span className="text-muted-foreground text-sm">
               Leicht, mittel, schwer im Wechsel
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <Trophy className="h-8 w-8 text-accent" />
-            {/* "GAMIFICATION" was the only piece of English jargon left on the page, and it
-                named the mechanism instead of what it does for you. "XP" was the only place in
-                the project that called them that; app, ranking and the cards say Punkte. */}
+            <Zap className="h-8 w-8 text-accent" />
             <span className="font-heading text-lg">PUNKTE UND LEVEL</span>
             <span className="text-muted-foreground text-sm">
               Streaks, Abzeichen, Wertungen
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            {/* chart-1 rather than the chart-4 red the community slot had: red reads as a
-                warning, and this one is about growing. */}
-            <TrendingUp className="h-8 w-8 text-chart-1" />
+            <TrendingUp className="h-8 w-8 text-primary" />
             <span className="font-heading text-lg">SKILL-WACHSTUM</span>
             <span className="text-muted-foreground text-sm">
               Algorithmen und Datenstrukturen
