@@ -1,0 +1,61 @@
+name: Fehler melden
+description: Melde ein reproduzierbares Problem mit Daily Coding.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für deine Meldung. Bitte veröffentliche hier keine Passwörter, Tokens oder anderen sensiblen Daten.
+        Sicherheitslücken bitte nicht öffentlich melden, sondern per E-Mail an leonid.domahalskyy@icloud.com.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Was ist passiert?
+      description: Beschreibe den Fehler möglichst konkret.
+      placeholder: Ich habe erwartet, dass …, stattdessen …
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Reproduzieren
+      description: Welche Schritte führen zuverlässig zum Fehler?
+      placeholder: |
+        1. Öffne …
+        2. Klicke auf …
+        3. Beobachte …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was hätte stattdessen passieren sollen?
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser und Gerät
+      description: Zum Beispiel Safari 18 auf iPhone oder Chrome 140 auf Windows 11.
+      placeholder: Browser, Version, Betriebssystem und Gerät
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Zusätzliche Informationen
+      description: Screenshots, Fehlermeldungen oder weitere Hinweise. Bitte keine sensiblen Daten einfügen.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Vor dem Absenden
+      options:
+        - label: Ich habe geprüft, dass dieser Fehler noch nicht gemeldet wurde.
+          required: true
+        - label: Diese Meldung enthält keine Passwörter, Tokens oder anderen sensiblen Daten.
+          required: true

@@ -1,11 +1,17 @@
 import Link from "next/link";
 
+const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
+const BUG_REPORT_URL = `${REPOSITORY_URL}/issues/new?template=bug_report.yml`;
+const SUPPORT_EMAIL = "leonid.domahalskyy@icloud.com";
+const footerLinkClass = "transition-colors hover:text-primary focus-visible:text-primary";
+
 /**
  * One row instead of a four-column grid.
  *
  * Two of the four columns were commented-out placeholder links (Über uns, Blog, Karriere, Kontakt,
  * all `href="#"`), so the grid rendered two thirds empty. What is actually here is a brand, two
- * legal pages and a line of small print — which fits on one row.
+ * legal pages and a line of small print — which fits on one row. Repository, feedback and
+ * support now sit beside the legal links and wrap as a compact link rail on small screens.
  */
 export function LandingFooter() {
   return (
@@ -20,11 +26,35 @@ export function LandingFooter() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-6 font-code text-sm text-muted-foreground">
-          <Link href="/impressum" className="hover:text-primary">
+        <nav
+          aria-label="Footer-Navigation"
+          className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-code text-sm text-muted-foreground sm:justify-end"
+        >
+          <a
+            href={REPOSITORY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={footerLinkClass}
+            aria-label="GitHub-Repository in neuem Tab öffnen"
+          >
+            GitHub
+          </a>
+          <a
+            href={BUG_REPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={footerLinkClass}
+            aria-label="Fehler auf GitHub in neuem Tab melden"
+          >
+            Fehler melden
+          </a>
+          <a href={`mailto:${SUPPORT_EMAIL}`} className={footerLinkClass}>
+            Support
+          </a>
+          <Link href="/impressum" className={footerLinkClass}>
             Impressum
           </Link>
-          <Link href="/datenschutz" className="hover:text-primary">
+          <Link href="/datenschutz" className={footerLinkClass}>
             Datenschutz
           </Link>
         </nav>
