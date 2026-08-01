@@ -9,6 +9,10 @@ import { ArrowRight, Lock, Mail, User } from "@nsmr/pixelart-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
+import {
+  DISPLAY_NAME_MAX_LENGTH,
+  displayNameValidationError,
+} from "@/lib/display-name";
 
 interface RegisterFormProps {
   githubEnabled?: boolean;
@@ -43,8 +47,15 @@ export function RegisterForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setFormError(null);
+
+    const nameError = displayNameValidationError(name);
+    if (nameError) {
+      setFormError(nameError);
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -110,11 +121,17 @@ export function RegisterForm({
             placeholder="Max Mustermann"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            
+            required
+            minLength={2}
+            maxLength={DISPLAY_NAME_MAX_LENGTH}
+            aria-describedby="name-requirements"
             className="bg-background pl-9"
           />
           <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         </div>
+        <p id="name-requirements" className="text-xs text-muted-foreground">
+          Mindestens zwei Buchstaben oder Zahlen, maximal {DISPLAY_NAME_MAX_LENGTH} Zeichen.
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="email">E-Mail Adresse</Label>
