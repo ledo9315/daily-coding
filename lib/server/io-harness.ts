@@ -54,7 +54,6 @@ export function extractIoProgramOutput(raw: string): string {
  * much until someone subtracts it again.
  */
 const JAVA_HEADER_LINES = ["import java.util.*;", "", "public class Main {"];
-export const JAVA_HARNESS_LINE_OFFSET = JAVA_HEADER_LINES.length;
 
 /*
   Go's header carries more than the harness needs, on purpose.
@@ -89,8 +88,36 @@ const GO_HEADER_LINES = [
   ")",
   "",
 ];
-/** Derived, not counted by hand: the header grows and the offset has to follow. */
-export const GO_HARNESS_LINE_OFFSET = GO_HEADER_LINES.length;
+/**
+ * How far a compiler's line numbers are ahead of the user's own, per language.
+ *
+ * Only the wrappers that put code *above* the solution appear here; the rest append and are
+ * therefore already aligned.
+ */
+/*
+  C++ has the same problem as Go and solves it in one line: <bits/stdc++.h> is a GCC header that
+  pulls in the whole standard library, so a solution never needs an include of its own. `using
+  namespace std` follows because vector<int> is what anyone writing this expects to type.
+*/
+const CPP_HEADER_LINES = ["#include <bits/stdc++.h>", "using namespace std;", ""];
+
+/** Same idea for C#: a solution cannot add a `using`, so the header carries the usual ones. */
+const CSHARP_HEADER_LINES = [
+  "using System;",
+  "using System.Collections;",
+  "using System.Collections.Generic;",
+  "using System.Globalization;",
+  "using System.Linq;",
+  "",
+  "public class Program {",
+];
+
+export const HARNESS_LINE_OFFSETS: Partial<Record<CodeLanguageId, number>> = {
+  java: JAVA_HEADER_LINES.length,
+  go: GO_HEADER_LINES.length,
+  cpp: CPP_HEADER_LINES.length,
+  csharp: CSHARP_HEADER_LINES.length,
+};
 
 /**
  * The shape of one argument, derived from a test case's JSON.
@@ -208,6 +235,62 @@ const GO_TYPE: Record<ScalarKind, string> = {
 
 function goLiteral(kind: ScalarKind, value: number | boolean | string): string {
   return kind === "string" ? quoteStringLiteral(String(value)) : String(value);
+}
+
+const CSHARP_TYPE: Record<ScalarKind, string> = {
+  int: "int",
+  long: "long",
+  double: "double",
+  bool: "bool",
+  string: "string",
+};
+
+function csharpLiteral(kind: ScalarKind, value: number | boolean | string): string {
+  if (kind === "string") return quoteStringLiteral(String(value));
+  if (kind === "long") return `${value}L`;
+  return String(value);
+}
+
+/** C# declarations for one test case, plus the names to pass. */
+export function buildCsharpArguments(input: string): { decls: string[]; names: string[] } {
+  const args = inferArguments(input, "C#");
+  const decls = args.map(({ name, shape }) => {
+    if (shape.kind === "array") {
+      const t = CSHARP_TYPE[shape.elem];
+      const items = shape.values.map((v) => csharpLiteral(shape.elem, v)).join(", ");
+      return `        ${t}[] ${name} = new ${t}[]{${items}};`;
+    }
+    return `        ${CSHARP_TYPE[shape.kind]} ${name} = ${csharpLiteral(shape.kind, shape.value)};`;
+  });
+  return { decls, names: args.map((a) => a.name) };
+}
+
+/** C++'s `long long` is the portable 64-bit choice; `long` is 32 bit on some targets. */
+const CPP_TYPE: Record<ScalarKind, string> = {
+  int: "int",
+  long: "long long",
+  double: "double",
+  bool: "bool",
+  string: "string",
+};
+
+function cppLiteral(kind: ScalarKind, value: number | boolean | string): string {
+  if (kind === "string") return quoteStringLiteral(String(value));
+  if (kind === "long") return `${value}LL`;
+  return String(value);
+}
+
+/** C++ declarations for one test case, plus the names to pass. */
+export function buildCppArguments(input: string): { decls: string[]; names: string[] } {
+  const args = inferArguments(input, "C++");
+  const decls = args.map(({ name, shape }) => {
+    if (shape.kind === "array") {
+      const items = shape.values.map((v) => cppLiteral(shape.elem, v)).join(", ");
+      return `    vector<${CPP_TYPE[shape.elem]}> ${name} = {${items}};`;
+    }
+    return `    ${CPP_TYPE[shape.kind]} ${name} = ${cppLiteral(shape.kind, shape.value)};`;
+  });
+  return { decls, names: args.map((a) => a.name) };
 }
 
 /** Java declarations for one test case, plus the names to pass to the user's method. */
@@ -408,6 +491,101 @@ func __emit(v interface{}) {
 func main() {
 ${decls.join("\n")}
 \t__emit(${callable}(${names.join(", ")}))
+}
+`;
+    }
+    case "cpp": {
+      if (input == null) {
+        throw new Error("C++-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+      }
+      const { decls, names } = buildCppArguments(input);
+      /*
+        Serialisation by overload, as in Java — C++ has no reflection and Piston's image has no
+        JSON library. The scalar overloads must be declared before the vector template so that
+        nested vectors resolve at instantiation.
+      */
+      return `${CPP_HEADER_LINES.join("\n")}
+${trimmed}
+
+static string __json(bool v) { return v ? "true" : "false"; }
+static string __json(int v) { return to_string(v); }
+static string __json(long long v) { return to_string(v); }
+static string __json(double v) { ostringstream o; o << v; return o.str(); }
+static string __json(const string& v) {
+    string r = "\\"";
+    for (char c : v) {
+        if (c == '"') r += "\\\\\\"";
+        else if (c == '\\\\') r += "\\\\\\\\";
+        else if (c == '\\n') r += "\\\\n";
+        else if (c == '\\r') r += "\\\\r";
+        else if (c == '\\t') r += "\\\\t";
+        else r += c;
+    }
+    return r + "\\"";
+}
+template <class T> static string __json(const vector<T>& v) {
+    string r = "[";
+    for (size_t i = 0; i < v.size(); i++) { if (i) r += ","; r += __json(v[i]); }
+    return r + "]";
+}
+
+int main() {
+${decls.join("\n")}
+    cout << __json(${callable}(${names.join(", ")}));
+}
+`;
+    }
+    case "csharp": {
+      if (input == null) {
+        throw new Error("C#-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+      }
+      const { decls, names } = buildCsharpArguments(input);
+      const indented = trimmed
+        .split("\n")
+        .map((line) => (line.trim() ? `    ${line}` : line))
+        .join("\n");
+      /*
+        One method with type tests rather than a pile of overloads: Mono's library has no
+        System.Text.Json, and a generic helper cannot pick an overload for an unknown T.
+
+        The order of the tests carries the whole thing. `string` is itself an IEnumerable of
+        char, so it has to be answered before the sequence branch or every word comes back as a
+        list of letters.
+      */
+      return `${CSHARP_HEADER_LINES.join("\n")}
+${indented}
+
+    static string __json(object v) {
+        if (v == null) return "null";
+        if (v is bool) return ((bool)v) ? "true" : "false";
+        if (v is string) return __str((string)v);
+        if (v is char) return __str(v.ToString());
+        if (v is double || v is float) return Convert.ToDouble(v).ToString(CultureInfo.InvariantCulture);
+        if (v is IEnumerable) {
+            var parts = new List<string>();
+            foreach (object o in (IEnumerable)v) parts.Add(__json(o));
+            return "[" + string.Join(",", parts) + "]";
+        }
+        return v.ToString();
+    }
+
+    static string __str(string s) {
+        var b = new System.Text.StringBuilder("\\"");
+        foreach (char c in s) {
+            if (c == '"') b.Append("\\\\\\"");
+            else if (c == '\\\\') b.Append("\\\\\\\\");
+            else if (c == '\\n') b.Append("\\\\n");
+            else if (c == '\\r') b.Append("\\\\r");
+            else if (c == '\\t') b.Append("\\\\t");
+            else b.Append(c);
+        }
+        return b.Append('"').ToString();
+    }
+
+    public static void Main() {
+${decls.join("\n")}
+        Console.Write(__json(${callable}(${names.join(", ")})));
+    }
 }
 `;
     }

@@ -12,7 +12,7 @@ Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bew
 ## Was es kann
 
 - **Tägliche Challenge** — eine Aufgabe pro Tag, für alle Nutzer dieselbe. Die Auswahl rotiert deterministisch aus dem UTC-Kalendertag (`lib/server/challenge-day.ts`), es braucht also keinen Cronjob.
-- **Sieben Sprachen** — JavaScript, TypeScript, Python, PHP, Ruby, Java, Go. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java und Go stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
+- **Neun Sprachen** — JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java, Go, C++ und C# stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
 - **Bewertung gegen Testfälle** — der eingereichte Code wird pro Testfall mit einem Harness aufgerufen und das Ergebnis verglichen. Kein Vergleich von Konsolenausgaben.
 - **Bestenliste** für Woche und Monat, mit Podium und Platzierungen nach Wettkampfregel (Gleichstand teilt den Platz).
 - **Fortschritt** — Punkte, Level, Streak samt Rekord, sechs Abzeichen, Monatsübersicht der gelösten Tage.

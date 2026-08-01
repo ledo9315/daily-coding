@@ -9,7 +9,7 @@ vi.mock("@/lib/server/piston-runner", () => ({
 }));
 
 import { executeWithPiston } from "@/lib/server/piston-runner";
-import { runChallengeTests } from "@/lib/server/challenge-execution";
+import { runChallengeTests, withEditorFileName } from "@/lib/server/challenge-execution";
 
 const mockExecute = vi.mocked(executeWithPiston);
 
@@ -189,5 +189,39 @@ describe("Kompilierfehler", () => {
 
     expect(compileError).toContain("solution.ts(1,7)");
     expect(compileError).not.toContain("main.ts");
+  });
+});
+
+describe("withEditorFileName", () => {
+  it("subtracts the harness offset so a line number points at the user's code", () => {
+    // javac counts from the top of the generated file, three lines above the solution's line 1.
+    expect(withEditorFileName("Main.java:5: error: cannot find symbol", "java")).toContain(
+      "Main.java:2:"
+    );
+  });
+
+  it("understands Mono's parenthesised notation as well as the colon one", () => {
+    // main.cs(9,17) rather than main.cs:9 — same offset, different spelling.
+    const out = withEditorFileName("main.cs(9,17): error CS0029: …", "csharp");
+    expect(out).toContain("main.cs(2,17)");
+  });
+
+  it("drops the compiler banner nobody needs to read twice", () => {
+    const raw =
+      "Microsoft (R) Visual C# Compiler version 3.9.0-6.21124.20 (db94f4cc)\n" +
+      "Copyright (C) Microsoft Corporation. All rights reserved.\n\n" +
+      "main.cs(9,17): error CS0029: Cannot implicitly convert type";
+    const out = withEditorFileName(raw, "csharp");
+    expect(out).not.toContain("Microsoft (R) Visual C# Compiler");
+    expect(out).toContain("CS0029");
+  });
+
+  it("leaves a line number alone when subtracting would put it above the file", () => {
+    // A message about the harness itself, not the solution — better wrong than negative.
+    expect(withEditorFileName("Main.java:2: error: x", "java")).toContain("Main.java:2:");
+  });
+
+  it("renames Piston's file to the one the editor shows", () => {
+    expect(withEditorFileName("main.ts.ts(3,1): error", "typescript")).toContain("solution.ts");
   });
 });

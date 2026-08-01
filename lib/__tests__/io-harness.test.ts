@@ -86,6 +86,40 @@ describe("buildWrappedProgram", () => {
     expect(src).toContain("g(_data)");
   });
 
+  it("C#: one serialiser with ordered type tests, no System.Text.Json", () => {
+    const src = buildWrappedProgram(
+      "csharp",
+      "static string ReverseString(string s) { return s; }",
+      "ReverseString",
+      '"hello"'
+    );
+    expect(src).toContain("public class Program {");
+    expect(src).toContain('string __input = "hello";');
+    expect(src).toContain("Console.Write(__json(ReverseString(__input)))");
+    // Mono's library has no System.Text.Json, so the harness serialises by hand.
+    expect(src).not.toContain("System.Text.Json");
+    // A string is itself an IEnumerable of char: tested later, every word becomes a letter list.
+    expect(src.indexOf("v is string")).toBeLessThan(src.indexOf("v is IEnumerable"));
+  });
+
+  it("C++: pulls in the standard library and serialises by overload", () => {
+    const src = buildWrappedProgram(
+      "cpp",
+      "vector<int> moveZeroes(vector<int> nums) { return nums; }",
+      "moveZeroes",
+      "[0,1,0]"
+    );
+    // A solution cannot add its own include; <bits/stdc++.h> covers the standard library at once.
+    expect(src).toContain("#include <bits/stdc++.h>");
+    expect(src).toContain("using namespace std;");
+    expect(src).toContain("vector<int> __input = {0, 1, 0};");
+    expect(src).toContain("cout << __json(moveZeroes(__input));");
+    // The scalar overloads have to precede the template, or nested vectors fail to resolve.
+    expect(src.indexOf("static string __json(int v)")).toBeLessThan(
+      src.indexOf("template <class T> static string __json")
+    );
+  });
+
   it("Go: bakes the input in and gives the solution the usual packages", () => {
     const src = buildWrappedProgram(
       "go",

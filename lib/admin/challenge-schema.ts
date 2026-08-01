@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CODE_LANGUAGES } from "@/lib/challenge-languages";
+import { CODE_LANGUAGES, perLanguage } from "@/lib/challenge-languages";
 import { HINT_TITLE_MAX } from "@/lib/challenge-hints";
 
 const codeLanguageZ = z.enum(CODE_LANGUAGES);
@@ -40,34 +40,21 @@ export const adminCreateChallengeSchema = z.object({
     )
     .min(1)
     .max(20),
-  evaluationConfig: z.object({
-    /*
-      Java is the only optional one. Its harness needs typed input, which rules out challenges
-      whose test cases mix types in one array or nest a structure. Leaving the method name empty
-      is how such a challenge says "no Java" — supportedLanguages then omits it and the dropdown
-      never offers a language whose submission would fail.
+  /*
+    Built from the registry rather than spelled out: a language whose Zod field someone forgot
+    would be silently dropped from every save, and nothing would fail loudly.
 
-      Ruby has no such limit: `data` is just a value, so every challenge can support it.
-    */
-    callableByLanguage: z.object({
-      javascript: z.string().min(1),
-      typescript: z.string().min(1),
-      python: z.string().min(1),
-      php: z.string().min(1),
-      ruby: z.string().min(1),
-      java: z.string().optional(),
-      go: z.string().optional(),
-    }),
+    Typed languages are optional, the rest are not. A typed harness needs the test input
+    expressible as typed parameters, which rules out challenges whose cases mix types in one
+    array or nest a structure — leaving the function name empty is how such a challenge says
+    "not this language", and supportedLanguages then omits it.
+  */
+  evaluationConfig: z.object({
+    callableByLanguage: z.object(
+      perLanguage((spec) => (spec.typed ? z.string().optional() : z.string().min(1)))
+    ),
   }),
-  starterCodes: z.object({
-    javascript: z.string(),
-    typescript: z.string(),
-    python: z.string(),
-    php: z.string(),
-    ruby: z.string(),
-    java: z.string().optional(),
-    go: z.string().optional(),
-  }),
+  starterCodes: z.object(perLanguage((spec) => (spec.typed ? z.string().optional() : z.string()))),
   supportedLanguages: z.array(codeLanguageZ).optional(),
   isActive: z.boolean().optional(),
   /** Start of the UTC day as an ISO string, or empty for no daily date */

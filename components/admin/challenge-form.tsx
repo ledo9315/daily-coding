@@ -17,6 +17,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import type { ChallengeFormInitial } from "@/lib/admin/map-challenge-to-form";
+import { LANGUAGE_LIST, perLanguage, type CodeLanguageId } from "@/lib/challenge-languages";
 
 const DEFAULT_EXAMPLES = `[
   { "input": "[1, 2, 3]", "output": "[1, 3, 6]" }
@@ -62,33 +63,17 @@ export function AdminChallengeForm({
   const [testsJson, setTestsJson] = useState(
     initial?.testsJson ?? DEFAULT_TESTS,
   );
-  const [fnJs, setFnJs] = useState(initial?.fnJs ?? "solve");
-  const [fnTs, setFnTs] = useState(initial?.fnTs ?? "solve");
-  const [fnPy, setFnPy] = useState(initial?.fnPy ?? "solve");
-  const [fnPhp, setFnPhp] = useState(initial?.fnPhp ?? "solve");
-  const [fnRuby, setFnRuby] = useState(initial?.fnRuby ?? "solve");
-  const [fnJava, setFnJava] = useState(initial?.fnJava ?? "");
-  const [fnGo, setFnGo] = useState(initial?.fnGo ?? "");
-  const [starterJs, setStarterJs] = useState(
-    initial?.starterJs ??
-      "function solve(arr) {\n  // …\n  return arr;\n}",
+  /*
+    One record instead of fourteen useState pairs. Every language added used to mean two more
+    hooks, two more form fields and two more payload entries here; now it means one entry in the
+    registry.
+  */
+  const [callables, setCallables] = useState<Record<CodeLanguageId, string>>(
+    initial?.callables ?? perLanguage((spec) => (spec.typed ? "" : "solve")),
   );
-  const [starterTs, setStarterTs] = useState(
-    initial?.starterTs ??
-      "function solve(arr: number[]): number[] {\n  // …\n  return arr;\n}",
+  const [starters, setStarters] = useState<Record<CodeLanguageId, string>>(
+    initial?.starters ?? perLanguage((spec) => (spec.typed ? "" : spec.starter)),
   );
-  const [starterPy, setStarterPy] = useState(
-    initial?.starterPy ?? "def solve(arr):\n    # …\n    pass\n",
-  );
-  const [starterPhp, setStarterPhp] = useState(
-    initial?.starterPhp ??
-      "<?php\n\nfunction solve($arr) {\n    // …\n}\n",
-  );
-  const [starterRuby, setStarterRuby] = useState(
-    initial?.starterRuby ?? "def solve(arr)\n  # …\n  arr\nend\n",
-  );
-  const [starterJava, setStarterJava] = useState(initial?.starterJava ?? "");
-  const [starterGo, setStarterGo] = useState(initial?.starterGo ?? "");
   const [isActive, setIsActive] = useState(initial?.isActive ?? false);
   const [dateUtcDay, setDateUtcDay] = useState(initial?.dateUtcDay ?? "");
 
@@ -121,21 +106,16 @@ export function AdminChallengeForm({
     }
 
     /*
-      Java and Go only count as supported when a function name is filled in. Their harnesses
-      cannot type every input shape, and a language in the dropdown whose submission always
-      fails is worse than one that is missing.
+      A typed language counts as supported only when a function name is filled in. Its harness
+      cannot express every input shape, and a dropdown entry whose submission always fails is
+      worse than a missing one.
     */
-    const javaFn = fnJava.trim();
-    const goFn = fnGo.trim();
-    const supportedLanguages = [
-      "javascript",
-      "typescript",
-      "python",
-      "php",
-      "ruby",
-      ...(javaFn ? (["java"] as const) : []),
-      ...(goFn ? (["go"] as const) : []),
-    ] as const;
+    const supportedLanguages = LANGUAGE_LIST.filter(
+      (spec) => !spec.typed || callables[spec.id].trim().length > 0,
+    ).map((spec) => spec.id);
+
+    const entries = <T,>(pick: (id: CodeLanguageId) => T) =>
+      Object.fromEntries(supportedLanguages.map((id) => [id, pick(id)]));
 
     const payload = {
       ...(mode === "create" ? { id: id.trim() } : {}),
@@ -148,25 +128,9 @@ export function AdminChallengeForm({
       examples,
       testCases,
       evaluationConfig: {
-        callableByLanguage: {
-          javascript: fnJs.trim(),
-          typescript: fnTs.trim(),
-          python: fnPy.trim(),
-          php: fnPhp.trim(),
-          ruby: fnRuby.trim(),
-          ...(javaFn ? { java: javaFn } : {}),
-          ...(goFn ? { go: goFn } : {}),
-        },
+        callableByLanguage: entries((id) => callables[id].trim()),
       },
-      starterCodes: {
-        javascript: starterJs,
-        typescript: starterTs,
-        python: starterPy,
-        php: starterPhp,
-        ruby: starterRuby,
-        ...(javaFn ? { java: starterJava } : {}),
-        ...(goFn ? { go: starterGo } : {}),
-      },
+      starterCodes: entries((id) => starters[id]),
       supportedLanguages,
       isActive,
       // Interpret this as a UTC day, not as local time: otherwise the challenge
@@ -362,140 +326,41 @@ export function AdminChallengeForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-2">
-          <Label htmlFor="fjs">Funktionsname JS</Label>
-          <Input
-            id="fjs"
-            value={fnJs}
-            onChange={(e) => setFnJs(e.target.value)}
-            className="rounded-none font-mono text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fts">Funktionsname TS</Label>
-          <Input
-            id="fts"
-            value={fnTs}
-            onChange={(e) => setFnTs(e.target.value)}
-            className="rounded-none font-mono text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fpy">Funktionsname Python</Label>
-          <Input
-            id="fpy"
-            value={fnPy}
-            onChange={(e) => setFnPy(e.target.value)}
-            className="rounded-none font-mono text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fphp">Funktionsname PHP</Label>
-          <Input
-            id="fphp"
-            value={fnPhp}
-            onChange={(e) => setFnPhp(e.target.value)}
-            className="rounded-none font-mono text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fruby">Funktionsname Ruby</Label>
-          <Input
-            id="fruby"
-            value={fnRuby}
-            onChange={(e) => setFnRuby(e.target.value)}
-            className="rounded-none font-mono text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fjava">Funktionsname Java</Label>
-          <Input
-            id="fjava"
-            value={fnJava}
-            onChange={(e) => setFnJava(e.target.value)}
-            placeholder="leer = kein Java"
-            className="rounded-none font-mono text-sm"
-          />
-          <p className="text-xs text-muted-foreground">
-            Leer lassen, wenn die Testfälle Typen mischen oder verschachtelt sind.
-          </p>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fgo">Funktionsname Go</Label>
-          <Input
-            id="fgo"
-            value={fnGo}
-            onChange={(e) => setFnGo(e.target.value)}
-            placeholder="leer = kein Go"
-            className="rounded-none font-mono text-sm"
-          />
-          <p className="text-xs text-muted-foreground">Dieselbe Einschränkung wie bei Java.</p>
-        </div>
+        {LANGUAGE_LIST.map((spec) => (
+          <div key={spec.id} className="space-y-2">
+            <Label htmlFor={`fn-${spec.id}`}>Funktionsname {spec.label}</Label>
+            <Input
+              id={`fn-${spec.id}`}
+              value={callables[spec.id]}
+              onChange={(e) =>
+                setCallables((prev) => ({ ...prev, [spec.id]: e.target.value }))
+              }
+              placeholder={spec.typed ? `leer = kein ${spec.label}` : undefined}
+              className="rounded-none font-mono text-sm"
+            />
+            {spec.typed && (
+              <p className="text-xs text-muted-foreground">
+                Leer lassen, wenn die Testfälle Typen mischen oder verschachtelt sind.
+              </p>
+            )}
+          </div>
+        ))}
       </div>
 
       <div className="space-y-3">
         <Label>Starter-Code</Label>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">JavaScript</p>
-          <Textarea
-            value={starterJs}
-            onChange={(e) => setStarterJs(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">TypeScript</p>
-          <Textarea
-            value={starterTs}
-            onChange={(e) => setStarterTs(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">Python</p>
-          <Textarea
-            value={starterPy}
-            onChange={(e) => setStarterPy(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">PHP</p>
-          <Textarea
-            value={starterPhp}
-            onChange={(e) => setStarterPhp(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">Ruby</p>
-          <Textarea
-            value={starterRuby}
-            onChange={(e) => setStarterRuby(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Java — nur die Methode, ohne Klasse. Der Harness umschließt sie mit
-            <span className="font-mono"> public class Main</span>.
-          </p>
-          <Textarea
-            value={starterJava}
-            onChange={(e) => setStarterJava(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Go — nur die Funktion, ohne <span className="font-mono">package main</span>.
-          </p>
-          <Textarea
-            value={starterGo}
-            onChange={(e) => setStarterGo(e.target.value)}
-            className="rounded-none font-mono text-xs min-h-[100px]"
-          />
-        </div>
+        {LANGUAGE_LIST.map((spec) => (
+          <div key={spec.id} className="space-y-2">
+            <p className="text-xs text-muted-foreground">{spec.label}</p>
+            <Textarea
+              value={starters[spec.id]}
+              onChange={(e) =>
+                setStarters((prev) => ({ ...prev, [spec.id]: e.target.value }))
+              }
+              className="rounded-none font-mono text-xs min-h-[100px]"
+            />
+          </div>
+        ))}
       </div>
 
       <Button

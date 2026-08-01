@@ -315,13 +315,13 @@ async function main() {
 
   const supportedLangs = ["javascript", "typescript", "python", "php", "ruby"] as const;
   /*
-    Java and Go need the shape of a test case to be expressible as typed parameters, so both are
-    opt-in per challenge rather than part of the base set. Hash Map (values of mixed type in one
+    The typed languages need the shape of a test case to be expressible as typed parameters, so
+    they are opt-in per challenge rather than part of the base set. Hash Map (values of mixed type in one
     array) and Binary Tree Traversal (a recursive node structure) stay without them — offering a
     language whose submission cannot pass is worse than not offering it. The two share one list
     because the limit is the same: it comes from the test data, not from the language.
   */
-  const langsWithTypes = [...supportedLangs, "java", "go"] as const;
+  const langsWithTypes = [...supportedLangs, "java", "go", "cpp", "csharp"] as const;
 
   const challengeToday = await prisma.challenge.upsert(
     challengeUpsertArgs({
@@ -377,6 +377,8 @@ async function main() {
           php: "transformArray",
           java: "transformArray",
           go: "transformArray",
+          cpp: "transformArray",
+          csharp: "TransformArray",
         },
       },
       testCases: [
@@ -411,6 +413,8 @@ async function main() {
         php: "<?php\n\nfunction transformArray($arr) {\n    // Your solution here\n}\n",
         java: "static int[] transformArray(int[] arr) {\n    // Your solution here\n    return new int[]{};\n}\n",
         go: "func transformArray(arr []int) []int {\n\t// Your solution here\n\treturn []int{}\n}\n",
+        cpp: "vector<int> transformArray(vector<int> arr) {\n    // Your solution here\n    return {};\n}\n",
+        csharp: "static int[] TransformArray(int[] arr) {\n    // Your solution here\n    return new int[]{};\n}\n",
         ruby: "def transform_array(arr)\n  # Your solution here\n  []\nend\n",
       },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
@@ -430,6 +434,8 @@ async function main() {
         php: "binarySearch",
         java: "binarySearch",
         go: "binarySearch",
+        cpp: "binarySearch",
+        csharp: "BinarySearch",
       },
     },
     testCases: [
@@ -449,6 +455,8 @@ async function main() {
       php: "<?php\n\nfunction binarySearch($data) {\n    $arr = $data['arr'];\n    $target = $data['target'];\n    // Your solution here\n    return -1;\n}\n",
       java: "static int binarySearch(int[] arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
       go: "func binarySearch(arr []int, target int) int {\n\t// Your solution here\n\treturn -1\n}\n",
+      cpp: "int binarySearch(vector<int> arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
+      csharp: "static int BinarySearch(int[] arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
       ruby: "def binary_search(data)\n  arr, target = data['arr'], data['target']\n  # Your solution here\n  -1\nend\n",
     },
     starterCode:
@@ -518,6 +526,8 @@ async function main() {
         php: "reverseString",
         java: "reverseString",
         go: "reverseString",
+        cpp: "reverseString",
+        csharp: "ReverseString",
       },
     },
     testCases: [
@@ -535,6 +545,8 @@ async function main() {
       php: "<?php\n\nfunction reverseString($s) {\n    // Your solution here\n    return $s;\n}\n",
       java: "static String reverseString(String s) {\n    // Your solution here\n    return s;\n}\n",
       go: "func reverseString(s string) string {\n\t// Your solution here\n\treturn s\n}\n",
+      cpp: "string reverseString(string s) {\n    // Your solution here\n    return s;\n}\n",
+      csharp: "static string ReverseString(string s) {\n    // Your solution here\n    return s;\n}\n",
       ruby: "def reverse_string(s)\n  # Your solution here\n  s\nend\n",
     },
     starterCode: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
@@ -713,6 +725,8 @@ async function main() {
         php: "fibonacci",
         java: "fibonacci",
         go: "fibonacci",
+        cpp: "fibonacci",
+        csharp: "Fibonacci",
       },
     },
     testCases: [
@@ -730,6 +744,8 @@ async function main() {
       php: "<?php\n\nfunction fibonacci($n) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
       go: "func fibonacci(n int) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      cpp: "int fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
+      csharp: "static int Fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
       ruby: "def fibonacci(n)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
@@ -913,6 +929,8 @@ async function main() {
         php: "twoSum",
         java: "twoSum",
         go: "twoSum",
+        cpp: "twoSum",
+        csharp: "TwoSum",
       },
     },
     testCases: [
@@ -932,6 +950,8 @@ async function main() {
       php: "<?php\n\nfunction twoSum($data) {\n    $nums = $data['nums'];\n    $target = $data['target'];\n    // Your solution here\n    return [];\n}\n",
       java: "static int[] twoSum(int[] nums, int target) {\n    // Your solution here\n    return new int[]{};\n}\n",
       go: "func twoSum(nums []int, target int) []int {\n\t// Your solution here\n\treturn []int{}\n}\n",
+      cpp: "vector<int> twoSum(vector<int> nums, int target) {\n    // Your solution here\n    return {};\n}\n",
+      csharp: "static int[] TwoSum(int[] nums, int target) {\n    // Your solution here\n    return new int[]{};\n}\n",
       ruby: "def two_sum(data)\n  nums, target = data['nums'], data['target']\n  # Your solution here\n  []\nend\n",
     },
     starterCode:
@@ -1000,6 +1020,8 @@ async function main() {
         php: "fizzBuzz",
         java: "fizzBuzz",
         go: "fizzBuzz",
+        cpp: "fizzBuzz",
+        csharp: "FizzBuzz",
       },
     },
     testCases: [
@@ -1022,6 +1044,8 @@ async function main() {
       php: "<?php\n\nfunction fizzBuzz($n) {\n    // Your solution here\n    return [];\n}\n",
       java: "static String[] fizzBuzz(int n) {\n    // Your solution here\n    return new String[]{};\n}\n",
       go: "func fizzBuzz(n int) []string {\n\t// Your solution here\n\treturn []string{}\n}\n",
+      cpp: "vector<string> fizzBuzz(int n) {\n    // Your solution here\n    return {};\n}\n",
+      csharp: "static string[] FizzBuzz(int n) {\n    // Your solution here\n    return new string[]{};\n}\n",
       ruby: "def fizz_buzz(n)\n  # Your solution here\n  []\nend\n",
     },
     starterCode: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
@@ -1084,6 +1108,8 @@ async function main() {
         php: "isValid",
         java: "isValid",
         go: "isValid",
+        cpp: "isValid",
+        csharp: "IsValid",
       },
     },
     testCases: [
@@ -1100,6 +1126,8 @@ async function main() {
       php: "<?php\n\nfunction isValid($s) {\n    // Your solution here\n    return false;\n}\n",
       java: "static boolean isValid(String s) {\n    // Your solution here\n    return false;\n}\n",
       go: "func isValid(s string) bool {\n\t// Your solution here\n\treturn false\n}\n",
+      cpp: "bool isValid(string s) {\n    // Your solution here\n    return false;\n}\n",
+      csharp: "static bool IsValid(string s) {\n    // Your solution here\n    return false;\n}\n",
       ruby: "def is_valid(s)\n  # Your solution here\n  false\nend\n",
     },
     starterCode: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
@@ -1173,6 +1201,8 @@ async function main() {
         php: "countVowels",
         java: "countVowels",
         go: "countVowels",
+        cpp: "countVowels",
+        csharp: "CountVowels",
       },
     },
     testCases: [
@@ -1189,6 +1219,8 @@ async function main() {
       php: "<?php\n\nfunction countVowels($s) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int countVowels(String s) {\n    // Your solution here\n    return 0;\n}\n",
       go: "func countVowels(s string) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      cpp: "int countVowels(string s) {\n    // Your solution here\n    return 0;\n}\n",
+      csharp: "static int CountVowels(string s) {\n    // Your solution here\n    return 0;\n}\n",
       ruby: "def count_vowels(s)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
@@ -1252,6 +1284,8 @@ async function main() {
         php: "maxSubArray",
         java: "maxSubArray",
         go: "maxSubArray",
+        cpp: "maxSubArray",
+        csharp: "MaxSubArray",
       },
     },
     testCases: [
@@ -1268,6 +1302,8 @@ async function main() {
       php: "<?php\n\nfunction maxSubArray($nums) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int maxSubArray(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
       go: "func maxSubArray(nums []int) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      cpp: "int maxSubArray(vector<int> nums) {\n    // Your solution here\n    return 0;\n}\n",
+      csharp: "static int MaxSubArray(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
       ruby: "def max_sub_array(nums)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
@@ -1338,6 +1374,8 @@ async function main() {
         php: "isAnagram",
         java: "isAnagram",
         go: "isAnagram",
+        cpp: "isAnagram",
+        csharp: "IsAnagram",
       },
     },
     testCases: [
@@ -1357,6 +1395,8 @@ async function main() {
       php: "<?php\n\nfunction isAnagram($data) {\n    $s = $data['s'];\n    $t = $data['t'];\n    // Your solution here\n    return false;\n}\n",
       java: "static boolean isAnagram(String s, String t) {\n    // Your solution here\n    return false;\n}\n",
       go: "func isAnagram(s string, t string) bool {\n\t// Your solution here\n\treturn false\n}\n",
+      cpp: "bool isAnagram(string s, string t) {\n    // Your solution here\n    return false;\n}\n",
+      csharp: "static bool IsAnagram(string s, string t) {\n    // Your solution here\n    return false;\n}\n",
       ruby: "def is_anagram(data)\n  s, t = data['s'], data['t']\n  # Your solution here\n  false\nend\n",
     },
     starterCode:
@@ -1425,6 +1465,8 @@ async function main() {
         php: "digitalRoot",
         java: "digitalRoot",
         go: "digitalRoot",
+        cpp: "digitalRoot",
+        csharp: "DigitalRoot",
       },
     },
     testCases: [
@@ -1441,6 +1483,8 @@ async function main() {
       php: "<?php\n\nfunction digitalRoot($n) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int digitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
       go: "func digitalRoot(n int) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      cpp: "int digitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
+      csharp: "static int DigitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
       ruby: "def digital_root(n)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
@@ -1509,6 +1553,8 @@ async function main() {
         php: "moveZeroes",
         java: "moveZeroes",
         go: "moveZeroes",
+        cpp: "moveZeroes",
+        csharp: "MoveZeroes",
       },
     },
     testCases: [
@@ -1525,6 +1571,8 @@ async function main() {
       php: "<?php\n\nfunction moveZeroes($nums) {\n    // Your solution here\n    return $nums;\n}\n",
       java: "static int[] moveZeroes(int[] nums) {\n    // Your solution here\n    return nums;\n}\n",
       go: "func moveZeroes(nums []int) []int {\n\t// Your solution here\n\treturn nums\n}\n",
+      cpp: "vector<int> moveZeroes(vector<int> nums) {\n    // Your solution here\n    return nums;\n}\n",
+      csharp: "static int[] MoveZeroes(int[] nums) {\n    // Your solution here\n    return nums;\n}\n",
       ruby: "def move_zeroes(nums)\n  # Your solution here\n  nums\nend\n",
     },
     starterCode: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
@@ -1592,6 +1640,8 @@ async function main() {
         php: "romanToInt",
         java: "romanToInt",
         go: "romanToInt",
+        cpp: "romanToInt",
+        csharp: "RomanToInt",
       },
     },
     testCases: [
@@ -1608,6 +1658,8 @@ async function main() {
       php: "<?php\n\nfunction romanToInt($s) {\n    // Your solution here\n    return 0;\n}\n",
       java: "static int romanToInt(String s) {\n    // Your solution here\n    return 0;\n}\n",
       go: "func romanToInt(s string) int {\n\t// Your solution here\n\treturn 0\n}\n",
+      cpp: "int romanToInt(string s) {\n    // Your solution here\n    return 0;\n}\n",
+      csharp: "static int RomanToInt(string s) {\n    // Your solution here\n    return 0;\n}\n",
       ruby: "def roman_to_int(s)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",

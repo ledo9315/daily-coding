@@ -1,6 +1,7 @@
 import type { Challenge } from "@/lib/generated/prisma/client";
 import { parseEvaluationConfig } from "@/lib/server/challenge-execution";
 import { normalizeHints } from "@/lib/challenge-hints";
+import { perLanguage, type CodeLanguageId } from "@/lib/challenge-languages";
 
 function jsonPretty(value: unknown): string {
   if (value === null || value === undefined) return "[]";
@@ -22,21 +23,12 @@ export type ChallengeFormInitial = {
   categoryId: string;
   examplesJson: string;
   testsJson: string;
-  fnJs: string;
-  fnTs: string;
-  fnPy: string;
-  fnPhp: string;
-  fnRuby: string;
-  /** Empty when the challenge has no Java support — see the schema for why that is a state. */
-  fnJava: string;
-  fnGo: string;
-  starterJs: string;
-  starterTs: string;
-  starterPy: string;
-  starterPhp: string;
-  starterRuby: string;
-  starterJava: string;
-  starterGo: string;
+  /**
+   * Function name per language. Empty means "not this language" for the typed ones — hence no
+   * "solve" fallback there, which would turn every edit into a Java- and Go-enabled challenge.
+   */
+  callables: Record<CodeLanguageId, string>;
+  starters: Record<CodeLanguageId, string>;
   isActive: boolean;
   dateUtcDay: string;
 };
@@ -64,21 +56,12 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     categoryId: ch.categoryId,
     examplesJson: jsonPretty(examples),
     testsJson: jsonPretty(testCases),
-    fnJs: typeof cbl?.javascript === "string" ? cbl.javascript : "solve",
-    fnTs: typeof cbl?.typescript === "string" ? cbl.typescript : "solve",
-    fnPy: typeof cbl?.python === "string" ? cbl.python : "solve",
-    fnPhp: typeof cbl?.php === "string" ? cbl.php : "solve",
-    fnRuby: typeof cbl?.ruby === "string" ? cbl.ruby : "solve",
-    // No "solve" fallback: an invented name would turn every edit into a Java-enabled challenge.
-    fnJava: typeof cbl?.java === "string" ? cbl.java : "",
-    fnGo: typeof cbl?.go === "string" ? cbl.go : "",
-    starterJs: starters.javascript ?? "",
-    starterTs: starters.typescript ?? "",
-    starterPy: starters.python ?? "",
-    starterPhp: starters.php ?? "",
-    starterRuby: starters.ruby ?? "",
-    starterJava: starters.java ?? "",
-    starterGo: starters.go ?? "",
+    callables: perLanguage((spec) => {
+      const name = cbl?.[spec.id];
+      if (typeof name === "string") return name;
+      return spec.typed ? "" : "solve";
+    }),
+    starters: perLanguage((spec) => starters[spec.id] ?? ""),
     isActive: ch.isActive,
     dateUtcDay: ch.date ? formatUtcDay(new Date(ch.date)) : "",
   };

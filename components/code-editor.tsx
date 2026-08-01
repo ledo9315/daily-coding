@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useMemo } from "react";
 import type { editor } from "monaco-editor";
 import type { Monaco } from "@monaco-editor/react";
-import type { CodeLanguageId } from "@/lib/challenge-languages";
+import { monacoLanguageId, type CodeLanguageId } from "@/lib/challenge-languages";
 import {
   MONACO_THEME_FRAPPE,
   registerCatppuccinFrappeTheme,
@@ -116,10 +116,10 @@ export function CodeEditor({
 
       <div className="max-h-[500px] min-h-[320px] overflow-hidden">
         <Editor
-          key={`${language}-${fileName}`}
+          key={`${monacoLanguageId(language)}-${fileName}`}
           height="500px"
           theme={MONACO_THEME_FRAPPE}
-          language={language}
+          language={monacoLanguageId(language)}
           path={fileName}
           value={isControlled ? value : undefined}
           defaultValue={isControlled ? undefined : value}

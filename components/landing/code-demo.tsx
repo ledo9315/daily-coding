@@ -128,6 +128,38 @@ const SOLUTIONS: Record<
     which costs a second or more each — showing 12 ms like JavaScript would promise something
     the platform does not deliver.
   */
+  csharp: {
+    ms: [510, 470, 480, 465, 475],
+    entry: "BinarySearch",
+    code: [
+      "static int BinarySearch(int[] arr, int target) {",
+      "    int low = 0, high = arr.Length - 1;",
+      "    while (low <= high) {",
+      "        int mid = (low + high) / 2;",
+      "        if (arr[mid] == target) return mid;",
+      "        if (arr[mid] < target) low = mid + 1;",
+      "        else high = mid - 1;",
+      "    }",
+      "    return -1;",
+      "}",
+    ],
+  },
+  cpp: {
+    ms: [95, 78, 82, 76, 80],
+    entry: "binarySearch",
+    code: [
+      "int binarySearch(vector<int> arr, int target) {",
+      "    int low = 0, high = arr.size() - 1;",
+      "    while (low <= high) {",
+      "        int mid = (low + high) / 2;",
+      "        if (arr[mid] == target) return mid;",
+      "        if (arr[mid] < target) low = mid + 1;",
+      "        else high = mid - 1;",
+      "    }",
+      "    return -1;",
+      "}",
+    ],
+  },
   go: {
     ms: [640, 590, 610, 580, 600],
     entry: "binarySearch",

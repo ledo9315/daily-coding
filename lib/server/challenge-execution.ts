@@ -1,12 +1,11 @@
 import type { ChallengeTestCase } from "@/lib/api";
-import { languageFileName, type CodeLanguageId } from "@/lib/challenge-languages";
+import { LANGUAGES, languageFileName, type CodeLanguageId } from "@/lib/challenge-languages";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { isCodeExecutionEnabled } from "@/lib/server/code-execution-flag";
 import {
   buildWrappedProgram,
   extractIoProgramOutput,
-  GO_HARNESS_LINE_OFFSET,
-  JAVA_HARNESS_LINE_OFFSET,
+  HARNESS_LINE_OFFSETS,
   outputsMatch,
 } from "@/lib/server/io-harness";
 import { executeWithPiston } from "@/lib/server/piston-runner";
@@ -99,23 +98,31 @@ export type ChallengeRunResult = {
  * Piston compiles `main.ts` and reports errors against `main.ts.ts`. The editor calls the file
  * `solution.ts`, and a line number is only useful next to a file the user recognises.
  */
-function withEditorFileName(message: string, language: CodeLanguageId): string {
+export function withEditorFileName(message: string, language: CodeLanguageId): string {
+  const name = languageFileName(language);
+  const withoutBanner = message.replace(LANGUAGES[language].compilerBanner ?? /(?!)/u, "");
+
   /*
-    Java and Go already name the file the editor shows, but both count lines from the top of the
-    generated program — three above the user's first line for Java, eight for Go. An error
+    Several compilers already name the file the editor shows, but count lines from the top of the
+    generated program — three above the user's first line for Java, twenty-three for Go. An error
     pointing below the actual mistake is worse than no line number at all.
+
+    Two notations to cover: `Main.java:12` and, from Mono, `main.cs(12,7)`.
   */
-  if (language === "java" || language === "go") {
-    const offset = language === "java" ? JAVA_HARNESS_LINE_OFFSET : GO_HARNESS_LINE_OFFSET;
-    const file = language === "java" ? "Main.java" : "main.go";
-    const pattern = new RegExp(`\\b${file.replace(".", "\\.")}:(\\d+)\\b`, "gu");
-    return message.replaceAll(pattern, (whole, digits: string) => {
-      const line = Number(digits) - offset;
-      return line >= 1 ? `${file}:${line}` : whole;
+  const offset = HARNESS_LINE_OFFSETS[language];
+  if (offset) {
+    const file = name.replace(".", "\\.");
+    const pattern = new RegExp(`\\b${file}(?::(\\d+)|\\((\\d+),)`, "gu");
+    return withoutBanner.replaceAll(pattern, (whole, colon?: string, paren?: string) => {
+      const raw = colon ?? paren;
+      const line = Number(raw) - offset;
+      if (line < 1) return whole;
+      return colon ? `${name}:${line}` : `${name}(${line},`;
     });
   }
-  const name = languageFileName(language);
-  return message.replaceAll("main.ts.ts", name).replaceAll(/\bmain\.(ts|js|py|php)\b/gu, name);
+  return withoutBanner
+    .replaceAll("main.ts.ts", name)
+    .replaceAll(/\bmain\.(ts|js|py|php)\b/gu, name);
 }
 
 async function runPistonIoCases(
