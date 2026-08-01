@@ -73,6 +73,18 @@ const SOLUTIONS: Record<CodeLanguageId, { code: string; callable: string }> = {
   best
 end`,
   },
+  rust: {
+    callable: "max_sub_array",
+    code: `fn max_sub_array(nums: Vec<i64>) -> i64 {
+    let mut best = nums[0];
+    let mut cur = nums[0];
+    for &n in nums.iter().skip(1) {
+        cur = if cur + n > n { cur + n } else { n };
+        if cur > best { best = cur; }
+    }
+    best
+}`,
+  },
   csharp: {
     callable: "MaxSubArray",
     code: `static int MaxSubArray(int[] nums) {
