@@ -53,7 +53,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   await send(to, "Willkommen bei Daily Coding!", {
     heading: `Willkommen, ${name}`,
     lines: [
-      "Jeden Tag wartet eine neue Coding-Challenge auf dich — in JavaScript, TypeScript, Python oder PHP.",
+      "Jeden Tag wartet eine neue Coding-Challenge auf dich — in deiner Sprache.",
       "Löse sie, sammle Punkte und halte deine Serie am Leben.",
     ],
     action: { label: "Zur heutigen Challenge", url: `${getAppUrl()}/challenge` },
