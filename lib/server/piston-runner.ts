@@ -133,6 +133,13 @@ export type PistonRunResult = {
   stdout: string;
   stderr: string;
   compileStderr: string;
+  /**
+   * The program never ran: the compiler rejected it. Callers must not present the output as a
+   * test result — it is not what the program produced, it is why it produced nothing.
+   */
+  compileFailed: boolean;
+  /** Everything the compiler said. tsc writes its errors to stdout, not stderr. */
+  compileOutput: string;
   durationMs: number;
 };
 
@@ -155,6 +162,8 @@ export async function executeWithPiston(
       stderr:
         "Piston meldet keine Laufzeiten. Nach Start des Containers: pnpm piston:install (javascript, typescript, python, php).",
       compileStderr: "",
+      compileFailed: false,
+      compileOutput: "",
       durationMs: 0,
     };
   }
@@ -184,6 +193,8 @@ export async function executeWithPiston(
       stdout: "",
       stderr: `Piston HTTP ${res.status}: ${text.slice(0, 500)}`,
       compileStderr: "",
+      compileFailed: false,
+      compileOutput: "",
       durationMs,
     };
   }
@@ -211,6 +222,8 @@ export async function executeWithPiston(
     stdout: compileOut + stdout,
     stderr: stderr || (compileFail ? compileStderr : stderrRun),
     compileStderr,
+    compileFailed: Boolean(compileFail),
+    compileOutput: [compileOut, compileStderr].filter(Boolean).join("\n").trim(),
     durationMs,
   };
 }

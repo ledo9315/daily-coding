@@ -264,6 +264,8 @@ export function submitSolution(
     language?: CodeLanguageId;
     /** Whether runtime/compilation (Piston) succeeded; always true for the stub. */
     runtimeOk?: boolean;
+    /** Set when the compiler rejected the program, so no test ever ran. */
+    compileError?: string;
     celebration?: SubmitCelebration;
   }> {
   return apiFetch(`/api/challenge/${challengeId}/submit`, {
@@ -281,6 +283,8 @@ export function runTests(
     language?: CodeLanguageId;
     /** Whether runtime/compilation succeeded; always true for the stub. */
     runtimeOk?: boolean;
+    /** Set when the compiler rejected the program, so no test ever ran. */
+    compileError?: string;
   }> {
   return apiFetch(`/api/challenge/${challengeId}/run`, {
     method: "POST",

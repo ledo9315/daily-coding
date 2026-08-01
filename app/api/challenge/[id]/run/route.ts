@@ -27,6 +27,11 @@ export async function POST(
     );
   }
 
-  const { testCases, runtimeOk } = await runChallengeTests(challenge, code, language, "run");
-  return NextResponse.json({ testCases, language, runtimeOk });
+  const { testCases, runtimeOk, compileError } = await runChallengeTests(
+    challenge,
+    code,
+    language,
+    "run"
+  );
+  return NextResponse.json({ testCases, language, runtimeOk, compileError });
 }
