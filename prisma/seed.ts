@@ -321,7 +321,7 @@ async function main() {
     language whose submission cannot pass is worse than not offering it. The two share one list
     because the limit is the same: it comes from the test data, not from the language.
   */
-  const langsWithTypes = [...supportedLangs, "java", "go", "cpp", "csharp"] as const;
+  const langsWithTypes = [...supportedLangs, "java", "go", "cpp", "csharp", "rust"] as const;
 
   const challengeToday = await prisma.challenge.upsert(
     challengeUpsertArgs({
@@ -379,6 +379,7 @@ async function main() {
           go: "transformArray",
           cpp: "transformArray",
           csharp: "TransformArray",
+          rust: "transform_array",
         },
       },
       testCases: [
@@ -415,6 +416,7 @@ async function main() {
         go: "func transformArray(arr []int) []int {\n\t// Your solution here\n\treturn []int{}\n}\n",
         cpp: "vector<int> transformArray(vector<int> arr) {\n    // Your solution here\n    return {};\n}\n",
         csharp: "static int[] TransformArray(int[] arr) {\n    // Your solution here\n    return new int[]{};\n}\n",
+        rust: "fn transform_array(arr: Vec<i64>) -> Vec<i64> {\n    // Your solution here\n    vec![]\n}\n",
         ruby: "def transform_array(arr)\n  # Your solution here\n  []\nend\n",
       },
       starterCode: "function transformArray(arr) {\n  // Your solution here\n}",
@@ -436,6 +438,7 @@ async function main() {
         go: "binarySearch",
         cpp: "binarySearch",
         csharp: "BinarySearch",
+        rust: "binary_search",
       },
     },
     testCases: [
@@ -457,6 +460,7 @@ async function main() {
       go: "func binarySearch(arr []int, target int) int {\n\t// Your solution here\n\treturn -1\n}\n",
       cpp: "int binarySearch(vector<int> arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
       csharp: "static int BinarySearch(int[] arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
+      rust: "fn binary_search(arr: Vec<i64>, target: i64) -> i64 {\n    // Your solution here\n    -1\n}\n",
       ruby: "def binary_search(data)\n  arr, target = data['arr'], data['target']\n  # Your solution here\n  -1\nend\n",
     },
     starterCode:
@@ -528,6 +532,7 @@ async function main() {
         go: "reverseString",
         cpp: "reverseString",
         csharp: "ReverseString",
+        rust: "reverse_string",
       },
     },
     testCases: [
@@ -547,6 +552,7 @@ async function main() {
       go: "func reverseString(s string) string {\n\t// Your solution here\n\treturn s\n}\n",
       cpp: "string reverseString(string s) {\n    // Your solution here\n    return s;\n}\n",
       csharp: "static string ReverseString(string s) {\n    // Your solution here\n    return s;\n}\n",
+      rust: "fn reverse_string(s: String) -> String {\n    // Your solution here\n    s\n}\n",
       ruby: "def reverse_string(s)\n  # Your solution here\n  s\nend\n",
     },
     starterCode: "function reverseString(s) {\n  // Your solution here\n  return s;\n}",
@@ -727,6 +733,7 @@ async function main() {
         go: "fibonacci",
         cpp: "fibonacci",
         csharp: "Fibonacci",
+        rust: "fibonacci",
       },
     },
     testCases: [
@@ -746,6 +753,7 @@ async function main() {
       go: "func fibonacci(n int) int {\n\t// Your solution here\n\treturn 0\n}\n",
       cpp: "int fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
       csharp: "static int Fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
+      rust: "fn fibonacci(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
       ruby: "def fibonacci(n)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function fibonacci(n) {\n  // Your solution here\n  return 0;\n}",
@@ -931,6 +939,7 @@ async function main() {
         go: "twoSum",
         cpp: "twoSum",
         csharp: "TwoSum",
+        rust: "two_sum",
       },
     },
     testCases: [
@@ -952,6 +961,7 @@ async function main() {
       go: "func twoSum(nums []int, target int) []int {\n\t// Your solution here\n\treturn []int{}\n}\n",
       cpp: "vector<int> twoSum(vector<int> nums, int target) {\n    // Your solution here\n    return {};\n}\n",
       csharp: "static int[] TwoSum(int[] nums, int target) {\n    // Your solution here\n    return new int[]{};\n}\n",
+      rust: "fn two_sum(nums: Vec<i64>, target: i64) -> Vec<i64> {\n    // Your solution here\n    vec![]\n}\n",
       ruby: "def two_sum(data)\n  nums, target = data['nums'], data['target']\n  # Your solution here\n  []\nend\n",
     },
     starterCode:
@@ -1022,6 +1032,7 @@ async function main() {
         go: "fizzBuzz",
         cpp: "fizzBuzz",
         csharp: "FizzBuzz",
+        rust: "fizz_buzz",
       },
     },
     testCases: [
@@ -1046,6 +1057,7 @@ async function main() {
       go: "func fizzBuzz(n int) []string {\n\t// Your solution here\n\treturn []string{}\n}\n",
       cpp: "vector<string> fizzBuzz(int n) {\n    // Your solution here\n    return {};\n}\n",
       csharp: "static string[] FizzBuzz(int n) {\n    // Your solution here\n    return new string[]{};\n}\n",
+      rust: "fn fizz_buzz(n: i64) -> Vec<String> {\n    // Your solution here\n    vec![]\n}\n",
       ruby: "def fizz_buzz(n)\n  # Your solution here\n  []\nend\n",
     },
     starterCode: "function fizzBuzz(n) {\n  // Your solution here\n  return [];\n}",
@@ -1110,6 +1122,7 @@ async function main() {
         go: "isValid",
         cpp: "isValid",
         csharp: "IsValid",
+        rust: "is_valid",
       },
     },
     testCases: [
@@ -1128,6 +1141,7 @@ async function main() {
       go: "func isValid(s string) bool {\n\t// Your solution here\n\treturn false\n}\n",
       cpp: "bool isValid(string s) {\n    // Your solution here\n    return false;\n}\n",
       csharp: "static bool IsValid(string s) {\n    // Your solution here\n    return false;\n}\n",
+      rust: "fn is_valid(s: String) -> bool {\n    // Your solution here\n    false\n}\n",
       ruby: "def is_valid(s)\n  # Your solution here\n  false\nend\n",
     },
     starterCode: "function isValid(s) {\n  // Your solution here\n  return false;\n}",
@@ -1203,6 +1217,7 @@ async function main() {
         go: "countVowels",
         cpp: "countVowels",
         csharp: "CountVowels",
+        rust: "count_vowels",
       },
     },
     testCases: [
@@ -1221,6 +1236,7 @@ async function main() {
       go: "func countVowels(s string) int {\n\t// Your solution here\n\treturn 0\n}\n",
       cpp: "int countVowels(string s) {\n    // Your solution here\n    return 0;\n}\n",
       csharp: "static int CountVowels(string s) {\n    // Your solution here\n    return 0;\n}\n",
+      rust: "fn count_vowels(s: String) -> i64 {\n    // Your solution here\n    0\n}\n",
       ruby: "def count_vowels(s)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function countVowels(s) {\n  // Your solution here\n  return 0;\n}",
@@ -1286,6 +1302,7 @@ async function main() {
         go: "maxSubArray",
         cpp: "maxSubArray",
         csharp: "MaxSubArray",
+        rust: "max_sub_array",
       },
     },
     testCases: [
@@ -1304,6 +1321,7 @@ async function main() {
       go: "func maxSubArray(nums []int) int {\n\t// Your solution here\n\treturn 0\n}\n",
       cpp: "int maxSubArray(vector<int> nums) {\n    // Your solution here\n    return 0;\n}\n",
       csharp: "static int MaxSubArray(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
+      rust: "fn max_sub_array(nums: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
       ruby: "def max_sub_array(nums)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function maxSubArray(nums) {\n  // Your solution here\n  return 0;\n}",
@@ -1376,6 +1394,7 @@ async function main() {
         go: "isAnagram",
         cpp: "isAnagram",
         csharp: "IsAnagram",
+        rust: "is_anagram",
       },
     },
     testCases: [
@@ -1397,6 +1416,7 @@ async function main() {
       go: "func isAnagram(s string, t string) bool {\n\t// Your solution here\n\treturn false\n}\n",
       cpp: "bool isAnagram(string s, string t) {\n    // Your solution here\n    return false;\n}\n",
       csharp: "static bool IsAnagram(string s, string t) {\n    // Your solution here\n    return false;\n}\n",
+      rust: "fn is_anagram(s: String, t: String) -> bool {\n    // Your solution here\n    false\n}\n",
       ruby: "def is_anagram(data)\n  s, t = data['s'], data['t']\n  # Your solution here\n  false\nend\n",
     },
     starterCode:
@@ -1467,6 +1487,7 @@ async function main() {
         go: "digitalRoot",
         cpp: "digitalRoot",
         csharp: "DigitalRoot",
+        rust: "digital_root",
       },
     },
     testCases: [
@@ -1485,6 +1506,7 @@ async function main() {
       go: "func digitalRoot(n int) int {\n\t// Your solution here\n\treturn 0\n}\n",
       cpp: "int digitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
       csharp: "static int DigitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
+      rust: "fn digital_root(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
       ruby: "def digital_root(n)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function digitalRoot(n) {\n  // Your solution here\n  return 0;\n}",
@@ -1555,6 +1577,7 @@ async function main() {
         go: "moveZeroes",
         cpp: "moveZeroes",
         csharp: "MoveZeroes",
+        rust: "move_zeroes",
       },
     },
     testCases: [
@@ -1573,6 +1596,7 @@ async function main() {
       go: "func moveZeroes(nums []int) []int {\n\t// Your solution here\n\treturn nums\n}\n",
       cpp: "vector<int> moveZeroes(vector<int> nums) {\n    // Your solution here\n    return nums;\n}\n",
       csharp: "static int[] MoveZeroes(int[] nums) {\n    // Your solution here\n    return nums;\n}\n",
+      rust: "fn move_zeroes(nums: Vec<i64>) -> Vec<i64> {\n    // Your solution here\n    nums\n}\n",
       ruby: "def move_zeroes(nums)\n  # Your solution here\n  nums\nend\n",
     },
     starterCode: "function moveZeroes(nums) {\n  // Your solution here\n  return nums;\n}",
@@ -1642,6 +1666,7 @@ async function main() {
         go: "romanToInt",
         cpp: "romanToInt",
         csharp: "RomanToInt",
+        rust: "roman_to_int",
       },
     },
     testCases: [
@@ -1660,6 +1685,7 @@ async function main() {
       go: "func romanToInt(s string) int {\n\t// Your solution here\n\treturn 0\n}\n",
       cpp: "int romanToInt(string s) {\n    // Your solution here\n    return 0;\n}\n",
       csharp: "static int RomanToInt(string s) {\n    // Your solution here\n    return 0;\n}\n",
+      rust: "fn roman_to_int(s: String) -> i64 {\n    // Your solution here\n    0\n}\n",
       ruby: "def roman_to_int(s)\n  # Your solution here\n  0\nend\n",
     },
     starterCode: "function romanToInt(s) {\n  // Your solution here\n  return 0;\n}",

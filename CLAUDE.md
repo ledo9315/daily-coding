@@ -91,7 +91,7 @@ Adding a language means: registry entry, Prisma enum plus migration, a `case` in
 `json.dumps` — deliberately not `JSON.generate`, which refuses a bare String or Integer at the
 top level, and half the challenges return exactly that.
 
-Java, Go, C++ and C# are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
+Java, Go, C++, C# and Rust are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
 turned into typed parameters (one per JSON key, in key order) and baked into the program as
 literals. Both differ from the interpreted languages in ways worth knowing before touching the
 harness:
@@ -118,12 +118,16 @@ harness:
   template or nested vectors fail to resolve. C# uses one method with ordered type tests instead
   — Mono has no `System.Text.Json`, and `string` must be answered before `IEnumerable` or every
   word comes back as a list of letters.
+- Rust puts the solution *first* — no class to nest in, so line numbers need no correction at
+  all — and serialises through a `ToJson` trait, where a blanket `impl<T: ToJson> for Vec<T>`
+  covers nesting in one line. Its string escapes are `\u{XXXX}` with braces, unlike every other
+  typed language here.
 - C# runs on **Mono**, not on the `csharp.net` runtime Piston also offers: that one scaffolds a
   project per execution, ten seconds of CPU with its progress on stdout. Mono cannot start under
   the QEMU emulation the amd64 image needs on Apple Silicon, so C# is only testable against the
   real host — `piston-integration.test.ts` skips a runtime that dies in the sandbox keeper.
 
-Java, Go, C++ and C# are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
+Java, Go, C++, C# and Rust are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
 out of `supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one
 array) and Binary Tree Traversal (recursive structure) are the two seeded challenges without
 them — Ruby covers both, since `data` there is just a value.
