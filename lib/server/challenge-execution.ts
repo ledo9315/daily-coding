@@ -1,5 +1,5 @@
 import type { ChallengeTestCase } from "@/lib/api";
-import type { CodeLanguageId } from "@/lib/challenge-languages";
+import { languageFileName, type CodeLanguageId } from "@/lib/challenge-languages";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { isCodeExecutionEnabled } from "@/lib/server/code-execution-flag";
 import {
@@ -86,7 +86,21 @@ export type ChallengeExecutionMode = "run" | "submit";
 export type ChallengeRunResult = {
   testCases: ChallengeTestCase[];
   runtimeOk: boolean;
+  /**
+   * Set when the compiler rejected the program. Not a test result: nothing ran, so every slot
+   * stays pending and the message is shown on its own instead of in "actual".
+   */
+  compileError?: string;
 };
+
+/**
+ * Piston compiles `main.ts` and reports errors against `main.ts.ts`. The editor calls the file
+ * `solution.ts`, and a line number is only useful next to a file the user recognises.
+ */
+function withEditorFileName(message: string, language: CodeLanguageId): string {
+  const name = languageFileName(language);
+  return message.replaceAll("main.ts.ts", name).replaceAll(/\bmain\.(ts|js|py|php)\b/gu, name);
+}
 
 async function runPistonIoCases(
   challenge: ChallengeLike,
@@ -131,6 +145,26 @@ async function runPistonIoCases(
 
     const piston = await executeWithPiston(language, wrapped, tc.input);
     const timeStr = `${piston.durationMs}ms`;
+
+    if (piston.compileFailed) {
+      /*
+        One compile error, reported once. Every case runs the same program, so the remaining
+        four calls would fail identically — five compiler runs, some fifteen seconds, for an
+        answer that was settled after the first.
+      */
+      return {
+        testCases: list.map((slot) => ({
+          id: slot.id,
+          name: slot.name,
+          status: "pending" as const,
+        })),
+        runtimeOk: false,
+        compileError: withEditorFileName(
+          (piston.compileOutput || piston.stderr || `Exit ${piston.exitCode}`).slice(0, 2000),
+          language
+        ),
+      };
+    }
 
     if (!piston.ok) {
       allPassed = false;
@@ -184,6 +218,17 @@ async function runPistonSmoke(
   const piston = await executeWithPiston(language, code, "");
   const list = parseTestCasesIo(challenge.testCases);
   const slots = list.length > 0 ? list : defaultSlots();
+
+  if (piston.compileFailed) {
+    return {
+      testCases: slots.map((s) => ({ id: s.id, name: s.name, status: "pending" as const })),
+      runtimeOk: false,
+      compileError: withEditorFileName(
+        (piston.compileOutput || piston.stderr || `Exit ${piston.exitCode}`).slice(0, 2000),
+        language
+      ),
+    };
+  }
 
   if (mode === "submit") {
     // Without real I/O test cases a submission cannot be checked for
