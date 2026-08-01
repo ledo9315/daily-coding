@@ -289,11 +289,43 @@ async function main() {
     challengeUpsertArgs({
       id: "challenge-array-manipulation",
       title: "Array Manipulation Challenge",
-      description: "Implementiere eine Funktion transformArray(arr), die ein Array von Zahlen nimmt und ein neues Array zurückgibt, bei dem jedes Element die kumulative Summe aller vorherigen Elemente (inklusive sich selbst) enthält.",
+      description:
+        "Implementiere transformArray(arr).\n\n" +
+        "Gib ein neues Array zurück, in dem jedes Element die Summe aller Elemente bis zu " +
+        "dieser Position enthält, sich selbst eingeschlossen.\n\n" +
+        "Für jede Position von vorn neu zu summieren funktioniert und kostet O(n²). Es " +
+        "geht in einem Durchlauf, denn die Summe bis Position i ist die Summe bis i-1 plus " +
+        "das aktuelle Element.",
       difficulty: "medium",
       points: 150,
       categoryId: catAlgorithmen.id,
-      hints: [{ title: "Ansatz", body: "Versuche die Lösung mit O(n) Zeitkomplexität und O(1) zusätzlichem Speicher zu implementieren." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Jeder Wert im Ergebnis unterscheidet sich von seinem Vorgänger um genau ein " +
+            "Element: das an dieser Stelle. Du musst also nichts wiederholt aufsummieren, " +
+            "sondern nur eine laufende Summe mitführen und fortschreiben.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Leg eine Variable für die Summe an und starte sie bei 0. Geh das Array einmal " +
+            "von links nach rechts durch, addiere das aktuelle Element auf die Summe und " +
+            "häng ihren neuen Wert ans Ergebnis. Am Ende gibst du das Ergebnis-Array " +
+            "zurück.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die verschachtelte Schleife. Wer für jede Position wieder bei Index 0 " +
+            "anfängt, bekommt dasselbe Ergebnis in quadratischer Zeit – bei dieser Aufgabe " +
+            "geht es genau um den Unterschied.\n\n" +
+            "Gefragt ist ein neues Array. Das übergebene zu überschreiben ist unsauber, " +
+            "auch wenn die Tests es hier nicht bemerken.\n\n" +
+            "Das leere Array muss ein leeres Array ergeben, keinen Fehler und keine [0].",
+        },
+      ],
       examples: [
         { input: "[1, 2, 3, 4, 5]", output: "[1, 3, 6, 10, 15]" },
         { input: "[5, -2, 3, 1]", output: "[5, 3, 6, 7]" },
@@ -457,11 +489,43 @@ async function main() {
       id: "challenge-string-reversal",
       title: "String Reversal",
       description:
-        "Implementiere reverseString(s): Gib den übergebenen String in umgekehrter Zeichenreihenfolge zurück.",
+        "Implementiere reverseString(s).\n\n" +
+        "Gib den übergebenen String in umgekehrter Zeichenreihenfolge zurück.\n\n" +
+        "Jede Sprache hat dafür einen Einzeiler, und der ist hier auch eine gültige " +
+        "Antwort. Wer etwas mitnehmen will, schreibt die Schleife einmal selbst – sie " +
+        "steckt in jedem Palindrom-Check und in jeder Zwei-Zeiger-Aufgabe wieder.",
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hints: [{ title: "Ansatz", body: "Nutze einen Zwei-Zeiger-Ansatz oder kehre die Zeichen direkt um." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Ein String ist eine Folge von Zeichen mit Positionen. Umdrehen heißt: das " +
+            "letzte Zeichen kommt an Position 0, das vorletzte an Position 1, und so " +
+            "weiter. Entweder liest du von hinten nach vorn, oder du tauschst paarweise " +
+            "von außen nach innen.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Der kurze Weg: in Zeichen zerlegen, die Reihenfolge umkehren, wieder " +
+            "zusammensetzen. In JavaScript s.split(\"\").reverse().join(\"\"), in Python " +
+            "s[::-1], in PHP strrev.\n\n" +
+            "Der lehrreiche Weg: eine Schleife vom letzten Index rückwärts bis 0, die " +
+            "jedes Zeichen an ein Ergebnis hängt.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Der letzte Index ist Länge minus 1. Bei Länge zu starten liefert nichts oder " +
+            "einen Fehler, je nach Sprache.\n\n" +
+            "Strings sind in JavaScript und Python unveränderlich: Du kannst kein Zeichen " +
+            "über s[i] = … zuweisen, sondern baust ein neues Ergebnis auf.\n\n" +
+            "Der leere String ergibt den leeren String. Ein Palindrom ergibt sich selbst – " +
+            "beides sind gültige Eingaben und keine Sonderfälle, die du abfangen musst.",
+        },
+      ],
       examples: [
         { input: '"hello"', output: '"olleh"' },
         { input: '"racecar"', output: '"racecar"' },
@@ -523,11 +587,51 @@ async function main() {
       id: "challenge-hashmap",
       title: "Hash Map Implementation",
       description:
-        "Implementiere hashMap(operations): Verarbeite eine Liste von Operationen und gib ein Array mit dem Ergebnis jeder Operation zurück. Jede Operation ist [typ, key] oder [typ, key, value]. Typen: \"set\" speichert value (Ergebnis null), \"get\" gibt den gespeicherten value oder null zurück, \"has\" gibt einen Boolean zurück, \"delete\" gibt einen Boolean zurück (ob der Schlüssel vorhanden war).",
+        "Implementiere hashMap(operations).\n\n" +
+        "Verarbeite eine Liste von Operationen und gib ein Array mit dem Ergebnis jeder " +
+        "Operation zurück. Jede Operation ist [typ, key] oder [typ, key, value].\n\n" +
+        '"set" speichert value und ergibt null. "get" gibt den gespeicherten value zurück ' +
+        'oder null, wenn der Schlüssel fehlt. "has" gibt einen Boolean zurück. "delete" ' +
+        "gibt zurück, ob der Schlüssel vorhanden war.\n\n" +
+        "Die Datenstruktur bringt jede Sprache mit. Die Aufgabe ist, ihr Verhalten exakt " +
+        "nachzubilden: Was passiert beim Überschreiben, was beim Löschen von etwas, das " +
+        "gar nicht da war.",
       difficulty: "medium",
       points: 150,
       categoryId: catDatenstrukturen.id,
-      hints: [{ title: "Ansatz", body: "Verwende intern eine Map bzw. ein Dictionary und laufe die Operationen der Reihe nach durch." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Zwei Dinge laufen parallel: der Zustand, der zwischen den Operationen " +
+            "bestehen bleibt, und das Protokoll, das du zurückgibst. Jede Operation " +
+            "verändert den Zustand und hängt genau einen Eintrag ans Protokoll – auch " +
+            "dann, wenn sie nichts Sichtbares liefert.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Leg eine Map bzw. ein Dictionary an und ein leeres Ergebnis-Array. Geh die " +
+            "Operationen der Reihe nach durch und verzweige über den Typ im ersten " +
+            "Element.\n\n" +
+            "Bei set schreibst du den Wert und hängst null an. Bei get liest du und hängst " +
+            "den Wert oder null an. Bei has hängst du an, ob der Schlüssel existiert. Bei " +
+            "delete fragst du zuerst, ob er existiert, entfernst ihn dann und hängst die " +
+            "Antwort von vorher an.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Das Ergebnis-Array ist genauso lang wie die Operationsliste. Wer bei set " +
+            "nichts anhängt, weil es nichts zurückgibt, verschiebt alle folgenden " +
+            "Ergebnisse um eine Position.\n\n" +
+            "Bei delete muss die Prüfung vor dem Löschen stehen. Danach ist der Schlüssel " +
+            "weg und die Antwort immer false.\n\n" +
+            "Ein fehlender Schlüssel ergibt null, nicht undefined und nicht None. In " +
+            "JavaScript liefert map.get genau dann undefined – das musst du auf null " +
+            "abbilden, sonst fällt es beim JSON-Vergleich auf.",
+        },
+      ],
       examples: [
         {
           input: '[["set","a",1],["get","a"],["get","b"]]',
@@ -572,11 +676,46 @@ async function main() {
       id: "challenge-recursion",
       title: "Recursion Basics",
       description:
-        "Implementiere fibonacci(n): Gib die n-te Fibonacci-Zahl zurück (0-indiziert, d. h. fibonacci(0) = 0, fibonacci(1) = 1).",
+        "Implementiere fibonacci(n).\n\n" +
+        "Gib die n-te Fibonacci-Zahl zurück, 0-indiziert: fibonacci(0) = 0, " +
+        "fibonacci(1) = 1, jede weitere ist die Summe ihrer beiden Vorgänger.\n\n" +
+        "Die Rekursion schreibt sich in drei Zeilen und ist die eigentliche Übung: Wann " +
+        "hört sie auf, und was gibt sie dann zurück.",
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      hints: [{ title: "Ansatz", body: "fibonacci(n) = fibonacci(n-1) + fibonacci(n-2), mit fibonacci(0) = 0 und fibonacci(1) = 1." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Die Definition ist schon der Algorithmus: fibonacci(n) ist fibonacci(n-1) " +
+            "plus fibonacci(n-2). Damit das nicht endlos weiterläuft, brauchst du " +
+            "Haltepunkte – zwei Werte, die du direkt weißt, ohne weiter zu fragen: 0 und " +
+            "1.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Prüfe zuerst die beiden Basisfälle und gib n zurück, wenn n kleiner als 2 " +
+            "ist. Sonst gib die Summe der beiden rekursiven Aufrufe zurück.\n\n" +
+            "Alternativ ohne Rekursion: Halte zwei Variablen mit 0 und 1 und schiebe sie " +
+            "in einer Schleife n-mal weiter. Das ist der Weg, der auch bei großem n noch " +
+            "in Sekundenbruchteilen antwortet.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Der Basisfall fehlt oder ist zu eng. Nur n === 0 abzufangen reicht nicht: " +
+            "fibonacci(1) fragt dann nach fibonacci(-1) und läuft ins Negative, bis der " +
+            "Stack voll ist.\n\n" +
+            "Der Index. 0-indiziert heißt fibonacci(5) = 5 und fibonacci(10) = 55. Wer bei " +
+            "1 zu zählen beginnt, liegt in jeder Antwort um eine Stelle daneben.\n\n" +
+            "Die naive Rekursion berechnet dieselben Werte immer wieder und wird ab etwa " +
+            "n = 40 unbrauchbar langsam. Hier reicht sie, aber merk dir die Stelle: Ein " +
+            "Zwischenspeicher für bereits berechnete n macht daraus wieder eine schnelle " +
+            "Funktion.",
+        },
+      ],
       examples: [
         { input: "5", output: "5" },
         { input: "10", output: "55" },
@@ -642,11 +781,47 @@ async function main() {
       id: "challenge-binary-tree",
       title: "Binary Tree Traversal",
       description:
-        'Implementiere inorderTraversal(root): Gib die In-order-Reihenfolge (links, Wurzel, rechts) der Knotenwerte als Array zurück. Ein Knoten hat die Form { val, left, right }; leere Teilbäume sind null.',
+        "Implementiere inorderTraversal(root).\n\n" +
+        "Gib die Knotenwerte in In-order-Reihenfolge als Array zurück: erst der linke " +
+        "Teilbaum, dann die Wurzel, dann der rechte. Ein Knoten hat die Form " +
+        "{ val, left, right }, leere Teilbäume sind null.\n\n" +
+        "Bei einem Suchbaum ist das Ergebnis sortiert – nicht durch Zufall, sondern weil " +
+        "genau das die Ordnung ist, die ein Suchbaum herstellt.",
       difficulty: "hard",
       points: 200,
       categoryId: catBaeume.id,
-      hints: [{ title: "Ansatz", body: "In-order: erst den linken Teilbaum, dann die Wurzel, dann den rechten Teilbaum besuchen." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Jeder Teilbaum ist selbst wieder ein Baum. Was du für die Wurzel tust, tust " +
+            "du für jeden Knoten: links alles einsammeln, dann den eigenen Wert, dann " +
+            "rechts alles einsammeln.\n\n" +
+            "Die Rekursion endet dort, wo kein Knoten mehr ist – und ein leerer Baum " +
+            "steuert eine leere Liste bei.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Ist root null, gib ein leeres Array zurück. Sonst setze drei Teile " +
+            "aneinander: das Ergebnis des Aufrufs für root.left, den Wert root.val als " +
+            "einzelnes Element, das Ergebnis des Aufrufs für root.right.\n\n" +
+            "Wer keine Arrays zusammenbauen will, gibt stattdessen eine gemeinsame Liste " +
+            "durch alle Aufrufe durch und hängt den Wert an der richtigen Stelle an.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die Reihenfolge der drei Schritte. Wird der eigene Wert vor dem linken " +
+            "Teilbaum angehängt, ist das Pre-order: der Suchbaum kommt dann als [2,1,3] " +
+            "statt [1,2,3] heraus. Alle Testfälle bis auf den Einzelknoten fallen darüber.\n\n" +
+            "Der Abbruch bei null muss vor jedem Zugriff stehen, nicht nur ganz oben. " +
+            "Jeder Blattknoten hat zwei null-Kinder – ohne die Prüfung greifst du auf " +
+            "root.val eines nicht vorhandenen Knotens zu.\n\n" +
+            "Der leere Baum ist selbst eine Eingabe: root ist dann direkt null, und die " +
+            "Antwort ist das leere Array.",
+        },
+      ],
       examples: [
         {
           input: '{ "val": 2, "left": { "val": 1 }, "right": { "val": 3 } }',
@@ -696,11 +871,45 @@ async function main() {
       id: "challenge-two-sum",
       title: "Two Sum",
       description:
-        "Implementiere twoSum(data) mit data = { nums, target }: Gib die beiden Indizes (aufsteigend) zurück, deren Werte zusammen target ergeben. Es existiert genau eine Lösung.",
+        "Implementiere twoSum(data) mit data = { nums, target }.\n\n" +
+        "Gib die beiden Indizes (aufsteigend) zurück, deren Werte zusammen target ergeben. " +
+        "Es existiert genau eine Lösung.\n\n" +
+        "Jedes Paar durchzuprobieren funktioniert und kostet O(n²). Die Aufgabe zielt auf " +
+        "den einen Durchlauf: Wer sich merkt, was er schon gesehen hat, muss den Partner " +
+        "nicht suchen – er weiß, ob es ihn gibt.",
       difficulty: "medium",
       points: 150,
       categoryId: catAlgorithmen.id,
-      hints: [{ title: "Ansatz", body: "Speichere gesehene Werte in einer Map: für jedes Element prüfst du, ob target - element bereits vorkam." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Zu jedem Element steht der gesuchte Partner fest: target - nums[i]. Die Frage " +
+            "ist nicht mehr „welche zwei Zahlen passen zusammen\", sondern „kam diese eine " +
+            "Zahl vorher schon vor\". Und das ist eine Frage, die eine Map in einem Schritt " +
+            "beantwortet.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Lege eine Map an, die Wert auf Index abbildet. Laufe einmal durch das Array " +
+            "und prüfe für jedes nums[i], ob target - nums[i] bereits in der Map steht. " +
+            "Steht es dort, hast du beide Indizes: den gespeicherten und i. Steht es nicht " +
+            "dort, trage nums[i] mit seinem Index ein und geh weiter.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Erst nachschlagen, dann eintragen. In der anderen Reihenfolge findet sich ein " +
+            "Element bei target = 2 * nums[i] selbst und du gibst zweimal denselben Index " +
+            "zurück.\n\n" +
+            "Gefragt sind die Indizes, nicht die Werte – und aufsteigend. Wenn du beim " +
+            "Treffer den gespeicherten Index zuerst nennst, stimmt die Reihenfolge von " +
+            "allein, denn er liegt zwangsläufig vor i.\n\n" +
+            "Doppelte Werte sind erlaubt: Die Map darf einen bereits belegten Wert " +
+            "überschreiben, das kostet dich hier nichts.",
+        },
+      ],
       examples: [{ input: '{ "nums": [2,7,11,15], "target": 9 }', output: "[0,1]" }],
       ...twoSumFields,
       isActive: false,
@@ -745,11 +954,40 @@ async function main() {
       id: "challenge-fizzbuzz",
       title: "FizzBuzz",
       description:
-        'Implementiere fizzBuzz(n): Gib ein Array der Länge n zurück. Für jede Zahl 1..n: Vielfache von 3 werden zu "Fizz", von 5 zu "Buzz", von beiden zu "FizzBuzz", sonst die Zahl als String.',
+        "Implementiere fizzBuzz(n).\n\n" +
+        'Gib ein Array der Länge n zurück. Für jede Zahl 1..n: Vielfache von 3 werden zu ' +
+        '"Fizz", von 5 zu "Buzz", von beiden zu "FizzBuzz", sonst die Zahl als String.\n\n' +
+        "Rechnen muss man hier nichts. Die Aufgabe prüft, ob du die Fälle in eine " +
+        "Reihenfolge bringst, in der sich keiner vor dem anderen wegnimmt.",
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      hints: [{ title: "Ansatz", body: "Prüfe zuerst auf teilbar durch 15, dann durch 3, dann durch 5." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Jede Zahl steht für sich, es gibt nichts zu merken. Teilbarkeit fragst du mit " +
+            "dem Restoperator ab: n % 3 === 0 heißt „durch 3 teilbar\". Vier Fälle, ein " +
+            "Durchlauf.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Laufe von 1 bis einschließlich n. Prüfe pro Zahl zuerst, ob sie durch 3 und " +
+            "durch 5 teilbar ist, dann nur durch 3, dann nur durch 5, sonst nimm die Zahl " +
+            "selbst. Häng das Ergebnis an ein Array und gib es am Ende zurück.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die Reihenfolge der Abfragen entscheidet. Steht die Prüfung auf 3 vor der auf " +
+            "15, greift sie bei 15 zuerst und „FizzBuzz\" kommt nie zustande.\n\n" +
+            "Im Array stehen ausschließlich Strings, auch die Zahlen selbst: 1 wird zu \"1\". " +
+            "Eine Zahl im Array lässt den Vergleich mit der Erwartung scheitern.\n\n" +
+            "Die Schleife läuft bei 1 los und schließt n mit ein – nicht bei 0 beginnen und " +
+            "nicht vor n abbrechen.",
+        },
+      ],
       examples: [{ input: "5", output: '["1","2","Fizz","4","Buzz"]' }],
       ...fizzBuzzFields,
       isActive: false,
@@ -788,11 +1026,48 @@ async function main() {
       id: "challenge-valid-parentheses",
       title: "Valid Parentheses",
       description:
-        "Implementiere isValid(s): Prüfe, ob die Klammern in s korrekt verschachtelt und geschlossen sind. Erlaubte Zeichen: (), [], {}. Gib true oder false zurück.",
+        "Implementiere isValid(s).\n\n" +
+        "Prüfe, ob die Klammern in s korrekt verschachtelt und geschlossen sind. Erlaubte " +
+        "Zeichen sind (), [] und {}. Gib true oder false zurück.\n\n" +
+        "Klammern zu zählen reicht nicht: \"([)]\" hat von jeder Sorte gleich viele und ist " +
+        "trotzdem falsch. Es geht um die Reihenfolge, und die verlangt eine Struktur, die " +
+        "sich merkt, was zuletzt geöffnet wurde.",
       difficulty: "medium",
       points: 150,
       categoryId: catDatenstrukturen.id,
-      hints: [{ title: "Ansatz", body: "Nutze einen Stack: öffnende Klammern legst du ab, bei schließenden muss die oberste passen." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Zuletzt geöffnet, zuerst geschlossen. Genau das ist ein Stack: Du legst " +
+            "öffnende Klammern oben ab, und eine schließende Klammer darf nur die " +
+            "wegnehmen, die gerade obenauf liegt.\n\n" +
+            "Passt sie nicht zur obersten, war die Verschachtelung falsch, und du kannst " +
+            "sofort aufhören.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Geh den String Zeichen für Zeichen durch. Bei einer öffnenden Klammer legst " +
+            "du sie auf den Stack. Bei einer schließenden nimmst du das oberste Element " +
+            "herunter und prüfst, ob es die passende Öffnung ist – sonst gib sofort false " +
+            "zurück.\n\n" +
+            "Eine Map von schließender auf öffnende Klammer erspart dir drei " +
+            "Vergleichsketten.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Der Stack am Ende. Wer nur prüft, dass jede schließende Klammer gepasst hat, " +
+            "hält \"(((\" für gültig. Die Antwort ist nur dann true, wenn der Stack " +
+            "danach leer ist – jede offene Klammer wurde geschlossen.\n\n" +
+            "Die schließende Klammer auf leerem Stack. Bei \")\" gibt es nichts " +
+            "herunterzunehmen; ohne Prüfung liest du undefined und vergleichst ins Leere. " +
+            "Ein leerer Stack an dieser Stelle heißt false.\n\n" +
+            "Und der eigentliche Testfall: \"([)]\" scheitert nur, wenn du die oberste " +
+            "Klammer prüfst und nicht bloß irgendeine offene.",
+        },
+      ],
       examples: [
         { input: '"()[]{}"', output: "true" },
         { input: '"([)]"', output: "false" },
@@ -834,11 +1109,41 @@ async function main() {
       id: "challenge-count-vowels",
       title: "Count Vowels",
       description:
-        "Implementiere countVowels(s): Zähle die Vokale (a, e, i, o, u – Groß-/Kleinschreibung egal) im String s.",
+        "Implementiere countVowels(s).\n\n" +
+        "Zähle die Vokale im String s. Vokale sind a, e, i, o und u, " +
+        "Groß-/Kleinschreibung spielt keine Rolle.\n\n" +
+        "Der Kern der Aufgabe ist nicht das Zählen, sondern die Frage „gehört dieses " +
+        "Zeichen dazu\" so zu stellen, dass sie nicht bei jedem Sonderfall neu " +
+        "beantwortet werden muss.",
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hints: [{ title: "Ansatz", body: "Wandle den String in Kleinbuchstaben um und prüfe jedes Zeichen gegen die Vokalmenge." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Statt jedes Zeichen gegen zehn Varianten zu vergleichen – a, A, e, E und so " +
+            "weiter – bringst du es erst in eine einheitliche Form und prüfst dann gegen " +
+            "eine einzige Menge von fünf Buchstaben.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Wandle den String einmal komplett in Kleinbuchstaben um. Halte die Vokale in " +
+            "einer Zeichenkette oder Menge, etwa \"aeiou\". Geh dann Zeichen für Zeichen " +
+            "durch und erhöhe einen Zähler, wenn das Zeichen darin vorkommt.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die Groß-/Kleinschreibung. \"AEIOU\" muss 5 ergeben – wer nur gegen " +
+            "Kleinbuchstaben prüft und nicht umwandelt, bekommt 0.\n\n" +
+            "y ist hier kein Vokal. \"why\" ergibt 0, auch wenn man es im Englischen " +
+            "anders sehen kann. Halte dich an die fünf, die in der Aufgabe stehen.\n\n" +
+            "Der leere String ergibt 0, nicht null oder einen Fehler – die Schleife läuft " +
+            "dann einfach keinmal, wenn der Zähler vorher bei 0 startet.",
+        },
+      ],
       examples: [{ input: '"hello"', output: "2" }],
       ...countVowelsFields,
       isActive: false,
@@ -877,11 +1182,48 @@ async function main() {
       id: "challenge-max-subarray",
       title: "Maximum Subarray",
       description:
-        "Implementiere maxSubArray(nums): Gib die größtmögliche Summe eines zusammenhängenden Teil-Arrays zurück (mindestens ein Element).",
+        "Implementiere maxSubArray(nums).\n\n" +
+        "Gib die größtmögliche Summe eines zusammenhängenden Teil-Arrays zurück. Das " +
+        "Teil-Array enthält mindestens ein Element.\n\n" +
+        "Zusammenhängend heißt: kein Überspringen. Alle Start-Ende-Paare " +
+        "durchzuprobieren kostet O(n²) und besteht die Tests. Interessant wird es bei " +
+        "dem einen Durchlauf, der ohne Rückblick auskommt.",
       difficulty: "medium",
       points: 150,
       categoryId: catAlgorithmen.id,
-      hints: [{ title: "Ansatz", body: "Kadane: laufe einmal durch und entscheide je Element, ob du die bisherige Summe fortführst oder neu beginnst." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Geh das Array von links nach rechts und frag dich an jeder Stelle nur eines: " +
+            "Hilft mir, was links von mir liegt?\n\n" +
+            "Ist die Summe bis hierher negativ, ist sie Ballast – jedes Teil-Array, das sie " +
+            "mitschleppt, wäre ohne sie größer. Dann fängst du beim aktuellen Element neu " +
+            "an. Andernfalls führst du sie fort. Mehr musst du über die Vergangenheit nicht " +
+            "wissen.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Halte zwei Werte: die beste Summe, die hier endet, und die beste Summe, die du " +
+            "je gesehen hast. Beide startest du mit dem ersten Element.\n\n" +
+            "Ab dem zweiten Element ist die hier endende Summe das Maximum aus dem Element " +
+            "allein und dem Element plus der bisherigen Summe. Danach ziehst du das " +
+            "Gesamtmaximum nach. Am Ende gibst du das Gesamtmaximum zurück.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die Null als Startwert. Bei [-3,-1,-2] ist die Antwort -1, nicht 0 – ein leeres " +
+            "Teil-Array ist nicht erlaubt. Starte deshalb mit dem ersten Element, nicht mit " +
+            "0, und laufe ab dem zweiten los.\n\n" +
+            "Zwei getrennte Werte, nicht einer. Wer nur die laufende Summe führt und sie am " +
+            "Ende zurückgibt, verliert ein Maximum, das in der Mitte lag und danach von " +
+            "negativen Zahlen wieder aufgefressen wurde.\n\n" +
+            "Das Gesamtmaximum gehört in jeden Durchlauf, nicht nur dorthin, wo du neu " +
+            "anfängst.",
+        },
+      ],
       examples: [{ input: "[-2,1,-3,4,-1,2,1,-5,4]", output: "6" }],
       ...maxSubArrayFields,
       isActive: false,
@@ -924,11 +1266,45 @@ async function main() {
       id: "challenge-valid-anagram",
       title: "Valid Anagram",
       description:
-        "Implementiere isAnagram(data) mit data = { s, t }: Gib true zurück, wenn t ein Anagramm von s ist (dieselben Buchstaben in derselben Anzahl).",
+        "Implementiere isAnagram(data) mit data = { s, t }.\n\n" +
+        "Gib true zurück, wenn t ein Anagramm von s ist, also aus denselben Buchstaben in " +
+        "derselben Anzahl besteht.\n\n" +
+        "Zwei Wege führen zum Ziel: sortieren und vergleichen, oder zählen und " +
+        "vergleichen. Der erste ist kürzer, der zweite schneller – ein Fall, an dem sich " +
+        "gut sehen lässt, was ein Sortiervorgang kostet.",
       difficulty: "easy",
       points: 100,
       categoryId: catStrings.id,
-      hints: [{ title: "Ansatz", body: "Sortiere beide Strings und vergleiche – oder zähle die Buchstabenhäufigkeiten." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Die Reihenfolge der Buchstaben ist egal, ihre Anzahl nicht. Du brauchst also " +
+            "eine Darstellung, in der die Reihenfolge verschwindet: entweder beide Wörter " +
+            "sortiert, oder für jedes Wort eine Tabelle, wie oft jeder Buchstabe " +
+            "vorkommt.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Kurz: beide Strings in Zeichen zerlegen, sortieren, wieder zusammensetzen " +
+            "und vergleichen. Das kostet O(n log n).\n\n" +
+            "Schnell: eine Map anlegen, für jeden Buchstaben aus s hochzählen, für jeden " +
+            "aus t herunterzählen. Bleibt am Ende jeder Zähler auf 0, sind es Anagramme. " +
+            "Das ist ein Durchlauf pro Wort.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Die Länge zuerst. Sind s und t unterschiedlich lang, kann es kein Anagramm " +
+            "sein – und beim Zählweg würdest du das sonst leicht übersehen, weil ein " +
+            "zusätzlicher Buchstabe in t nur einen Zähler ins Minus schiebt.\n\n" +
+            "Zwei leere Strings sind ein Anagramm: die Antwort ist true, nicht false.\n\n" +
+            "Beim Vergleich von Buchstabentabellen reicht es nicht, dass jeder Buchstabe " +
+            "aus s in t vorkommt. Es geht um die Anzahl – prüfe die Zähler, nicht bloß " +
+            "die Anwesenheit.",
+        },
+      ],
       examples: [{ input: '{ "s": "listen", "t": "silent" }', output: "true" }],
       ...isAnagramFields,
       isActive: false,
@@ -967,11 +1343,46 @@ async function main() {
       id: "challenge-digital-root",
       title: "Digital Root",
       description:
-        "Implementiere digitalRoot(n): Addiere wiederholt die Ziffern von n, bis nur noch eine einzelne Ziffer (0–9) übrig ist, und gib sie zurück.",
+        "Implementiere digitalRoot(n).\n\n" +
+        "Addiere wiederholt die Ziffern von n, bis nur noch eine einzelne Ziffer von 0 " +
+        "bis 9 übrig ist, und gib sie zurück.\n\n" +
+        "Aus 132189 wird 24, daraus 6. Einmal Quersumme reicht also nicht – gefragt ist " +
+        "das Falten, bis nichts mehr zu falten ist.",
       difficulty: "easy",
       points: 100,
       categoryId: catAlgorithmen.id,
-      hints: [{ title: "Ansatz", body: "Wiederhole die Quersumme, bis das Ergebnis kleiner als 10 ist." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Zwei Vorgänge stecken ineinander: die Quersumme einer Zahl bilden, und das " +
+            "so lange wiederholen, bis das Ergebnis einstellig ist.\n\n" +
+            "Trenn sie gedanklich. Die Quersumme ist eine Schleife über die Ziffern, das " +
+            "Falten eine Schleife über die Quersummen.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Die Ziffern bekommst du mit Rest und Ganzzahldivision: n % 10 ist die letzte " +
+            "Ziffer, n / 10 abgerundet der Rest der Zahl. Wiederhole das, bis nichts mehr " +
+            "übrig ist, und summiere.\n\n" +
+            "Diesen Schritt legst du in eine äußere Schleife, die läuft, solange n " +
+            "mindestens 10 ist. Am Ende gibst du n zurück. Wer mag, geht über den Umweg " +
+            "String und zerlegt die Zahl in Zeichen – das ist langsamer, aber genauso " +
+            "richtig.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Nur einmal falten. Bei 942 kommt 15 heraus, und 15 ist keine Ziffer. Die " +
+            "Bedingung muss geprüft werden, bevor und nachdem summiert wurde – eine " +
+            "while-Schleife tut genau das.\n\n" +
+            "Die 0. Sie ist bereits einstellig, die Antwort ist 0. Eine Schleife mit " +
+            "do-while oder eine Bedingung auf n > 0 kann hier danebengreifen.\n\n" +
+            "Ganzzahldivision. In JavaScript ist n / 10 eine Kommazahl – ohne " +
+            "Math.floor summierst du Nachkommastellen mit.",
+        },
+      ],
       examples: [{ input: "942", output: "6" }],
       ...digitalRootFields,
       isActive: false,
@@ -1010,11 +1421,45 @@ async function main() {
       id: "challenge-move-zeroes",
       title: "Move Zeroes",
       description:
-        "Implementiere moveZeroes(nums): Verschiebe alle Nullen ans Ende des Arrays und behalte die Reihenfolge der übrigen Elemente bei.",
+        "Implementiere moveZeroes(nums).\n\n" +
+        "Verschiebe alle Nullen ans Ende des Arrays. Die Reihenfolge der übrigen Elemente " +
+        "bleibt dabei erhalten.\n\n" +
+        "Ohne diese Bedingung wäre es Sortieren. Mit ihr ist es eine Aufgabe über " +
+        "Reihenfolge: Die Nicht-Nullen dürfen untereinander nicht die Plätze tauschen.",
       difficulty: "easy",
       points: 100,
       categoryId: catDatenstrukturen.id,
-      hints: [{ title: "Ansatz", body: "Sammle zuerst alle Nicht-Null-Werte, fülle danach mit Nullen auf." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Dreh die Aufgabe um. Statt Nullen nach hinten zu schieben, ziehst du alles, " +
+            "was keine Null ist, nach vorn – in genau der Reihenfolge, in der es " +
+            "vorkommt. Was hinten übrig bleibt, sind zwangsläufig die Nullen.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Der einfache Weg: filtere die Nicht-Null-Werte in ein neues Array und häng " +
+            "so viele Nullen an, wie zur ursprünglichen Länge fehlen.\n\n" +
+            "Der Weg ohne zweites Array: Führe einen Schreibzeiger mit, der bei 0 startet. " +
+            "Läufst du auf einen Wert ungleich null, schreibst du ihn an die Position des " +
+            "Schreibzeigers und rückst ihn eins weiter. Am Ende füllst du von dort bis " +
+            "zum Ende mit Nullen.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Nullen einzeln nach hinten zu tauschen. Bei [4,0,5,0,0,6] holt jeder Tausch " +
+            "ein Element von hinten nach vorn und zerstört die Reihenfolge – aus 4,5,6 " +
+            "wird 4,6,5.\n\n" +
+            "Die Länge. Das Ergebnis hat genauso viele Elemente wie die Eingabe. Wer die " +
+            "Nullen nur herausfiltert und das Auffüllen vergisst, gibt ein zu kurzes " +
+            "Array zurück.\n\n" +
+            "Und die Rückgabe: Auch wenn du direkt in nums schreibst, muss die Funktion " +
+            "das Array zurückgeben. Ohne return kommt beim Test nichts an.",
+        },
+      ],
       examples: [{ input: "[0,1,0,3,12]", output: "[1,3,12,0,0]" }],
       ...moveZeroesFields,
       isActive: false,
@@ -1053,11 +1498,48 @@ async function main() {
       id: "challenge-roman-to-integer",
       title: "Roman to Integer",
       description:
-        "Implementiere romanToInt(s): Wandle eine römische Zahl (I=1, V=5, X=10, L=50, C=100, D=500, M=1000) in ihren ganzzahligen Wert um. Steht ein kleinerer Wert vor einem größeren, wird er subtrahiert (z. B. IV = 4).",
+        "Implementiere romanToInt(s).\n\n" +
+        "Wandle eine römische Zahl in ihren ganzzahligen Wert um. Es gilt I=1, V=5, X=10, " +
+        "L=50, C=100, D=500, M=1000.\n\n" +
+        "Steht ein kleinerer Wert vor einem größeren, wird er abgezogen statt addiert: IV " +
+        "ist 4, IX ist 9. Diese eine Ausnahme ist die ganze Aufgabe – man braucht keine " +
+        "Liste der sechs Sonderfälle, sondern eine Regel, die sie alle erzeugt.",
       difficulty: "medium",
       points: 150,
       categoryId: catStrings.id,
-      hints: [{ title: "Ansatz", body: "Gehe von links nach rechts: ist der aktuelle Wert kleiner als der nächste, ziehe ihn ab, sonst addiere ihn." }],
+      hints: [
+        {
+          title: "Die Idee",
+          body:
+            "Sieh dir jedes Zeichen zusammen mit seinem Nachfolger an. Ist der Nachfolger " +
+            "größer, gehört das Zeichen zu einer Subtraktion und zählt negativ. In allen " +
+            "anderen Fällen zählt es positiv.\n\n" +
+            "Mehr Regeln braucht es nicht: IV, IX, XL, XC, CD und CM fallen alle unter " +
+            "diese eine.",
+        },
+        {
+          title: "Die Umsetzung",
+          body:
+            "Leg eine Zuordnung von Zeichen auf Wert an. Geh den String von links nach " +
+            "rechts durch und vergleiche den Wert an Position i mit dem an Position i+1. " +
+            "Ist er kleiner, ziehe ihn von der Summe ab, sonst addiere ihn.\n\n" +
+            "Genauso gut geht es von rechts nach links: Merk dir den größten bisher " +
+            "gesehenen Wert und ziehe alles ab, was kleiner ist als er.",
+        },
+        {
+          title: "Woran die meisten scheitern",
+          body:
+            "Das letzte Zeichen hat keinen Nachfolger. Ohne Absicherung liest du über das " +
+            "Ende hinaus – in JavaScript kommt undefined heraus, der Vergleich wird " +
+            "false, und das Zeichen wird zufällig richtig addiert. Verlass dich nicht " +
+            "darauf, behandle den letzten Schritt bewusst.\n\n" +
+            "Die Sonderfälle einzeln abzufangen. Wer nach \"IV\" und \"IX\" im String " +
+            "sucht und sie ersetzt, hat bei MCMXCIV drei Ersetzungen zu bedenken und " +
+            "übersieht eine.\n\n" +
+            "Kleiner als der Nachfolger heißt echt kleiner. Bei II ist der Nachfolger " +
+            "gleich groß, und beide zählen positiv.",
+        },
+      ],
       examples: [
         { input: '"IX"', output: "9" },
         { input: '"MCMXCIV"', output: "1994" },
@@ -1104,6 +1586,13 @@ async function main() {
     data: { emailVerified: true },
   });
 
+  /*
+    Operational state, and therefore off-limits to a content refresh. `challengeUpsertArgs`
+    already keeps isActive, position and date out of its update — this block wrote all three
+    anyway, plus the ring pointer, so refreshing prose on a running instance reset the order
+    someone arranged in the admin and jumped the daily challenge to the front of the ring.
+  */
+  if (!contentOnly) {
   // Since #67, `isActive` means "part of the rotation pool", not "is today's
   // challenge". Every finished challenge is eligible — otherwise the rotation would
   // hold a single element and the app would serve the same challenge forever.
@@ -1147,6 +1636,7 @@ async function main() {
     create: { id: "current", challengeId: challengeToday.id, position: 0, day: anchor },
     update: { challengeId: challengeToday.id, position: 0, day: anchor },
   });
+  }
 
   // ─── Submissions ─────────────────────────────────────────────────────────────
 
