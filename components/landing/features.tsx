@@ -1,6 +1,9 @@
 "use client";
 
+// Hidden with the banner below: import Image from "next/image";
 import { motion, Variants } from "framer-motion";
+import { FlickeringGrid } from "@/components/ui/flickering-grid";
+// Hidden with the bloom below: import { AmbientGlow } from "@/components/landing/ambient-glow";
 
 /**
  * The day, as a timed sequence instead of four feature cards.
@@ -54,51 +57,97 @@ export function LandingFeatures() {
     /* Only a top border: the countdown section below shares this background, and a line between
        them would split what is meant to read as one block.
 
-       `id="features"` is the hero button's target. It lived on the section that is currently
-       commented out in `landing-page.tsx`; if that one comes back, one of the two has to give up
-       the anchor. */
-    <section id="features" className="border-t border-border bg-[#020912]">
-      <motion.div
-        className="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        variants={container}
-      >
-        <motion.div variants={item} className="max-w-2xl">
-          <p className="font-code text-xs uppercase tracking-[0.2em] text-primary">
-            Von Mitternacht zu Mitternacht
-          </p>
-          <h2 className="mt-4 font-heading text-2xl leading-tight sm:text-3xl">
-            EIN TAG AUF
-            <br />
-            DAILY CODING
-          </h2>
+       `id="features"` is the hero button's target, and stays here now that the button says
+       "SO LÄUFT EIN TAG". The section below used to hold it; two anchors of the same name would
+       leave the jump to document order. */
+    <section
+      id="features"
+      className="relative overflow-hidden border-t border-border bg-[#020912] pb-12"
+    >
+      {/*
+        As faint as the one behind the countdown, and wrapped around the table only: over the
+        artwork below it would compete with the picture. Same numbers there, so both black
+        sections move at the same rate.
+      */}
+      <div className="relative">
+        {/*
+          One bloom, on the side the grey section below does not start on, and inside the table
+          block rather than the section: over the artwork it would wash out the night sky, which
+          is why it was taken out here in the first place.
+
+          Lime instead of the component's violet, and thinner still: the primary is a far brighter
+          colour than chart-5, and on `#020912` a haze reads much more readily than it does on the
+          grey `bg-card/50`. The violet stays with the grey section in between.
+        */}
+        {/* <AmbientGlow side="left" className="bg-primary/8" /> */}
+        <FlickeringGrid
+          className="absolute inset-0 z-0 mask-[radial-gradient(700px_260px_at_center,white,transparent)]"
+          squareSize={6}
+          gridGap={1}
+          color="#C4FE4D"
+          maxOpacity={0.06}
+          flickerChance={0.03}
+        />
+        <motion.div
+          className="relative mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={container}
+        >
+          <motion.div variants={item} className="max-w-2xl">
+            <p className="font-code text-xs uppercase tracking-[0.2em] text-primary">
+              Von Mitternacht zu Mitternacht
+            </p>
+            <h2 className="mt-4 font-heading text-2xl leading-tight sm:text-3xl">
+              EIN TAG AUF
+              <br />
+              DAILY CODING
+            </h2>
+          </motion.div>
+
+          <div className="mt-14 border-t border-border">
+            {DAY.map((step) => (
+              <motion.div
+                key={step.what}
+                variants={item}
+                className="grid grid-cols-1 gap-2 border-b border-border py-6 sm:grid-cols-[9rem_1fr] sm:gap-8"
+              >
+                <span className="font-code text-sm text-primary sm:pt-1">
+                  {step.when}
+                </span>
+                <div className="sm:flex sm:items-baseline sm:gap-6">
+                  <h3 className="font-heading text-base sm:w-40 sm:shrink-0">
+                    {step.what}
+                  </h3>
+                  <p className="mt-2 text-lg text-muted-foreground sm:mt-0">
+                    {step.detail}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
+      </div>
 
-        <div className="mt-14 border-t border-border">
-          {DAY.map((step) => (
-            <motion.div
-              key={step.what}
-              variants={item}
-              className="grid grid-cols-1 gap-2 border-b border-border py-6 sm:grid-cols-[9rem_1fr] sm:gap-8"
-            >
-              <span className="font-code text-sm text-primary sm:pt-1">
-                {step.when}
-              </span>
-              <div className="sm:flex sm:items-baseline sm:gap-6">
-                <h3 className="font-heading text-base sm:w-40 sm:shrink-0">
-                  {step.what}
-                </h3>
-                <p className="mt-2 text-lg text-muted-foreground sm:mt-0">
-                  {step.detail}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+      {/*
+        Hidden for now, kept for later. It closed the section rather than heading it: the table
+        walks from 00:00 to 23:59, so the picture was the moment right after the last row.
+        Full-bleed, outside the container, so the section edge is the edge of the picture.
 
+        No fade needed, the top pixel row of the artwork is #020912, the section's own colour.
+        The height is 648 and not the 724 of the other banner; a wrong ratio reserves the wrong
+        height and the section jumps once the file has loaded.
+
+        <Image
+          src="/pixel/banner6.webp"
+          alt="Nachtszene als Pixelgrafik: links eine Werkstatt mit grün leuchtendem Fenster, in der Mitte ein kahler Baum auf einem Hügel, rechts ein Uhrturm vor dem Vollmond, dessen Zeiger auf Mitternacht stehen"
+          width={2172}
+          height={648}
+          sizes="100vw"
+          className="block h-auto w-full [image-rendering:pixelated]"
+        />
+      */}
     </section>
   );
 }

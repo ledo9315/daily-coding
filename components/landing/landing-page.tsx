@@ -2,10 +2,10 @@ import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingHero } from "@/components/landing/hero";
 import { LandingCTA } from "@/components/landing/cta";
 import { LandingFooter } from "@/components/landing/footer";
+import { AmbientGlow } from "@/components/landing/ambient-glow";
 import { LandingFeatures } from "@/components/landing/features";
-// Temporarily out with the section below: import { AmbientGlow } from "@/components/landing/ambient-glow";
-// Temporarily out with the section below: import { LandingRoutine } from "@/components/landing/routine";
-// Temporarily out with the section below: import { LandingCodeDemo } from "@/components/landing/code-demo";
+import { LandingRoutine } from "@/components/landing/routine";
+import { LandingCodeDemo } from "@/components/landing/code-demo";
 
 /**
  * The page a visitor without a session sees on `/`.
@@ -27,21 +27,23 @@ export function LandingPage({
         <LandingHero todaysChallengeTitle={todaysChallengeTitle} />
         <LandingFeatures />
         {/*
-          Hidden for a look at the page without it, not deleted. Both blocks live in one section
-          because each one of its own needed `overflow-hidden` and cut the ambient bloom at the
-          boundary, a visible seam between two blocks that share the same background anyway. Two
-          blooms at different heights, as in the hero, because the merged block is tall.
+          The grey block between two black ones: day timeline `#020912`, this on `bg-card/50`,
+          countdown `#020912` again. The alternation is what separates them, so this section
+          carries borders on both edges and the two around it need none.
 
-          While this is out, `id="features"` sits on the day timeline instead, so the hero button
-          has a target. Bringing this back means taking the anchor off one of the two.
+          Both blocks live in one section because each one of its own needed `overflow-hidden`
+          and cut the ambient bloom at the boundary, a visible seam between two blocks sharing a
+          background. Two blooms at different heights, as in the hero, because the block is tall.
 
-          <section id="features" className="relative overflow-hidden bg-card/50">
-            <AmbientGlow side="right" className="top-[22%]" />
-            <AmbientGlow side="left" className="top-[62%]" />
-            <LandingRoutine />
-            <LandingCodeDemo />
-          </section>
+          No `id="features"` here: the anchor sits on the day timeline, which is what the hero
+          button now promises.
         */}
+        <section className="relative overflow-hidden border-y border-border bg-card/50">
+          <AmbientGlow side="right" className="top-[22%]" />
+          <AmbientGlow side="left" className="top-[62%]" />
+          <LandingRoutine />
+          <LandingCodeDemo />
+        </section>
         <LandingCTA />
       </main>
       <LandingFooter />

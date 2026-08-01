@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
+// Hidden with the bloom below: import { AmbientGlow } from "@/components/landing/ambient-glow";
 
 /**
  * Closes with the running clock, and nothing else.
@@ -28,28 +29,18 @@ export function LandingCTA() {
         section far taller, and anything centred in it would sit in the middle of the picture.
       */}
       <div className="relative">
-        {/*
-          Same component, same mask and the same violet as the hero: the page opens and closes on
-          the same note, with the lime sections in between. Purely decorative, below the content.
+        {/* Mirrored the day timeline's bloom: lime, other side, same low opacity. Inside the
+            clock block, so it could not reach the artwork below.
 
-          No scanline layer here. `scanlines` came with `bg-primary/5`, a flat lime wash over the
-          whole block, and since the block does not span the section it ended in a visible bright
-          rectangle against the identical background above it. The grid carries the texture.
+            <AmbientGlow side="right" className="bg-primary/8" />
         */}
         <FlickeringGrid
-          /*
-            An ellipse, not the hero's circle: the clock block is ~620px tall, so a 500px circle
-            still had a quarter of its alpha left at the top edge and the grid ended in a straight
-            cut along the border. 260px vertical radius fades out inside it.
-          */
           className="absolute inset-0 z-0 mask-[radial-gradient(700px_260px_at_center,white,transparent)]"
           squareSize={6}
           gridGap={1}
-          color="#A371F7"
-          /* Violet sits darker on #020912 than the lime did, so it needs a touch more opacity
-             to read at all. */
-          maxOpacity={0.2}
-          flickerChance={0.08}
+          color="#C4FE4D"
+          maxOpacity={0.06}
+          flickerChance={0.03}
         />
 
         <motion.div
