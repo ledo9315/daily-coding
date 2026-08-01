@@ -8,7 +8,7 @@ import { findOrCreateOAuthUser, findOAuthUserByAccount } from "@/lib/server/oaut
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  debug: process.env.NODE_ENV !== "production",
+  debug: process.env.AUTH_DEBUG === "true",
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days max; per-user exp set in jwt callback
@@ -21,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         rememberMe: { label: "Angemeldet bleiben", type: "text" },
         verificationToken: { label: "Verifizierungstoken", type: "text" },
       },
-      authorize: authorizeCredentials,
+      authorize: (credentials, request) => authorizeCredentials(credentials, request),
     }),
     ...(process.env.GITHUB_CLIENT_ID
       ? [

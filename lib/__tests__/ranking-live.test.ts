@@ -47,6 +47,7 @@ describe("getLiveRanking — week/month", () => {
         userId: "u1",
         challengeId: "ch1",
         status: "completed",
+        createdAt: d1,
         user: user("u1", "One"),
         challenge: { id: "ch1", points: 100, date: d1 },
       },
@@ -54,6 +55,7 @@ describe("getLiveRanking — week/month", () => {
         userId: "u1",
         challengeId: "ch2",
         status: "completed",
+        createdAt: d2,
         user: user("u1", "One"),
         challenge: { id: "ch2", points: 100, date: d2 },
       },
@@ -61,6 +63,7 @@ describe("getLiveRanking — week/month", () => {
         userId: "u2",
         challengeId: "ch1",
         status: "completed",
+        createdAt: d1,
         user: user("u2", "Two"),
         challenge: { id: "ch1", points: 100, date: d1 },
       },
@@ -73,5 +76,10 @@ describe("getLiveRanking — week/month", () => {
     expect(rows[0].points).toBe(200);
     expect(rows[1].userId).toBe("u2");
     expect(rows[1].challengesSolved).toBe(1);
+    expect(mockSubmissionFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ createdAt: { gte: expect.any(Date), lt: expect.any(Date) } }),
+      })
+    );
   });
 });

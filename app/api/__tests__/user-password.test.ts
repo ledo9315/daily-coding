@@ -43,7 +43,7 @@ function makeRequest(body: object) {
 describe("PATCH /api/user/password", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetSession.mockResolvedValue({ userId: "u-1", userEmail: null });
+    mockGetSession.mockResolvedValue({ userId: "u-1" });
     mockFindUnique.mockResolvedValue({ id: "u-1", passwordHash: "old-hash" } as never);
     mockCompare.mockResolvedValue(true as never);
     mockUpdate.mockResolvedValue({} as never);
