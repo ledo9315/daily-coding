@@ -125,10 +125,32 @@ model Challenge {
   /// Map language id -> starter template (JSON object).
   starterCodes Json @default("{}")
   isActive    Boolean      @default(false)
+  /// Place in the daily ring. Not unique: swapping two rows would collide mid-transaction,
+  /// and ties are broken by id anyway (`compareRingEntries`).
+  position    Int          @default(0)
+  /// @deprecated Superseded by `position`. The ring has no dates; kept for one release so the
+  /// old schedule can be read back if the rollout goes wrong.
   date        DateTime?    @unique
   submissions Submission[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+}
+
+/// Where the daily ring currently stands. Exactly one row, id "current".
+///
+/// Stored rather than computed: `dayNumber % poolSize` is part formula, part pool size, so it
+/// jumped every time a challenge was added or deactivated. With the position visible in the
+/// admin panel that jump would look like a bug. The row moves on the first request of a new UTC
+/// day, which is why no cron job is involved.
+model RotationState {
+  id          String   @id @default("current")
+  /// The challenge that is live. Null only before the first advance.
+  challengeId String?
+  /// Position of that challenge, so the ring can continue at the right gap if it disappears.
+  position    Int      @default(0)
+  /// Start of the UTC day `challengeId` became live.
+  day         DateTime
+  updatedAt   DateTime @updatedAt
 }
 
 model Submission {

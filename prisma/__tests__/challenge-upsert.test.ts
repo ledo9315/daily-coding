@@ -44,6 +44,8 @@ describe("challengeUpsertArgs", () => {
     expect(update).not.toHaveProperty("isActive");
     expect(update).not.toHaveProperty("date");
     expect(update).not.toHaveProperty("id");
+    // The ring order is arranged by hand in the admin panel; a re-seed must not undo it.
+    expect(update).not.toHaveProperty("position");
   });
 
   it("creates the row from the payload unchanged", () => {
@@ -52,13 +54,14 @@ describe("challengeUpsertArgs", () => {
     expect(create).toEqual(binarySearch);
   });
 
-  it("clears the daily dates before handing them out again", () => {
-    // Without this the second re-seed on a later day dies on the unique `date`: the row that
-    // should take anchor-1 still holds anchor.
+  it("clears the deprecated dates and hands out ring positions instead", () => {
+    // `date` is unique and no longer drives the daily; leaving stale values around would only
+    // wait to collide with a future write.
     const reset = seed.indexOf("challenge.updateMany({ data: { date: null } })");
-    const firstAssignment = seed.indexOf("data: { date: anchor }");
+    const ring = seed.indexOf("const ringOrder = [");
     expect(reset).toBeGreaterThan(-1);
-    expect(reset).toBeLessThan(firstAssignment);
+    expect(ring).toBeGreaterThan(reset);
+    expect(seed).toContain("rotationState.upsert");
   });
 
   it("is the only way the seed writes a challenge", () => {

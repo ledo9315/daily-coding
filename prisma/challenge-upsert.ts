@@ -10,10 +10,17 @@ export type ChallengeSeed = Prisma.ChallengeUncheckedCreateInput & { id: string 
  * mechanical fields. Prose — title, description, hints, examples — sat in `create` alone, so a
  * re-seed left existing rows untouched and every challenge kept the text it was born with.
  *
- * `isActive` and `date` are deliberately not updated: those are set in the admin UI, and `date`
- * is unique, so writing it back against a fresh anchor would collide with a sibling row.
+ * `isActive`, `position` and `date` are deliberately not updated: those are operational state
+ * set in the admin UI. `position` in particular is the order of the daily ring — refreshing the
+ * prose of a challenge must not throw away a schedule someone arranged by hand.
  */
 export function challengeUpsertArgs(data: ChallengeSeed) {
-  const { id, isActive: _isActive, date: _date, ...refreshable } = data;
+  const {
+    id,
+    isActive: _isActive,
+    date: _date,
+    position: _position,
+    ...refreshable
+  } = data;
   return { where: { id }, create: data, update: refreshable };
 }
