@@ -2,10 +2,14 @@
 /**
  * Installs runtimes via GET /api/v2/packages + POST /api/v2/packages.
  * In pkgs/index the Node runtime is called "node", not "javascript" — using the
- * wrong name yields a 404 or an empty filter result.
+ * wrong name yields a 404 or an empty filter result, which is why the package name
+ * lives in the language registry rather than being guessed from the id.
  *
  * Env: PISTON_API_URL or PISTON_URL (defaults to http://127.0.0.1:2000)
  */
+import { LANGUAGE_LIST } from "../lib/challenge-languages";
+
+type PackageRow = { language: string; language_version: string; installed?: boolean };
 const origin = (
   process.env.PISTON_API_URL ||
   process.env.PISTON_URL ||
@@ -16,20 +20,19 @@ const origin = (
 const packagesUrl = `${origin}/api/v2/packages`;
 const runtimesUrl = `${origin}/api/v2/runtimes`;
 
-/** Our app language id -> the name used in Piston's pkgs/index (ppman) */
-const RUNTIME_INSTALL = [
-  { app: "javascript", pkg: "node" },
-  { app: "typescript", pkg: "typescript" },
-  { app: "python", pkg: "python" },
-  { app: "php", pkg: "php" },
-  { app: "java", pkg: "java" },
-  { app: "ruby", pkg: "ruby" },
-  { app: "go", pkg: "go" },
-];
+/*
+  Straight from the registry, so a new language cannot be added to the app and forgotten here.
+  This file used to keep its own copy of the mapping, which is how it ends up one entry behind.
+*/
+const RUNTIME_INSTALL = LANGUAGE_LIST.map((spec) => ({
+  app: spec.id,
+  pkg: spec.pistonPackage,
+  versionPrefix: spec.versionPrefix,
+}));
 
 /** Rough semver comparison — higher versions come first under an ascending sort */
-function compareSemverDesc(a, b) {
-  const core = (v) => v.split("-")[0].split("+")[0];
+function compareSemverDesc(a: string, b: string) {
+  const core = (v: string) => v.split("-")[0]!.split("+")[0]!;
   const pa = core(a)
     .split(".")
     .map((x) => parseInt(x, 10) || 0);
@@ -45,12 +48,11 @@ function compareSemverDesc(a, b) {
   return core(b).localeCompare(core(a));
 }
 
-function python3Only(rows) {
-  return rows.filter((p) => {
-    const v = String(p.language_version);
-    const major = parseInt(v.split(".")[0], 10);
-    return !Number.isNaN(major) && major >= 3;
-  });
+/** Piston keeps outdated majors around — Python 2, Ruby 2.5, TypeScript 4. */
+function matchingVersion(rows: PackageRow[], versionPrefix?: string) {
+  if (!versionPrefix) return rows;
+  const filtered = rows.filter((p) => String(p.language_version).startsWith(versionPrefix));
+  return filtered.length > 0 ? filtered : rows;
 }
 
 async function ensureReachable() {
@@ -71,18 +73,21 @@ async function fetchPackageList() {
       `Paketliste fehlgeschlagen: HTTP ${res.status}\n${t.slice(0, 300)}`
     );
   }
-  const list = await res.json();
+  const list = (await res.json()) as PackageRow[];
   if (!Array.isArray(list)) {
     throw new Error("Unerwartete Antwort von /api/v2/packages (kein Array)");
   }
   return list;
 }
 
-async function installOne({ app, pkg }, index) {
-  let rows = index.filter((p) => p && p.language === pkg);
-  if (pkg === "python") {
-    rows = python3Only(rows);
-  }
+async function installOne(
+  { app, pkg, versionPrefix }: (typeof RUNTIME_INSTALL)[number],
+  index: PackageRow[]
+) {
+  const rows = matchingVersion(
+    index.filter((p) => p && p.language === pkg),
+    versionPrefix
+  );
   if (!rows.length) {
     if (!index.length) {
       throw new Error(
@@ -93,15 +98,21 @@ async function installOne({ app, pkg }, index) {
       `Keine Pakete für „${pkg}“ im Index (App: ${app}). Netzwerk vom Container zu GitHub prüfen.`
     );
   }
-  const pending = rows.filter((p) => !p.installed);
-  if (!pending.length) {
-    console.log(`· ${app} (Paket ${pkg}, bereits installiert)`);
+  /*
+    Any matching version being present is enough. Filtering to the uninstalled ones and taking
+    the highest of *those* is how this script quietly added Python 3.10 next to an existing 3.12
+    and PHP 8.0 next to 8.2 — older runtimes that only make the version choice ambiguous.
+  */
+  if (rows.some((p) => p.installed)) {
+    const have = rows.find((p) => p.installed)!.language_version;
+    console.log(`· ${app} (Paket ${pkg} @ ${have}, bereits installiert)`);
     return;
   }
+  const pending = rows.filter((p) => !p.installed);
   pending.sort((a, b) =>
     compareSemverDesc(String(a.language_version), String(b.language_version))
   );
-  const version = String(pending[0].language_version);
+  const version = String(pending[0]!.language_version);
 
   const res = await fetch(packagesUrl, {
     method: "POST",
@@ -116,7 +127,7 @@ async function installOne({ app, pkg }, index) {
   }
   let msg = text;
   try {
-    const j = JSON.parse(text);
+    const j = JSON.parse(text) as { message?: unknown };
     if (typeof j.message === "string") msg = j.message;
   } catch {
     /* raw */
@@ -141,7 +152,7 @@ async function main() {
   console.log(`\nFertig. Runtimes: ${Array.isArray(list) ? list.length : 0}`);
 }
 
-main().catch((e) => {
+main().catch((e: unknown) => {
   console.error(e instanceof Error ? e.message : e);
   console.error(
     "\nTipp: docker compose up -d piston\n" +

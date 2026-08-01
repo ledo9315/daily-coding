@@ -51,6 +51,8 @@ enum CodeLanguage {
   java
   ruby
   go
+  cpp
+  csharp
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import type { CodeLanguageId } from "@/lib/challenge-languages";
+import { LANGUAGES, pistonLanguageName, type CodeLanguageId } from "@/lib/challenge-languages";
 
 /** Locally: docker compose serves Piston on port 2000. The public EMKC API is whitelist-only, so it is no longer the default. */
 const DEFAULT_PISTON_ORIGIN = "http://127.0.0.1:2000";
@@ -20,21 +20,19 @@ type PistonExecuteBody = {
 };
 
 /**
- * Extra CPU budget for the compiled languages, in milliseconds — nothing for the rest.
+ * Extra CPU budget for the languages Piston compiles inside the run step — nothing for the rest.
  *
- * Piston compiles inside the run step, so the compiler's own cost counts against the program's
- * budget. javac plus JVM startup measured 2500-3100 ms and the Go toolchain about 1700 ms,
- * against Piston's 3000 ms default: submissions were killed with SIGKILL and no output at all.
- * The container must allow the higher ceiling too (PISTON_RUN_CPU_TIME in docker-compose.yml),
- * otherwise Piston answers HTTP 400.
+ * The compiler's own cost counts against the program's budget there. javac plus JVM startup
+ * measured 2500-3100 ms and the Go toolchain about 1700 ms, against Piston's 3000 ms default:
+ * submissions were killed with SIGKILL and no output at all. The container must allow the higher
+ * ceiling too (PISTON_RUN_CPU_TIME in docker-compose.yml), otherwise Piston answers HTTP 400.
  *
- * The interpreted languages send no limit at all rather than Piston's own default: a host
- * rejects any request above its configured ceiling, and a value that merely *equals* it would
- * make every submission depend on how that comparison is meant. Omitting the field keeps their
- * behaviour identical on every host.
+ * The rest send no limit at all rather than Piston's own default: a host rejects any request
+ * above its configured ceiling, and a value that merely *equals* it would make every submission
+ * depend on how that comparison is meant. Omitting the field keeps them identical on every host.
  */
 function runBudgetMs(language: CodeLanguageId): number | undefined {
-  return language === "java" || language === "go" ? 15_000 : undefined;
+  return LANGUAGES[language].compiledInRunStep ? 15_000 : undefined;
 }
 
 type PistonExecuteResponse = {
@@ -103,92 +101,63 @@ export function clearPistonRuntimeCache(): void {
   runtimeCache.clear();
 }
 
+function compareVersionsDesc(a: string, b: string): number {
+  const pa = a.split(".").map((x) => parseInt(x, 10) || 0);
+  const pb = b.split(".").map((x) => parseInt(x, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pb[i] ?? 0) - (pa[i] ?? 0);
+    if (d !== 0) return d;
+  }
+  return 0;
+}
+
 function pickVersion(
   runtimes: PistonRuntimeInfo[],
   language: CodeLanguageId
 ): PistonRuntimeInfo {
+  /*
+    Node ships twice in Piston, under the same language name and two runtimes; the others differ
+    only by version, and Piston keeps the outdated ones around — Ruby 2.5 next to 3.0, TypeScript
+    4.2 next to 5.0. Picking the first match would be a coin flip.
+  */
+  const name = pistonLanguageName(language);
   if (language === "javascript") {
-    const node = runtimes.find(
-      (r) => r.language === "javascript" && r.runtime === "node"
-    );
+    const node = runtimes.find((r) => r.language === name && r.runtime === "node");
     if (node) return node;
   }
-  if (language === "typescript") {
-    const ts5 = runtimes.find(
-      (r) => r.language === "typescript" && r.version.startsWith("5.")
-    );
-    if (ts5) return ts5;
+  const prefix = LANGUAGES[language].versionPrefix;
+  const candidates = runtimes
+    .filter((r) => r.language === name && (!prefix || r.version.startsWith(prefix)))
+    .sort((a, b) => compareVersionsDesc(a.version, b.version));
+
+  // The newest matching one, not the first: a host can carry Python 3.10 and 3.12 side by side.
+  const best = candidates[0] ?? runtimes.find((r) => r.language === name);
+  if (!best) {
+    throw new Error(`Piston: no runtime for ${name}`);
   }
-  if (language === "python") {
-    const py = runtimes.find(
-      (r) => r.language === "python" && !r.language.includes("2")
-    );
-    if (py) return py;
-  }
-  if (language === "php") {
-    const ph = runtimes.find((r) => r.language === "php");
-    if (ph) return ph;
-  }
-  if (language === "java") {
-    const jv = runtimes.find((r) => r.language === "java");
-    if (jv) return jv;
-  }
-  if (language === "ruby") {
-    // Piston also ships Ruby 2.5, which is missing plenty the challenges may use.
-    const rb = runtimes.find((r) => r.language === "ruby" && r.version.startsWith("3."));
-    if (rb) return rb;
-  }
-  const fallback = runtimes.find((r) => r.language === language);
-  if (!fallback) {
-    throw new Error(`Piston: no runtime for ${language}`);
-  }
-  return fallback;
+  return best;
 }
 
 function fileForLanguage(language: CodeLanguageId, code: string) {
-  switch (language) {
-    case "typescript":
-      return { name: "main.ts", content: code };
-    case "python":
-      return { name: "main.py", content: code };
-    case "php":
-      return { name: "main.php", content: code };
-    /*
-      No extension on purpose. Piston appends `.java` itself, so a file called `Main.java` is
-      compiled as `Main.java.java` and every error message names a file the user never saw —
-      the same trap as `main.ts.ts`. Handing over `Main` yields plain `Main.java:12: error: …`.
-    */
-    case "java":
-      return { name: "Main", content: code };
-    case "ruby":
-      return { name: "main.rb", content: code };
-    /* Same reason as Java: Piston appends `.go`, so `main.go` would be compiled as main.go.go. */
-    case "go":
-      return { name: "main", content: code };
-    default:
-      return { name: "main.js", content: code };
-  }
+  return { name: LANGUAGES[language].pistonFile, content: code };
 }
 
 /**
- * Java has no compile stage in Piston: javac runs inside the run step, so a rejected program
- * comes back as exit 1 with an empty stdout and `error: compilation failed` on stderr. Without
- * this the caller would treat a compiler message as the program's output and run it once per
- * test case.
+ * Java and Go have no compile stage in Piston — the compiler runs inside the run step, so a
+ * rejected program looks like a failed run. Without this the caller would treat a compiler
+ * message as the program's output and run the same broken program once per test case.
+ *
+ * Empty stdout is the shared half of the test: a program that printed something has run, whatever
+ * it said afterwards. The language-specific half is the pattern in the registry.
  */
-function javaCompileFailure(stderr: string, stdout: string): boolean {
-  return stdout.trim().length === 0 && /^error: compilation failed$/mu.test(stderr);
-}
-
-/**
- * Go has no compile stage either, and unlike Java it exits 2 for both a rejected build and a
- * runtime panic. The build is told apart by its own output: `# command-line-arguments` heads the
- * error list, and each line points at ./main.go with a line and column. A panic writes
- * "panic: …" and a goroutine dump instead.
- */
-function goCompileFailure(stderr: string, stdout: string): boolean {
-  if (stdout.trim().length > 0) return false;
-  return /^# command-line-arguments$/mu.test(stderr) || /^\.\/main\.go:\d+:\d+:/mu.test(stderr);
+function compileFailedInRunStep(
+  language: CodeLanguageId,
+  stderr: string,
+  stdout: string
+): boolean {
+  const pattern = LANGUAGES[language].compileFailure;
+  if (!pattern) return false;
+  return stdout.trim().length === 0 && pattern.test(stderr);
 }
 
 export type PistonRunResult = {
@@ -281,10 +250,7 @@ export async function executeWithPiston(
 
   const compileFail =
     (data.compile && data.compile.code !== 0) ||
-    (runFail &&
-      (language === "java"
-        ? javaCompileFailure(stderrRun, stdout)
-        : language === "go" && goCompileFailure(stderrRun, stdout)));
+    (runFail && compileFailedInRunStep(language, stderrRun, stdout));
   const compileStderr = data.compile?.stderr ?? "";
   const compileOut = data.compile?.stdout ?? "";
 
@@ -303,11 +269,11 @@ export async function executeWithPiston(
     compileStderr,
     compileFailed: Boolean(compileFail),
     /*
-      Java and Go compile inside the run step, so their message lives in stderrRun — the joined
+      When the compiler ran inside the run step its message lives in stderrRun — the joined
       `stderr` above would hand the caller a block labelled "Run:" for a compile error.
     */
     compileOutput:
-      compileFail && (language === "java" || language === "go")
+      compileFail && LANGUAGES[language].compiledInRunStep
         ? stderrRun.trim()
         : [compileOut, compileStderr].filter(Boolean).join("\n").trim(),
     durationMs,
