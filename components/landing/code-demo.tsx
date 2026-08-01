@@ -322,7 +322,7 @@ export function LandingCodeDemo() {
               */}
               <TerminalAnimationContainer className="max-w-xl px-0 pt-0 md:pt-0">
                 <TerminalAnimationWindow
-                  className="h-[22rem] rounded-xl border border-border shadow-2xl"
+                  className="h-[24rem] rounded-xl border border-border shadow-2xl"
                   minHeight="0"
                 >
                   {/*
