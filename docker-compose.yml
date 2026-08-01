@@ -7,6 +7,14 @@ services:
     container_name: daily-dev-piston
     restart: unless-stopped
     privileged: true
+    environment:
+      # Piston's default ceiling is 3000 ms of CPU per run, and javac plus JVM startup alone burn
+      # roughly 2500-3100 ms — Java submissions were killed with SIGKILL and an empty output at
+      # random. These two values are the *upper bound* a request may ask for, not the default
+      # every program gets: piston-runner.ts sends 3000 ms for the interpreted languages and the
+      # full budget only for Java.
+      PISTON_RUN_TIMEOUT: "15000"
+      PISTON_RUN_CPU_TIME: "15000"
     ports:
       - "2000:2000"
     volumes:

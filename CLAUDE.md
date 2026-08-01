@@ -79,7 +79,24 @@ Challenges run user code via a **self-hosted Piston** container (port 2000). Flo
 3. `lib/server/piston-runner.ts` handles HTTP calls to Piston (`PISTON_API_URL` env var, defaults to `http://127.0.0.1:2000`)
 4. When `CODE_EXECUTION_ENABLED` env is not `true`, stub results are returned (`challenge-run-stub.ts`)
 
-Supported languages: `javascript`, `typescript`, `python`, `php` (matches `CodeLanguage` Prisma enum).
+Supported languages: `javascript`, `typescript`, `python`, `php`, `java` (matches `CodeLanguage` Prisma enum).
+
+Java differs from the other four in three ways worth knowing before touching the harness:
+
+- It has **no `data` without a type**, and Piston's image ships no JSON library. The harness
+  therefore bakes the test input into the program as typed literals (`buildJavaArguments`)
+  instead of reading stdin — so `buildWrappedProgram` needs the input and is called once per
+  test case, not once per submission.
+- Piston runs **javac inside the run step**, so a compile error arrives as exit 1 with
+  `error: compilation failed` on stderr rather than in a `compile` block.
+- javac plus JVM startup burn about 2.5–3 s of CPU, over Piston's 3000 ms default. The
+  container's ceiling is raised in `docker-compose.yml`; `piston-runner.ts` asks for the
+  larger budget for Java only. **A Piston host without those env vars kills every Java
+  submission with SIGKILL and an empty output.**
+
+Java is opt-in per challenge: no `callableByLanguage.java` means the language is left out of
+`supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one array) and
+Binary Tree Traversal (recursive structure) are the two seeded challenges without it.
 
 ### Authentication
 
