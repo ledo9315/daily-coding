@@ -90,6 +90,7 @@ describe("findOrCreateOAuthUser", () => {
       id: "u-1",
       role: "user",
       avatar: "/user/chibi1.png",
+      emailVerified: true,
     });
     mockAccountCreate.mockResolvedValueOnce({});
 
@@ -103,6 +104,23 @@ describe("findOrCreateOAuthUser", () => {
 
     expect(result.avatar).toBe("/user/chibi1.png");
     expect(mockUserCreate).not.toHaveBeenCalled();
+  });
+
+  it("does not auto-link an OAuth identity to an unverified password account", async () => {
+    mockUserFindUnique.mockResolvedValueOnce({
+      id: "u-unverified",
+      role: "user",
+      avatar: "/user/chibi1.png",
+      emailVerified: false,
+    });
+
+    await expect(
+      findOrCreateOAuthUser(
+        { email: "victim@example.com", name: "Victim" },
+        account
+      )
+    ).rejects.toThrow(/unverified email account/);
+    expect(mockAccountCreate).not.toHaveBeenCalled();
   });
 });
 

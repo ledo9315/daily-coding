@@ -39,4 +39,10 @@ describe("LandingHero", () => {
     const html = renderToStaticMarkup(<LandingHero todaysChallengeTitle="Two Sum" />);
     expect(html).toContain("Eine Aufgabe am Tag");
   });
+
+  it("loads the above-the-fold dashboard image eagerly", () => {
+    const html = renderToStaticMarkup(<LandingHero todaysChallengeTitle="Two Sum" />);
+
+    expect(html).toContain('fetchPriority="high"');
+  });
 });

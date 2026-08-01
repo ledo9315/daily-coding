@@ -16,7 +16,7 @@ export const SITE_URL = "https://daily-coding.de";
 export const SITEMAP_PATHS = ["/", "/impressum", "/datenschutz"] as const;
 
 /**
- * Behind the login. Kept in step with `PROTECTED_PATHS` in `middleware.ts` plus the API
+ * Behind the login. Kept in step with `PROTECTED_PATHS` in `proxy.ts` plus the API
  * and the admin area; a crawler following these only ever reaches the login form.
  */
 export const PRIVATE_PATHS = [

@@ -1,18 +1,42 @@
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
+import { createHash } from "node:crypto";
+import { prisma } from "@/lib/prisma";
+
+function keyHash(key: string): string {
+  return createHash("sha256").update(key).digest("hex");
 }
 
-const store = new Map<string, RateLimitEntry>();
+/**
+ * Fixed-window limiter backed by Postgres. The conditional increment is atomic, so separate
+ * Vercel instances share the same limit and concurrent requests cannot all pass.
+ */
+export async function checkRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+  now: Date = new Date()
+): Promise<boolean> {
+  const hashedKey = keyHash(key);
+  const resetAt = new Date(now.getTime() + windowMs);
 
-export function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
-  const now = Date.now();
-  const entry = store.get(key);
-  if (!entry || now > entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (entry.count >= limit) return false;
-  entry.count++;
-  return true;
+  await prisma.rateLimitBucket.upsert({
+    where: { key: hashedKey },
+    create: { key: hashedKey, count: 0, resetAt },
+    update: {},
+  });
+
+  await prisma.rateLimitBucket.updateMany({
+    where: { key: hashedKey, resetAt: { lte: now } },
+    data: { count: 0, resetAt },
+  });
+
+  const incremented = await prisma.rateLimitBucket.updateMany({
+    where: {
+      key: hashedKey,
+      resetAt: { gt: now },
+      count: { lt: limit },
+    },
+    data: { count: { increment: 1 } },
+  });
+
+  return incremented.count === 1;
 }

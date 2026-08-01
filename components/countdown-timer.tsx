@@ -74,7 +74,10 @@ export function CountdownTimer({
 function TimeBlock({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <span className="text-2xl font-bold tabular-nums leading-none">
+      <span
+        className="text-2xl font-bold tabular-nums leading-none"
+        suppressHydrationWarning
+      >
         {value}
       </span>
       <span className="text-xs text-muted-foreground">{label}</span>
@@ -89,7 +92,10 @@ function TimeBlock({ value, label }: { value: string; label: string }) {
 function TimePlate({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center gap-3">
-      <span className="rounded-lg border border-border bg-card/80 px-4 py-3 font-heading text-3xl leading-none tabular-nums text-foreground shadow-lg backdrop-blur-sm sm:px-6 sm:py-5 sm:text-5xl">
+      <span
+        className="rounded-lg border border-border bg-card/80 px-4 py-3 font-heading text-3xl leading-none tabular-nums text-foreground shadow-lg backdrop-blur-sm sm:px-6 sm:py-5 sm:text-5xl"
+        suppressHydrationWarning
+      >
         {value}
       </span>
       <span className="font-code text-xs uppercase tracking-[0.2em] text-muted-foreground">

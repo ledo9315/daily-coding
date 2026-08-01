@@ -41,12 +41,11 @@ export default async function DashboardPage() {
     return <LandingPage todaysChallengeTitle={daily?.title ?? null} />;
   }
   const userId = session.user.id;
-  const userEmail = session.user.email ?? null;
 
   const [rankingPreview, todayChallenge, userStats] = await Promise.all([
     getDashboardRankingPreviewData(),
     getTodayChallengeSummary(userId),
-    getUserStatsData(userId, userEmail),
+    getUserStatsData(userId),
   ]);
   if (!userStats) {
     redirect("/api/auth/signout?callbackUrl=/login");

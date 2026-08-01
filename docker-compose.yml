@@ -21,7 +21,7 @@ services:
       # signal 6" while compile errors came back normally, which is a confusing way to learn it.
       PISTON_MAX_PROCESS_COUNT: "256"
     ports:
-      - "2000:2000"
+      - "127.0.0.1:2000:2000"
     volumes:
       - piston_packages:/piston/packages
     tmpfs:
@@ -38,7 +38,7 @@ services:
       POSTGRES_USER: daily_dev
       POSTGRES_PASSWORD: daily_dev_secret
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - daily_dev_pgdata:/var/lib/postgresql/data
 

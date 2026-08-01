@@ -29,7 +29,10 @@ function makeRequest(body: object) {
   });
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockCheckRateLimit.mockResolvedValue(true);
+});
 
 describe("POST /api/auth/forgot-password", () => {
   it("returns 400 for missing email", async () => {
@@ -38,13 +41,12 @@ describe("POST /api/auth/forgot-password", () => {
   });
 
   it("returns 429 when rate limit exceeded", async () => {
-    mockCheckRateLimit.mockReturnValueOnce(false);
+    mockCheckRateLimit.mockResolvedValueOnce(false);
     const res = await POST(makeRequest({ email: "a@b.de" }));
     expect(res.status).toBe(429);
   });
 
   it("returns 200 even when user is not found (no enumeration)", async () => {
-    mockCheckRateLimit.mockReturnValueOnce(true);
     mockFindUnique.mockResolvedValueOnce(null);
     const res = await POST(makeRequest({ email: "nobody@b.de" }));
     expect(res.status).toBe(200);
@@ -52,7 +54,6 @@ describe("POST /api/auth/forgot-password", () => {
   });
 
   it("sends reset email when user exists", async () => {
-    mockCheckRateLimit.mockReturnValueOnce(true);
     mockFindUnique.mockResolvedValueOnce({ id: "u1", email: "a@b.de" });
     mockCreatePasswordResetToken.mockResolvedValueOnce("resettoken");
     mockSendPasswordResetEmail.mockResolvedValueOnce(undefined);

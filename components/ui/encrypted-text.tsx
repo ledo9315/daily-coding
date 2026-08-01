@@ -32,6 +32,28 @@ function generateRandomCharacter(charset: string): string {
   return charset.charAt(index);
 }
 
+/** Stable first frame: SSR and hydration must render the exact same glyphs. */
+function generateDeterministicCharacter(
+  originalCharacter: string,
+  index: number,
+  charset: string,
+): string {
+  if (!charset) return "";
+  const codePoint = originalCharacter.codePointAt(0) ?? 0;
+  return charset.charAt((codePoint + index * 31) % charset.length);
+}
+
+function generateInitialGibberish(original: string, charset: string): string {
+  return original
+    .split("")
+    .map((character, index) =>
+      character === " "
+        ? " "
+        : generateDeterministicCharacter(character, index, charset),
+    )
+    .join("");
+}
+
 function generateGibberishPreservingSpaces(
   original: string,
   charset: string,
@@ -62,7 +84,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   const startTimeRef = useRef<number>(0);
   const lastFlipTimeRef = useRef<number>(0);
   const scrambleCharsRef = useRef<string[]>(
-    text ? generateGibberishPreservingSpaces(text, charset).split("") : [],
+    text ? generateInitialGibberish(text, charset).split("") : [],
   );
 
   useEffect(() => {
@@ -140,7 +162,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
           : char === " "
             ? " "
             : (scrambleCharsRef.current[index] ??
-              generateRandomCharacter(charset));
+              generateDeterministicCharacter(char, index, charset));
 
         return (
           <span

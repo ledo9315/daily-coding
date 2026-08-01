@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockFindUnique = vi.fn();
 const mockCompare = vi.fn();
 const mockVerifyEmailToken = vi.fn();
+const mockCheckRateLimit = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -22,10 +23,15 @@ vi.mock("@/lib/server/auth-service", () => ({
   verifyEmailToken: (...args: unknown[]) => mockVerifyEmailToken(...args),
 }));
 
+vi.mock("@/lib/server/rate-limiter", () => ({
+  checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
+}));
+
 import { authorizeCredentials } from "@/lib/auth-credentials";
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockCheckRateLimit.mockResolvedValue(true);
 });
 
 describe("authorizeCredentials", () => {
@@ -60,6 +66,18 @@ describe("authorizeCredentials", () => {
     expect(mockFindUnique).toHaveBeenCalledWith({
       where: { email: "nope@example.com" },
     });
+  });
+
+  it("normalises email before login lookup and rate limiting", async () => {
+    mockFindUnique.mockResolvedValueOnce(null);
+    await authorizeCredentials({ email: " Max@Example.COM ", password: "secret1234" });
+
+    expect(mockCheckRateLimit).toHaveBeenCalledWith(
+      "login:max@example.com",
+      10,
+      15 * 60 * 1000
+    );
+    expect(mockFindUnique).toHaveBeenCalledWith({ where: { email: "max@example.com" } });
   });
 
   it("returns null when user has no passwordHash", async () => {
