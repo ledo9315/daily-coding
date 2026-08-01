@@ -59,6 +59,7 @@ export default function ChallengePage() {
     "none" | "success" | "failed" | "pending"
   >("none");
   const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const [compileError, setCompileError] = useState<string | null>(null);
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
   const [testRunCount, setTestRunCount] = useState(0);
   const [celebrationOpen, setCelebrationOpen] = useState(false);
@@ -144,8 +145,13 @@ export default function ChallengePage() {
       runTests(challenge!.id, code, lang),
     onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
+      setCompileError(result.compileError ?? null);
       setTestRunCount((c) => c + 1);
-      if (result.runtimeOk === false) {
+      if (result.compileError) {
+        toast.error("Kompilieren fehlgeschlagen", {
+          description: "Der Code wurde nicht ausgeführt.",
+        });
+      } else if (result.runtimeOk === false) {
         toast.message("Tests ausgeführt", {
           description: "Mindestens ein Test ist fehlgeschlagen.",
         });
@@ -163,6 +169,7 @@ export default function ChallengePage() {
       submitSolution(challenge!.id, code, lang),
     onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
+      setCompileError(result.compileError ?? null);
       setSubmittedAtLabel(
         new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
       );
@@ -433,6 +440,20 @@ export default function ChallengePage() {
                   ? "Wird gesendet…"
                   : "Final abgeben"}
             </Button>
+
+            {compileError ? (
+              <div className="border-2 border-destructive/60 bg-destructive/10 p-4">
+                <p className="font-sans text-sm uppercase tracking-wide text-destructive">
+                  Kompilieren fehlgeschlagen
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Der Code wurde nicht ausgeführt, es gibt daher kein Testergebnis.
+                </p>
+                <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap font-code text-xs text-destructive">
+                  {compileError}
+                </pre>
+              </div>
+            ) : null}
 
             <TestResults testCases={testCases} />
           </div>

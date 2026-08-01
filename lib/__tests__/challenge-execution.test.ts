@@ -20,6 +20,8 @@ function pistonOk(stdout: string) {
     stdout,
     stderr: "",
     compileStderr: "",
+    compileFailed: false,
+    compileOutput: "",
     durationMs: 8,
   };
 }
@@ -31,7 +33,23 @@ function pistonFail(msg: string) {
     stdout: "",
     stderr: msg,
     compileStderr: "",
+    compileFailed: false,
+    compileOutput: "",
     durationMs: 3,
+  };
+}
+
+/** The compiler rejected the program: nothing ran, so there is no stdout to compare. */
+function pistonCompileError(msg: string) {
+  return {
+    ok: false,
+    exitCode: 2,
+    stdout: msg,
+    stderr: "",
+    compileStderr: "",
+    compileFailed: true,
+    compileOutput: msg,
+    durationMs: 2500,
   };
 }
 
@@ -133,5 +151,43 @@ describe("runChallengeTests (smoke, no IO)", () => {
     expect(runtimeOk).toBe(false);
     expect(testCases.every((t) => t.status !== "passed")).toBe(true);
     expect(testCases[0]?.actual).toContain("keine automatische Bewertung");
+  });
+});
+
+describe("Kompilierfehler", () => {
+  const ioChallenge = {
+    evaluationConfig: { callableByLanguage: { typescript: "solve" } },
+    testCases: [
+      { id: 1, name: "A", input: "[1]", expected: "[1]" },
+      { id: 2, name: "B", input: "[2]", expected: "[2]" },
+      { id: 3, name: "C", input: "[3]", expected: "[3]" },
+    ],
+  };
+
+  it("stops after the first case instead of compiling the same program five times", async () => {
+    mockExecute.mockResolvedValue(pistonCompileError("main.ts.ts(1,7): error TS2322: nope"));
+
+    const { runtimeOk, testCases, compileError } = await runChallengeTests(
+      ioChallenge,
+      "const x: number = 'nope';",
+      "typescript",
+      "run",
+    );
+
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    expect(runtimeOk).toBe(false);
+    expect(compileError).toContain("error TS2322");
+    // Nothing ran, so nothing may claim to have been tested.
+    expect(testCases.map((t) => t.status)).toEqual(["pending", "pending", "pending"]);
+    expect(testCases.every((t) => t.actual === undefined)).toBe(true);
+  });
+
+  it("renames Piston's main.ts.ts to the file the editor shows", async () => {
+    mockExecute.mockResolvedValue(pistonCompileError("main.ts.ts(1,7): error TS2322: nope"));
+
+    const { compileError } = await runChallengeTests(ioChallenge, "code", "typescript", "run");
+
+    expect(compileError).toContain("solution.ts(1,7)");
+    expect(compileError).not.toContain("main.ts");
   });
 });
