@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Anmelden",
   description:
-    "Melde dich bei Daily Coding an und löse die heutige Coding-Challenge in JavaScript, TypeScript, Python oder PHP.",
+    "Melde dich bei Daily Coding an und löse die heutige Coding-Challenge in deiner Programmiersprache.",
   alternates: { canonical: "/login" },
 };
 
