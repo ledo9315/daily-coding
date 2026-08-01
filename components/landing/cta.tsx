@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-// Hidden with the bloom below: import { AmbientGlow } from "@/components/landing/ambient-glow";
 
 /**
  * Closes with the running clock, and nothing else.
@@ -29,17 +28,13 @@ export function LandingCTA() {
         section far taller, and anything centred in it would sit in the middle of the picture.
       */}
       <div className="relative">
-        {/* Mirrored the day timeline's bloom: lime, other side, same low opacity. Inside the
-            clock block, so it could not reach the artwork below.
-
-            <AmbientGlow side="right" className="bg-primary/8" />
-        */}
+        {/* <AmbientGlow side="left" className="bg-primary/8" /> */}
         <FlickeringGrid
           className="absolute inset-0 z-0 mask-[radial-gradient(700px_260px_at_center,white,transparent)]"
           squareSize={6}
           gridGap={1}
           color="#C4FE4D"
-          maxOpacity={0.06}
+          maxOpacity={0.08}
           flickerChance={0.03}
         />
 
