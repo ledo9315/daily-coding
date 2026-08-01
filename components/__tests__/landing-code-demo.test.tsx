@@ -1,14 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LandingCodeDemo, terminalTabs } from "@/components/landing/code-demo";
-import { CODE_LANGUAGES, languageFileName } from "@/lib/challenge-languages";
+import { CODE_LANGUAGES, languageFileName, languageLabel } from "@/lib/challenge-languages";
 
 const html = renderToStaticMarkup(<LandingCodeDemo />);
 
 /** All lines of one tab as a single string, whitespace collapsed. */
-const bodyOf = (label: string) =>
+/** Looked up by language id; the tab itself is labelled for readers ("C++", not `cpp`). */
+const bodyOf = (language: (typeof CODE_LANGUAGES)[number]) =>
   terminalTabs
-    .find((tab) => tab.label === label)!
+    .find((tab) => tab.label === languageLabel(language))!
     .lines.map((line) => line.text)
     .join("\n");
 
@@ -24,8 +25,10 @@ describe("LandingCodeDemo", () => {
     // Derived from CODE_LANGUAGES, so adding a language to the app fails this until the
     // landing stops claiming a smaller set.
     for (const language of CODE_LANGUAGES) {
-      expect(html).toContain(`>${language}<`);
-      expect(terminalTabs.map((tab) => tab.label)).toContain(language);
+      // The label is what a reader sees: "C++", not the enum value `cpp`.
+      const label = languageLabel(language);
+      expect(html).toContain(`>${label}<`);
+      expect(terminalTabs.map((tab) => tab.label)).toContain(label);
     }
   });
 
@@ -52,7 +55,7 @@ describe("LandingCodeDemo", () => {
   it("names the entry point the harness really calls", () => {
     // snake_case for Python, camelCase for the rest — same as evaluationConfig in the seed.
     expect(bodyOf("python")).toContain("aufgerufen als binary_search()");
-    for (const language of ["javascript", "typescript", "php"]) {
+    for (const language of ["javascript", "typescript", "php"] as const) {
       expect(bodyOf(language)).toContain("aufgerufen als binarySearch()");
     }
   });
