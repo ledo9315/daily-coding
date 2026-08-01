@@ -79,24 +79,36 @@ Challenges run user code via a **self-hosted Piston** container (port 2000). Flo
 3. `lib/server/piston-runner.ts` handles HTTP calls to Piston (`PISTON_API_URL` env var, defaults to `http://127.0.0.1:2000`)
 4. When `CODE_EXECUTION_ENABLED` env is not `true`, stub results are returned (`challenge-run-stub.ts`)
 
-Supported languages: `javascript`, `typescript`, `python`, `php`, `java` (matches `CodeLanguage` Prisma enum).
+Supported languages: `javascript`, `typescript`, `python`, `php`, `ruby`, `java`, `go` (matches
+`CodeLanguage` Prisma enum). Ruby's harness is the Python one with `to_json` instead of
+`json.dumps` — deliberately not `JSON.generate`, which refuses a bare String or Integer at the
+top level, and half the challenges return exactly that.
 
-Java differs from the other four in three ways worth knowing before touching the harness:
+Java and Go are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
+turned into typed parameters (one per JSON key, in key order) and baked into the program as
+literals. Both differ from the interpreted languages in ways worth knowing before touching the
+harness:
 
-- It has **no `data` without a type**, and Piston's image ships no JSON library. The harness
-  therefore bakes the test input into the program as typed literals (`buildJavaArguments`)
-  instead of reading stdin — so `buildWrappedProgram` needs the input and is called once per
+- There is **no `data` without a type**, and Piston's images ship no JSON library for Java.
+  Hence the baked-in literals — so `buildWrappedProgram` needs the input and is called once per
   test case, not once per submission.
-- Piston runs **javac inside the run step**, so a compile error arrives as exit 1 with
-  `error: compilation failed` on stderr rather than in a `compile` block.
-- javac plus JVM startup burn about 2.5–3 s of CPU, over Piston's 3000 ms default. The
-  container's ceiling is raised in `docker-compose.yml`; `piston-runner.ts` asks for the
-  larger budget for Java only. **A Piston host without those env vars kills every Java
-  submission with SIGKILL and an empty output.**
+- Piston runs the **compiler inside the run step**. A Java compile error arrives as exit 1 with
+  `error: compilation failed`; Go exits 2 for both a rejected build and a panic, told apart by
+  `# command-line-arguments` and `./main.go:line:col`.
+- Both burn CPU before running a line — javac plus JVM startup 2.5–3 s, the Go toolchain about
+  1.7 s — over Piston's 3000 ms default. The ceiling is raised in `docker-compose.yml`;
+  `piston-runner.ts` asks for the larger budget for Java and Go only. **A Piston host without
+  those env vars kills every such submission with SIGKILL and an empty output.**
+- Go additionally needs `PISTON_MAX_PROCESS_COUNT` well above the default 64: its runtime starts
+  a thread per core and aborts with "Sandbox keeper received fatal signal 6" otherwise — while
+  compile errors keep coming back normally, which makes it look like a harness bug.
+- A Go solution **cannot add imports**; they live in the harness header, which therefore carries
+  strconv, strings, sort, math, fmt and unicode and consumes each with a blank assignment.
 
-Java is opt-in per challenge: no `callableByLanguage.java` means the language is left out of
-`supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one array) and
-Binary Tree Traversal (recursive structure) are the two seeded challenges without it.
+Java and Go are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
+out of `supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one
+array) and Binary Tree Traversal (recursive structure) are the two seeded challenges without
+them — Ruby covers both, since `data` there is just a value.
 
 ### Authentication
 

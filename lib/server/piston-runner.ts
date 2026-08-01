@@ -20,12 +20,13 @@ type PistonExecuteBody = {
 };
 
 /**
- * Extra CPU budget for Java, in milliseconds — nothing for the other languages.
+ * Extra CPU budget for the compiled languages, in milliseconds — nothing for the rest.
  *
- * javac plus JVM startup measured 2500-3100 ms on an empty program, right at Piston's 3000 ms
- * default, so submissions were killed at random with SIGKILL and no output at all. The container
- * must allow the higher ceiling too (PISTON_RUN_CPU_TIME in docker-compose.yml), otherwise
- * Piston answers HTTP 400.
+ * Piston compiles inside the run step, so the compiler's own cost counts against the program's
+ * budget. javac plus JVM startup measured 2500-3100 ms and the Go toolchain about 1700 ms,
+ * against Piston's 3000 ms default: submissions were killed with SIGKILL and no output at all.
+ * The container must allow the higher ceiling too (PISTON_RUN_CPU_TIME in docker-compose.yml),
+ * otherwise Piston answers HTTP 400.
  *
  * The interpreted languages send no limit at all rather than Piston's own default: a host
  * rejects any request above its configured ceiling, and a value that merely *equals* it would
@@ -33,7 +34,7 @@ type PistonExecuteBody = {
  * behaviour identical on every host.
  */
 function runBudgetMs(language: CodeLanguageId): number | undefined {
-  return language === "java" ? 15_000 : undefined;
+  return language === "java" || language === "go" ? 15_000 : undefined;
 }
 
 type PistonExecuteResponse = {
@@ -132,6 +133,11 @@ function pickVersion(
     const jv = runtimes.find((r) => r.language === "java");
     if (jv) return jv;
   }
+  if (language === "ruby") {
+    // Piston also ships Ruby 2.5, which is missing plenty the challenges may use.
+    const rb = runtimes.find((r) => r.language === "ruby" && r.version.startsWith("3."));
+    if (rb) return rb;
+  }
   const fallback = runtimes.find((r) => r.language === language);
   if (!fallback) {
     throw new Error(`Piston: no runtime for ${language}`);
@@ -154,6 +160,11 @@ function fileForLanguage(language: CodeLanguageId, code: string) {
     */
     case "java":
       return { name: "Main", content: code };
+    case "ruby":
+      return { name: "main.rb", content: code };
+    /* Same reason as Java: Piston appends `.go`, so `main.go` would be compiled as main.go.go. */
+    case "go":
+      return { name: "main", content: code };
     default:
       return { name: "main.js", content: code };
   }
@@ -167,6 +178,17 @@ function fileForLanguage(language: CodeLanguageId, code: string) {
  */
 function javaCompileFailure(stderr: string, stdout: string): boolean {
   return stdout.trim().length === 0 && /^error: compilation failed$/mu.test(stderr);
+}
+
+/**
+ * Go has no compile stage either, and unlike Java it exits 2 for both a rejected build and a
+ * runtime panic. The build is told apart by its own output: `# command-line-arguments` heads the
+ * error list, and each line points at ./main.go with a line and column. A panic writes
+ * "panic: …" and a goroutine dump instead.
+ */
+function goCompileFailure(stderr: string, stdout: string): boolean {
+  if (stdout.trim().length > 0) return false;
+  return /^# command-line-arguments$/mu.test(stderr) || /^\.\/main\.go:\d+:\d+:/mu.test(stderr);
 }
 
 export type PistonRunResult = {
@@ -259,7 +281,10 @@ export async function executeWithPiston(
 
   const compileFail =
     (data.compile && data.compile.code !== 0) ||
-    (language === "java" && runFail && javaCompileFailure(stderrRun, stdout));
+    (runFail &&
+      (language === "java"
+        ? javaCompileFailure(stderrRun, stdout)
+        : language === "go" && goCompileFailure(stderrRun, stdout)));
   const compileStderr = data.compile?.stderr ?? "";
   const compileOut = data.compile?.stdout ?? "";
 
@@ -277,10 +302,12 @@ export async function executeWithPiston(
     stderr: stderr || (compileFail ? compileStderr : stderrRun),
     compileStderr,
     compileFailed: Boolean(compileFail),
-    // Java's compiler writes into the run step, so its message lives in stderrRun — the joined
-    // `stderr` above would hand the caller a block labelled "Run:" for a compile error.
+    /*
+      Java and Go compile inside the run step, so their message lives in stderrRun — the joined
+      `stderr` above would hand the caller a block labelled "Run:" for a compile error.
+    */
     compileOutput:
-      language === "java" && compileFail
+      compileFail && (language === "java" || language === "go")
         ? stderrRun.trim()
         : [compileOut, compileStderr].filter(Boolean).join("\n").trim(),
     durationMs,

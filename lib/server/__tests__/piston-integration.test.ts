@@ -62,6 +62,34 @@ const SOLUTIONS: Record<CodeLanguageId, { code: string; callable: string }> = {
         best = max(best, cur)
     return best`,
   },
+  ruby: {
+    callable: "max_sub_array",
+    code: `def max_sub_array(nums)
+  best = cur = nums[0]
+  nums[1..].each do |n|
+    cur = [n, cur + n].max
+    best = [best, cur].max
+  end
+  best
+end`,
+  },
+  go: {
+    callable: "maxSubArray",
+    code: `func maxSubArray(nums []int) int {
+	best, cur := nums[0], nums[0]
+	for _, n := range nums[1:] {
+		if cur+n > n {
+			cur = cur + n
+		} else {
+			cur = n
+		}
+		if cur > best {
+			best = cur
+		}
+	}
+	return best
+}`,
+  },
   java: {
     callable: "maxSubArray",
     code: `static int maxSubArray(int[] nums) {
