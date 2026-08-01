@@ -213,8 +213,6 @@ export function LandingCodeDemo() {
               */}
               <TerminalAnimationContainer className="max-w-xl px-0 pt-0 md:pt-0">
                 <TerminalAnimationWindow
-                  /* Darker than the page and than `bg-card`, so the window reads as a screen. */
-                  backgroundColor="#020203"
                   className="h-[22rem] rounded-xl border border-border shadow-2xl"
                   minHeight="0"
                 >
