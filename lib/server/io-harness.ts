@@ -69,7 +69,17 @@ const result = ${callable}(data);
 process.stdout.write(JSON.stringify(result));
 `;
     case "typescript":
+      /*
+        Piston type-checks TypeScript before running it, and its image has no @types/node, so
+        the `require` and `process` the harness needs failed with TS2580 — every TypeScript
+        submission came back as 0/5 with a compiler error instead of a test result. Declaring
+        exactly the two members used is enough and keeps the user's own type errors reportable,
+        which `// @ts-nocheck` would swallow.
+      */
       return `${trimmed}
+
+declare function require(id: string): { readFileSync(fd: number, encoding: string): string };
+declare const process: { stdout: { write(text: string): void } };
 
 const fs = require('fs');
 const raw = fs.readFileSync(0, 'utf8').trim();
