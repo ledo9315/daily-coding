@@ -40,7 +40,7 @@ const MAILS: { subject: string; content: EmailContent }[] = [
     content: {
       heading: "Willkommen, Lisa Müller",
       lines: [
-        "Jeden Tag wartet eine neue Coding-Challenge auf dich — in JavaScript, TypeScript, Python oder PHP.",
+        "Jeden Tag wartet eine neue Coding-Challenge auf dich — in deiner Sprache.",
         "Löse sie, sammle Punkte und halte deine Serie am Leben.",
       ],
       action: { label: "Zur heutigen Challenge", url: `${APP}/challenge` },
