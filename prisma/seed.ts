@@ -22,11 +22,29 @@ function addUtcDays(d: Date, delta: number): Date {
   return x;
 }
 
-const databaseUrl = process.env.DATABASE_URL;
+/*
+  PROD_DATABASE_URL wins, and no .env file may touch it — same contract as
+  prisma.production.config.ts. The two loadEnv calls above run with override: true, so a
+  DATABASE_URL passed on the command line is silently replaced by whatever sits in .env.local:
+  the seed then reports success against the local database while the caller believes it wrote to
+  production. A separate name is the only thing those files cannot overwrite.
+*/
+const databaseUrl = process.env.PROD_DATABASE_URL?.trim() || process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error(
     "DATABASE_URL fehlt. Lege .env oder .env.local an (siehe .env.example)."
   );
+}
+if (process.env.PROD_DATABASE_URL?.trim()) {
+  // Host only: the URL carries credentials.
+  const host = (() => {
+    try {
+      return new URL(databaseUrl).host;
+    } catch {
+      return "(unlesbare URL)";
+    }
+  })();
+  console.log(`[seed] PROD_DATABASE_URL gesetzt, Ziel ist ${host}`);
 }
 const adapter = new PrismaPg({ connectionString: databaseUrl });
 const prisma = new PrismaClient({ adapter });
@@ -45,6 +63,18 @@ async function main() {
   // Demo data (users, rankings, submissions, default admin) only on a full seed.
   // For production set SEED_CONTENT_ONLY=true: categories, achievements, challenges only.
   const contentOnly = process.env.SEED_CONTENT_ONLY === "true";
+
+  /*
+    A full seed creates demo users with a default password, plus fixture submissions and
+    rankings. Against production that is not a mess to clean up, it is eleven accounts whose
+    credentials are in this file. One forgotten variable is too little between here and there.
+  */
+  if (process.env.PROD_DATABASE_URL?.trim() && !contentOnly) {
+    throw new Error(
+      "PROD_DATABASE_URL ohne SEED_CONTENT_ONLY=true: Das würde Demo-Nutzer, " +
+        "Beispiel-Abgaben und Rankings in die Produktionsdatenbank schreiben. Abgebrochen."
+    );
+  }
 
   let anna!: { id: string }, tom!: { id: string }, max!: { id: string },
     lisa!: { id: string }, sarah!: { id: string }, jan!: { id: string },
