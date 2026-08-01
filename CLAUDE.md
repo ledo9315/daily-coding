@@ -79,12 +79,19 @@ Challenges run user code via a **self-hosted Piston** container (port 2000). Flo
 3. `lib/server/piston-runner.ts` handles HTTP calls to Piston (`PISTON_API_URL` env var, defaults to `http://127.0.0.1:2000`)
 4. When `CODE_EXECUTION_ENABLED` env is not `true`, stub results are returned (`challenge-run-stub.ts`)
 
-Supported languages: `javascript`, `typescript`, `python`, `php`, `ruby`, `java`, `go` (matches
-`CodeLanguage` Prisma enum). Ruby's harness is the Python one with `to_json` instead of
+Supported languages live in the **registry** in `lib/challenge-languages.ts` — one `LanguageSpec`
+per entry, holding everything about a language that is data: Piston package and file name, Monaco
+id, editor file name, version prefix, whether it is typed, whether Piston compiles it inside the
+run step and how a compile failure looks there. `piston-runner.ts`, the admin schema and form, the
+editor and `scripts/install-piston-runtimes.ts` all read from it; a test checks each entry is
+complete and that the list matches the Prisma enum, order included.
+
+Adding a language means: registry entry, Prisma enum plus migration, a `case` in
+`buildWrappedProgram`, seed content, and the runtime on the Piston host. Everything else follows. Ruby's harness is the Python one with `to_json` instead of
 `json.dumps` — deliberately not `JSON.generate`, which refuses a bare String or Integer at the
 top level, and half the challenges return exactly that.
 
-Java and Go are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
+Java, Go, C++ and C# are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
 turned into typed parameters (one per JSON key, in key order) and baked into the program as
 literals. Both differ from the interpreted languages in ways worth knowing before touching the
 harness:
@@ -92,7 +99,8 @@ harness:
 - There is **no `data` without a type**, and Piston's images ship no JSON library for Java.
   Hence the baked-in literals — so `buildWrappedProgram` needs the input and is called once per
   test case, not once per submission.
-- Piston runs the **compiler inside the run step**. A Java compile error arrives as exit 1 with
+- Piston runs the **compiler inside the run step** for Java and Go — C++ and C# get a proper
+  compile stage, so nothing special is needed there. A Java compile error arrives as exit 1 with
   `error: compilation failed`; Go exits 2 for both a rejected build and a panic, told apart by
   `# command-line-arguments` and `./main.go:line:col`.
 - Both burn CPU before running a line — javac plus JVM startup 2.5–3 s, the Go toolchain about
@@ -102,10 +110,20 @@ harness:
 - Go additionally needs `PISTON_MAX_PROCESS_COUNT` well above the default 64: its runtime starts
   a thread per core and aborts with "Sandbox keeper received fatal signal 6" otherwise — while
   compile errors keep coming back normally, which makes it look like a harness bug.
-- A Go solution **cannot add imports**; they live in the harness header, which therefore carries
-  strconv, strings, sort, math, fmt and unicode and consumes each with a blank assignment.
+- A Go solution **cannot add imports** and a C++ one no includes; both live in the harness
+  header. Go's carries strconv, strings, sort, math, fmt and unicode and consumes each with a
+  blank assignment (Go rejects unused imports); C++ gets `<bits/stdc++.h>` and `using namespace
+  std`, which covers it in two lines.
+- C++ serialises by overload like Java, and the scalar overloads must precede the `vector<T>`
+  template or nested vectors fail to resolve. C# uses one method with ordered type tests instead
+  — Mono has no `System.Text.Json`, and `string` must be answered before `IEnumerable` or every
+  word comes back as a list of letters.
+- C# runs on **Mono**, not on the `csharp.net` runtime Piston also offers: that one scaffolds a
+  project per execution, ten seconds of CPU with its progress on stdout. Mono cannot start under
+  the QEMU emulation the amd64 image needs on Apple Silicon, so C# is only testable against the
+  real host — `piston-integration.test.ts` skips a runtime that dies in the sandbox keeper.
 
-Java and Go are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
+Java, Go, C++ and C# are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
 out of `supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one
 array) and Binary Tree Traversal (recursive structure) are the two seeded challenges without
 them — Ruby covers both, since `data` there is just a value.

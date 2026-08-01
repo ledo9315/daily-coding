@@ -23,6 +23,8 @@ export default tseslint.config(
     },
   },
   {
+    // The Piston installer moved to TypeScript so it can read the language registry; nothing
+    // under scripts/ is .mjs any more, but the globals block stays for the next one.
     files: ["scripts/**/*.mjs"],
     languageOptions: {
       ecmaVersion: 2022,
