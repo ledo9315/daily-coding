@@ -148,4 +148,20 @@ describe("findOrCreateOAuthUser and display names", () => {
 
     expect(mockUserCreate.mock.calls[0][0].data.name).toBe("someone");
   });
+
+  it("falls back to the email name when the provider name is only punctuation", async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+
+    await findOrCreateOAuthUser({ email: "valid.user@gmail.com", name: "." }, account);
+
+    expect(mockUserCreate.mock.calls[0][0].data.name).toBe("valid.user");
+  });
+
+  it("uses a safe default when neither provider nor email has a valid name", async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+
+    await findOrCreateOAuthUser({ email: "x@gmail.com", name: "🎮" }, account);
+
+    expect(mockUserCreate.mock.calls[0][0].data.name).toBe("User");
+  });
 });

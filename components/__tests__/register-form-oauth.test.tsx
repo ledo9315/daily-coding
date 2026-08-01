@@ -44,4 +44,13 @@ describe("RegisterForm", () => {
     }
     expect(html).toContain("REGISTRIEREN");
   });
+
+  it("communicates the display-name constraints before submission", () => {
+    const html = render({ githubEnabled: false, googleEnabled: false });
+
+    expect(html).toContain('id="name"');
+    expect(html).toContain('minLength="2"');
+    expect(html).toContain('maxLength="50"');
+    expect(html).toContain("Mindestens zwei Buchstaben oder Zahlen");
+  });
 });
