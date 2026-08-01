@@ -120,6 +120,8 @@ export function LandingHero({
             alt="Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge"
             width={1920}
             height={1121}
+            loading="eager"
+            fetchPriority="high"
             className="rounded-lg border border-border"
           />
         </div>

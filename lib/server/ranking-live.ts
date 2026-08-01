@@ -54,8 +54,8 @@ async function getMonthLiveRanking(now: Date): Promise<LiveRankingRow[]> {
 }
 
 /**
- * Week/month: sorted by the **number** of daily challenges solved (`challenge.date`
- * within the period), ties broken by the **sum of challenge points**, then by
+ * Week/month: sorted by the **number** of successful daily submissions in the period,
+ * ties broken by the **sum of challenge points**, then by
  * `userId` for a stable order.
  */
 async function aggregatePeriodByDailyChallenges(
@@ -65,16 +65,11 @@ async function aggregatePeriodByDailyChallenges(
   const submissions = await prisma.submission.findMany({
     where: {
       status: "completed",
-      challenge: {
-        date: {
-          gte: periodStart,
-          lt: periodEnd,
-        },
-      },
+      createdAt: { gte: periodStart, lt: periodEnd },
     },
     include: {
       user: true,
-      challenge: { select: { id: true, points: true, date: true } },
+      challenge: { select: { id: true, points: true } },
     },
   });
 
@@ -82,23 +77,23 @@ async function aggregatePeriodByDailyChallenges(
     string,
     {
       user: (typeof submissions)[0]["user"];
-      challengePoints: Map<string, number>;
+      dayPoints: Map<string, number>;
     }
   >();
 
   for (const s of submissions) {
-    if (!s.challenge.date) continue;
     let entry = perUser.get(s.userId);
     if (!entry) {
-      entry = { user: s.user, challengePoints: new Map() };
+      entry = { user: s.user, dayPoints: new Map() };
       perUser.set(s.userId, entry);
     }
-    entry.challengePoints.set(s.challengeId, s.challenge.points);
+    const day = s.createdAt.toISOString().slice(0, 10);
+    entry.dayPoints.set(day, Math.max(entry.dayPoints.get(day) ?? 0, s.challenge.points));
   }
 
-  const rows = [...perUser.entries()].map(([userId, { user, challengePoints }]) => {
-    const challengesSolved = challengePoints.size;
-    const points = [...challengePoints.values()].reduce((a, b) => a + b, 0);
+  const rows = [...perUser.entries()].map(([userId, { user, dayPoints }]) => {
+    const challengesSolved = dayPoints.size;
+    const points = [...dayPoints.values()].reduce((a, b) => a + b, 0);
     return { userId, user, challengesSolved, points };
   });
 

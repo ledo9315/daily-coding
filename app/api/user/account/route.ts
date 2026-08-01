@@ -31,17 +31,10 @@ export async function DELETE(request: Request) {
     );
   }
 
-  const user = result.userEmail
-    ? await prisma.user.findFirst({
-        where: {
-          OR: [{ id: result.userId }, { email: result.userEmail }],
-        },
-        select: { id: true, passwordHash: true, email: true, name: true },
-      })
-    : await prisma.user.findUnique({
-        where: { id: result.userId },
-        select: { id: true, passwordHash: true, email: true, name: true },
-      });
+  const user = await prisma.user.findUnique({
+    where: { id: result.userId },
+    select: { id: true, passwordHash: true, email: true, name: true },
+  });
 
   if (!user) {
     return NextResponse.json(
@@ -53,16 +46,7 @@ export async function DELETE(request: Request) {
     );
   }
 
-  const hasOAuthAccount = user.passwordHash
-    ? Boolean(
-        await prisma.account.findFirst({
-          where: { userId: user.id },
-          select: { id: true },
-        })
-      )
-    : false;
-
-  if (user.passwordHash && !hasOAuthAccount) {
+  if (user.passwordHash) {
     if (typeof currentPassword !== "string" || currentPassword.length === 0) {
       return NextResponse.json(
         { error: "Bitte gib dein aktuelles Passwort ein." },
@@ -79,6 +63,16 @@ export async function DELETE(request: Request) {
     }
   }
 
+  await prisma.$transaction([
+    prisma.rankingEntry.deleteMany({ where: { userId: user.id } }),
+    prisma.userAchievement.deleteMany({ where: { userId: user.id } }),
+    prisma.submission.deleteMany({ where: { userId: user.id } }),
+    prisma.emailVerificationToken.deleteMany({ where: { userId: user.id } }),
+    prisma.passwordResetToken.deleteMany({ where: { userId: user.id } }),
+    prisma.account.deleteMany({ where: { userId: user.id } }),
+    prisma.user.delete({ where: { id: user.id } }),
+  ]);
+
   try {
     await sendAccountDeletionEmail(user.email, user.name);
   } catch (error) {
@@ -88,14 +82,6 @@ export async function DELETE(request: Request) {
       error,
     });
   }
-
-  await prisma.rankingEntry.deleteMany({ where: { userId: user.id } });
-  await prisma.userAchievement.deleteMany({ where: { userId: user.id } });
-  await prisma.submission.deleteMany({ where: { userId: user.id } });
-  await prisma.emailVerificationToken.deleteMany({ where: { userId: user.id } });
-  await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
-  await prisma.account.deleteMany({ where: { userId: user.id } });
-  await prisma.user.delete({ where: { id: user.id } });
 
   return NextResponse.json({ success: true });
 }

@@ -9,32 +9,18 @@ import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
 import { utcDayKey } from "@/lib/streak-days";
 
 export async function getUserProfileData(
-  userId: string,
-  userEmail?: string | null
+  userId: string
 ): Promise<UserProfile | null> {
-  const user = userEmail
-    ? await prisma.user.findFirst({
-        where: {
-          OR: [{ id: userId }, { email: userEmail }],
-        },
-        include: {
-          submissions: {
-            orderBy: { createdAt: "desc" },
-            take: 10,
-            include: { challenge: true },
-          },
-        },
-      })
-    : await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          submissions: {
-            orderBy: { createdAt: "desc" },
-            take: 10,
-            include: { challenge: true },
-          },
-        },
-      });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      submissions: {
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: { challenge: true },
+      },
+    },
+  });
   if (!user) return null;
 
   const resolvedUserId = user.id;

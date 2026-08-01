@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import nextConfig from "@/next.config.mjs";
 
 const ROOT = process.cwd();
 
@@ -22,11 +23,11 @@ const files = [
 ];
 
 /** The `source` paths of every permanent redirect in `next.config.mjs`. */
-const redirectSources = [
-  ...readFileSync(resolve(ROOT, "next.config.mjs"), "utf8").matchAll(
-    /source:\s*"([^"]+)"/g
-  ),
-].map((match) => match[1].replace("/:path*", ""));
+async function redirectSources(): Promise<string[]> {
+  return (await nextConfig.redirects?.() ?? []).map((redirect) =>
+    redirect.source.replace("/:path*", "")
+  );
+}
 
 /**
  * Comments legitimately mention the old path — `landing-page.tsx` explains why it moved.
@@ -42,16 +43,18 @@ const withoutComments = (source: string) =>
  * crawler following them saw a redirect where a page should be.
  */
 describe("internal links", () => {
-  it("knows which paths redirect", () => {
-    expect(redirectSources).toContain("/landing");
+  it("knows which paths redirect", async () => {
+    expect(await redirectSources()).toContain("/landing");
   });
 
-  it.each(redirectSources)("no link points at %s, which only redirects", (path) => {
-    const offenders = files
-      .filter((file) =>
-        new RegExp(`["'\`]${path}["'\`]`).test(withoutComments(readFileSync(file, "utf8")))
-      )
-      .map((file) => relative(ROOT, file));
-    expect(offenders).toEqual([]);
+  it("has no links pointing at redirect-only paths", async () => {
+    for (const path of await redirectSources()) {
+      const offenders = files
+        .filter((file) =>
+          new RegExp(`["'\`]${path}["'\`]`).test(withoutComments(readFileSync(file, "utf8")))
+        )
+        .map((file) => relative(ROOT, file));
+      expect(offenders, path).toEqual([]);
+    }
   });
 });

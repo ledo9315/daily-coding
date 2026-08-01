@@ -168,10 +168,22 @@ model Submission {
   status      SubmissionStatus @default(pending)
   rank        Int?
   testResults Json?
+  /// UTC day reserved for the one-attempt constraint. Legacy rows are backfilled with createdAt.
+  submissionDay DateTime
   user        User             @relation(fields: [userId], references: [id])
   challenge   Challenge        @relation(fields: [challengeId], references: [id])
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+
+  @@unique([userId, submissionDay])
+}
+
+/** Shared across serverless instances; keys are SHA-256 hashes, never raw emails or IPs. */
+model RateLimitBucket {
+  key       String   @id
+  count     Int
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model RankingEntry {

@@ -6,7 +6,7 @@ import { isVercelAliasHost } from "@/lib/site";
 const PROTECTED_PATHS = ["/profile", "/challenge", "/ranking", "/settings"];
 const ADMIN_PREFIX = "/admin";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   /**
@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
 
   const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
   if (!secret) {
-    console.error("[middleware] Set AUTH_SECRET or NEXTAUTH_SECRET in .env");
+    console.error("[proxy] Set AUTH_SECRET or NEXTAUTH_SECRET in .env");
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return withNoindex(NextResponse.redirect(loginUrl));

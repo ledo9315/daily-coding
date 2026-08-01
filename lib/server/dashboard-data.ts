@@ -68,16 +68,9 @@ export async function getDashboardRankingPreviewData(): Promise<{
 }
 
 export async function getUserStatsData(
-  userId: string,
-  userEmail?: string | null
+  userId: string
 ): Promise<UserStats | null> {
-  const user = userEmail
-    ? await prisma.user.findFirst({
-        where: {
-          OR: [{ id: userId }, { email: userEmail }],
-        },
-      })
-    : await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return null;
 
   const resolvedUserId = user.id;

@@ -5,6 +5,7 @@ import { NextRequest } from "next/server";
 
 const mockFindUnique = vi.fn();
 const mockCreate = vi.fn();
+const mockCheckRateLimit = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -15,8 +16,13 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+vi.mock("@/lib/server/rate-limiter", () => ({
+  checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
+  mockCheckRateLimit.mockResolvedValue(true);
 });
 
 // ─── /api/auth/register ───────────────────────────────────────────────────────

@@ -34,7 +34,7 @@ const mockUpdate = vi.mocked(prisma.user.update);
 describe("PATCH /api/user/avatar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetSession.mockResolvedValue({ userId: "u-1", userEmail: null });
+    mockGetSession.mockResolvedValue({ userId: "u-1" });
     mockFindUnique.mockResolvedValue({ id: "u-1" } as never);
   });
 

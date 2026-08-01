@@ -6,6 +6,7 @@ import {
   nameKeyOf,
   uniqueDisplayName,
 } from "@/lib/display-name";
+import { emailAddressValidationError, normaliseEmailAddress } from "@/lib/email-address";
 
 /**
  * No `image` field on purpose. The provider sends a picture URL, but storing it would
@@ -56,6 +57,10 @@ export async function findOrCreateOAuthUser(
   profile: OAuthProfile,
   account: OAuthAccount
 ): Promise<DbUser> {
+  if (emailAddressValidationError(profile.email)) {
+    throw new Error("OAuth provider returned an invalid email address");
+  }
+  const email = normaliseEmailAddress(profile.email);
   // 1. Returning user via same OAuth provider
   const linkedUser = await findOAuthUserByAccount(account);
   if (linkedUser) {
@@ -64,10 +69,13 @@ export async function findOrCreateOAuthUser(
 
   // 2. Existing user by email (account linking)
   const existingUser = await prisma.user.findUnique({
-    where: { email: profile.email },
+    where: { email },
   });
 
   if (existingUser) {
+    if (!existingUser.emailVerified) {
+      throw new Error("Cannot auto-link OAuth to an unverified email account");
+    }
     await prisma.account.create({
       data: {
         userId: existingUser.id,
@@ -89,7 +97,7 @@ export async function findOrCreateOAuthUser(
    * here. The user comes back from Google or GitHub expecting an account, and there is no
    * form left to show an error in. The registration form does reject (#107).
    */
-  const emailName = profile.email.split("@")[0];
+  const emailName = email.split("@")[0];
   const baseName = [profile.name ?? "", emailName, "User"].find(
     (candidate) => displayNameValidationError(candidate) === null
   )!;
@@ -106,11 +114,11 @@ export async function findOrCreateOAuthUser(
 
   const newUser = await prisma.user.create({
     data: {
-      email: profile.email,
+      email,
       name,
       nameKey: nameKeyOf(name),
       initials,
-      avatar: starterAvatarPath(profile.email),
+      avatar: starterAvatarPath(email),
       emailVerified: true, // OAuth providers pre-verify emails
       accounts: {
         create: {
