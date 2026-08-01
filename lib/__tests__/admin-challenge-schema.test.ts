@@ -18,6 +18,7 @@ describe("adminCreateChallengeSchema", () => {
         typescript: "fn",
         python: "fn",
         php: "fn",
+        ruby: "fn",
       },
     },
     starterCodes: {
@@ -25,6 +26,7 @@ describe("adminCreateChallengeSchema", () => {
       typescript: "ts",
       python: "py",
       php: "p",
+      ruby: "rb",
     },
   };
 

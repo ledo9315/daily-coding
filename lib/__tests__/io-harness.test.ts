@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   outputsMatch,
+  buildGoArguments,
   buildJavaArguments,
   buildWrappedProgram,
   extractIoProgramOutput,
@@ -83,6 +84,44 @@ describe("buildWrappedProgram", () => {
     expect(src).toContain("def g(x):");
     expect(src).toContain("json.loads(_raw)");
     expect(src).toContain("g(_data)");
+  });
+
+  it("Go: bakes the input in and gives the solution the usual packages", () => {
+    const src = buildWrappedProgram(
+      "go",
+      "func fizzBuzz(n int) []string { return nil }",
+      "fizzBuzz",
+      "5"
+    );
+    expect(src).toContain("package main");
+    // A bare value has no key to take a name from, so it becomes the single parameter __input.
+    expect(src).toContain("__input := 5");
+    expect(src).toContain("__emit(fizzBuzz(__input))");
+    // A solution cannot add imports of its own — without strconv there is no int-to-string
+    // conversion and FizzBuzz is unsolvable in idiomatic Go.
+    expect(src).toContain('"strconv"');
+    expect(src).toContain("_ = strconv.Itoa");
+    // json.Marshal would answer null for a nil slice and escape & < > for HTML.
+    expect(src).toContain("rv.IsNil()");
+    expect(src).toContain("SetEscapeHTML(false)");
+  });
+
+  it("Go: declares object keys as separate parameters", () => {
+    const { decls, names } = buildGoArguments('{"arr":[1,3],"target":5}');
+    expect(names).toEqual(["arr", "target"]);
+    expect(decls[0]).toContain("arr := []int{1, 3}");
+    expect(decls[1]).toContain("target := 5");
+  });
+
+  it("Ruby: reads stdin and serialises with to_json", () => {
+    const src = buildWrappedProgram("ruby", "def f(a)\n  a\nend", "f");
+    expect(src).toContain("def f(a)");
+    expect(src).toContain("JSON.parse(_raw)");
+    expect(src).toContain("f(_data)");
+    // JSON.generate refuses a bare String or Integer at the top level; half the challenges
+    // return exactly that.
+    expect(src).toContain("_result.to_json");
+    expect(src).not.toContain("JSON.generate");
   });
 
   it("Java: wraps the method in class Main and bakes the input in", () => {

@@ -53,12 +53,62 @@ export function extractIoProgramOutput(raw: string): string {
  * javac counts from the top of the generated file, so its line numbers are off by exactly this
  * much until someone subtracts it again.
  */
-export const JAVA_HARNESS_LINE_OFFSET = 3;
+const JAVA_HEADER_LINES = ["import java.util.*;", "", "public class Main {"];
+export const JAVA_HARNESS_LINE_OFFSET = JAVA_HEADER_LINES.length;
 
-/** Java literal plus the type it has, derived from one JSON value. */
-type JavaTyped = { type: string; literal: string };
+/*
+  Go's header carries more than the harness needs, on purpose.
 
-function javaStringLiteral(s: string): string {
+  Imports live at the top of the file, inside this block — a solution cannot add its own. Without
+  strconv there is no int-to-string conversion, which makes FizzBuzz unsolvable in idiomatic Go;
+  the same goes for strings, sort and the rest. Go then rejects an import nobody uses, so each
+  one is consumed by a blank assignment below.
+*/
+const GO_HEADER_LINES = [
+  "package main",
+  "",
+  "import (",
+  '\t"encoding/json"',
+  '\t"fmt"',
+  '\t"math"',
+  '\t"os"',
+  '\t"reflect"',
+  '\t"sort"',
+  '\t"strconv"',
+  '\t"strings"',
+  '\t"unicode"',
+  ")",
+  "",
+  "var (",
+  "\t_ = fmt.Sprint",
+  "\t_ = math.Abs",
+  "\t_ = sort.Ints",
+  "\t_ = strconv.Itoa",
+  "\t_ = strings.ToLower",
+  "\t_ = unicode.IsLetter",
+  ")",
+  "",
+];
+/** Derived, not counted by hand: the header grows and the offset has to follow. */
+export const GO_HARNESS_LINE_OFFSET = GO_HEADER_LINES.length;
+
+/**
+ * The shape of one argument, derived from a test case's JSON.
+ *
+ * Shared by every typed language: the classification — scalar or array, which element type, what
+ * counts as unsupported — is the same everywhere, only the literal syntax differs. Java and Go
+ * each render this into their own form.
+ */
+type ScalarKind = "int" | "long" | "double" | "bool" | "string";
+type ArgShape =
+  | { kind: ScalarKind; value: number | boolean | string }
+  | { kind: "array"; elem: ScalarKind; values: (number | boolean | string)[] };
+
+/**
+ * Escaped string literal, valid in both Java and Go — they agree on \" \\ \n \r \t and \uXXXX.
+ * Everything outside printable ASCII is escaped so the generated source stays byte-safe.
+ */
+function quoteStringLiteral(s: string): string {
   let out = '"';
   for (const ch of s) {
     const code = ch.codePointAt(0)!;
@@ -73,72 +123,124 @@ function javaStringLiteral(s: string): string {
   return `${out}"`;
 }
 
-function javaNumber(n: number): JavaTyped {
-  if (!Number.isInteger(n)) return { type: "double", literal: String(n) };
-  if (n > 2147483647 || n < -2147483648) return { type: "long", literal: `${n}L` };
-  return { type: "int", literal: String(n) };
-}
-
-function javaScalar(v: unknown): JavaTyped {
-  if (typeof v === "number") return javaNumber(v);
-  if (typeof v === "boolean") return { type: "boolean", literal: String(v) };
-  if (typeof v === "string") return { type: "String", literal: javaStringLiteral(v) };
+function scalarKind(v: unknown): ScalarKind {
+  if (typeof v === "number") {
+    if (!Number.isInteger(v)) return "double";
+    return v > 2147483647 || v < -2147483648 ? "long" : "int";
+  }
+  if (typeof v === "boolean") return "bool";
+  if (typeof v === "string") return "string";
   throw new Error(
-    `Java-Harness: Eingabewert vom Typ ${v === null ? "null" : typeof v} wird nicht unterstützt.`
+    `Typisierter Harness: Eingabewert vom Typ ${v === null ? "null" : typeof v} wird nicht unterstützt.`
   );
 }
 
-function javaTyped(v: unknown): JavaTyped {
-  if (!Array.isArray(v)) return javaScalar(v);
+/** int widens to long widens to double; anything else mixed is a refusal. */
+function widestKind(kinds: ScalarKind[]): ScalarKind {
+  if (kinds.includes("double")) return "double";
+  if (kinds.includes("long")) return "long";
+  return kinds[0]!;
+}
 
-  // An empty array carries no element type. int[] is the only sensible guess and matches every
+function classify(v: unknown): ArgShape {
+  if (!Array.isArray(v)) return { kind: scalarKind(v), value: v as number | boolean | string };
+
+  // An empty array carries no element type. int is the only sensible guess and matches every
   // seeded challenge whose test cases include one.
-  if (v.length === 0) return { type: "int[]", literal: "new int[]{}" };
+  if (v.length === 0) return { kind: "array", elem: "int", values: [] };
 
-  const parts = v.map(javaScalar);
-  const elem = parts.some((p) => p.type === "double")
-    ? "double"
-    : parts.some((p) => p.type === "long")
-      ? "long"
-      : parts[0]!.type;
-  if (parts.some((p) => p.type !== elem && !(elem === "long" && p.type === "int") && !(elem === "double" && (p.type === "int" || p.type === "long")))) {
-    throw new Error("Java-Harness: gemischte Array-Typen werden nicht unterstützt.");
+  const kinds = v.map(scalarKind);
+  const elem = widestKind(kinds);
+  const numeric: ScalarKind[] = ["int", "long", "double"];
+  const compatible = kinds.every((k) => k === elem || (numeric.includes(k) && numeric.includes(elem)));
+  if (!compatible) {
+    throw new Error("Typisierter Harness: gemischte Array-Typen werden nicht unterstützt.");
   }
-  const cast = elem === "long" ? (l: string) => (l.endsWith("L") ? l : `${l}L`) : (l: string) => l;
-  return {
-    type: `${elem}[]`,
-    literal: `new ${elem}[]{${parts.map((p) => cast(p.literal)).join(",")}}`,
-  };
+  return { kind: "array", elem, values: v as (number | boolean | string)[] };
 }
 
 /**
- * Arguments for one test case, as Java declarations plus the names to pass.
+ * One entry per parameter of the user's function.
  *
  * A JSON object becomes one parameter per key, in key order — that is what makes
  * `binarySearch(int[] arr, int target)` read like Java instead of like a bag of values. Anything
- * else is a single parameter.
+ * else is a single parameter called `__input`.
  */
-export function buildJavaArguments(input: string): { decls: string[]; names: string[] } {
+function inferArguments(input: string, language: string): { name: string; shape: ArgShape }[] {
   let parsed: unknown;
   try {
     parsed = JSON.parse(input);
   } catch {
-    throw new Error(`Java-Harness: Testeingabe ist kein gültiges JSON: ${input.slice(0, 80)}`);
+    throw new Error(`${language}-Harness: Testeingabe ist kein gültiges JSON: ${input.slice(0, 80)}`);
   }
 
   if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
-    const decls: string[] = [];
-    const names: string[] = [];
-    for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
-      const { type, literal } = javaTyped(value);
-      decls.push(`        ${type} ${key} = ${literal};`);
-      names.push(key);
-    }
-    return { decls, names };
+    return Object.entries(parsed as Record<string, unknown>).map(([name, value]) => ({
+      name,
+      shape: classify(value),
+    }));
   }
+  return [{ name: "__input", shape: classify(parsed) }];
+}
 
-  const { type, literal } = javaTyped(parsed);
-  return { decls: [`        ${type} __input = ${literal};`], names: ["__input"] };
+const JAVA_TYPE: Record<ScalarKind, string> = {
+  int: "int",
+  long: "long",
+  double: "double",
+  bool: "boolean",
+  string: "String",
+};
+
+function javaLiteral(kind: ScalarKind, value: number | boolean | string): string {
+  if (kind === "string") return quoteStringLiteral(String(value));
+  if (kind === "long") return `${value}L`;
+  return String(value);
+}
+
+/** Go's `int` is 64 bit on every platform Piston runs, so long and int are the same type here. */
+const GO_TYPE: Record<ScalarKind, string> = {
+  int: "int",
+  long: "int",
+  double: "float64",
+  bool: "bool",
+  string: "string",
+};
+
+function goLiteral(kind: ScalarKind, value: number | boolean | string): string {
+  return kind === "string" ? quoteStringLiteral(String(value)) : String(value);
+}
+
+/** Java declarations for one test case, plus the names to pass to the user's method. */
+export function buildJavaArguments(input: string): { decls: string[]; names: string[] } {
+  const args = inferArguments(input, "Java");
+  const decls = args.map(({ name, shape }) => {
+    if (shape.kind === "array") {
+      const t = JAVA_TYPE[shape.elem];
+      const items = shape.values.map((v) => javaLiteral(shape.elem, v)).join(",");
+      return `        ${t}[] ${name} = new ${t}[]{${items}};`;
+    }
+    return `        ${JAVA_TYPE[shape.kind]} ${name} = ${javaLiteral(shape.kind, shape.value)};`;
+  });
+  return { decls, names: args.map((a) => a.name) };
+}
+
+/**
+ * Go declarations for one test case, plus the names to pass.
+ *
+ * `:=` everywhere, so no type names are needed except for an empty slice, which has nothing to
+ * infer from. Go rejects unused variables, but every declaration here becomes an argument.
+ */
+export function buildGoArguments(input: string): { decls: string[]; names: string[] } {
+  const args = inferArguments(input, "Go");
+  const decls = args.map(({ name, shape }) => {
+    if (shape.kind === "array") {
+      const t = GO_TYPE[shape.elem];
+      const items = shape.values.map((v) => goLiteral(shape.elem, v)).join(", ");
+      return `\t${name} := []${t}{${items}}`;
+    }
+    return `\t${name} := ${goLiteral(shape.kind, shape.value)}`;
+  });
+  return { decls, names: args.map((a) => a.name) };
 }
 
 /*
@@ -265,9 +367,7 @@ sys.stdout.write(json.dumps(_result))
         .split("\n")
         .map((line) => (line.trim() ? `    ${line}` : line))
         .join("\n");
-      return `import java.util.*;
-
-public class Main {
+      return `${JAVA_HEADER_LINES.join("\n")}
 ${indented}
 ${JAVA_OUTPUT_HELPERS}
     public static void main(String[] args) {
@@ -277,6 +377,53 @@ ${decls.join("\n")}
 }
 `;
     }
+    case "go": {
+      if (input == null) {
+        throw new Error("Go-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+      }
+      const { decls, names } = buildGoArguments(input);
+      return `${GO_HEADER_LINES.join("\n")}
+${trimmed}
+
+/*
+  Two things json.Marshal would get wrong on its own.
+
+  A nil slice marshals to null, but declaring "var out []int" and never appending is ordinary Go
+  and means an empty list — every challenge returning one would fail on its empty test case.
+
+  And Marshal escapes the characters & < > for embedding in HTML, which turns a perfectly good
+  string answer into a mismatch.
+*/
+func __emit(v interface{}) {
+\trv := reflect.ValueOf(v)
+\tif rv.Kind() == reflect.Slice && rv.IsNil() {
+\t\tos.Stdout.Write([]byte("[]"))
+\t\treturn
+\t}
+\tenc := json.NewEncoder(os.Stdout)
+\tenc.SetEscapeHTML(false)
+\tenc.Encode(v)
+}
+
+func main() {
+${decls.join("\n")}
+\t__emit(${callable}(${names.join(", ")}))
+}
+`;
+    }
+    case "ruby":
+      /*
+        `to_json` rather than `JSON.generate`: the latter refuses a bare String or Integer at the
+        top level in strict mode, and half the challenges return exactly that.
+      */
+      return `${trimmed}
+
+require 'json'
+_raw = STDIN.read.strip
+_data = JSON.parse(_raw)
+_result = ${callable}(_data)
+STDOUT.write(_result.to_json)
+`;
     case "php": {
       const body = /^<\?php\b/m.test(trimmed) ? trimmed : `<?php\n\n${trimmed}`;
       return `${body}

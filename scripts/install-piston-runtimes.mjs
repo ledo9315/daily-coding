@@ -23,6 +23,8 @@ const RUNTIME_INSTALL = [
   { app: "python", pkg: "python" },
   { app: "php", pkg: "php" },
   { app: "java", pkg: "java" },
+  { app: "ruby", pkg: "ruby" },
+  { app: "go", pkg: "go" },
 ];
 
 /** Rough semver comparison — higher versions come first under an ascending sort */
