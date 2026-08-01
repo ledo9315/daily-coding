@@ -157,16 +157,6 @@ export function Header() {
             <>
               <div className="pixel-box flex items-center gap-1.5 border-2 border-orange-500/20 px-2 py-2 text-orange-500 sm:gap-2 sm:px-4">
                 <Zap className="h-5 w-5 animate-pulse" />
-                {/*
-                  A dash reads as a value: "your streak is nothing". It is not, it is a number
-                  that has not arrived yet — the cache is empty on a first visit and after a
-                  switch of account.
-
-                  The span keeps the exact classes it had, and the spinner sits inside it as an
-                  inline glyph sized in `em`. A reserved minimum width would be wrong here: the
-                  box is as wide as its content, so padding it out for the loading state made
-                  the whole card 12px wider for good.
-                */}
                 <span className="text-xl font-sans">
                   {streak === null ? (
                     <Spinner
@@ -188,9 +178,6 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    /* `pixel-box` rather than a hand-written shadow: same class the streak card
-                       uses, so the two never drift apart. It brings the 2px border along, which
-                       was already there. */
                     className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-primary/20 cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
                   >
                     <Avatar className="h-full w-full rounded-none">
@@ -256,14 +243,8 @@ export function Header() {
               </DropdownMenu>
             </>
           ) : status === "loading" ? (
-            /*
-              "loading" is not "signed out". Every full page load and every hot reload starts
-              here, and the two states used to share a branch — so the dashboard, a page one
-              cannot reach without an account, briefly offered Login and Registrieren.
-
-              Placeholders in the shape of what follows: the streak card and the square avatar.
-              Same sizes, so the header does not jump once the session resolves.
-            */
+            /* "loading" is not "signed out": both used to share a branch, so the dashboard
+               briefly offered Login and Registrieren. */
             <>
               <div
                 className="h-12 w-[114px] animate-pulse border-2 border-orange-500/20 bg-muted/40"
