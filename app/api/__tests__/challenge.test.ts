@@ -20,6 +20,9 @@ vi.mock("@/auth", () => ({
 
 const mockFindFirst = vi.fn();
 const mockChallengeFindMany = vi.fn();
+const mockRotationFindUnique = vi.fn();
+const mockRotationUpdate = vi.fn();
+const mockRotationCreate = vi.fn();
 const mockFindUniqueChallenge = vi.fn();
 const mockUserFindUnique = vi.fn();
 const mockUserUpdate = vi.fn();
@@ -40,6 +43,11 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...args: unknown[]) => mockChallengeFindMany(...args),
       findUnique: (...args: unknown[]) => mockFindUniqueChallenge(...args),
     },
+    rotationState: {
+      findUnique: (...args: unknown[]) => mockRotationFindUnique(...args),
+      update: (...args: unknown[]) => mockRotationUpdate(...args),
+      create: (...args: unknown[]) => mockRotationCreate(...args),
+    },
     submission: {
       findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
@@ -58,7 +66,16 @@ beforeEach(() => {
   mockSubmissionCount.mockResolvedValue(3);
   mockUserUpdate.mockResolvedValue({ streak: 1, streakRecord: 1 });
   mockAuth.mockResolvedValue(null);
-  mockChallengeFindMany.mockResolvedValue([]);
+  // The daily is the ring: the active pool plus a pointer at where it stands.
+  mockChallengeFindMany.mockResolvedValue([activeChallenge]);
+  const startOfTodayUtc = new Date();
+  startOfTodayUtc.setUTCHours(0, 0, 0, 0);
+  mockRotationFindUnique.mockResolvedValue({
+    id: "current",
+    challengeId: activeChallenge.id,
+    position: 0,
+    day: startOfTodayUtc,
+  });
 });
 
 // ─── shared test data ─────────────────────────────────────────────────────────
@@ -120,45 +137,38 @@ describe("GET /api/challenge/daily", () => {
 
   it("returns an empty list when the hints column holds no array", async () => {
     // Legacy rows and hand-edited records reach the client too; the accordion maps over this.
-    mockFindFirst.mockResolvedValueOnce({ ...activeChallenge, hints: null });
+    mockChallengeFindMany.mockResolvedValueOnce([{ ...activeChallenge, hints: null }]);
     const res = await getDailyHandler();
     const json = await res.json();
     expect(json.hints).toEqual([]);
   });
 
   it("fills starterCodes from legacy starterCode when JSON map empty", async () => {
-    mockFindFirst.mockResolvedValueOnce({
-      ...activeChallenge,
-      starterCode: "function legacy() {}",
-      starterCodes: {},
-    });
+    mockChallengeFindMany.mockResolvedValueOnce([
+      { ...activeChallenge, starterCode: "function legacy() {}", starterCodes: {} },
+    ]);
     const res = await getDailyHandler();
     const json = await res.json();
     expect(json.starterCodes.javascript).toBe("function legacy() {}");
     expect(json.starterCode).toBe("function legacy() {}");
   });
 
-  // #67: without rotation the fallback served the same challenge forever.
-  it("prefers the challenge scheduled for today over the rotation", async () => {
-    mockFindFirst.mockResolvedValueOnce(activeChallenge);
-    await getDailyHandler();
-    expect(mockFindFirst.mock.calls[0][0]).toMatchObject({
-      where: { date: { gte: expect.any(Date), lt: expect.any(Date) } },
-      include: { category: true },
-    });
-    expect(mockChallengeFindMany).not.toHaveBeenCalled();
-  });
-
-  it("rotates over the active pool when nothing is scheduled for today", async () => {
-    mockFindFirst.mockResolvedValueOnce(null);
-    mockChallengeFindMany.mockResolvedValueOnce([activeChallenge]);
+  // #67: without rotation the fallback served the same challenge forever. The rotation is now
+  // an explicit order the admin can see and change.
+  it("serves the challenge the ring points at", async () => {
     const res = await getDailyHandler();
     expect(res.status).toBe(200);
+    expect((await res.json()).id).toBe("ch-1");
     expect(mockChallengeFindMany.mock.calls[0][0]).toMatchObject({
       where: { isActive: true },
-      orderBy: [{ date: "asc" }, { id: "asc" }],
+      orderBy: [{ position: "asc" }, { id: "asc" }],
       include: { category: true },
     });
+  });
+
+  it("does not move the pointer twice on the same day", async () => {
+    await getDailyHandler();
+    expect(mockRotationUpdate).not.toHaveBeenCalled();
   });
 
   it("does not query submissions when unauthenticated", async () => {
@@ -281,10 +291,9 @@ describe("GET /api/challenge/today", () => {
   });
 
   it("returns uppercased category name", async () => {
-    mockFindFirst.mockResolvedValueOnce({
-      ...activeChallenge,
-      category: { id: "cat-graphs", name: "Graphs", createdAt: new Date() },
-    });
+    mockChallengeFindMany.mockResolvedValueOnce([
+      { ...activeChallenge, category: { id: "cat-graphs", name: "Graphs", createdAt: new Date() } },
+    ]);
     const res = await getTodayHandler();
     const json = await res.json();
     expect(json.category).toBe("GRAPHS");

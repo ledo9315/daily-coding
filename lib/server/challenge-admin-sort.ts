@@ -1,37 +1,25 @@
-import { startOfUtcDay } from "@/lib/server/ranking-period";
-
-type HasDate = { date: Date | null; id?: string };
+import { compareRingEntries, type RingEntry } from "@/lib/server/challenge-ring";
 
 /**
- * Admin table: whatever is up next goes on top.
+ * The admin list: today on top, then the ring in order, inactive challenges last.
  *
- * 1. `date` >= today 00:00 UTC — ascending (today, tomorrow, …)
- * 2. `date` &lt; today — descending (most recent past first)
- * 3. no `date` — last
+ * The old rule needed three sentences above the table to explain itself ("first upcoming dailies,
+ * then past dates, then undated"). This one is a single sentence, and it matches what a visitor
+ * gets: row two runs tomorrow.
  */
-export function compareChallengesBySchedule(
-  a: HasDate,
-  b: HasDate,
-  now: Date = new Date(),
-): number {
-  const t0 = startOfUtcDay(now).getTime();
+export type AdminRow = RingEntry & { isActive: boolean };
 
-  const tier = (d: Date | null): 0 | 1 | 2 => {
-    if (d == null) return 2;
-    return d.getTime() < t0 ? 1 : 0;
-  };
+export function buildAdminOrder<T extends AdminRow>(
+  rows: T[],
+  liveChallengeId: string | null,
+): { active: T[]; inactive: T[] } {
+  const sorted = [...rows].sort(compareRingEntries);
+  const active = sorted.filter((c) => c.isActive);
+  const inactive = sorted.filter((c) => !c.isActive);
 
-  const ta = tier(a.date);
-  const tb = tier(b.date);
-  if (ta !== tb) return ta - tb;
+  const live = active.findIndex((c) => c.id === liveChallengeId);
+  // Rotating the display rather than the stored order: nothing is written when a day passes.
+  const rotated = live <= 0 ? active : [...active.slice(live), ...active.slice(0, live)];
 
-  if (ta === 0 && a.date && b.date) {
-    return a.date.getTime() - b.date.getTime();
-  }
-  if (ta === 1 && a.date && b.date) {
-    return b.date.getTime() - a.date.getTime();
-  }
-  const idA = a.id ?? "";
-  const idB = b.id ?? "";
-  return idA.localeCompare(idB);
+  return { active: rotated, inactive };
 }

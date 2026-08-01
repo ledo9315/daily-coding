@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
+import { resolveRingIndex } from "@/lib/server/challenge-ring";
 
 /** Start and end (exclusive) of the running UTC calendar day. */
 export function utcDayRange(now: Date = new Date()): { gte: Date; lt: Date } {
@@ -41,45 +42,68 @@ export function publicSubmissionStatus(
 }
 
 /**
- * Position in the rotation pool, derived from the UTC calendar day. Deterministic:
- * the same day always yields the same challenge — across requests and across
- * server instances, with no randomness and no server-side state.
+ * The active pool in ring order. `position` first, `id` as the tie-break, matching
+ * `compareRingEntries` — the admin list and the daily must agree on the order.
  */
-export function rotationIndexForUtcDay(now: Date, poolSize: number): number {
-  if (poolSize <= 0) return 0;
-  const utcDayNumber = Math.floor(now.getTime() / 86_400_000);
-  return ((utcDayNumber % poolSize) + poolSize) % poolSize;
+export async function findRingPool() {
+  return prisma.challenge.findMany({
+    where: { isActive: true },
+    orderBy: [{ position: "asc" }, { id: "asc" }],
+    include: { category: true },
+  });
 }
 
 /**
- * The challenge of the day.
+ * The challenge of the day: wherever the ring currently stands.
  *
- * 1. If a `date` falls on the current UTC day, that challenge wins — manual
- *    scheduling through the admin panel keeps priority.
- * 2. Otherwise rotate deterministically through the pool of active challenges.
- *    Without this step the app served the same challenge forever, because the
- *    seed only sets dates in the past (#67).
+ * Replaces the old two-step rule (a `date` on today wins, otherwise `dayNumber % poolSize`).
+ * That formula moved every time the pool grew or shrank, which was invisible while the order
+ * itself was invisible. Now the order is `position`, editable in the admin panel, and the
+ * pointer lives in `RotationState`.
  *
- * ponytail: with N challenges the cycle repeats after N days — accepted on
- * purpose, better than standing still. The cure is more content, not more code.
+ * The pointer advances here, on the first request of a new UTC day, rather than in a scheduled
+ * job: one moving part fewer, and a day without traffic costs nothing because the catch-up is
+ * computed from the number of days elapsed.
+ *
+ * ponytail: with N challenges the ring repeats after N days — accepted on purpose, better than
+ * standing still. The cure is more content, not more code.
  */
 export async function findDailyChallengeForApp() {
-  const forToday = await prisma.challenge.findFirst({
-    where: { date: utcDayRange() },
-    orderBy: { date: "desc" },
-    include: { category: true },
-  });
-
-  if (forToday) return forToday;
-
-  // Stable order: otherwise the rotation depends on whatever order the DB returns.
-  const pool = await prisma.challenge.findMany({
-    where: { isActive: true },
-    orderBy: [{ date: "asc" }, { id: "asc" }],
-    include: { category: true },
-  });
-
+  const pool = await findRingPool();
   if (pool.length === 0) return null;
 
-  return pool[rotationIndexForUtcDay(new Date(), pool.length)];
+  const state = await prisma.rotationState.findUnique({ where: { id: "current" } });
+  const now = new Date();
+
+  if (!state) {
+    // First run, or a database that predates the ring.
+    const first = pool[0];
+    await prisma.rotationState.create({
+      data: {
+        id: "current",
+        challengeId: first.id,
+        position: first.position,
+        day: startOfUtcDay(now),
+      },
+    });
+    return first;
+  }
+
+  const { index, changed } = resolveRingIndex(pool, state, now);
+  const current = pool[index];
+
+  if (changed) {
+    // Concurrent requests on the first hit of a new day compute the same target from the same
+    // stored state, so the second write is a no-op rather than a double advance.
+    await prisma.rotationState.update({
+      where: { id: "current" },
+      data: {
+        challengeId: current.id,
+        position: current.position,
+        day: startOfUtcDay(now),
+      },
+    });
+  }
+
+  return current;
 }
