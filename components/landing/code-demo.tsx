@@ -200,8 +200,7 @@ export function LandingCodeDemo() {
             </h2>
             <p className="text-xl text-muted-foreground">
               Dieselben Testfälle, die später deine Abgabe bewerten, laufen
-              vorher im Browser. So oft du willst, in JavaScript, TypeScript,
-              Python oder PHP.
+              vorher im Browser. So oft du willst, in deiner Sprache.
             </p>
           </motion.div>
 

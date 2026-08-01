@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     template: "%s · Daily Coding",
   },
   description:
-    "Löse jeden Tag eine neue Coding-Challenge in JavaScript, TypeScript, Python oder PHP und steige im Ranking auf.",
+    "Löse jeden Tag eine neue Coding-Challenge in deiner Programmiersprache und steige im Ranking auf.",
   /**
    * The card a shared link shows: a drawn brand card in the palette of the app, replacing
    * the padded dashboard screenshot that stood here before (#113).

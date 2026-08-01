@@ -28,7 +28,7 @@ const DAY = [
     when: "danach",
     what: "Testen",
     detail:
-      "Im Browser, in JavaScript, TypeScript, Python oder PHP. So oft du willst.",
+      "Im Browser, in deiner Sprache. So oft du willst.",
   },
   {
     when: "einmal",
