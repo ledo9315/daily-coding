@@ -41,11 +41,18 @@ export const adminCreateChallengeSchema = z.object({
     .min(1)
     .max(20),
   evaluationConfig: z.object({
+    /*
+      Java is optional, the other four are not. Its harness needs typed input, which rules out
+      challenges whose test cases mix types in one array or nest a structure. Leaving the method
+      name empty is how such a challenge says "no Java" — supportedLanguages then omits it and
+      the dropdown never offers a language whose submission would fail.
+    */
     callableByLanguage: z.object({
       javascript: z.string().min(1),
       typescript: z.string().min(1),
       python: z.string().min(1),
       php: z.string().min(1),
+      java: z.string().optional(),
     }),
   }),
   starterCodes: z.object({
@@ -53,6 +60,7 @@ export const adminCreateChallengeSchema = z.object({
     typescript: z.string(),
     python: z.string(),
     php: z.string(),
+    java: z.string().optional(),
   }),
   supportedLanguages: z.array(codeLanguageZ).optional(),
   isActive: z.boolean().optional(),
