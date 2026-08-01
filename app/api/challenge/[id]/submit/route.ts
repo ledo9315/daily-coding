@@ -61,7 +61,7 @@ export async function POST(
     );
   }
 
-  const { testCases: testResults, runtimeOk } = await runChallengeTests(
+  const { testCases: testResults, runtimeOk, compileError } = await runChallengeTests(
     challenge,
     code,
     language,
@@ -117,6 +117,7 @@ export async function POST(
     success: runtimeOk,
     testCases: testResults,
     language,
+    ...(compileError ? { compileError } : {}),
     ...(celebration ? { celebration } : {}),
   });
 }
