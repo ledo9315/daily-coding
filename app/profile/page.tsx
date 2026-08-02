@@ -25,7 +25,7 @@ import {
   CalendarWeek,
   Clock,
 } from "@nsmr/pixelart-react";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { getUserProfileData } from "@/lib/server/profile-data";
 import { levelTitleDe } from "@/lib/level";
 import type { Achievement } from "@/lib/api";
@@ -55,15 +55,13 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <FlickeringGrid
-        className="absolute inset-0 z-0 mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
+      <AnimatedFlickeringGrid
+        className="absolute inset-x-0 top-0 z-0 h-[300px] mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
         squareSize={6}
         gridGap={1}
         color="#A371F7"
         maxOpacity={0.2}
         flickerChance={0.1}
-        height={300}
-        width={1920}
       />
       {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
