@@ -1,20 +1,18 @@
 import { Header } from "@/components/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 
 export default function ProfileLoading() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <FlickeringGrid
-        className="absolute inset-0 z-0 mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
+      <AnimatedFlickeringGrid
+        className="absolute inset-x-0 top-0 z-0 h-[300px] mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
         squareSize={6}
         gridGap={1}
         color="#A371F7"
         maxOpacity={0.2}
         flickerChance={0.1}
-        height={300}
-        width={1920}
       />
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] h-150 w-150 bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
