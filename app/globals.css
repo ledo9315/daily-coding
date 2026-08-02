@@ -170,4 +170,24 @@
     );
     pointer-events: none;
   }
+
+  /* Skip layout and paint work for landing sections that start well below the viewport. */
+  .landing-deferred {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+  }
+
+  .border-beam-orbit {
+    animation-name: border-beam-orbit;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  @keyframes border-beam-orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
 }
