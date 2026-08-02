@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CountdownTimer } from "@/components/countdown-timer";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 
 /**
  * Closes with the running clock, and nothing else.
@@ -22,14 +22,14 @@ import { FlickeringGrid } from "@/components/ui/flickering-grid";
  */
 export function LandingCTA() {
   return (
-    <section className="relative overflow-hidden bg-[#020912]">
+    <section className="landing-deferred relative overflow-hidden bg-[#020912]">
       {/*
         The decorations wrap only the clock, not the whole section: the artwork below makes the
         section far taller, and anything centred in it would sit in the middle of the picture.
       */}
       <div className="relative">
         {/* <AmbientGlow side="left" className="bg-primary/8" /> */}
-        <FlickeringGrid
+        <AnimatedFlickeringGrid
           className="absolute inset-0 z-0 mask-[radial-gradient(700px_260px_at_center,white,transparent)]"
           squareSize={6}
           gridGap={1}
