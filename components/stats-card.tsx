@@ -30,6 +30,7 @@ export function StatsCard({
 
   return (
     <CardSpotlight
+      animatedDots
       className={cn("pixel-box p-4 bg-card", className)}
       color="#262626"
     >

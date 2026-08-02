@@ -105,11 +105,7 @@ export function LandingHero({
         </motion.div>
 
         <div className="relative mt-16 mx-auto max-w-4xl rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm">
-          <BorderBeam
-            className="hidden sm:block"
-            duration={12}
-            delay={9}
-          />
+          <BorderBeam size={250} duration={12} delay={9} />
           <Image
             src="/screen2.png"
             alt="Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge"
