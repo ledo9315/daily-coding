@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -6,7 +6,6 @@ import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
 import { Meteors } from "@/components/ui/meteors";
-import { BorderBeam } from "@/components/ui/border-beam";
 
 const read = (...parts: string[]) =>
   readFileSync(resolve(process.cwd(), ...parts), "utf8");
@@ -67,24 +66,30 @@ describe("landing performance budget", () => {
     expect(meteors).not.toMatch(/^\s*["']use client["']/);
   });
 
-  it("renders the hero border beam as desktop-only CSS", () => {
-    const html = renderToStaticMarkup(
-      <BorderBeam className="hidden sm:block" />,
-    );
+  it("uses the original motion border beam in the hero", () => {
     const hero = read("components", "landing", "hero.tsx");
-    const beam = read("components", "ui", "border-beam.tsx");
-
-    expect(html).toContain("hidden sm:block");
-    expect(html).toContain("border-beam-orbit");
-    expect(html).toContain("conic-gradient");
-    expect(html).toContain("#9c40ff 350deg 359deg");
-    expect(html).toContain("transparent 359deg 360deg");
-    expect(html).not.toContain("offset-path");
-    expect(hero).toMatch(
-      /<BorderBeam[\s\S]*?className="hidden sm:block"/,
+    const beamPath = resolve(
+      process.cwd(),
+      "components",
+      "ui",
+      "border-beam.tsx",
     );
-    expect(beam).not.toMatch(/^\s*["']use client["']/);
-    expect(beam).not.toMatch(/from ["'](?:framer-motion|motion\/react)["']/);
+    const beam = existsSync(beamPath) ? readFileSync(beamPath, "utf8") : "";
+
+    expect(existsSync(beamPath)).toBe(true);
+    expect(hero).toContain(
+      '<BorderBeam size={250} duration={12} delay={9} />',
+    );
+    expect(beam).toMatch(/^\s*["']use client["']/);
+    expect(beam).toContain('from "motion/react"');
+    expect(beam).toContain(
+      '"bg-linear-to-l from-(--color-from) via-(--color-to) to-transparent"',
+    );
+    expect(beam).toContain(
+      "offsetPath: `rect(0 auto auto 0 round ${size}px)`",
+    );
+    expect(beam).toContain("offsetDistance");
+    expect(beam).toContain('ease: "linear"');
   });
 
   it("restores the requested Motion reveals across the landing page", () => {
