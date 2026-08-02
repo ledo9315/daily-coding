@@ -1,49 +1,40 @@
-"use client";
-
-import React from "react";
-import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { DesktopCardSpotlightEffect } from "@/components/ui/desktop-card-spotlight-effect";
 
-export const CardSpotlight = ({
+/** Static spotlight treatment without a dedicated WebGL renderer per card. */
+export function CardSpotlight({
   children,
   radius = 350,
   color = "#262626",
+  animatedDots = false,
   className,
+  style,
   ...props
 }: {
   radius?: number;
   color?: string;
-  children: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>) => {
-  const mask = `radial-gradient(${radius}px circle at 90% 30%, white, transparent 60%)`;
-
+  animatedDots?: boolean;
+  children: ReactNode;
+} & HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "group/spotlight p-10 rounded-md relative border border-neutral-800 bg-black dark:border-neutral-800",
+        "relative overflow-hidden rounded-md border border-neutral-800 bg-black p-10 dark:border-neutral-800",
         className,
       )}
+      style={
+        {
+          backgroundImage: `radial-gradient(${radius}px circle at 90% 30%, color-mix(in srgb, ${color} 85%, #8b5cf6), transparent 60%)`,
+          ...style,
+        } as CSSProperties
+      }
       {...props}
     >
-      <div
-        className="pointer-events-none absolute z-0 -inset-px rounded-md opacity-100"
-        style={{
-          backgroundColor: color,
-          maskImage: mask,
-          WebkitMaskImage: mask,
-        }}
-      >
-        <CanvasRevealEffect
-          animationSpeed={5}
-          containerClassName="bg-transparent absolute inset-0 pointer-events-none"
-          colors={[
-            [59, 130, 246],
-            [139, 92, 246],
-          ]}
-          dotSize={2}
-        />
-      </div>
+      {animatedDots ? (
+        <DesktopCardSpotlightEffect color={color} radius={radius} />
+      ) : null}
       {children}
     </div>
   );
-};
+}

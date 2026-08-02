@@ -2,7 +2,21 @@
 
 import { ArrowBarUp, Trophy, Script, Calendar } from "@nsmr/pixelart-react";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
-import { motion, Variants } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 100 },
+  },
+};
 
 /**
  * What accumulates across days. The look is deliberate and unchanged; the content is not.
@@ -30,28 +44,6 @@ import { motion, Variants } from "framer-motion";
  * cut in half. The `features` anchor moved to that shared section.
  */
 export function LandingRoutine() {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
-
   return (
     <div className="py-24">
       <motion.div
@@ -73,7 +65,7 @@ export function LandingRoutine() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
+            <CardSpotlight animatedDots className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
               <div className="h-12 w-12 flex items-center justify-center rounded-full mb-4 text-primary relative z-10">
                 <ArrowBarUp className="h-8 w-8" />
               </div>
@@ -89,7 +81,7 @@ export function LandingRoutine() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
+            <CardSpotlight animatedDots className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
               <div className="h-12 w-12 flex items-center justify-center bg-accent/10 rounded-full mb-4 text-accent relative z-10">
                 <Trophy className="h-8 w-8" />
               </div>
@@ -104,7 +96,7 @@ export function LandingRoutine() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
+            <CardSpotlight animatedDots className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
               <div className="h-12 w-12 flex items-center justify-center bg-chart-4/10 rounded-full mb-4 text-chart-4 relative z-10">
                 <Script className="h-8 w-8" />
               </div>
@@ -119,7 +111,7 @@ export function LandingRoutine() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="h-full">
-            <CardSpotlight className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
+            <CardSpotlight animatedDots className="pixel-box bg-card p-6 flex flex-col items-center text-center hover:translate-y-[-4px] transition-transform h-full">
               <div className="h-12 w-12 flex items-center justify-center bg-success/10 rounded-full mb-4 text-success relative z-10">
                 <Calendar className="h-8 w-8" />
               </div>

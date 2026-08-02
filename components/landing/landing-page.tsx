@@ -38,7 +38,7 @@ export function LandingPage({
           No `id="features"` here: the anchor sits on the day timeline, which is what the hero
           button now promises.
         */}
-        <section className="relative overflow-hidden border-y border-border bg-card/50">
+        <section className="landing-deferred relative overflow-hidden border-y border-border bg-card/50">
           <AmbientGlow side="right" className="top-[22%]" />
           <AmbientGlow side="left" className="top-[62%]" />
           <LandingRoutine />

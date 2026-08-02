@@ -1,9 +1,8 @@
 "use client";
 
 // Hidden with the banner below: import Image from "next/image";
-import { motion, Variants } from "framer-motion";
-import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { AmbientGlow } from "@/components/landing/ambient-glow";
+import { motion, type Variants } from "framer-motion";
 
 /**
  * The day, as a timed sequence instead of four feature cards.
@@ -64,19 +63,6 @@ export function LandingFeatures() {
       id="features"
       className="relative overflow-hidden border-t border-border bg-[#020912] pb-12"
     >
-      {/*
-        As faint as the one behind the countdown, and wrapped around the table only: over the
-        artwork below it would compete with the picture. Same numbers there, so both black
-        sections move at the same rate.
-      */}
-      <FlickeringGrid
-        className="absolute inset-0 z-0 mask-[radial-gradient(900px_300px_at_50%_100%,white,transparent)]"
-        squareSize={6}
-        gridGap={1}
-        color="#C4FE4D"
-        maxOpacity={0.08}
-        flickerChance={0.03}
-      />
       <div className="relative">
         {/*
           One bloom, on the side the grey section below does not start on, and inside the table

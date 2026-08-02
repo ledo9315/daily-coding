@@ -2,12 +2,28 @@
 
 import Link from "next/link";
 import { Code, TrendingUp, Zap } from "@nsmr/pixelart-react";
-import { Meteors } from "../ui/meteors";
 import Image from "next/image";
+import { motion, type Variants } from "framer-motion";
+import { AnimatedFlickeringGrid } from "../ui/animated-flickering-grid";
+import { Meteors } from "../ui/meteors";
 import { BorderBeam } from "../ui/border-beam";
-import { EncryptedText } from "../ui/encrypted-text";
-import { FlickeringGrid } from "../ui/flickering-grid";
-import { motion, Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 100 },
+  },
+};
 
 /**
  * `todaysChallengeTitle` comes from the server. The badge used to hardcode
@@ -20,42 +36,18 @@ export function LandingHero({
 }: {
   todaysChallengeTitle: string | null;
 }) {
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
-
   return (
     <div className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
-      <FlickeringGrid
+      <AnimatedFlickeringGrid
         className="absolute inset-0 z-0 mask-[radial-gradient(400px_circle_at_center,white,transparent)]"
         squareSize={6}
         gridGap={1}
         color="#A371F7"
         maxOpacity={0.2}
         flickerChance={0.1}
-        height={800}
-        width={1920}
       />
       {/* Background patterns */}
-      <Meteors />
+      <Meteors number={20} />
       <div className="absolute inset-0 z-0 opacity-20 scanlines" />
       <div className="absolute top-20 right-0 h-100 w-100 bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
       <div className="absolute bottom-0 left-0 h-75 w-75 bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
@@ -72,10 +64,9 @@ export function LandingHero({
             className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm"
           >
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <EncryptedText
-              text={`Heutige Challenge: ${todaysChallengeTitle}`}
-              revealDelayMs={40}
-            />
+            <span aria-label={`Heutige Challenge: ${todaysChallengeTitle}`}>
+              Heutige Challenge: {todaysChallengeTitle}
+            </span>
           </motion.div>
         ) : null}
 
@@ -114,12 +105,17 @@ export function LandingHero({
         </motion.div>
 
         <div className="relative mt-16 mx-auto max-w-4xl rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm">
-          <BorderBeam size={250} duration={12} delay={9} />
+          <BorderBeam
+            className="hidden sm:block"
+            duration={12}
+            delay={9}
+          />
           <Image
             src="/screen2.png"
             alt="Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge"
             width={1920}
             height={1121}
+            sizes="(max-width: 896px) calc(100vw - 48px), 896px"
             loading="eager"
             fetchPriority="high"
             className="rounded-lg border border-border"

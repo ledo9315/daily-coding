@@ -18,9 +18,6 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { useControllableState } from "@radix-ui/react-use-controllable-state"
-
 import { cn } from "@/lib/utils"
 
 // ---------------------------------------------------------------------------
@@ -329,16 +326,22 @@ export function TerminalAnimationRoot({
   children,
   ...props
 }: TerminalAnimationRootProps) {
-  const [activeTab, setActiveTab] = useControllableState({
-    prop: activeTabProp,
-    defaultProp: defaultActiveTab,
-    onChange: onActiveTabChange,
-  })
+  const [internalActiveTab, setInternalActiveTab] = useState(defaultActiveTab)
+  const activeTab = activeTabProp ?? internalActiveTab
+  const setActiveTab = useCallback(
+    (index: number) => {
+      if (activeTabProp === undefined) setInternalActiveTab(index)
+      onActiveTabChange?.(index)
+    },
+    [activeTabProp, onActiveTabChange]
+  )
 
   const [visibleLines, setVisibleLines] = useState(0)
   const [commandTyped, setCommandTyped] = useState("")
   const [isTypingCommand, setIsTypingCommand] = useState(true)
   const [showCursor, setShowCursor] = useState(true)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [isInView, setIsInView] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const clearTimeouts = useCallback(() => {
@@ -398,9 +401,27 @@ export function TerminalAnimationRoot({
   )
 
   useEffect(() => {
+    const element = rootRef.current
+    if (!element) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setIsInView(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!isInView) return
     animateTab(activeTab)
     return clearTimeouts
-  }, [activeTab, animateTab, clearTimeouts])
+  }, [activeTab, animateTab, clearTimeouts, isInView])
 
   const currentTab = tabs[activeTab] ?? tabs[0]
   const safeActiveTab = Math.min(activeTab, tabs.length - 1)
@@ -421,6 +442,7 @@ export function TerminalAnimationRoot({
       <div
         className={cn(alwaysDark && "dark", className)}
         data-slot="terminal-animation-root"
+        ref={rootRef}
         {...props}
       >
         {backgroundImage && (
@@ -771,13 +793,10 @@ export type TerminalAnimationTabTriggerProps =
   React.ComponentPropsWithoutRef<"button"> & {
     /** Tab index to activate when clicked */
     index: number
-    /** Merge props onto child element instead of rendering a button */
-    asChild?: boolean
   }
 
 export function TerminalAnimationTabTrigger({
   index,
-  asChild = false,
   className,
   children,
   ...props
@@ -791,10 +810,6 @@ export function TerminalAnimationTabTrigger({
     "data-state": isActive ? "active" : "inactive",
     onClick: () => setActiveTab(index),
     children,
-  }
-
-  if (asChild) {
-    return <Slot {...triggerProps} {...props} className={className} />
   }
 
   return (
