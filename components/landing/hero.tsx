@@ -107,10 +107,10 @@ export function LandingHero({
         <div className="relative mt-16 mx-auto max-w-4xl rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm">
           <BorderBeam size={250} duration={12} delay={9} />
           <Image
-            src="/screen2.png"
+            src="/screen.webp"
             alt="Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge"
-            width={1920}
-            height={1121}
+            width={3338}
+            height={1890}
             sizes="(max-width: 896px) calc(100vw - 48px), 896px"
             loading="eager"
             fetchPriority="high"
