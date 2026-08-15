@@ -1,9 +1,16 @@
 import bcrypt from "bcryptjs";
+import { CredentialsSignin } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { verifyEmailToken } from "@/lib/server/auth-service";
 import { emailAddressValidationError, normaliseEmailAddress } from "@/lib/email-address";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { requestClientIdentity } from "@/lib/server/request-security";
+
+export const EMAIL_NOT_VERIFIED_CODE = "email_not_verified";
+
+export class EmailNotVerifiedError extends CredentialsSignin {
+  code = EMAIL_NOT_VERIFIED_CODE;
+}
 
 type CredentialsInput = Partial<
   Record<"email" | "password" | "rememberMe" | "verificationToken", unknown>
@@ -73,11 +80,13 @@ export async function authorizeCredentials(
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) return null;
 
+  // Safe to name the real reason here: the password already matched, so this leaks
+  // nothing to a stranger. NextAuth passes the error's `code` on to the client.
   if (
     process.env.REQUIRE_EMAIL_VERIFICATION === "true" &&
     !user.emailVerified
   ) {
-    return null;
+    throw new EmailNotVerifiedError();
   }
 
   return mapUserToSessionUser(user, rememberMe);

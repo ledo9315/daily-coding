@@ -38,7 +38,10 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
 
     if (result?.error) {
       toast.error("Anmeldung fehlgeschlagen", {
-        description: "E-Mail oder Passwort ist falsch.",
+        description:
+          result.code === "email_not_verified"
+            ? "Deine E-Mail-Adresse ist noch nicht bestätigt. Schau in dein Postfach (auch im Spam-Ordner)."
+            : "E-Mail oder Passwort ist falsch.",
       });
       setIsLoading(false);
       return;
