@@ -27,6 +27,12 @@ vi.mock("@/lib/server/rate-limiter", () => ({
   checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
 }));
 
+// next-auth's entry pulls in `next/server`, which the node test environment cannot
+// resolve. Only the base class of EmailNotVerifiedError is needed here.
+vi.mock("next-auth", () => ({
+  CredentialsSignin: class extends Error {},
+}));
+
 import { authorizeCredentials } from "@/lib/auth-credentials";
 
 beforeEach(() => {
@@ -137,7 +143,7 @@ describe("authorizeCredentials", () => {
     });
   });
 
-  it("returns null when emailVerified is false and REQUIRE_EMAIL_VERIFICATION is true", async () => {
+  it("throws email_not_verified when emailVerified is false and REQUIRE_EMAIL_VERIFICATION is true", async () => {
     const original = process.env.REQUIRE_EMAIL_VERIFICATION;
     process.env.REQUIRE_EMAIL_VERIFICATION = "true";
 
@@ -152,8 +158,9 @@ describe("authorizeCredentials", () => {
     });
     mockCompare.mockResolvedValueOnce(true);
 
-    const result = await authorizeCredentials({ email: "a@b.de", password: "secret1234" });
-    expect(result).toBeNull();
+    await expect(
+      authorizeCredentials({ email: "a@b.de", password: "secret1234" })
+    ).rejects.toMatchObject({ code: "email_not_verified" });
 
     process.env.REQUIRE_EMAIL_VERIFICATION = original;
   });
