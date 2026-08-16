@@ -4,9 +4,6 @@
 Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bewertet gegen echte Testfälle in einer Sandbox. Mit Bestenliste, Streaks, Levels und Abzeichen.
 
 **Live:** [daily-coding.de](https://daily-coding.de)
-
-<img width="2770" height="1818" alt="CleanShot 2026-08-11 at 09 17 52@2x" src="https://github.com/user-attachments/assets/47569d31-13d5-4626-83f7-92eec1cd9133" />
-
 ---
 
 ## Was es kann
