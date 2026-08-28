@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import { avatarImageSrc } from "@/lib/avatar-src";
+import { publicProfilePath } from "@/lib/display-name";
 import { cn } from "@/lib/utils";
 import { Trophy } from "@nsmr/pixelart-react";
 
@@ -67,7 +69,12 @@ export function TopThreePodium({
             </AvatarFallback>
           </Avatar>
           <div className="mt-2 text-center flex flex-col items-center gap-1">
-            <p className="font-semibold">{second.name}</p>
+            <Link
+              href={publicProfilePath(second.name)}
+              className="font-semibold transition-colors hover:text-primary"
+            >
+              {second.name}
+            </Link>
             {second.level && (
               <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
                 Level {second.level}
@@ -99,7 +106,12 @@ export function TopThreePodium({
           </Avatar>
         </div>
         <div className="mt-2 text-center flex flex-col items-center gap-1">
-          <p className="font-semibold">{first.name}</p>
+          <Link
+            href={publicProfilePath(first.name)}
+            className="font-semibold transition-colors hover:text-primary"
+          >
+            {first.name}
+          </Link>
           {first.level && (
             <span className="text-xs uppercase font-bold text-primary tracking-wider">
               Level {first.level}
@@ -129,7 +141,12 @@ export function TopThreePodium({
             </AvatarFallback>
           </Avatar>
           <div className="mt-2 text-center flex flex-col items-center gap-1">
-            <p className="font-semibold">{third.name}</p>
+            <Link
+              href={publicProfilePath(third.name)}
+              className="font-semibold transition-colors hover:text-primary"
+            >
+              {third.name}
+            </Link>
             {third.level && (
               <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
                 Level {third.level}

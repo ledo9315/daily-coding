@@ -34,6 +34,13 @@ describe("RankingTable", () => {
     expect(html).not.toContain("1 Challenges gelöst");
   });
 
+  it("links the name to the public profile", () => {
+    const html = renderToStaticMarkup(
+      <RankingTable entries={[row({ name: "Lisa Müller" })]} />
+    );
+    expect(html).toContain('href="/u/lisa%20m%C3%BCller"');
+  });
+
   it("still says Challenges for other counts", () => {
     for (const n of [0, 2, 17]) {
       const html = renderToStaticMarkup(<RankingTable entries={[row({ challengesSolved: n })]} />);
