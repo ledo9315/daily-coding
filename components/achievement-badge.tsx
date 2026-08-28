@@ -1,5 +1,30 @@
+import {
+  Bookmark,
+  Bullseye,
+  CalendarWeek,
+  Check,
+  Clock,
+  Trophy,
+  Zap,
+} from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
 // import type { LucideIcon } from "lucide-react"
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Check,
+  CalendarWeek,
+  Clock,
+  Trophy,
+  Zap,
+  Bullseye,
+};
+
+/** The glyph for an achievement's `iconKey`; anything unknown falls back to the bookmark. */
+export function resolveAchievementIcon(
+  iconKey: string
+): React.ComponentType<{ className?: string }> {
+  return iconMap[iconKey] ?? Bookmark;
+}
 
 interface AchievementBadgeProps {
   title: string;
