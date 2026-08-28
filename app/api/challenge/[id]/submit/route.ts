@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CodeLanguage, Prisma } from "@/lib/generated/prisma/client";
+import { CodeLanguage } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
@@ -72,16 +72,6 @@ export async function POST(
 
   const alreadyToday = await findTodaySubmission(userId);
 
-  if (alreadyToday) {
-    return NextResponse.json(
-      {
-        error:
-          "Du hast diese Challenge heute (UTC) bereits abgegeben. Eine erneute Abgabe ist erst morgen möglich.",
-      },
-      { status: 409 },
-    );
-  }
-
   const { testCases: testResults, runtimeOk, compileError } = await runChallengeTests(
     challenge,
     code,
@@ -89,27 +79,35 @@ export async function POST(
     "submit"
   );
 
-  try {
-    await prisma.submission.create({
-      data: {
-        userId,
-        challengeId,
-        code,
-        language: language as CodeLanguage,
-        status: runtimeOk ? "completed" : "failed",
-        submissionDay: utcDayRange().gte,
-        testResults: testResults as unknown as Parameters<typeof prisma.submission.create>[0]["data"]["testResults"],
-      },
-    });
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      return NextResponse.json(
-        { error: "Du hast diese Challenge heute (UTC) bereits abgegeben." },
-        { status: 409 }
-      );
-    }
-    throw error;
-  }
+  // Once passed, it stays passed: rewriting a green solution and breaking it must not
+  // cost the points and the streak that were already earned today.
+  const status = runtimeOk || alreadyToday?.status === "completed" ? "completed" : "failed";
+  const submissionDay = utcDayRange().gte;
+  const storedResults = testResults as unknown as Parameters<
+    typeof prisma.submission.create
+  >[0]["data"]["testResults"];
+
+  // A re-submission overwrites today's row rather than adding one (#200). The day keeps
+  // exactly one submission, so points, level and streak still count it once.
+  await prisma.submission.upsert({
+    where: { userId_submissionDay: { userId, submissionDay } },
+    create: {
+      userId,
+      challengeId,
+      code,
+      language: language as CodeLanguage,
+      status,
+      submissionDay,
+      testResults: storedResults,
+    },
+    update: {
+      challengeId,
+      code,
+      language: language as CodeLanguage,
+      status,
+      testResults: storedResults,
+    },
+  });
 
   let celebration:
     | {
@@ -147,6 +145,9 @@ export async function POST(
 
   return NextResponse.json({
     success: runtimeOk,
+    // The stored status, which a failed retry on an already solved day leaves at
+    // "completed" — the panel would otherwise claim a failure until the next reload.
+    status,
     testCases: testResults,
     language,
     ...(compileError ? { compileError } : {}),

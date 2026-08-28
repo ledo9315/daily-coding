@@ -11,7 +11,6 @@ import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { ChallengeHints } from "@/components/challenge-hints";
-import { SubmissionLockedBanner } from "@/components/submission-locked-banner";
 import {
   Card,
   CardContent,
@@ -138,8 +137,6 @@ export default function ChallengePage() {
     }
   }, [challenge]);
 
-  const isSubmitLocked = submitOutcome !== "none";
-
   const { mutate: runTestsMutation, isPending: isRunning } = useMutation({
     mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
       runTests(challenge!.id, code, lang),
@@ -173,8 +170,9 @@ export default function ChallengePage() {
       setSubmittedAtLabel(
         new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
       );
+      setSubmitOutcome(result.status === "completed" ? "success" : "failed");
+
       if (result.success) {
-        setSubmitOutcome("success");
         notifyUserStatsChanged();
         if (result.celebration) {
           setCelebration(result.celebration);
@@ -185,7 +183,6 @@ export default function ChallengePage() {
           });
         }
       } else {
-        setSubmitOutcome("failed");
         toast.error("Abgabe nicht bestanden", {
           description:
             "Mindestens ein Test ist fehlgeschlagen oder die Ausführung war fehlerhaft.",
@@ -340,12 +337,8 @@ export default function ChallengePage() {
                     <Select
                       value={language}
                       onValueChange={(v) => setLanguage(v as CodeLanguageId)}
-                      disabled={isSubmitLocked}
                     >
-                      <SelectTrigger
-                        size="sm"
-                        className="w-full rounded-none font-sans disabled:opacity-40 sm:w-[180px]"
-                      >
+                      <SelectTrigger size="sm" className="w-full rounded-none font-sans sm:w-[180px]">
                         <SelectValue placeholder="Sprache" />
                       </SelectTrigger>
                       <SelectContent className="rounded-none">
@@ -360,7 +353,7 @@ export default function ChallengePage() {
                   <Button
                     variant="outline"
                     onClick={handleRunTests}
-                    disabled={isRunning || isSubmitLocked || !language}
+                    disabled={isRunning || !language}
                     className="gap-2 rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />
@@ -369,16 +362,13 @@ export default function ChallengePage() {
                 </div>
               </div>
 
-              {isSubmitLocked ? <SubmissionLockedBanner /> : null}
-
               {language ? (
                 <CodeEditor
                   value={currentCode}
                   onChange={setCurrentCode}
                   language={language}
                   fileName={languageFileName(language)}
-                  readOnly={isSubmitLocked}
-                  className={`shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50${isSubmitLocked ? " opacity-50 grayscale pointer-events-none" : ""}`}
+                  className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50"
                 />
               ) : null}
             </div>
@@ -398,7 +388,7 @@ export default function ChallengePage() {
               submittedAt={submittedAtLabel}
             />
 
-            {!isSubmitLocked && !submitWarningDismissed && (
+            {!submitWarningDismissed && (
               <Alert
                 variant="destructive"
                 className="relative border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none pr-12"
@@ -419,8 +409,9 @@ export default function ChallengePage() {
                 <AlertIcon className="h-4 w-4" fill="currentColor" />
                 <AlertTitle className="text-lg leading-none mb-2">Achtung</AlertTitle>
                 <AlertDescription className="text-sm">
-                  Pro Kalendertag (UTC) kannst du nur eine finale Abgabe machen. Stelle
-                  sicher, dass alle Tests bestanden sind, bevor du einreichst.
+                  Pro Kalendertag (UTC) zählt genau eine Abgabe. Bis zum Tageswechsel
+                  kannst du sie beliebig oft überschreiben — eine bestandene Challenge
+                  bleibt dabei bestanden.
                 </AlertDescription>
               </Alert>
             )}
@@ -429,14 +420,14 @@ export default function ChallengePage() {
               size="lg"
               className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={handleSubmit}
-              disabled={isSubmitLocked || !language || isSubmitting}
+              disabled={!language || isSubmitting}
             >
               <ArrowRight className="h-4 w-4" fill="currentColor" />
-              {isSubmitLocked
-                ? "Bereits abgegeben"
-                : isSubmitting
-                  ? "Wird gesendet…"
-                  : "Final abgeben"}
+              {isSubmitting
+                ? "Wird gesendet…"
+                : submitOutcome === "none"
+                  ? "Final abgeben"
+                  : "Erneut abgeben"}
             </Button>
 
             {compileError ? (

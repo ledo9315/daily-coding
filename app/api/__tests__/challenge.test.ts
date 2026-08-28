@@ -21,6 +21,20 @@ vi.mock("@/auth", () => ({
   auth: () => mockAuth(),
 }));
 
+// Partial mock: every test keeps the real stub runner, a single one overrides it to
+// simulate a failing attempt — the stub always passes on submit.
+type ChallengeExecution = typeof import("@/lib/server/challenge-execution");
+const { mockRunChallengeTests } = vi.hoisted(() => ({ mockRunChallengeTests: vi.fn() }));
+vi.mock("@/lib/server/challenge-execution", async (importOriginal) => {
+  const actual = await importOriginal<ChallengeExecution>();
+  mockRunChallengeTests.mockImplementation(actual.runChallengeTests);
+  return {
+    ...actual,
+    runChallengeTests: (...args: Parameters<ChallengeExecution["runChallengeTests"]>) =>
+      mockRunChallengeTests(...args),
+  };
+});
+
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindFirst = vi.fn();
@@ -57,6 +71,7 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
       create: (...args: unknown[]) => mockCreate(...args),
+      upsert: (...args: unknown[]) => mockCreate(...args),
       aggregate: (...args: unknown[]) => mockSubmissionAggregate(...args),
       count: (...args: unknown[]) => mockSubmissionCount(...args),
     },
@@ -487,16 +502,35 @@ describe("POST /api/challenge/[id]/submit", () => {
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it("returns 409 when already submitted today (UTC)", async () => {
-    mockSubmissionFindFirst.mockResolvedValueOnce({ id: "existing-sub" });
+  // #200: a re-submission on the same UTC day overwrites the row instead of being rejected.
+  it("overwrites today's submission instead of returning 409", async () => {
+    mockSubmissionFindFirst.mockResolvedValueOnce({ id: "existing-sub", status: "failed" });
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
-    const res = await submitHandler(makeRequest("ch-1"), {
+    mockCreate.mockResolvedValueOnce({});
+    const res = await submitHandler(makeRequest("ch-1", "besserer code"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(200);
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { userId_submissionDay: { userId: "user-test", submissionDay: expect.any(Date) } },
+        update: expect.objectContaining({ code: "besserer code", status: "completed" }),
+      })
+    );
+  });
+
+  it("keeps a solved day solved when a later attempt fails", async () => {
+    mockSubmissionFindFirst.mockResolvedValueOnce({ id: "existing-sub", status: "completed" });
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockRunChallengeTests.mockResolvedValueOnce({ testCases: [], runtimeOk: false });
+    mockCreate.mockResolvedValueOnce({});
+    const res = await submitHandler(makeRequest("ch-1", "kaputter code"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
     const json = await res.json();
-    expect(json.error).toMatch(/heute \(UTC\) bereits/);
-    expect(mockCreate).not.toHaveBeenCalled();
+    expect(json.success).toBe(false);
+    expect(json.status).toBe("completed");
+    expect(mockCreate.mock.calls[0][0].update.status).toBe("completed");
   });
 
   it("creates a submission record in the database", async () => {
@@ -507,7 +541,7 @@ describe("POST /api/challenge/[id]/submit", () => {
     });
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({
+        create: expect.objectContaining({
           challengeId: "ch-1",
           code: "my code",
           language: "typescript",
@@ -525,7 +559,7 @@ describe("POST /api/challenge/[id]/submit", () => {
     await submitHandler(makeRequest("ch-1", "code", "javascript"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
-    expect(mockCreate.mock.calls[0][0].data).not.toHaveProperty("timeTaken");
+    expect(mockCreate.mock.calls[0][0].create).not.toHaveProperty("timeTaken");
   });
 
   it("update streak and record after successful submission", async () => {
