@@ -4,12 +4,12 @@
  * the dashboard read them with `findMany`, so the seed is the only way to change them.
  */
 export const ACHIEVEMENT_DEFS = [
-  { id: "ach-1", title: "Erste Schritte",    description: "Erste Challenge abgeschlossen",         iconKey: "Check",        rarity: "common"    as const },
-  { id: "ach-2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht",                iconKey: "CalendarWeek", rarity: "rare"      as const },
-  { id: "ach-3", title: "Polyglott",         description: "In drei verschiedenen Sprachen gelöst", iconKey: "Code",         rarity: "rare"      as const },
-  { id: "ach-4", title: "Code-Meister",      description: "10 schwere Challenges gelöst",          iconKey: "Trophy",       rarity: "epic"      as const },
-  { id: "ach-5", title: "Unaufhaltsam",      description: "30 Tage Streak erreicht",               iconKey: "Zap",          rarity: "legendary" as const },
-  { id: "ach-6", title: "Perfektionist",     description: "20 Challenges ohne Fehler",             iconKey: "Bullseye",     rarity: "epic"      as const },
+  { id: "ach-1", title: "Erste Schritte",    description: "Erste Challenge abgeschlossen",                       iconKey: "Check",        rarity: "common"    as const },
+  { id: "ach-2", title: "Wochenend-Krieger", description: "7 Tage Streak erreicht",                              iconKey: "CalendarWeek", rarity: "rare"      as const },
+  { id: "ach-3", title: "Polyglott",         description: "An drei Tagen in drei verschiedenen Sprachen gelöst", iconKey: "Code",         rarity: "rare"      as const },
+  { id: "ach-4", title: "Code-Meister",      description: "10 schwere Challenges gelöst",                        iconKey: "Trophy",       rarity: "epic"      as const },
+  { id: "ach-5", title: "Unaufhaltsam",      description: "30 Tage Streak erreicht",                             iconKey: "Zap",          rarity: "legendary" as const },
+  { id: "ach-6", title: "Perfektionist",     description: "20 Challenges ohne Fehler",                           iconKey: "Bullseye",     rarity: "epic"      as const },
 ];
 
 type AchievementDefUpsertClient = {

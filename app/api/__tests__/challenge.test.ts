@@ -35,6 +35,14 @@ vi.mock("@/lib/server/challenge-execution", async (importOriginal) => {
   };
 });
 
+// Mocked whole: the route only owes us the call, and the module's own behaviour is
+// covered in lib/server/__tests__/achievement-unlocks.test.ts.
+const mockPersistAchievementUnlocks = vi.fn().mockResolvedValue([]);
+vi.mock("@/lib/server/achievement-unlocks", () => ({
+  persistAchievementUnlocks: (...args: unknown[]) =>
+    mockPersistAchievementUnlocks(...args),
+}));
+
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
 
 const mockFindFirst = vi.fn();
@@ -587,6 +595,28 @@ describe("POST /api/challenge/[id]/submit", () => {
     });
     expect(res.status).toBe(400);
     expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("freezes reached achievements after a successful submission (#205)", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(mockPersistAchievementUnlocks).toHaveBeenCalledWith(
+      expect.anything(),
+      "user-test"
+    );
+  });
+
+  it("freezes nothing when the attempt failed", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockRunChallengeTests.mockResolvedValueOnce({ testCases: [], runtimeOk: false });
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1", "kaputter code"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(mockPersistAchievementUnlocks).not.toHaveBeenCalled();
   });
 
   it("all stub test cases have status=passed on submit", async () => {
