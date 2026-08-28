@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 // ponytail: static legal text. Have it reviewed by a lawyer before launch.
 export default function ImpressumPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans">
+    <div className="flex min-h-screen flex-col bg-background text-foreground font-sans">
       <LandingNavbar />
-      <main className="mx-auto max-w-3xl px-4 pt-32 pb-16 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-32 pb-16 sm:px-6 lg:px-8">
         <h1 className="font-pixel text-2xl mb-8 uppercase tracking-wide">
           Impressum
         </h1>

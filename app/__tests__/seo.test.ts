@@ -42,6 +42,7 @@ describe("sitemap.xml", () => {
     expect(urls).toEqual([
       // The landing lives on the apex URL since #130 — `/landing` only redirects there.
       `${SITE}/`,
+      `${SITE}/changelog`,
       `${SITE}/impressum`,
       `${SITE}/datenschutz`,
     ]);
