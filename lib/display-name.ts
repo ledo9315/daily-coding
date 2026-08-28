@@ -12,6 +12,11 @@ export function nameKeyOf(name: string): string {
   return name.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+/** The handle is the `nameKey` itself, so no separate `username` field is needed. */
+export function publicProfilePath(name: string): string {
+  return `/u/${encodeURIComponent(nameKeyOf(name))}`;
+}
+
 /** The display form: trimmed, inner whitespace collapsed, case left as typed. */
 export function normaliseDisplayName(name: string): string {
   return name.trim().replace(/\s+/g, " ");

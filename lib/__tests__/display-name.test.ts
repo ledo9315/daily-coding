@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   displayNameValidationError,
   nameKeyOf,
+  publicProfilePath,
   uniqueDisplayName,
 } from "@/lib/display-name";
 
@@ -32,6 +33,20 @@ describe("nameKeyOf", () => {
 
   it("trims and collapses inner whitespace", () => {
     expect(nameKeyOf("  Max   Müller ")).toBe("max müller");
+  });
+});
+
+describe("publicProfilePath", () => {
+  it("builds the path from the name key", () => {
+    expect(publicProfilePath("Anna Schmidt")).toBe("/u/anna%20schmidt");
+  });
+
+  it("percent-encodes umlauts", () => {
+    expect(publicProfilePath("Lisa Müller")).toBe("/u/lisa%20m%C3%BCller");
+  });
+
+  it("ignores case and surrounding whitespace, because nameKeyOf normalises", () => {
+    expect(publicProfilePath("  ANNA   SCHMIDT  ")).toBe(publicProfilePath("Anna Schmidt"));
   });
 });
 

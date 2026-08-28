@@ -95,6 +95,25 @@ describe("proxy", () => {
   });
 
   /**
+   * #34: the public profile at /u/<handle> is reachable without a login, so /u is
+   * deliberately absent from PROTECTED_PATHS and must never be added there by a prefix
+   * that reaches too far.
+   */
+  describe("public profile pages", () => {
+    it("passes through an encoded handle without calling getToken", async () => {
+      const res = await proxy(req("http://localhost:3000/u/anna%20schmidt"));
+      expect(mockGetToken).not.toHaveBeenCalled();
+      expect(res.headers.get("location")).toBeNull();
+    });
+
+    it("passes through a plain handle without calling getToken", async () => {
+      const res = await proxy(req("http://localhost:3000/u/tom-weber"));
+      expect(mockGetToken).not.toHaveBeenCalled();
+      expect(res.headers.get("location")).toBeNull();
+    });
+  });
+
+  /**
    * #114: the app answers on daily-coding.de and on the vercel.app alias with identical
    * content. Without a marker, a search engine may index the alias as the real thing and
    * the brand name never appears in the results. A redirect would fix it too, but it

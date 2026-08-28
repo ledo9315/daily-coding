@@ -56,4 +56,13 @@ describe("TopThreePodium", () => {
     ).not.toThrow();
   });
 
+  it("links every placement to its public profile (#34)", () => {
+    const markup = renderToStaticMarkup(
+      <TopThreePodium first={first} second={second} third={third} />,
+    );
+
+    expect(markup).toContain('href="/u/leonid"');
+    expect(markup).toContain('href="/u/lisa%20m%C3%BCller"');
+    expect(markup).toContain('href="/u/max%20mustermann"');
+  });
 });

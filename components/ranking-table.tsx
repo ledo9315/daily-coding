@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import {
@@ -9,6 +10,7 @@ import {
   Minus,
 } from "@nsmr/pixelart-react";
 import { avatarImageSrc } from "@/lib/avatar-src";
+import { publicProfilePath } from "@/lib/display-name";
 import { cn } from "@/lib/utils";
 
 interface RankingEntry {
@@ -154,7 +156,12 @@ export function RankingTable({
                       </Avatar>
                       <div className="min-w-0">
                         <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                          <p className="min-w-0 font-medium break-words">{entry.name}</p>
+                          <Link
+                            href={publicProfilePath(entry.name)}
+                            className="min-w-0 font-medium break-words transition-colors hover:text-primary"
+                          >
+                            {entry.name}
+                          </Link>
                           {entry.level && (
                             /*
                               `shrink-0` and `whitespace-nowrap`: as a shrinking flex item

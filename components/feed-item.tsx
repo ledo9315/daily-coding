@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { publicProfilePath } from "@/lib/display-name";
 import { Bookmark, ArrowBarUp, Bullseye, Script } from "@nsmr/pixelart-react";
 
 export type EventType =
@@ -83,7 +85,12 @@ export function FeedItem({ user, event }: FeedItemProps) {
           <div className="flex-1 space-y-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-bold">{user.username}</span>
+                <Link
+                  href={publicProfilePath(user.name)}
+                  className="font-bold hover:text-primary transition-colors"
+                >
+                  {user.username}
+                </Link>
               </div>
               <span className="text-xs text-muted-foreground">
                 {event.timestamp}

@@ -95,10 +95,17 @@ export default function DatenschutzPage() {
               (Art. 6 Abs. 1 lit. f DSGVO).
             </p>
             <p>
-              Für andere angemeldete Nutzer sichtbar sind dabei dein Name, dein
-              gewählter Avatar, dein Level und die von dir gelösten Challenges
-              — in der Bestenliste und im Community-Feed. Dein eingereichter
-              Quellcode ist für andere Nutzer nicht sichtbar.
+              Für andere sichtbar sind dabei dein Name, dein gewählter Avatar,
+              dein Level, deine aktuelle Streak samt Streak-Rekord und die
+              Anzahl der von dir gelösten Challenges — in der Bestenliste, im
+              Community-Feed und auf deiner öffentlichen Profilseite.
+            </p>
+            <p>
+              Diese Profilseite ist ohne Anmeldung abrufbar, also auch für
+              Personen ohne Konto bei uns. Sie ist per Meta-Angabe von der
+              Indexierung durch Suchmaschinen ausgenommen und nicht in unserer
+              Sitemap verzeichnet. Deine E-Mail-Adresse und dein eingereichter
+              Quellcode sind für andere Nutzer weiterhin nicht sichtbar.
             </p>
           </section>
 

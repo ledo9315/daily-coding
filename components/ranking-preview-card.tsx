@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import { Trophy, ArrowRight, Clock } from "@nsmr/pixelart-react";
 import { avatarImageSrc } from "@/lib/avatar-src";
+import { publicProfilePath } from "@/lib/display-name";
 import { cn } from "@/lib/utils";
 
 interface RankingUser {
@@ -95,9 +96,12 @@ export function RankingPreviewCard({
 
               <div className="flex-1 min-w-0">
                 <div className="flex min-w-0 items-baseline gap-2">
-                  <p className="min-w-0 truncate text-lg font-sans uppercase">
+                  <Link
+                    href={publicProfilePath(user.name)}
+                    className="min-w-0 truncate text-lg font-sans uppercase transition-colors hover:text-primary"
+                  >
                     {user.name}
-                  </p>
+                  </Link>
                   {user.level && (
                     <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
                       Lvl {user.level}
