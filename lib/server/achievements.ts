@@ -39,19 +39,25 @@ const HARD_SOLVED = 10;
 /** „Perfektionist“ (ach-6): 20 challenges solved (a completed submission passes every test case). */
 const NO_ERROR_SOLVED = 20;
 
+export type AchievementRule = {
+  unlocked: boolean;
+  /** When the rule was first met. Null for the streak rules, which the record cannot date. */
+  at: Date | null;
+  current: number;
+  target: number;
+  label?: string;
+};
+
 /**
- * Builds the achievement list for a profile, including locked/unlocked state.
+ * Evaluates the six rules against a user's completed submissions.
  *
- * Unlocks are derived at runtime from existing data, so no separate "unlock"
- * persistence is needed. An existing UserAchievement row with `unlockedAt` takes
- * precedence and freezes the unlock date.
+ * Split out from the view because `persistAchievementUnlocks` needs the raw dates rather
+ * than the formatted strings the view produces — and both must read the same rules.
  */
-export function buildUserAchievementsView(
-  defs: DefRow[],
-  userAchievements: UserAchievementRow[],
+export function deriveAchievementRules(
   completedSubmissions: CompletedSubmission[],
   streakRecord = 0
-): { achievements: Achievement[]; unlockedCount: number } {
+): Record<string, AchievementRule> {
   const byDate = [...completedSubmissions].sort(
     (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
   );
@@ -82,16 +88,7 @@ export function buildUserAchievementsView(
    * The streak rules read the record rather than the running streak, so they carry a
    * label; „5/7" alone would read as a series still going.
    */
-  const inferred: Record<
-    string,
-    {
-      unlocked: boolean;
-      at: Date | null;
-      current: number;
-      target: number;
-      label?: string;
-    }
-  > = {
+  return {
     "ach-1": {
       unlocked: totalSolved > 0,
       at: nthDate(byDate, 1),
@@ -131,6 +128,22 @@ export function buildUserAchievementsView(
       target: NO_ERROR_SOLVED,
     },
   };
+}
+
+/**
+ * Builds the achievement list for a profile, including locked/unlocked state.
+ *
+ * A UserAchievement row with `unlockedAt` wins over the rules and freezes the date. That
+ * row is what makes an unlock permanent: the rules are recomputed from the submissions on
+ * every call, and since #200 a re-submission can lower a count they read (#205).
+ */
+export function buildUserAchievementsView(
+  defs: DefRow[],
+  userAchievements: UserAchievementRow[],
+  completedSubmissions: CompletedSubmission[],
+  streakRecord = 0
+): { achievements: Achievement[]; unlockedCount: number } {
+  const inferred = deriveAchievementRules(completedSubmissions, streakRecord);
 
   const progressByAchievementId = new Map(
     userAchievements.map((ua) => [ua.achievementId, ua])

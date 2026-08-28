@@ -10,6 +10,7 @@ import {
   utcDayRange,
 } from "@/lib/server/challenge-day";
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
+import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import {
   codeExceedsLimit,
@@ -131,6 +132,10 @@ export async function POST(
       },
       select: { streak: true, streakRecord: true },
     });
+
+    // After the streak update, because two of the rules read `streakRecord`. Freezes what
+    // has been reached so a later re-submission cannot recompute it away (#205).
+    await persistAchievementUnlocks(prisma, userId);
 
     const completionsToday = await prisma.submission.count({
       where: { challengeId, status: "completed", createdAt: utcDayRange() },
