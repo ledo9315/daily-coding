@@ -38,12 +38,14 @@ export function isAllowedUserAvatarPath(path: string): path is UserAvatarPath {
  * the same one. Both registration paths used to store an empty avatar, which left the
  * ranking and the feed showing bare initials next to picked avatars (#101).
  *
- * Callers pass the email address, not the user id: Prisma assigns the id during the
- * insert, so an id-based derivation would need a second write. The result is stored, so
- * this runs exactly once per user and a later email change does not move the avatar.
+ * **The seed has to be public.** The result is rendered in the feed, in the ranking and
+ * on the public profile page, so anyone can read it and invert the hash over a guess.
+ * Seeded from the email address, as it was until #34, that turned a guessed address into
+ * a testable claim. The display name is shown next to the picture anyway, and it carries
+ * the unique constraint (#107), so it spreads exactly as well.
  *
- * ponytail: FNV-1a, not a crypto hash. Nothing here needs to resist an attacker — it
- * only needs to spread evenly and give the same answer twice.
+ * ponytail: FNV-1a, not a crypto hash. It does not have to resist an attacker as long as
+ * the seed is public — it only needs to spread evenly and give the same answer twice.
  */
 export function starterAvatarPath(seed: string): UserAvatarPath {
   let hash = 2166136261;

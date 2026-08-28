@@ -118,7 +118,7 @@ export async function findOrCreateOAuthUser(
       name,
       nameKey: nameKeyOf(name),
       initials,
-      avatar: starterAvatarPath(email),
+      avatar: starterAvatarPath(name),
       emailVerified: true, // OAuth providers pre-verify emails
       accounts: {
         create: {

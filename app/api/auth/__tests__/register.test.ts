@@ -35,6 +35,7 @@ vi.mock("@/lib/server/rate-limiter", () => ({
 import { POST } from "@/app/api/auth/register/route";
 import { NextRequest } from "next/server";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { starterAvatarPath } from "@/lib/user-avatars";
 
 function makeRequest(body: object) {
   return new NextRequest("http://localhost/api/auth/register", {
@@ -96,6 +97,25 @@ describe("POST /api/auth/register", () => {
 
     const body = (await res.json()) as { success: boolean; verificationEmailSent: boolean };
     expect(body).toEqual({ success: true, verificationEmailSent: true });
+  });
+
+  /**
+   * The starter avatar is public — it shows up in the feed, in the ranking and on the
+   * public profile page. Seeded from the address, it turned a guessed e-mail into a
+   * testable claim: compute the hash, compare it with the rendered `img`, and a mismatch
+   * rules the guess out. The display name is public already, so seeding from it tells an
+   * observer nothing they cannot read next to the picture.
+   */
+  it("seeds the starter avatar from the display name, never from the address", async () => {
+    mockFindUnique.mockResolvedValueOnce(null);
+    mockCreate.mockResolvedValueOnce({ id: "new-user" });
+    mockCreateEmailVerificationToken.mockResolvedValueOnce("tok123");
+
+    await POST(makeRequest({ email: "new@b.de", password: "secret1234", name: "New User" }));
+
+    const stored = mockCreate.mock.calls[0][0].data.avatar;
+    expect(stored).toBe(starterAvatarPath("New User"));
+    expect(stored).not.toBe(starterAvatarPath("new@b.de"));
   });
 
   it("normalises email before lookup, storage and delivery", async () => {
