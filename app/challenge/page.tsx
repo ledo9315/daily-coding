@@ -25,6 +25,8 @@ import {
   ArrowRight,
   Alert as AlertIcon,
   BookOpen,
+  Expand,
+  Collapse,
 } from "@nsmr/pixelart-react";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
@@ -47,6 +49,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /** Interval for the silent API check that picks up a new UTC day / new challenge. */
 const CHALLENGE_POLL_MS = 60_000;
@@ -137,6 +140,24 @@ export default function ChallengePage() {
     }
   }, [challenge]);
 
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  useEffect(() => {
+    if (!isMaximized) return;
+    // Own overlay instead of the Fullscreen API: the browser window keeps its tabs and
+    // address bar, which also means Escape and the scroll lock are ours to handle.
+    const closeOnEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMaximized(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMaximized]);
+
   const { mutate: runTestsMutation, isPending: isRunning } = useMutation({
     mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
       runTests(challenge!.id, code, lang),
@@ -203,8 +224,30 @@ export default function ChallengePage() {
     setSources((prev) => ({ ...prev, [language]: next }));
   };
 
+  // Everything a test run produces. Defined once so it can live in the sidebar or, while
+  // maximized, inside the panel — a compile error is a result too, and reading it should
+  // not require shrinking the editor first.
+  const runOutcome = (
+    <>
+      {compileError ? (
+        <div className="border-2 border-destructive/60 bg-destructive/10 p-4">
+          <p className="font-sans text-sm uppercase tracking-wide text-destructive">
+            Kompilieren fehlgeschlagen
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Der Code wurde nicht ausgeführt, es gibt daher kein Testergebnis.
+          </p>
+          <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap font-code text-xs text-destructive">
+            {compileError}
+          </pre>
+        </div>
+      ) : null}
+      <TestResults testCases={testCases} />
+    </>
+  );
+
   const handleRunTests = () => {
-    if (!challenge || !language) return;
+    if (!challenge || !language || isRunning) return;
     runTestsMutation({ code: currentCode, lang: language });
   };
 
@@ -329,7 +372,13 @@ export default function ChallengePage() {
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
+            <div
+              className={cn(
+                "space-y-4",
+                isMaximized &&
+                  "fixed inset-0 z-[60] flex flex-col gap-4 space-y-0 overflow-hidden bg-background p-4 sm:p-6"
+              )}
+            >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-semibold">Code Editor</h2>
                 <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
@@ -354,23 +403,62 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || !language}
+                    title="Test ausführen — im Editor auch mit ⌘S / Strg+S"
                     className="gap-2 rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />
                     {isRunning ? "Läuft..." : "Test ausführen"}
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsMaximized((v) => !v)}
+                    aria-pressed={isMaximized}
+                    aria-label={
+                      isMaximized ? "Editor verkleinern" : "Editor maximieren"
+                    }
+                    title={isMaximized ? "Editor verkleinern" : "Editor maximieren"}
+                    className="rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
+                  >
+                    {isMaximized ? (
+                      <Collapse className="h-4 w-4" fill="currentColor" />
+                    ) : (
+                      <Expand className="h-4 w-4" fill="currentColor" />
+                    )}
+                  </Button>
                 </div>
               </div>
 
-              {language ? (
-                <CodeEditor
-                  value={currentCode}
-                  onChange={setCurrentCode}
-                  language={language}
-                  fileName={languageFileName(language)}
-                  className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50"
-                />
-              ) : null}
+              {/* This wrapper stays in the tree in both modes on purpose: moving the editor
+                  to a different parent would remount Monaco and drop the undo history. */}
+              <div
+                className={cn(
+                  isMaximized && "flex min-h-0 flex-1 flex-col gap-4 lg:flex-row"
+                )}
+              >
+                {language ? (
+                  <CodeEditor
+                    value={currentCode}
+                    onChange={setCurrentCode}
+                    onSaveShortcut={handleRunTests}
+                    language={language}
+                    fileName={languageFileName(language)}
+                    className={cn(
+                      "shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50",
+                      isMaximized && "h-auto min-h-0 flex-1"
+                    )}
+                  />
+                ) : null}
+
+                {/* Running tests without seeing the result is pointless, so the panel comes
+                    along instead of staying behind the overlay. Beside the editor where
+                    there is room, below it on a narrow screen. */}
+                {isMaximized ? (
+                  <div className="max-h-[38%] shrink-0 space-y-4 overflow-y-auto lg:max-h-none lg:w-[380px]">
+                    {runOutcome}
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -430,21 +518,7 @@ export default function ChallengePage() {
                   : "Erneut abgeben"}
             </Button>
 
-            {compileError ? (
-              <div className="border-2 border-destructive/60 bg-destructive/10 p-4">
-                <p className="font-sans text-sm uppercase tracking-wide text-destructive">
-                  Kompilieren fehlgeschlagen
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Der Code wurde nicht ausgeführt, es gibt daher kein Testergebnis.
-                </p>
-                <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap font-code text-xs text-destructive">
-                  {compileError}
-                </pre>
-              </div>
-            ) : null}
-
-            <TestResults testCases={testCases} />
+            {isMaximized ? null : runOutcome}
           </div>
         </div>
       </main>
