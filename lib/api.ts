@@ -260,6 +260,8 @@ export function submitSolution(
   language: CodeLanguageId
 ): Promise<{
     success: boolean;
+    /** Stored status of today's submission after this attempt. */
+    status: "completed" | "failed";
     testCases: ChallengeTestCase[];
     language?: CodeLanguageId;
     /** Whether runtime/compilation (Piston) succeeded; always true for the stub. */
