@@ -26,8 +26,8 @@ type CompletedSubmission = {
  * „Blitzschnell“, which needed a solve duration — that measurement went away with the
  * daily ranking (#91).
  *
- * Reachable because the submit lock is per challenge and day, not per language: three
- * days with three languages is enough.
+ * Counted across days, not across attempts: since #200 a second submission overwrites the
+ * day's row, so eight languages on one day leave one behind. Three days, three languages.
  */
 const POLYGLOT_LANGUAGES = 3;
 /** „Wochenend-Krieger“ (ach-2): a 7-day streak. */
