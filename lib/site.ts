@@ -13,7 +13,7 @@ export const SITE_URL = "https://daily-coding.de";
  * and answering it put `/login` and `/register` in the sitemap, which recommends a sign-in
  * form for indexing (#132). Both stay crawlable; they are simply not recommended.
  */
-export const SITEMAP_PATHS = ["/", "/impressum", "/datenschutz"] as const;
+export const SITEMAP_PATHS = ["/", "/changelog", "/impressum", "/datenschutz"] as const;
 
 /**
  * Behind the login. Kept in step with `PROTECTED_PATHS` in `proxy.ts` plus the API

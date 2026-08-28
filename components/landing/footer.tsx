@@ -51,6 +51,9 @@ export function LandingFooter() {
           <a href={`mailto:${SUPPORT_EMAIL}`} className={footerLinkClass}>
             Support
           </a>
+          <Link href="/changelog" className={footerLinkClass}>
+            Changelog
+          </Link>
           <Link href="/impressum" className={footerLinkClass}>
             Impressum
           </Link>
