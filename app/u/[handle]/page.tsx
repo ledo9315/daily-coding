@@ -2,11 +2,24 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowBarUp, Bullseye, Zap } from "@nsmr/pixelart-react";
+import {
+  ArrowBarUp,
+  Bookmark,
+  Bullseye,
+  CalendarToday,
+  Zap,
+} from "@nsmr/pixelart-react";
 import { Header } from "@/components/header";
 import { LandingFooter } from "@/components/landing/footer";
 import { StatsCard } from "@/components/stats-card";
+import { PixelStar } from "@/components/points-chip";
+import {
+  AchievementBadge,
+  resolveAchievementIcon,
+} from "@/components/achievement-badge";
+import { MonthlyActivityView } from "@/components/monthly-activity";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { avatarImageSrc } from "@/lib/avatar-src";
 import { levelTitleDe } from "@/lib/level";
@@ -37,7 +50,9 @@ export default async function PublicProfilePage({ params }: PageProps) {
   if (!profile) notFound();
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    // `flex-col` with a growing main: without it the footer stops where the content does,
+    // which on a short profile leaves it sitting in the middle of the screen.
+    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
       <AnimatedFlickeringGrid
         className="absolute inset-x-0 top-0 z-0 h-[300px] mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
         squareSize={6}
@@ -49,7 +64,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
 
       <Header />
 
-      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8 relative">
+      <main className="flex-1 mx-auto w-full max-w-5xl px-4 pt-8 pb-16 sm:px-6 sm:pb-24 lg:px-8 relative">
         <div className="mb-8 flex items-center gap-4">
           <Avatar className="h-20 w-20 rounded-none border-4 border-zinc-700">
             <AvatarImage src={avatarImageSrc(profile.avatar)} alt={profile.name} />
@@ -64,11 +79,22 @@ export default async function PublicProfilePage({ params }: PageProps) {
             <p className="text-muted-foreground uppercase tracking-wider text-sm">
               Level {profile.level} – {levelTitleDe(profile.level)}
             </p>
+            <p className="mt-1 text-xs text-muted-foreground/80">
+              Dabei seit {profile.memberSince}
+              {profile.lastSolvedAt
+                ? ` · Zuletzt gelöst am ${profile.lastSolvedAt}`
+                : ""}
+            </p>
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard title="LEVEL" value={profile.level} icon={ArrowBarUp} />
+          <StatsCard
+            title="PUNKTE"
+            value={profile.points.toLocaleString("de-DE")}
+            icon={PixelStar}
+          />
           <StatsCard
             title="STREAK"
             value={profile.streak}
@@ -76,6 +102,45 @@ export default async function PublicProfilePage({ params }: PageProps) {
             icon={Zap}
           />
           <StatsCard title="GELÖST" value={profile.totalSolved} icon={Bullseye} />
+        </div>
+
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          {profile.achievements.length > 0 && (
+            <Card>
+              <CardHeader className="mb-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Bookmark className="h-5 w-5 text-amber-500" />
+                  Abzeichen {profile.achievements.length}/{profile.badgesTotal}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {profile.achievements.map((achievement) => (
+                  <AchievementBadge
+                    key={achievement.id}
+                    title={achievement.title}
+                    description={achievement.description}
+                    icon={resolveAchievementIcon(achievement.iconKey)}
+                    unlocked
+                    rarity={achievement.rarity}
+                    unlockedAt={achievement.unlockedAt}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Without badges next to it the activity card would sit in half a grid. */}
+          <Card className={profile.achievements.length === 0 ? "lg:col-span-2" : undefined}>
+            <CardHeader className="mb-2">
+              <CardTitle className="flex items-center gap-2">
+                <CalendarToday className="h-5 w-5 text-primary" />
+                Aktivität
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <MonthlyActivityView activity={profile.monthlyActivity} />
+            </CardContent>
+          </Card>
         </div>
       </main>
 

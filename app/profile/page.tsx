@@ -7,41 +7,24 @@ import { Header } from "@/components/header";
 import { StreakBadge } from "@/components/streak-badge";
 import { PointsChip } from "@/components/points-chip";
 import { StatsCard } from "@/components/stats-card";
-import { AchievementBadge } from "@/components/achievement-badge";
+import { AchievementBadge, resolveAchievementIcon } from "@/components/achievement-badge";
 import { ProgressBar } from "@/components/progress-bar";
 import { ChallengeHistory } from "@/components/challenge-history";
 import { MonthlyActivityView } from "@/components/monthly-activity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileAvatarPicker } from "@/components/profile-avatar-picker";
 import {
-  Trophy,
   Bookmark,
   ArrowBarUp,
   Bullseye,
   Zap,
   CalendarToday,
   Tournament,
-  Check,
-  CalendarWeek,
-  Clock,
 } from "@nsmr/pixelart-react";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { getUserProfileData } from "@/lib/server/profile-data";
 import { levelTitleDe } from "@/lib/level";
 import type { Achievement } from "@/lib/api";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Check,
-  CalendarWeek,
-  Clock,
-  Trophy,
-  Zap,
-  Bullseye,
-};
-
-function resolveIcon(iconKey: string): React.ComponentType<{ className?: string }> {
-  return iconMap[iconKey] ?? Bookmark;
-}
 
 export const metadata: Metadata = { title: "Profil" };
 
@@ -150,7 +133,7 @@ export default async function ProfilePage() {
                     key={achievement.id}
                     title={achievement.title}
                     description={achievement.description}
-                    icon={resolveIcon(achievement.iconKey)}
+                    icon={resolveAchievementIcon(achievement.iconKey)}
                     unlocked={achievement.unlocked}
                     rarity={achievement.rarity}
                     unlockedAt={achievement.unlockedAt}
