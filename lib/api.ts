@@ -221,7 +221,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 // ─── Ranking ──────────────────────────────────────────────────────────────────
 
 export function getRanking(
-  period: "week" | "month"
+  period: "week" | "month" | "all"
 ): Promise<RankingEntry[]> {
   return apiFetch<RankingEntry[]>(`/api/ranking?period=${period}`);
 }

@@ -12,13 +12,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   CalendarWeek,
   CalendarMonth,
+  Trophy,
 } from "@nsmr/pixelart-react";
 import { EncryptedText } from "@/components/ui/encrypted-text";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { getRanking } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type Period = "week" | "month";
+type Period = "week" | "month" | "all";
 
 function TableRowSkeleton() {
   return (
@@ -87,9 +88,19 @@ export default function RankingPage() {
     queryFn: () => getRanking("month"),
   });
 
-  const isLoading = weekLoading || monthLoading;
+  const { data: allTimeRanking = [], isLoading: allTimeLoading } = useQuery({
+    queryKey: ["ranking", "all"],
+    queryFn: () => getRanking("all"),
+  });
 
-  const currentRanking = activeTab === "week" ? weekRanking : monthRanking;
+  const isLoading = weekLoading || monthLoading || allTimeLoading;
+
+  const currentRanking =
+    activeTab === "week"
+      ? weekRanking
+      : activeTab === "month"
+        ? monthRanking
+        : allTimeRanking;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -134,6 +145,10 @@ export default function RankingPage() {
               <CalendarMonth className="h-4 w-4 hidden sm:block" fill="currentColor" />
               Monat
             </TabsTrigger>
+            <TabsTrigger value="all" className="gap-2 cursor-pointer rounded-none text-md">
+              <Trophy className="h-4 w-4 hidden sm:block" fill="currentColor" />
+              Gesamt
+            </TabsTrigger>
           </TabsList>
 
           {isLoading ? (
@@ -169,6 +184,24 @@ export default function RankingPage() {
                         first={monthRanking[0]}
                         second={monthRanking[1]}
                         third={monthRanking[2]}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+                <RankingTable entries={currentRanking} />
+              </TabsContent>
+
+              <TabsContent value="all" className="space-y-8">
+                {allTimeRanking.length > 0 && (
+                  <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
+                    <CardHeader>
+                      <CardTitle className="text-center">Top 3 insgesamt</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TopThreePodium
+                        first={allTimeRanking[0]}
+                        second={allTimeRanking[1]}
+                        third={allTimeRanking[2]}
                       />
                     </CardContent>
                   </Card>

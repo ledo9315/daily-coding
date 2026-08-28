@@ -35,9 +35,10 @@ export type LiveRankingRow = {
 };
 
 export async function getLiveRanking(
-  period: "week" | "month",
+  period: "week" | "month" | "all",
   now: Date = new Date()
 ): Promise<LiveRankingRow[]> {
+  if (period === "all") return aggregatePeriodByDailyChallenges();
   return period === "week" ? getWeekLiveRanking(now) : getMonthLiveRanking(now);
 }
 
@@ -56,16 +57,17 @@ async function getMonthLiveRanking(now: Date): Promise<LiveRankingRow[]> {
 /**
  * Week/month: sorted by the **number** of successful daily submissions in the period,
  * ties broken by the **sum of challenge points**, then by
- * `userId` for a stable order.
+ * `userId` for a stable order. Without bounds this is the all-time ranking.
  */
 async function aggregatePeriodByDailyChallenges(
-  periodStart: Date,
-  periodEnd: Date
+  periodStart?: Date,
+  periodEnd?: Date
 ): Promise<LiveRankingRow[]> {
   const submissions = await prisma.submission.findMany({
     where: {
       status: "completed",
-      createdAt: { gte: periodStart, lt: periodEnd },
+      createdAt:
+        periodStart && periodEnd ? { gte: periodStart, lt: periodEnd } : undefined,
     },
     include: {
       user: true,

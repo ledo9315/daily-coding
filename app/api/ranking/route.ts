@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   // week rather than erroring, so an old bookmark or a cached client still gets a list.
   const period = searchParams.get("period") ?? "week";
 
-  const validPeriods = ["week", "month"] as const;
+  const validPeriods = ["week", "month", "all"] as const;
   const selectedPeriod = validPeriods.includes(period as (typeof validPeriods)[number])
     ? (period as (typeof validPeriods)[number])
     : "week";

@@ -92,6 +92,12 @@ describe("GET /api/ranking", () => {
     expect(mockGetLiveRanking).toHaveBeenCalledWith("month");
   });
 
+  it("uses period=all when specified", async () => {
+    mockGetLiveRanking.mockResolvedValueOnce([]);
+    await getRankingHandler(makeRequest("all"));
+    expect(mockGetLiveRanking).toHaveBeenCalledWith("all");
+  });
+
   it("falls back to week for an invalid period", async () => {
     mockGetLiveRanking.mockResolvedValueOnce([]);
     await getRankingHandler(makeRequest("invalid"));
