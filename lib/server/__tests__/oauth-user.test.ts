@@ -61,7 +61,9 @@ describe("findOrCreateOAuthUser", () => {
     // unchanged: the stored value is a local path from the allow-list, never a URL.
     const stored = mockUserCreate.mock.calls[0][0].data.avatar;
     expect(isAllowedUserAvatarPath(stored)).toBe(true);
-    expect(stored).toBe(starterAvatarPath("someone@gmail.com"));
+    expect(stored).toBe(starterAvatarPath("Some One"));
+    // The seed is the display name, not the address — see the register-route test.
+    expect(stored).not.toBe(starterAvatarPath("someone@gmail.com"));
   });
 
   it("writes no external URL into avatar for a GitHub picture either", async () => {

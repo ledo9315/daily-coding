@@ -28,23 +28,23 @@ describe("isAllowedUserAvatarPath", () => {
 
 describe("starterAvatarPath", () => {
   it("returns a path from the list", () => {
-    expect(isAllowedUserAvatarPath(starterAvatarPath("max@example.com"))).toBe(true);
+    expect(isAllowedUserAvatarPath(starterAvatarPath("Max Mustermann"))).toBe(true);
   });
 
   it("returns the same avatar for the same seed", () => {
-    expect(starterAvatarPath("max@example.com")).toBe(starterAvatarPath("max@example.com"));
+    expect(starterAvatarPath("Max Mustermann")).toBe(starterAvatarPath("Max Mustermann"));
   });
 
   it("spreads different seeds across the set", () => {
-    const seeds = Array.from({ length: 60 }, (_, i) => `user${i}@example.com`);
+    const seeds = Array.from({ length: 60 }, (_, i) => `User ${i}`);
     const distinct = new Set(seeds.map(starterAvatarPath));
     // Not a uniformity claim — just that it is not one avatar for everybody, which is
     // the whole reason for deriving it (#101).
     expect(distinct.size).toBeGreaterThan(USER_AVATAR_PATHS.length / 2);
   });
 
-  it("ignores case, so the same address cannot yield two avatars", () => {
-    expect(starterAvatarPath("Max@Example.com")).toBe(starterAvatarPath("max@example.com"));
+  it("ignores case, so the same name cannot yield two avatars", () => {
+    expect(starterAvatarPath("Max Mustermann")).toBe(starterAvatarPath("max mustermann"));
   });
 
   it("still returns a valid path for an empty seed", () => {

@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         name: displayName,
         nameKey,
         initials,
-        avatar: starterAvatarPath(canonicalEmail),
+        avatar: starterAvatarPath(displayName),
       },
     });
   } catch (error) {
