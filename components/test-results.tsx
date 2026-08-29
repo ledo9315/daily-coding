@@ -16,6 +16,8 @@ export interface TestCase {
 interface TestResultsProps {
   testCases: TestCase[];
   className?: string;
+  /** For a caller that already names the block and shows the score in its own trigger. */
+  hideHeader?: boolean;
 }
 
 const statusConfig = {
@@ -45,12 +47,13 @@ const statusConfig = {
   },
 };
 
-export function TestResults({ testCases, className }: TestResultsProps) {
+export function TestResults({ testCases, className, hideHeader }: TestResultsProps) {
   const passedCount = testCases.filter((tc) => tc.status === "passed").length;
   const totalCount = testCases.length;
 
   return (
     <div className={cn("rounded-none border border-border bg-card", className)}>
+      {!hideHeader && (
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h3 className="font-semibold">Testergebnisse</h3>
         <div className="flex items-center gap-2">
@@ -66,6 +69,7 @@ export function TestResults({ testCases, className }: TestResultsProps) {
           </span>
         </div>
       </div>
+      )}
 
       <div className="divide-y divide-border">
         {testCases.map((testCase) => {

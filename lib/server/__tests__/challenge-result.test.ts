@@ -28,7 +28,6 @@ const newest = {
     description: "Finde zwei Zahlen …",
     difficulty: "easy",
     points: 100,
-    testCases: [{ id: 1, name: "Beispiel", input: "[1,2]", expected: "3" }],
     category: { name: "Arrays" },
   },
 };
@@ -95,30 +94,25 @@ describe("getOwnChallengeResult", () => {
 });
 
 /**
- * #224 puts the challenge's own test cases on the result page. They carry the expected
- * outputs, so they are as much of a spoiler as a foreign solution — and the rule that keeps
- * them from an unsolved account has to live here, not in the component that renders them.
+ * #224 puts the task description on the result page. It is read through the user's own
+ * submission, so the rule that keeps an unsolved challenge unreadable lives here rather
+ * than in the page that renders it.
  */
-describe("the test cases of the challenge", () => {
-  it("come along with the own solution, parsed into slots", async () => {
+describe("the description of the challenge", () => {
+  it("comes along with the own solution", async () => {
     const result = await getOwnChallengeResult("user-1", "ch-1");
-    expect(result?.challenge.testCases).toEqual([
-      { id: 1, name: "Beispiel", input: "[1,2]", expected: "3" },
-    ]);
     expect(result?.challenge.description).toBe("Finde zwei Zahlen …");
   });
 
-  it("are read through the own submission, never by a lookup on the URL id", async () => {
+  it("is read through the own submission, never by a lookup on the URL id", async () => {
     await getOwnChallengeResult("user-1", "ch-1");
     const args = mockSubmissionFindFirst.mock.calls[0][0] as {
       where: Record<string, unknown>;
-      select: { challenge: { select: Record<string, boolean> } };
     };
     expect(args.where).toEqual({ userId: "user-1", challengeId: "ch-1", status: "completed" });
-    expect(args.select.challenge.select.testCases).toBe(true);
   });
 
-  it("stay unreachable without a completed submission of the user", async () => {
+  it("stays unreachable without a completed submission of the user", async () => {
     mockSubmissionFindFirst.mockResolvedValue(null);
     expect(await getOwnChallengeResult("user-1", "ch-1")).toBeNull();
   });
