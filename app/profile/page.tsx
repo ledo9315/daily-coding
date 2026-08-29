@@ -20,6 +20,7 @@ import {
   Zap,
   CalendarToday,
   Tournament,
+  Trophy,
 } from "@nsmr/pixelart-react";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { getUserProfileData } from "@/lib/server/profile-data";
@@ -80,17 +81,15 @@ export default async function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="min-w-0 space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
-              <StatsCard
-                title="LEVEL"
-                value={profile.stats.level}
-                description={
-                  profile.stats.rank !== "#-" ? `Heute ${profile.stats.rank}` : undefined
-                }
-                icon={ArrowBarUp}
-              />
+              <StatsCard title="LEVEL" value={profile.stats.level} icon={ArrowBarUp} />
               <StatsCard title="GELÖST" value={String(profile.stats.totalSolved)} icon={Bullseye} />
               <StatsCard title="REKORD" value={String(profile.stats.streakRecord)} icon={Zap} />
-              <StatsCard title="BADGES" value={`${profile.stats.badges}/${profile.stats.badgesTotal}`} icon={Bookmark} />
+              <StatsCard
+                title="PLATZIERUNG"
+                value={profile.stats.totalSolved > 0 ? profile.stats.rank : "–"}
+                description={`von ${profile.stats.totalUsers}`}
+                icon={Trophy}
+              />
             </div>
 
             <Card>
@@ -124,7 +123,7 @@ export default async function ProfilePage() {
               <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Bookmark className="h-5 w-5 text-amber-500" />
-                  Achievements
+                  Achievements {profile.stats.badges}/{profile.stats.badgesTotal}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
