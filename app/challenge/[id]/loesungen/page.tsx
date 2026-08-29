@@ -12,7 +12,6 @@ import type { TestCase } from "@/components/test-results";
 import { ChallengePanels } from "@/components/challenge-result/challenge-panels";
 import { ResultEffects } from "@/components/challenge-result/result-effects";
 import { SolutionList } from "@/components/challenge-result/solution-list";
-import { Button } from "@/components/ui/button";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { languageLabel, type CodeLanguageId } from "@/lib/challenge-languages";
 import { formatDate } from "@/lib/format";
@@ -60,6 +59,11 @@ export default async function ChallengeResultPage({ params }: PageProps) {
         maxOpacity={0.2}
         flickerChance={0.1}
       />
+      {/* Same ambient purple as the challenge and profile pages. */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] h-150 w-150 bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
+      </div>
 
       <Header />
       <ResultEffects submissionId={submission.id} />
@@ -113,13 +117,14 @@ export default async function ChallengeResultPage({ params }: PageProps) {
               Dein Code
             </h2>
             {isTodaysChallenge && (
-              <Button
-                asChild
-                variant="ghost"
-                className="h-auto rounded-none px-2 py-1 text-base uppercase tracking-wider text-primary hover:bg-primary/10 hover:text-primary"
+              /* Not the shadcn ghost button: its hover is `accent`, which in this palette is
+                 amber, and amber behind green text is unreadable. */
+              <Link
+                href="/challenge"
+                className="border-2 border-primary/40 bg-primary/10 px-3 py-1.5 text-base uppercase tracking-wider text-primary transition-colors hover:border-primary hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Link href="/challenge">Lösung verbessern</Link>
-              </Button>
+                Lösung verbessern
+              </Link>
             )}
           </div>
           <CodeBlock
