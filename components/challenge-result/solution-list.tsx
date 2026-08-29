@@ -112,24 +112,28 @@ export function SolutionList({
   }, [onLoadMore]);
 
   return (
-    <section className="mt-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-pixel text-sm uppercase tracking-wide">
+    <section className="mt-12">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border pb-4">
+        <h2 className="font-pixel text-sm uppercase tracking-wide sm:text-base">
           Lösungen der Community
         </h2>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex" role="group" aria-label="Lösungen filtern">
+        <div className="flex flex-wrap items-center gap-3">
+          <div
+            className="flex border-2 border-border"
+            role="group"
+            aria-label="Lösungen filtern"
+          >
             {(["all", "mine"] as const).map((value) => (
               <button
                 key={value}
                 type="button"
                 aria-pressed={filter === value}
                 onClick={() => setFilter(value)}
-                className={`border border-border px-3 py-1 text-xs uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`px-3 py-1.5 text-base uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
                   filter === value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-primary/15 text-primary"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {value === "all" ? "Alle" : "Meine"}
@@ -144,7 +148,7 @@ export function SolutionList({
             id="solution-sort"
             value={sort}
             onChange={(e) => setSort(e.target.value as SolutionSort)}
-            className="border border-border bg-background px-3 py-1 text-xs uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="border-2 border-border bg-secondary px-3 py-1.5 text-base uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {Object.entries(SORT_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -161,18 +165,20 @@ export function SolutionList({
           <span className="sr-only">Lösungen werden geladen</span>
         </div>
       ) : error && groups.length === 0 ? (
-        <p className="mt-4 border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+        <p className="mt-6 border-2 border-destructive/40 bg-destructive/10 px-4 py-3 text-lg text-destructive">
           {error}
         </p>
       ) : groups.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">
-          {filter === "mine"
-            ? "Von dir liegt hier noch keine Lösung."
-            : "Diese Challenge hat bisher noch niemand gelöst — schau später wieder vorbei."}
-        </p>
+        <div className="mt-6 border-2 border-dashed border-border px-4 py-10 text-center">
+          <p className="text-lg text-muted-foreground">
+            {filter === "mine"
+              ? "Von dir steht hier noch keine Lösung."
+              : "Diese Challenge hat noch niemand gelöst. Schau später wieder vorbei."}
+          </p>
+        </div>
       ) : (
         <>
-          <div className="mt-4 grid gap-4">
+          <div className="mt-6 grid gap-4">
             {groups.map((group) => (
               <SolutionCard
                 key={group.codeHash}
@@ -187,7 +193,7 @@ export function SolutionList({
           <div ref={sentinelRef} className="h-4 w-full shrink-0" aria-hidden />
 
           {error ? (
-            <p className="text-center text-sm text-destructive">{error}</p>
+            <p className="text-center text-lg text-destructive">{error}</p>
           ) : null}
 
           {loadingMore ? (

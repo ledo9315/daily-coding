@@ -16,20 +16,20 @@ function makeGroup(
     authors: [{ name: "Lisa Müller", initials: "LM", avatar: "", level: 4 }],
     submissionCount: 1,
     own: false,
+    commentCount: 0,
     votes: { best_practices: 0, clever: 0 },
     myVotes: { best_practices: false, clever: false },
     ...overrides,
   };
 }
 
-function render(group: ChallengeSolutionGroup, defaultOpen = false) {
+function render(group: ChallengeSolutionGroup) {
   return renderToStaticMarkup(
     <SolutionCard
       challengeId="ch-1"
       group={group}
       ownCode="const answer = 1;"
       ownLanguage="javascript"
-      defaultOpen={defaultOpen}
     />
   );
 }
@@ -40,11 +40,34 @@ describe("SolutionCard", () => {
     expect(html).toContain('href="/u/lisa%20m%C3%BCller"');
   });
 
-  it("keeps the code out of the markup while collapsed", () => {
+  /** The page exists to be read; a click in front of every solution makes that a chore. */
+  it("shows the code without a toggle", () => {
     const html = render(makeGroup());
-    expect(html).not.toContain("const answer = 42;");
-    expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain("Code anzeigen");
+    expect(html).toContain("answer");
+    expect(html).not.toContain("Code anzeigen");
+  });
+
+  it("offers the comments behind a toggle that carries the count", () => {
+    const html = render(makeGroup({ commentCount: 6 }));
+    expect(html).toContain("Kommentare");
+    expect(html).toContain(">6<");
+    // Two collapsed toggles: the comments and the comparison.
+    expect(html.match(/aria-expanded="false"/g)).toHaveLength(2);
+    expect(html).not.toContain("Schreib einen Kommentar");
+  });
+
+  it("names the level of every author", () => {
+    const html = render(
+      makeGroup({
+        authors: [
+          { name: "Lisa Müller", initials: "LM", avatar: "", level: 4 },
+          { name: "Bob Bauer", initials: "BB", avatar: "", level: 9 },
+        ],
+        submissionCount: 2,
+      })
+    );
+    expect(html).toContain("Level 4");
+    expect(html).toContain("Level 9");
   });
 
   it("lists every named author and sums up the rest", () => {
@@ -59,14 +82,14 @@ describe("SolutionCard", () => {
     );
     expect(html).toContain("Lisa Müller");
     expect(html).toContain("Bob Bauer");
-    expect(html).toContain("+38 weitere");
-    expect(html).toContain("40 Abgaben");
+    expect(html).toContain("und 38 weitere");
+    expect(html).toContain("40 identische Abgaben");
   });
 
-  it("leaves out the rest count when the group is fully named", () => {
+  it("leaves out the rest count and the tally when the group is a single solution", () => {
     const html = render(makeGroup());
     expect(html).not.toContain("weitere");
-    expect(html).toContain("1 Abgabe");
+    expect(html).not.toContain("Abgabe");
   });
 
   it("marks a revised single solution and leaves an unrevised one unmarked", () => {
@@ -88,13 +111,8 @@ describe("SolutionCard", () => {
     expect(other).not.toContain("Deine Lösung");
   });
 
-  it("offers the comparison only inside the expanded body", () => {
-    expect(render(makeGroup())).not.toContain("Mit deiner Lösung vergleichen");
-    expect(render(makeGroup(), true)).toContain("Mit deiner Lösung vergleichen");
-  });
-
   it("escapes code that looks like markup", () => {
-    const html = render(makeGroup({ code: "<script>alert(1)</script>" }), true);
+    const html = render(makeGroup({ code: "<script>alert(1)</script>" }));
     expect(html).not.toContain("<script>");
     expect(html).toContain("&lt;script&gt;");
   });

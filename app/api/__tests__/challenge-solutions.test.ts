@@ -11,6 +11,7 @@ const mockHasSolvedChallenge = vi.fn();
 const mockGetLifetimePointsByUserIds = vi.fn();
 const mockVoteGroupBy = vi.fn();
 const mockVoteFindMany = vi.fn();
+const mockCommentGroupBy = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -21,6 +22,9 @@ vi.mock("@/lib/prisma", () => ({
     solutionVote: {
       findMany: (...args: unknown[]) => mockVoteFindMany(...args),
       groupBy: (...args: unknown[]) => mockVoteGroupBy(...args),
+    },
+    comment: {
+      groupBy: (...args: unknown[]) => mockCommentGroupBy(...args),
     },
   },
 }));
@@ -82,6 +86,7 @@ beforeEach(() => {
   mockGroupBy.mockResolvedValue([]);
   mockVoteGroupBy.mockResolvedValue([]);
   mockVoteFindMany.mockResolvedValue([]);
+  mockCommentGroupBy.mockResolvedValue([]);
   ownHashRows = [];
   groupRows = [makeRow()];
   mockFindMany.mockImplementation((args: { select?: Record<string, unknown> }) =>
@@ -159,6 +164,7 @@ describe("GET /api/challenge/[id]/solutions", () => {
         ],
         submissionCount: 12,
         own: false,
+        commentCount: 0,
         votes: { best_practices: 0, clever: 0 },
         myVotes: { best_practices: false, clever: false },
       },
@@ -179,6 +185,29 @@ describe("GET /api/challenge/[id]/solutions", () => {
     groupRows = [makeRow({ updatedAt: new Date("2026-08-02T10:00:00.000Z") })];
     const json = await (await call()).json();
     expect(json.groups[0].revised).toBe(true);
+  });
+
+  it("counts the comments of the representative row, in one query for the page", async () => {
+    mockGroupBy.mockResolvedValue([
+      makeGroup({ codeHash: "hash-a" }),
+      makeGroup({ codeHash: "hash-b" }),
+    ]);
+    mockCommentGroupBy.mockResolvedValue([
+      { submissionId: "sub-1", _count: { _all: 6 } },
+    ]);
+
+    const json = await (await call()).json();
+    expect(mockCommentGroupBy).toHaveBeenCalledTimes(1);
+    expect(mockCommentGroupBy).toHaveBeenCalledWith(
+      expect.objectContaining({ by: ["submissionId"] }),
+    );
+    expect(json.groups.map((g: { commentCount: number }) => g.commentCount)).toEqual([6, 6]);
+  });
+
+  it("reports zero for a group nobody has commented on", async () => {
+    mockGroupBy.mockResolvedValue([makeGroup()]);
+    const json = await (await call()).json();
+    expect(json.groups[0].commentCount).toBe(0);
   });
 
   it("orders groups by their oldest submission, newest group first", async () => {

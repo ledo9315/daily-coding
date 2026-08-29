@@ -3,19 +3,16 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Zap } from "@nsmr/pixelart-react";
 import { auth } from "@/auth";
 import { CodeBlock } from "@/components/code-block";
 import { Header } from "@/components/header";
 import { DifficultyBadge } from "@/components/difficulty-badge";
-import { PixelStar, PointsChip } from "@/components/points-chip";
-import { StatsCard } from "@/components/stats-card";
+import { PointsChip } from "@/components/points-chip";
 import type { TestCase } from "@/components/test-results";
 import { ChallengePanels } from "@/components/challenge-result/challenge-panels";
 import { ResultEffects } from "@/components/challenge-result/result-effects";
 import { SolutionList } from "@/components/challenge-result/solution-list";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { languageLabel, type CodeLanguageId } from "@/lib/challenge-languages";
 import { formatDate } from "@/lib/format";
@@ -38,7 +35,7 @@ export default async function ChallengeResultPage({ params }: PageProps) {
   const result = await getOwnChallengeResult(session.user.id, id);
   if (!result) notFound();
 
-  const { submission, challenge, streak, streakRecord } = result;
+  const { submission, challenge } = result;
   const testCases = Array.isArray(submission.testResults)
     ? (submission.testResults as unknown as TestCase[])
     : [];
@@ -68,68 +65,75 @@ export default async function ChallengeResultPage({ params }: PageProps) {
       <ResultEffects submissionId={submission.id} />
 
       <main className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-pixel text-2xl uppercase tracking-tight">
-                {challenge.title}
-              </h1>
-              <DifficultyBadge difficulty={challenge.difficulty} size="sm" />
-            </div>
-            <p className="text-muted-foreground uppercase tracking-wide">
+            <h1 className="font-pixel text-xl uppercase leading-tight tracking-tight sm:text-2xl">
+              {challenge.title}
+            </h1>
+            <p className="mt-2 text-lg uppercase tracking-wide text-muted-foreground">
               {challenge.category}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground/80">
-              Gelöst am {formatDate(submission.createdAt)}
-              {revised ? " · überarbeitet" : ""}
             </p>
           </div>
 
-          <div className="flex shrink-0 items-center gap-3">
+          {/* Difficulty and points travel together: both answer "what is this task worth". */}
+          <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
+            <DifficultyBadge difficulty={challenge.difficulty} size="lg" />
             <PointsChip points={challenge.points} variant="highlight" size="lg" />
           </div>
         </div>
 
+        {/*
+          One line in the voice of a test runner, which is where the reader just came from.
+          It replaces the two stat cards that stood here: the points are already in the chip
+          above, and a streak is a property of the account, not of this solution.
+        */}
+        <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-l-4 border-primary bg-primary/[0.06] py-2 pl-3 font-code text-sm text-muted-foreground">
+          <span className="font-bold text-primary">
+            {languageLabel(submission.language as CodeLanguageId)}
+          </span>
+          <span aria-hidden className="text-border">
+            |
+          </span>
+          <span>gelöst am {formatDate(submission.createdAt)}</span>
+          {revised && (
+            <>
+              <span aria-hidden className="text-border">
+                |
+              </span>
+              <span>später überarbeitet</span>
+            </>
+          )}
+        </p>
+
         <ChallengePanels description={challenge.description} testResults={testCases} />
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <StatsCard title="PUNKTE" value={challenge.points} icon={PixelStar} />
-          <StatsCard
-            title="STREAK"
-            value={streak}
-            description={`Rekord: ${streakRecord}`}
-            icon={Zap}
-          />
-        </div>
-
-        <Card className="mt-6">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-pixel text-sm uppercase tracking-wide">Dein Code</h2>
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">
-              {languageLabel(submission.language as CodeLanguageId)}
-            </span>
+        <section className="mt-10">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-pixel text-sm uppercase tracking-wide sm:text-base">
+              Dein Code
+            </h2>
+            {isTodaysChallenge && (
+              <Button
+                asChild
+                variant="ghost"
+                className="h-auto rounded-none px-2 py-1 text-base uppercase tracking-wider text-primary hover:bg-primary/10 hover:text-primary"
+              >
+                <Link href="/challenge">Lösung verbessern</Link>
+              </Button>
+            )}
           </div>
           <CodeBlock
             code={submission.code}
             language={submission.language}
             className="max-h-[32rem]"
           />
-        </Card>
-
+        </section>
 
         <SolutionList
           challengeId={challenge.id}
           ownCode={submission.code}
           ownLanguage={submission.language as CodeLanguageId}
         />
-
-        {isTodaysChallenge && (
-          <div className="mt-6">
-            <Button asChild className="pixel-btn w-full rounded-none sm:w-fit">
-              <Link href="/challenge">Lösung verbessern</Link>
-            </Button>
-          </div>
-        )}
       </main>
     </div>
   );
