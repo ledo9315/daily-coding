@@ -26,8 +26,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const OG_ALT =
-  "Der Schriftzug DAILY CODING im Pixel-Stil mit dem Satz „Jeden Tag eine neue " +
-  "Coding-Challenge“, daneben ein Code-Fenster und ein Pokal als Pixelgrafik";
+  "Die Startseite von DAILY CODING: der Schriftzug „Eine Challenge jeden Tag“ im " +
+  "Pixel-Stil, darunter zwei Schaltflächen und der obere Rand der Übersichtsseite";
 
 export const metadata: Metadata = {
   /**
@@ -56,12 +56,16 @@ export const metadata: Metadata = {
   description:
     "Löse jeden Tag eine neue Coding-Challenge in deiner Programmiersprache und steige im Ranking auf.",
   /**
-   * The card a shared link shows: a drawn brand card in the palette of the app, replacing
-   * the padded dashboard screenshot that stood here before (#113).
+   * The card a shared link shows: the landing above the fold, captured at 2400x1260 and
+   * scaled down, so the headline is the same one a visitor lands on.
    *
-   * Exactly 1200x630, the ratio every platform lays the card out for, and 127 KB. Size is
-   * the reason the source export was scaled down: WhatsApp drops the preview above roughly
-   * 300 KB, and a chat message is how a link like this travels.
+   * The capture starts below the navigation on purpose. It also stops above the badge
+   * naming today's challenge: that name changes daily, and a file cached by every crawler
+   * and chat client would keep announcing a challenge from months ago.
+   *
+   * Exactly 1200x630, the ratio every platform lays the card out for, and 110 KB. Size
+   * matters here: WhatsApp drops the preview above roughly 300 KB, and a chat message is
+   * how a link like this travels.
    */
   openGraph: {
     type: "website",
