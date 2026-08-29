@@ -14,7 +14,7 @@ const layout = read("app", "layout.tsx");
  * nobody notices until someone asks.
  *
  * ponytail: reads the sources as text. The page is a server component pulling in fonts and
- * CSS, so it does not import in the node test environment — and the point here is the
+ * CSS, so it does not import in the node test environment - and the point here is the
  * coupling between what the code loads and what the page discloses, which text captures.
  */
 describe("Datenschutzerklärung", () => {

@@ -1,6 +1,6 @@
 /**
  * Predefined pixel avatars under `public/user/`.
- * Only these paths can be set through the API — no free-form values.
+ * Only these paths can be set through the API - no free-form values.
  */
 export const USER_AVATAR_PATHS = [
   "/user/gpt.png",
@@ -45,7 +45,7 @@ export function isAllowedUserAvatarPath(path: string): path is UserAvatarPath {
  * the unique constraint (#107), so it spreads exactly as well.
  *
  * ponytail: FNV-1a, not a crypto hash. It does not have to resist an attacker as long as
- * the seed is public — it only needs to spread evenly and give the same answer twice.
+ * the seed is public - it only needs to spread evenly and give the same answer twice.
  */
 export function starterAvatarPath(seed: string): UserAvatarPath {
   let hash = 2166136261;

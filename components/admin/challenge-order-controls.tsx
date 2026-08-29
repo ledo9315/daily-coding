@@ -11,7 +11,7 @@ import { toast } from "sonner";
  *
  * With a pool this size dragging costs a library, breaks on touch and needs keyboard handling
  * built from scratch; an arrow is one click and one request. The third button is the move that
- * is actually wanted most often — "run this one tomorrow" — which as an arrow would be a dozen
+ * is actually wanted most often - "run this one tomorrow" - which as an arrow would be a dozen
  * clicks down the list.
  */
 export function ChallengeOrderControls({

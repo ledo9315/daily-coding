@@ -8,7 +8,7 @@ import { deriveAchievementRules } from "@/lib/server/achievements";
  * Until #205 nothing ever wrote those rows outside the seed, so an unlock was only as
  * permanent as the data behind it. Since #200 a second submission overwrites the day's
  * row: changing the language of the only Ruby solve dropped the distinct-language count
- * back to two and took „Polyglott" away again. A written date cannot be recomputed away —
+ * back to two and took „Polyglott" away again. A written date cannot be recomputed away -
  * `buildUserAchievementsView` gives it precedence over the rules.
  *
  * The date comes from the rule wherever the submissions can supply one, so a badge earned

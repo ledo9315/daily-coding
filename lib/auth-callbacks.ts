@@ -59,7 +59,7 @@ export function authSessionCallback({
 }
 
 /**
- * True for every external provider — Google is "oidc", GitHub is "oauth".
+ * True for every external provider - Google is "oidc", GitHub is "oauth".
  * Deliberately written as "not credentials" rather than a list of known types:
  * checking for a single type had silently missed Google logins.
  * A type guard, so `account` counts as defined in the branch that follows.

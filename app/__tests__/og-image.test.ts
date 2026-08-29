@@ -19,7 +19,7 @@ function jpegSize(path: string): { width: number; height: number } {
     if (buffer[offset] !== 0xff) throw new Error(`no marker at ${offset}`);
     const marker = buffer[offset + 1];
     const length = buffer.readUInt16BE(offset + 2);
-    // SOF0..SOF3, SOF5..SOF7, SOF9..SOF11, SOF13..SOF15 — all carry the dimensions.
+    // SOF0..SOF3, SOF5..SOF7, SOF9..SOF11, SOF13..SOF15 - all carry the dimensions.
     if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
       return {
         height: buffer.readUInt16BE(offset + 5),
@@ -49,7 +49,7 @@ describe("Open Graph image", () => {
   });
 
   it("stays under 300 KB, or WhatsApp drops the preview", () => {
-    // The documented soft limit for chat previews — the way a link like this spreads.
+    // The documented soft limit for chat previews - the way a link like this spreads.
     expect(statSync(OG_FILE).size).toBeLessThan(300 * 1024);
   });
 

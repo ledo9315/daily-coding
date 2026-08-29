@@ -8,7 +8,7 @@ import type { CodeLanguageId } from "@/lib/challenge-languages";
  *
  * Every other test here checks the string the harness builds, never whether the result runs.
  * That is how the TypeScript harness could reference `require` and `process` for weeks while
- * Piston's image, which has no @types/node, rejected every submission at compile time — users
+ * Piston's image, which has no @types/node, rejected every submission at compile time - users
  * saw 0/5 with a compiler error where a test result belonged.
  *
  * Skips itself when nothing answers at PISTON_API_URL, so CI and a laptop without Docker stay

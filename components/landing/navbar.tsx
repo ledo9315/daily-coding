@@ -8,7 +8,7 @@ export function LandingNavbar() {
           <span className="text-xl font-pixel tracking-tighter text-primary">
             {">_"}
           </span>
-          {/* Two lines, like the header on every signed-in page — one logo, one shape. */}
+          {/* Two lines, like the header on every signed-in page - one logo, one shape. */}
           <span className="font-pixel text-[10px] leading-tight tracking-tight text-foreground sm:text-xs">
             DAILY
             <br />

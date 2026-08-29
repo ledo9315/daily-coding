@@ -55,7 +55,7 @@ describe("pistonHttpEndpoints", () => {
 });
 
 describe("executeWithPiston: Go", () => {
-  it("tells a rejected build apart from a panic — both exit 2", async () => {
+  it("tells a rejected build apart from a panic - both exit 2", async () => {
     mockPiston("go", {
       stderr: "# command-line-arguments\n./main.go:24:9: undefined: strconv\n",
       code: 2,
@@ -79,7 +79,7 @@ describe("executeWithPiston: Java", () => {
     "Main.java:5: error: cannot find symbol\n        retrun best;\n        ^\n1 error\nerror: compilation failed\n";
 
   it("reports a rejected program as a compile failure", async () => {
-    // Piston gives Java no compile stage — javac runs inside the run step. Without this the
+    // Piston gives Java no compile stage - javac runs inside the run step. Without this the
     // caller shows a compiler message in "Erhalten" and runs the same broken program five times.
     mockPiston("java", { stderr: COMPILE_ERROR, code: 1 });
     const res = await executeWithPiston("java", "class Main {}", "");

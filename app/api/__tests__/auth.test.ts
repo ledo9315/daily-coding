@@ -93,7 +93,7 @@ describe("POST /api/auth/register", () => {
 
   /**
    * #107: without this, two accounts could carry the same name, and with a starter avatar
-   * drawn from a set of 20 also the same picture — indistinguishable in the ranking.
+   * drawn from a set of 20 also the same picture - indistinguishable in the ranking.
    */
   it("returns 409 when the display name is already taken", async () => {
     mockFindUnique.mockResolvedValueOnce(null); // email is free

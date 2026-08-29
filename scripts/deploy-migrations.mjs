@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 
 /**
- * Applies pending migrations during the Vercel build — production only.
+ * Applies pending migrations during the Vercel build - production only.
  *
  * The build command was `prisma generate && next build`, so a merged migration never reached
  * Neon. Twice now the deployed code queried something that did not exist yet and the site
@@ -10,13 +10,13 @@ import { execFileSync } from "node:child_process";
  * Two guards, both load-bearing:
  *
  * 1. `VERCEL_ENV` must be exactly "production". Preview deployments share the same Neon database
- *    (DATABASE_URL is set for All Environments), so without this every preview build — including
- *    branches that never get merged — would migrate the production database.
+ *    (DATABASE_URL is set for All Environments), so without this every preview build - including
+ *    branches that never get merged - would migrate the production database.
  * 2. The direct connection is preferred over the pooled one. Neon's DATABASE_URL goes through
  *    PgBouncer, and migrations there are unreliable: DDL in a transaction and the advisory lock
  *    Prisma takes on the migrations table both dislike the pooler.
  *
- * Anywhere else — locally, in CI, in a preview build — this prints what it would have done and
+ * Anywhere else - locally, in CI, in a preview build - this prints what it would have done and
  * exits 0. A failing migration fails the build on purpose: no deploy is better than a deploy
  * against a schema that does not fit.
  */
@@ -57,7 +57,7 @@ console.log(`[migrations] prisma migrate deploy gegen ${host}`);
 /*
   `prisma.production.config.ts` and not the default one: `prisma.config.ts` loads `.env.local`
   with `override: true`, so a DATABASE_URL passed in here is silently replaced by whatever sits
-  in that file. Caught in testing — the script reported success against localhost while pointed
+  in that file. Caught in testing - the script reported success against localhost while pointed
   at an unreachable host.
 */
 try {

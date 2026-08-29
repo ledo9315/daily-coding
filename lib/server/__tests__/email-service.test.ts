@@ -90,7 +90,7 @@ describe("every mail", () => {
     const sent = mockSend.mock.calls[0][0] as { html: string };
     /**
      * The URL still appears as visible text, and some clients turn bare URLs into links
-     * on their own — that we cannot prevent. What we control is that we do not author the
+     * on their own - that we cannot prevent. What we control is that we do not author the
      * anchor ourselves, and the only href we emit is our own action link.
      */
     expect(sent.html).not.toContain('href="http://phish.example"');

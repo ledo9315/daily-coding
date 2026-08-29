@@ -14,7 +14,7 @@ import { Header } from "@/components/header";
 
 /**
  * #79: the nav bar is `hidden md:flex`, so on a phone the only way into the challenge or
- * the ranking is the sheet. These assertions are about structure, not looks — the visual
+ * the ranking is the sheet. These assertions are about structure, not looks - the visual
  * check needs a signed-in session in a real browser.
  */
 describe("Header on small screens", () => {

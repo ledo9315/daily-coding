@@ -124,7 +124,7 @@ describe("GET /api/user/stats", () => {
     expect(json.rank).toBe("#3");
   });
 
-  // #91: the all-time rank always has a place — someone without points is simply last,
+  // #91: the all-time rank always has a place - someone without points is simply last,
   // which says more than the dash the today ranking used to show.
   it("shows a place even for a user without any points", async () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);

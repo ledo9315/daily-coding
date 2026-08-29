@@ -11,7 +11,7 @@ import { emailAddressValidationError, normaliseEmailAddress } from "@/lib/email-
 /**
  * No `image` field on purpose. The provider sends a picture URL, but storing it would
  * make every viewer of the feed, the ranking or the podium fetch that file straight
- * from googleusercontent.com — handing a third party the IP of people who have no
+ * from googleusercontent.com - handing a third party the IP of people who have no
  * relationship with it (#86). New OAuth accounts get one of the local avatars from
  * `USER_AVATAR_PATHS` instead (#101).
  */
@@ -93,7 +93,7 @@ export async function findOrCreateOAuthUser(
 
   // 3. Brand-new user via OAuth
   /**
-   * A counter is appended when the provider's name is taken — rejecting is not an option
+   * A counter is appended when the provider's name is taken - rejecting is not an option
    * here. The user comes back from Google or GitHub expecting an account, and there is no
    * form left to show an error in. The registration form does reject (#107).
    */

@@ -24,7 +24,7 @@ export type ChallengeFormInitial = {
   examplesJson: string;
   testsJson: string;
   /**
-   * Function name per language. Empty means "not this language" for the typed ones — hence no
+   * Function name per language. Empty means "not this language" for the typed ones - hence no
    * "solve" fallback there, which would turn every edit into a Java- and Go-enabled challenge.
    */
   callables: Record<CodeLanguageId, string>;

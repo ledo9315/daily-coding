@@ -69,7 +69,7 @@ export function ChallengeHistory({
                     defaults to `min-width: auto`, so without it the title refuses to
                     shrink and the row pushes the whole grid column past the viewport (#79).
                     Wrapping instead of truncating, because "Array Ma…" tells a phone user
-                    nothing — the badge drops to its own line when the title needs the room.
+                    nothing - the badge drops to its own line when the title needs the room.
                   */}
                   <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                     <h4 className="min-w-0 font-medium break-words">{entry.title}</h4>

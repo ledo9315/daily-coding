@@ -3,7 +3,7 @@ import { CHANGELOG } from "@/lib/changelog";
 
 /**
  * The list is ordered by hand, so a new entry appended in the wrong place is the one
- * mistake worth catching — the page renders the array as it stands.
+ * mistake worth catching - the page renders the array as it stands.
  */
 describe("changelog", () => {
   it("lists the releases newest first", () => {

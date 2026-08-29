@@ -7,7 +7,7 @@ import {
   USER_AVATAR_PATHS,
 } from "@/lib/user-avatars";
 
-/** Width and height from the PNG header — bytes 16..24, no decoding needed. */
+/** Width and height from the PNG header - bytes 16..24, no decoding needed. */
 function pngSize(file: string): { width: number; height: number } {
   const head = readFileSync(file).subarray(0, 24);
   return { width: head.readUInt32BE(16), height: head.readUInt32BE(20) };
@@ -38,7 +38,7 @@ describe("starterAvatarPath", () => {
   it("spreads different seeds across the set", () => {
     const seeds = Array.from({ length: 60 }, (_, i) => `User ${i}`);
     const distinct = new Set(seeds.map(starterAvatarPath));
-    // Not a uniformity claim — just that it is not one avatar for everybody, which is
+    // Not a uniformity claim - just that it is not one avatar for everybody, which is
     // the whole reason for deriving it (#101).
     expect(distinct.size).toBeGreaterThan(USER_AVATAR_PATHS.length / 2);
   });
@@ -56,7 +56,7 @@ describe("avatar paths written by the seed", () => {
   /**
    * The seed used to spell out paths like "/user/chibi1.png". Replacing the avatar set
    * updated the allow-list but not those literals, so a seed kept writing references to
-   * files that no longer exist — 11 of 14 users ended up with a 404 as their avatar (#103).
+   * files that no longer exist - 11 of 14 users ended up with a 404 as their avatar (#103).
    *
    * ponytail: reads the seed as text instead of importing it. `prisma/seed.ts` calls
    * `main()` at import time and connects to a database; a regex over the source is what

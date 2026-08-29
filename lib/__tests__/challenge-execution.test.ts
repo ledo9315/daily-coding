@@ -201,7 +201,7 @@ describe("withEditorFileName", () => {
   });
 
   it("understands Mono's parenthesised notation as well as the colon one", () => {
-    // main.cs(9,17) rather than main.cs:9 — same offset, different spelling.
+    // main.cs(9,17) rather than main.cs:9 - same offset, different spelling.
     const out = withEditorFileName("main.cs(9,17): error CS0029: …", "csharp");
     expect(out).toContain("main.cs(2,17)");
   });
@@ -217,7 +217,7 @@ describe("withEditorFileName", () => {
   });
 
   it("leaves a line number alone when subtracting would put it above the file", () => {
-    // A message about the harness itself, not the solution — better wrong than negative.
+    // A message about the harness itself, not the solution - better wrong than negative.
     expect(withEditorFileName("Main.java:2: error: x", "java")).toContain("Main.java:2:");
   });
 

@@ -6,7 +6,7 @@
  *
  * Vendored unchanged, the same way the shadcn primitives in this folder are, so a later
  * `npx shadcn add` can replace it without a merge. `defaultTerminalTabs` is upstream demo
- * content and unused here — the landing passes its own tabs.
+ * content and unused here - the landing passes its own tabs.
  */
 
 import {

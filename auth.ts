@@ -57,7 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (isFederatedAccount(account)) {
         // NextAuth fills `token.picture` from the provider profile on its own. Drop it
         // before anything else, so the URL cannot survive in the JWT via the error
-        // paths below — the avatar comes from the database or not at all (#86).
+        // paths below - the avatar comes from the database or not at all (#86).
         delete token.picture;
         try {
           const oauthAccount = {

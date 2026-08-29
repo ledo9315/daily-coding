@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Installs runtimes via GET /api/v2/packages + POST /api/v2/packages.
- * In pkgs/index the Node runtime is called "node", not "javascript" — using the
+ * In pkgs/index the Node runtime is called "node", not "javascript" - using the
  * wrong name yields a 404 or an empty filter result, which is why the package name
  * lives in the language registry rather than being guessed from the id.
  *
@@ -30,7 +30,7 @@ const RUNTIME_INSTALL = LANGUAGE_LIST.map((spec) => ({
   versionPrefix: spec.versionPrefix,
 }));
 
-/** Rough semver comparison — higher versions come first under an ascending sort */
+/** Rough semver comparison - higher versions come first under an ascending sort */
 function compareSemverDesc(a: string, b: string) {
   const core = (v: string) => v.split("-")[0]!.split("+")[0]!;
   const pa = core(a)
@@ -48,7 +48,7 @@ function compareSemverDesc(a: string, b: string) {
   return core(b).localeCompare(core(a));
 }
 
-/** Piston keeps outdated majors around — Python 2, Ruby 2.5, TypeScript 4. */
+/** Piston keeps outdated majors around - Python 2, Ruby 2.5, TypeScript 4. */
 function matchingVersion(rows: PackageRow[], versionPrefix?: string) {
   if (!versionPrefix) return rows;
   const filtered = rows.filter((p) => String(p.language_version).startsWith(versionPrefix));
@@ -101,7 +101,7 @@ async function installOne(
   /*
     Any matching version being present is enough. Filtering to the uninstalled ones and taking
     the highest of *those* is how this script quietly added Python 3.10 next to an existing 3.12
-    and PHP 8.0 next to 8.2 — older runtimes that only make the version choice ambiguous.
+    and PHP 8.0 next to 8.2 - older runtimes that only make the version choice ambiguous.
   */
   if (rows.some((p) => p.installed)) {
     const have = rows.find((p) => p.installed)!.language_version;
@@ -136,7 +136,7 @@ async function installOne(
     console.log(`· ${app} (Paket ${pkg}, bereits installiert)`);
     return;
   }
-  throw new Error(`${app} (${pkg} @ ${version}): HTTP ${res.status} — ${msg.slice(0, 500)}`);
+  throw new Error(`${app} (${pkg} @ ${version}): HTTP ${res.status}: ${msg.slice(0, 500)}`);
 }
 
 async function main() {

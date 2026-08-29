@@ -21,7 +21,7 @@ export type PublicProfile = {
   memberSince: string;
   /** Date of the most recent completed submission; null for an account that never solved one. */
   lastSolvedAt: string | null;
-  /** Unlocked achievements only — a stranger has no use for someone else's progress bars. */
+  /** Unlocked achievements only - a stranger has no use for someone else's progress bars. */
   achievements: Achievement[];
   badgesTotal: number;
   monthlyActivity: MonthlyActivity;
@@ -42,13 +42,13 @@ function decodeHandle(handle: string): string {
 }
 
 /**
- * The read model behind the public profile page — the security boundary for #34.
+ * The read model behind the public profile page - the security boundary for #34.
  *
  * `select` is the whole point: it never widens to `email`, `passwordHash` or `role`, and
  * the return value is built field by field so a later column on `User` cannot ride along.
  * `getUserProfileData` is not reusable here, it loads the full row via `include` and adds
  * the challenge history, which is the one block that would expose failed and skipped
- * attempts — the feed shows completions only (#194).
+ * attempts - the feed shows completions only (#194).
  *
  * `nameKeyOf` is idempotent, so both the stored key and the displayed name work as handle.
  *

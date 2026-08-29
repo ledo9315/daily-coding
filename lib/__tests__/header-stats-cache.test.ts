@@ -8,9 +8,9 @@ import {
 
 /**
  * #42: <Header /> is rendered per page instead of in a shared layout, so every
- * navigation remounts it and its state restarts at null — the streak flashed "—"
- * until /api/user/stats answered. The cache keeps the last known values across that
- * remount.
+ * navigation remounts it and its state restarts at null, so the streak flashed a
+ * placeholder until /api/user/stats answered. The cache keeps the last known values
+ * across that remount.
  */
 describe("header stats cache", () => {
   beforeEach(() => {

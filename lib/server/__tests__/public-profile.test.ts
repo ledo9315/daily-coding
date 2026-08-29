@@ -123,8 +123,8 @@ describe("getPublicProfile", () => {
   });
 
   /**
-   * A stranger has no use for someone else's progress bars, and the challenge history —
-   * the one block carrying failed and skipped attempts — stays off this page entirely.
+   * A stranger has no use for someone else's progress bars, and the challenge history -
+   * the one block carrying failed and skipped attempts - stays off this page entirely.
    */
   it("hands out unlocked badges only", async () => {
     mockUserFindUnique.mockResolvedValue(makeUserRow());

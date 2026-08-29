@@ -84,7 +84,7 @@ describe("DELETE /api/submission/[id]/comments/[commentId]", () => {
     expect(mockDelete).not.toHaveBeenCalled();
   });
 
-  it("returns 403 for a foreign comment under my own submission — no moderation rights", async () => {
+  it("returns 403 for a foreign comment under my own submission - no moderation rights", async () => {
     mockFindUnique.mockResolvedValue({
       id: "comment-1",
       userId: "user-alice",

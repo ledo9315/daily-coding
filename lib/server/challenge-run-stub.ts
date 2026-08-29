@@ -2,7 +2,7 @@ import type { ChallengeTestCase } from "@/lib/api";
 import type { CodeLanguageId } from "@/lib/challenge-languages";
 
 /**
- * Temporary stub runner — swap for real sandbox / Judge0 per language later.
+ * Temporary stub runner - swap for real sandbox / Judge0 per language later.
  * Returns distinct stub metadata so clients can verify language was accepted.
  */
 export function stubRunResults(language: CodeLanguageId): ChallengeTestCase[] {

@@ -117,7 +117,7 @@ export function CodeEditor({
   );
 
   return (
-    // The height lives on the outer box so a caller can stretch it — `h-[500px]` is the
+    // The height lives on the outer box so a caller can stretch it - `h-[500px]` is the
     // default that `cn` lets a passed class override. Monaco itself fills what it is given.
     <div className={cn("pixel-box flex h-[500px] flex-col overflow-hidden", className)}>
       <div className="flex items-center gap-2 border-b border-border/50 bg-secondary/30 px-4 py-2">

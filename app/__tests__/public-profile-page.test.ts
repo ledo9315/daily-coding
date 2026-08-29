@@ -13,7 +13,7 @@ const privacyPolicy = read("app", "datenschutz", "page.tsx");
  * login, so two promises made elsewhere have to keep holding here.
  *
  * ponytail: reads the page as text. It is a server component pulling in fonts, CSS and
- * next-auth, so it does not import in the node test environment — and what is at stake
+ * next-auth, so it does not import in the node test environment - and what is at stake
  * is the coupling between two files, which text captures. The behaviour behind the page
  * is covered by `lib/server/__tests__/public-profile.test.ts`.
  */

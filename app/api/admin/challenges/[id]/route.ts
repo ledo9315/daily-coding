@@ -79,7 +79,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
     // Normalise to UTC midnight: the time of day has no effect, since the daily
     // challenge covers the whole UTC day, and a timestamp in the middle of the day
-    // would defeat the `@unique` constraint — two challenges could then share a day
+    // would defeat the `@unique` constraint - two challenges could then share a day
     // and one of them would be invisible (#71).
     date = startOfUtcDay(d);
   }

@@ -185,7 +185,7 @@ describe("buildUserAchievementsView", () => {
       });
     });
 
-    it("omits progress once unlocked — the unlock date says more than a full bar", () => {
+    it("omits progress once unlocked - the unlock date says more than a full bar", () => {
       const { achievements } = buildUserAchievementsView(
         [def("ach-4")],
         [],

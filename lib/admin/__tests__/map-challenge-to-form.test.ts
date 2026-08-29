@@ -5,7 +5,7 @@ type ChallengeRow = Parameters<typeof challengeToFormInitial>[0];
 
 /**
  * #71: the form prefill used local getters and therefore showed a different day than
- * the stored UTC day — off by up to a day in CEST.
+ * the stored UTC day - off by up to a day in CEST.
  */
 describe("challengeToFormInitial", () => {
   const base = {
@@ -30,7 +30,7 @@ describe("challengeToFormInitial", () => {
   } satisfies ChallengeRow;
 
   it("shows the stored UTC day, not the local one", () => {
-    // 22:00Z is already the next day in CEST — the UTC day is what must be shown.
+    // 22:00Z is already the next day in CEST - the UTC day is what must be shown.
     const initial = challengeToFormInitial({
       ...base,
       date: new Date("2026-07-30T22:00:00.000Z"),

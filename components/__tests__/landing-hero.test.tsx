@@ -15,7 +15,7 @@ const source = readFileSync(
 /**
  * The badge above the headline used to read "Heutige Challenge: Array Manipulation" as a
  * hardcoded string. It claimed to name today's challenge and would have said the same thing
- * forever — the one piece of the landing page that promises to be live.
+ * forever - the one piece of the landing page that promises to be live.
  */
 describe("LandingHero", () => {
   it("names the challenge it is given", () => {

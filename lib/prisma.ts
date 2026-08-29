@@ -17,7 +17,7 @@ function createPrismaClient() {
     /localhost|127\.0\.0\.1/.test(connectionString)
   ) {
     throw new Error(
-      "DATABASE_URL zeigt auf localhost — auf Vercel gibt es keine lokale Datenbank. Trage die Verbindungs-URL deines gehosteten Postgres (Neon/Supabase/Vercel Postgres) unter Environment Variables ein und führe prisma migrate deploy gegen diese DB aus."
+      "DATABASE_URL zeigt auf localhost. Auf Vercel gibt es keine lokale Datenbank. Trage die Verbindungs-URL deines gehosteten Postgres (Neon/Supabase/Vercel Postgres) unter Environment Variables ein und führe prisma migrate deploy gegen diese DB aus."
     );
   }
   const adapter = new PrismaPg({ connectionString });

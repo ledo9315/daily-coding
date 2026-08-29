@@ -56,7 +56,7 @@ export async function proxy(request: NextRequest) {
     return withNoindex(NextResponse.redirect(loginUrl));
   }
 
-  // Admin rights are not checked from the JWT — it goes stale after a role change in
+  // Admin rights are not checked from the JWT - it goes stale after a role change in
   // the DB. requireAdminPage / requireAdminApi check against the database instead.
 
   return withNoindex(NextResponse.next());
@@ -65,7 +65,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   /**
    * Everything except static assets and the metadata routes. It used to list only the
-   * protected paths, but the noindex header above has to reach the public pages too —
+   * protected paths, but the noindex header above has to reach the public pages too -
    * those are the ones a crawler indexes (#114). robots.txt and sitemap.xml are excluded
    * so they stay statically cacheable.
    */

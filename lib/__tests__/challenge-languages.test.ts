@@ -41,7 +41,7 @@ describe("Sprach-Registry", () => {
 
   it("erkennt bei jeder im Run-Schritt kompilierten Sprache den Compilerfehler", () => {
     // Without a pattern the compiler's message is shown as the program's output and the same
-    // broken program runs once per test case — the bug behind #161.
+    // broken program runs once per test case - the bug behind #161.
     for (const spec of LANGUAGE_LIST.filter((l) => l.compiledInRunStep)) {
       expect(spec.compileFailure, spec.id).toBeInstanceOf(RegExp);
     }

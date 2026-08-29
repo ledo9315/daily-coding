@@ -150,7 +150,7 @@ describe("Polyglott after a re-submission changes the language", () => {
     expect(achievements[0].unlocked).toBe(true);
   });
 
-  it("would be lost without that row — what the fix prevents", () => {
+  it("would be lost without that row - what the fix prevents", () => {
     const { achievements } = buildUserAchievementsView(defs, [], afterRewrite);
     expect(achievements[0].unlocked).toBe(false);
   });

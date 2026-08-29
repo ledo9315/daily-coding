@@ -104,7 +104,7 @@ export function withEditorFileName(message: string, language: CodeLanguageId): s
 
   /*
     Several compilers already name the file the editor shows, but count lines from the top of the
-    generated program — three above the user's first line for Java, twenty-three for Go. An error
+    generated program - three above the user's first line for Java, twenty-three for Go. An error
     pointing below the actual mistake is worse than no line number at all.
 
     Two notations to cover: `Main.java:12` and, from Mono, `main.cs(12,7)`.
@@ -177,7 +177,7 @@ async function runPistonIoCases(
     if (piston.compileFailed) {
       /*
         One compile error, reported once. Every case runs the same program, so the remaining
-        four calls would fail identically — five compiler runs, some fifteen seconds, for an
+        four calls would fail identically - five compiler runs, some fifteen seconds, for an
         answer that was settled after the first.
       */
       return {
@@ -260,7 +260,7 @@ async function runPistonSmoke(
 
   if (mode === "submit") {
     // Without real I/O test cases a submission cannot be checked for
-    // correctness. No auto-pass — that would award full points for code that
+    // correctness. No auto-pass - that would award full points for code that
     // merely compiles. Affects misconfigured challenges: seed demos without a
     // config, or admin-created challenges without test cases.
     const note =

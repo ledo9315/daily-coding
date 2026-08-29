@@ -17,7 +17,7 @@ const row = (over: Partial<Parameters<typeof RankingTable>[0]["entries"][number]
 describe("RankingTable", () => {
   /**
    * #79: on a phone the level chip broke into "Lvl" over "2" as soon as the name claimed
-   * the width — as a shrinking flex item it had no reason to stay on one line. Two words
+   * the width - as a shrinking flex item it had no reason to stay on one line. Two words
    * on two lines in a chip that small reads as a rendering fault.
    */
   it("keeps the level chip on one line", () => {

@@ -56,7 +56,7 @@ beforeEach(() => {
 });
 
 /**
- * #35: the dashboard needs to know whether today's challenge was already submitted —
+ * #35: the dashboard needs to know whether today's challenge was already submitted -
  * otherwise the button promises "start challenge" while the next page refuses.
  */
 describe("getTodayChallengeSummary", () => {

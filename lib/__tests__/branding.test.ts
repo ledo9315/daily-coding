@@ -9,8 +9,8 @@ import { renderEmail } from "@/lib/server/email-template";
  * a user does, so the check is mechanical.
  *
  * Deliberately scoped to user-facing sources. Infrastructure identifiers keep the old
- * name on purpose — the Postgres role `daily_dev`, the container `daily-dev-db`, the seed
- * admin `admin@dailydev.local` — renaming those is a migration, not a rebrand.
+ * name on purpose - the Postgres role `daily_dev`, the container `daily-dev-db`, the seed
+ * admin `admin@dailydev.local` - renaming those is a migration, not a rebrand.
  */
 const ROOTS = ["app", "components", "lib"];
 const SKIP = new Set(["generated", "__tests__", "node_modules"]);
@@ -40,7 +40,7 @@ describe("branding", () => {
 
   /**
    * #111: without `metadataBase`, Next.js emits relative Open-Graph and canonical URLs,
-   * and a relative URL in metadata is worthless — Slack, WhatsApp and search engines read
+   * and a relative URL in metadata is worthless - Slack, WhatsApp and search engines read
    * it from the outside. A shared link then has no preview card.
    *
    * ponytail: reads the file as text. `app/layout.tsx` imports globals.css and next/font,
@@ -53,13 +53,13 @@ describe("branding", () => {
 
   /**
    * #113: `public/screen.png` was the image on the landing page. It showed the pre-#109
-   * brand name, Batman and a My-Little-Pony avatar — the protected characters #39 is about
-   * — and the daily ranking removed in #91. Replaced by a current screenshot; the guard is
+   * brand name, Batman and a My-Little-Pony avatar - the protected characters #39 is about
+   * - and the daily ranking removed in #91. Replaced by a current screenshot; the guard is
    * here so it cannot creep back into a hero or a metadata field.
    */
   it("renders no image file that is missing from public/", () => {
     /**
-     * Only `src=` and `url:` — the places that actually load an image. A path compared
+     * Only `src=` and `url:` - the places that actually load an image. A path compared
      * against, like the rejected `/placeholder.svg` in `lib/avatar-src.ts`, is not a
      * reference and must not trip this.
      */

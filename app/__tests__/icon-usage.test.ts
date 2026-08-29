@@ -12,12 +12,12 @@ const resultPage = read("app", "challenge", "[id]", "loesungen", "page.tsx");
 const rankingTable = read("components", "ranking-table.tsx");
 
 /**
- * #37: `Trophy` stood for rank, level, badges and — on the result page — points.
+ * #37: `Trophy` stood for rank, level, badges and - on the result page - points.
  * LEVEL and BADGES sat side by side in the same grid carrying the identical glyph, so
  * the icons made the cards harder to tell apart instead of easier.
  *
  * ponytail: reads the sources as text. Both pages are server components that pull in
- * auth and CSS, so they do not import under the node test environment — and the subject
+ * auth and CSS, so they do not import under the node test environment - and the subject
  * here is which icon a call site names, which text captures exactly.
  */
 describe("icon assignments", () => {

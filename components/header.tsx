@@ -31,9 +31,9 @@ export function Header() {
   const { data: session, status } = useSession();
   /**
    * Seeded from the module cache, not from null: this component remounts on every
-   * navigation, and starting empty made the streak flash "—" until the API answered
-   * (#42). Reading in the initialiser means the very first render already has the
-   * value — an effect would run after the browser had a chance to paint the dash.
+   * navigation, and starting empty made the streak flash a placeholder dash until the
+   * API answered (#42). Reading in the initialiser means the very first render already
+   * has the value; an effect would run after the browser had a chance to paint it.
    */
   const [streak, setStreak] = useState<number | null>(() => readHeaderStats().streak);
   const [level, setLevel] = useState<number | null>(() => readHeaderStats().level);
@@ -56,7 +56,7 @@ export function Header() {
     const userId = session?.user?.id;
     if (!userId) return;
 
-    // Cached values belong to someone else — show the dash rather than their numbers.
+    // Cached values belong to someone else - show the dash rather than their numbers.
     if (readHeaderStats().userId !== userId) {
       setStreak(null);
       setLevel(null);

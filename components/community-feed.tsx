@@ -146,7 +146,7 @@ export function CommunityFeed() {
   if (items.length === 0) {
     return (
       <p className="text-sm text-muted-foreground px-1">
-        Noch keine abgeschlossenen Challenges — der Feed füllt sich, sobald die Community
+        Noch keine abgeschlossenen Challenges. Der Feed füllt sich, sobald die Community
         Aufgaben löst.
       </p>
     );

@@ -97,8 +97,8 @@ export default function DatenschutzPage() {
             <p>
               Für andere sichtbar sind dabei dein Name, dein gewählter Avatar,
               dein Level, deine aktuelle Streak samt Streak-Rekord und die
-              Anzahl der von dir gelösten Challenges — in der Bestenliste, im
-              Community-Feed und auf deiner öffentlichen Profilseite.
+              Anzahl der von dir gelösten Challenges. Das gilt in der Bestenliste,
+              im Community-Feed und auf deiner öffentlichen Profilseite.
             </p>
             <p>
               Diese Profilseite ist ohne Anmeldung abrufbar, also auch für

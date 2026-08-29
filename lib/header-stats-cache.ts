@@ -18,9 +18,10 @@ let cache: HeaderStats = EMPTY;
 /**
  * Last known header values, held outside React so they survive the remount that every
  * navigation causes: `<Header />` is rendered per page rather than in a shared layout,
- * so its state restarted at null and the streak flashed "—" until the API answered (#42).
+ * so its state restarted at null and the streak flashed a placeholder until the API
+ * answered (#42).
  *
- * In-memory and per tab on purpose — a full reload starts empty and shows the dash,
+ * In-memory and per tab on purpose - a full reload starts empty and shows the dash,
  * which is honest, instead of resurrecting a number that may be stale.
  *
  * ponytail: a module variable, not a React context. A context needs a component that

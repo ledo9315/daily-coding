@@ -102,7 +102,7 @@ export default function ChallengePage() {
         setSources({ ...challenge.starterCodes });
       }
 
-      // Prefer the graded results of today's submission — otherwise the panel
+      // Prefer the graded results of today's submission - otherwise the panel
       // showed the empty template ("0/5") next to "successfully submitted" after
       // a reload. Legacy rows without stored results fall back to the template.
       const storedResults = challenge.todaySubmission?.testResults;
@@ -223,7 +223,7 @@ export default function ChallengePage() {
   };
 
   // Everything a test run produces. Defined once so it can live in the sidebar or, while
-  // maximized, inside the panel — a compile error is a result too, and reading it should
+  // maximized, inside the panel - a compile error is a result too, and reading it should
   // not require shrinking the editor first.
   const runOutcome = (
     <>
@@ -331,7 +331,7 @@ export default function ChallengePage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* pre-wrap, so a description may use paragraphs — nothing parses Markdown. */}
+                {/* pre-wrap, so a description may use paragraphs - nothing parses Markdown. */}
                 <CardDescription className="whitespace-pre-wrap text-lg text-muted-foreground">
                   {challenge.description}
                 </CardDescription>
@@ -392,7 +392,7 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || !language}
-                    title="Test ausführen — im Editor auch mit ⌘S / Strg+S"
+                    title="Test ausführen, im Editor auch mit ⌘S / Strg+S"
                     className="gap-2 rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />

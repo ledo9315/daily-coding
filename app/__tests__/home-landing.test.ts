@@ -10,8 +10,8 @@ const nextConfig = read("next.config.mjs");
 
 /**
  * #130: `/` answered 307 to `/login?callbackUrl=/` for anyone without a session, so the
- * canonical URL of the site — the one in `metadataBase`, in the OG tags and in every
- * external link — served a login form to crawlers, while the landing sat on `/landing`.
+ * canonical URL of the site - the one in `metadataBase`, in the OG tags and in every
+ * external link - served a login form to crawlers, while the landing sat on `/landing`.
  *
  * ponytail: reads the sources as text. `app/page.tsx` is a server component that awaits
  * `auth()` and three database queries, so it does not import under the node test
@@ -30,7 +30,7 @@ describe("home page for visitors without a session", () => {
   });
 
   it("still sends a signed-out session to the login form", () => {
-    // The `userStats` miss means the JWT outlived its user row — that one must sign out.
+    // The `userStats` miss means the JWT outlived its user row - that one must sign out.
     expect(homePage).toContain("/api/auth/signout");
   });
 });

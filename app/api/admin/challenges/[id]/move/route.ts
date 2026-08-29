@@ -9,7 +9,7 @@ import { compareRingEntries } from "@/lib/server/challenge-ring";
  *
  * `swapWith` names the row to trade places with instead of saying "up" or "down". The list is
  * displayed rotated so that today is on top, so the row above something is not always its
- * neighbour in stored order — at the wrap point it is the far end of the list. Naming the
+ * neighbour in stored order - at the wrap point it is the far end of the list. Naming the
  * partner removes that ambiguity from the server entirely.
  *
  * `next` is the move an admin actually wants most of the time, "run this one tomorrow", which
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     /*
       The live challenge takes part in no swap. The pointer follows the challenge and the list is
       drawn starting from it, so trading places with it wrote to the database and changed nothing
-      visible — the live one stayed on top and its partner jumped to the far end. Today is
+      visible - the live one stayed on top and its partner jumped to the far end. Today is
       running; the order applies from tomorrow.
     */
     if (state?.challengeId && (id === state.challengeId || move.swapWith === state.challengeId)) {
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   /*
     Positions are rewritten as a dense 0..n-1 sequence rather than swapping two values. A few
-    more writes, but it repairs duplicates and gaps as a side effect — and duplicates are
+    more writes, but it repairs duplicates and gaps as a side effect - and duplicates are
     possible, `position` carries no unique constraint precisely so a swap cannot collide.
   */
   await prisma.$transaction(

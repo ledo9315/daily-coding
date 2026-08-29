@@ -16,7 +16,7 @@ interface TodaysChallengeCardProps {
   category: string;
   /**
    * Status of today's submission. Once one exists, the challenge page locks the
-   * editor, the tests and submitting — so the button must not promise a start.
+   * editor, the tests and submitting - so the button must not promise a start.
    */
   todayStatus?: "completed" | "failed" | "pending" | null;
   className?: string;
@@ -32,13 +32,13 @@ export function TodaysChallengeCard({
   className,
 }: TodaysChallengeCardProps) {
   const submittedToday = todayStatus != null;
-  // Say "solved" only when it actually passed — a failed attempt locks the page
-  // just the same, but would be labelled wrongly.
+  // Say "solved" only when it actually passed. A failed attempt locks the page just
+  // the same, but would be labelled wrongly.
   const label = !submittedToday
     ? "CHALLENGE STARTEN"
     : todayStatus === "completed"
-      ? "BEREITS GELÖST — ANSEHEN"
-      : "BEREITS ABGEGEBEN — ANSEHEN";
+      ? "LÖSUNG ANSEHEN"
+      : "ABGABE ANSEHEN";
 
   return (
     <div className={cn("pixel-box relative overflow-hidden p-6", className)}>

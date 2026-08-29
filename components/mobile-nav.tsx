@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
  * The navigation for screens below `md`, where the header's bar is hidden (#79).
  *
  * Only the primary destinations. Profile, settings and sign-out stay in the avatar menu,
- * which is reachable on every screen size — duplicating them here would give two paths to
+ * which is reachable on every screen size - duplicating them here would give two paths to
  * the same place and no clue which one is meant.
  */
 export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {

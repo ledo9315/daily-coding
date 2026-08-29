@@ -157,7 +157,7 @@ describe("POST /api/challenge/[id]/votes", () => {
 
   /**
    * #200 lets a re-submission overwrite the row of the day. A vote tied to that row would
-   * follow the author to code the voter never saw, so it hangs on the hash of the code —
+   * follow the author to code the voter never saw, so it hangs on the hash of the code -
    * and nothing in the write may name a submission.
    */
   it("keys the vote by the code, never by the submission row", async () => {

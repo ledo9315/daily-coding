@@ -23,23 +23,23 @@ export type StarterCodesMap = Partial<Record<CodeLanguageId, string>>;
  * exhaustive `Record<CodeLanguageId, …>` refused to compile. The fields below exist because each
  * one has already differed from the language id somewhere:
  *
- * - `pistonPackage` — the installer calls Node "node", not "javascript".
- * - `pistonLanguage` — what Piston calls the runtime, when that is not the id. C++ has to be
+ * - `pistonPackage` - the installer calls Node "node", not "javascript".
+ * - `pistonLanguage` - what Piston calls the runtime, when that is not the id. C++ has to be
  *   `cpp` in a Postgres enum and is `c++` to Piston.
- * - `pistonFile` — Piston appends its own extension, so Java is handed `Main` and Go `main`;
+ * - `pistonFile` - Piston appends its own extension, so Java is handed `Main` and Go `main`;
  *   passing `Main.java` yields errors against `Main.java.java`.
- * - `editorFile` — what the user sees in the editor's title bar.
- * - `monacoId` — what Monaco calls the language, when that is not the id either.
- * - `versionPrefix` — Piston ships Ruby 2.5 next to 3.0 and TypeScript 4 next to 5.
- * - `typed` — needs the test input expressible as typed parameters, so it is opt-in per
+ * - `editorFile` - what the user sees in the editor's title bar.
+ * - `monacoId` - what Monaco calls the language, when that is not the id either.
+ * - `versionPrefix` - Piston ships Ruby 2.5 next to 3.0 and TypeScript 4 next to 5.
+ * - `typed` - needs the test input expressible as typed parameters, so it is opt-in per
  *   challenge instead of part of the base set.
- * - `compiledInRunStep` — Piston has no separate compile stage for these, so the compiler's CPU
+ * - `compiledInRunStep` - Piston has no separate compile stage for these, so the compiler's CPU
  *   cost counts against the program's budget and its errors arrive as a failed *run*.
- * - `compileFailure` — how that failed run is told apart from a crash. Matched against stderr,
+ * - `compileFailure` - how that failed run is told apart from a crash. Matched against stderr,
  *   and only when stdout is empty.
- * - `compilerBanner` — boilerplate to drop before showing the message; Mono greets with two
+ * - `compilerBanner` - boilerplate to drop before showing the message; Mono greets with two
  *   lines of version and copyright.
- * - `harnessLineOffset` — lines the wrapper puts above the user's code, so a compiler's line
+ * - `harnessLineOffset` - lines the wrapper puts above the user's code, so a compiler's line
  *   numbers can be corrected. Derived in `io-harness.ts`, not counted by hand.
  */
 export type LanguageSpec = {
@@ -189,7 +189,7 @@ export const LANGUAGES: Record<CodeLanguageId, LanguageSpec> = {
     editorFile: "main.rs",
     /*
       With the extension, unlike Java, Go and C++. Piston appends one for those and rustc reports
-      against whatever it was handed — `main` without a suffix would put a file the user never
+      against whatever it was handed - `main` without a suffix would put a file the user never
       saw into every error message.
     */
     pistonFile: "main.rs",
@@ -201,7 +201,7 @@ export const LANGUAGES: Record<CodeLanguageId, LanguageSpec> = {
   },
 };
 
-/** What Piston calls this language — the id unless the registry says otherwise. */
+/** What Piston calls this language - the id unless the registry says otherwise. */
 export function pistonLanguageName(lang: CodeLanguageId): string {
   return LANGUAGES[lang]?.pistonLanguage ?? lang;
 }
@@ -225,7 +225,7 @@ export function languageLabel(lang: CodeLanguageId): string {
   return LANGUAGES[lang]?.label ?? lang;
 }
 
-/** The name shown in the editor — not necessarily the one Piston is handed. */
+/** The name shown in the editor - not necessarily the one Piston is handed. */
 export function languageFileName(lang: CodeLanguageId): string {
   return LANGUAGES[lang]?.editorFile ?? "solution.txt";
 }

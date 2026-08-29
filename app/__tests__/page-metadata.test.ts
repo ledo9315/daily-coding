@@ -53,7 +53,7 @@ function titleSourceOf(pagePath: string): { title: string; file: string } | null
 }
 
 /**
- * `/admin` and `/join` only call `redirect()` — they render nothing, so a title on them
+ * `/admin` and `/join` only call `redirect()` - they render nothing, so a title on them
  * would never be shown. Detected rather than listed, so a page that grows a body later
  * starts being checked on its own.
  *
@@ -67,7 +67,7 @@ const pages = findPages(APP).filter(rendersSomething);
 
 /**
  * #131: no page in the project exported metadata except the root layout, so every route
- * shared one title and one description — the strongest signal a page has, spent once for
+ * shared one title and one description - the strongest signal a page has, spent once for
  * all of them. `metadataBase` was already set (#111); the canonical URLs were not.
  */
 describe("page metadata", () => {
@@ -94,7 +94,7 @@ describe("page metadata", () => {
       if (!title) continue;
       byTitle.set(title, [...(byTitle.get(title) ?? []), routeOf(page)]);
     }
-    // Routes sharing a title share the layout that declares it — siblings of one feature,
+    // Routes sharing a title share the layout that declares it - siblings of one feature,
     // never two unrelated pages.
     const shared = [...byTitle.entries()].filter(([, routes]) => routes.length > 1);
     for (const [title, routes] of shared) {

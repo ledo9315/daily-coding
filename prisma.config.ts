@@ -4,12 +4,12 @@ import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 import { defineConfig } from "prisma/config";
 
-// Same order as Next.js: .env first, then .env.local (which overrides) — otherwise
+// Same order as Next.js: .env first, then .env.local (which overrides) - otherwise
 // DATABASE_URL tends to be missing for `prisma migrate` only.
 loadEnv({ path: resolve(process.cwd(), ".env") });
 loadEnv({ path: resolve(process.cwd(), ".env.local"), override: true });
 
-// `prisma generate` — called from postinstall, among others — needs no running DB, only
+// `prisma generate` - called from postinstall, among others - needs no running DB, only
 // a syntactically valid URL. GitHub Actions often has no .env, but sets CI.
 const placeholderForGenerateOnly =
   "postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder";

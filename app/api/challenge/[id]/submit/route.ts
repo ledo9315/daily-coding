@@ -147,7 +147,7 @@ export async function POST(
   return NextResponse.json({
     success: runtimeOk,
     // The stored status, which a failed retry on an already solved day leaves at
-    // "completed" — the panel would otherwise claim a failure until the next reload.
+    // "completed" - the panel would otherwise claim a failure until the next reload.
     status,
     submissionId: submission.id,
     // Decided here rather than on the client so a reload between two attempts cannot
