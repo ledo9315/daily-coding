@@ -43,6 +43,12 @@ enum UserRole {
 }
 
 /// Programming languages available for daily challenges (extend as runners are added).
+/// The two ways a solution can be praised (#225).
+enum SolutionVoteKind {
+  best_practices
+  clever
+}
+
 enum CodeLanguage {
   javascript
   typescript
@@ -77,6 +83,7 @@ model User {
   streakRecord Int          @default(0)
   submissions    Submission[]
   comments       Comment[]
+  solutionVotes  SolutionVote[]
   achievements   UserAchievement[]
   rankingEntries RankingEntry[]
   createdAt    DateTime     @default(now())
@@ -139,6 +146,7 @@ model Challenge {
   /// old schedule can be read back if the rollout goes wrong.
   date        DateTime?    @unique
   submissions Submission[]
+  solutionVotes SolutionVote[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -181,6 +189,24 @@ model Submission {
   updatedAt   DateTime         @updatedAt
 
   @@unique([userId, submissionDay])
+  @@index([challengeId, codeHash])
+}
+
+/// One user's praise for one *solution*, which is a piece of code, not a submission row.
+///
+/// The key is the code hash on purpose: a re-submission overwrites the row of the day (#200),
+/// so a vote tied to the submission would silently move to code the voter never saw.
+model SolutionVote {
+  id          String           @id @default(cuid())
+  challengeId String
+  codeHash    String
+  userId      String
+  kind        SolutionVoteKind
+  challenge   Challenge        @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+
+  @@unique([challengeId, codeHash, userId, kind])
   @@index([challengeId, codeHash])
 }
 

@@ -9,12 +9,18 @@ const mockGroupBy = vi.fn();
 const mockGetSessionUserId = vi.fn();
 const mockHasSolvedChallenge = vi.fn();
 const mockGetLifetimePointsByUserIds = vi.fn();
+const mockVoteGroupBy = vi.fn();
+const mockVoteFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     submission: {
       findMany: (...args: unknown[]) => mockFindMany(...args),
       groupBy: (...args: unknown[]) => mockGroupBy(...args),
+    },
+    solutionVote: {
+      findMany: (...args: unknown[]) => mockVoteFindMany(...args),
+      groupBy: (...args: unknown[]) => mockVoteGroupBy(...args),
     },
   },
 }));
@@ -74,6 +80,8 @@ beforeEach(() => {
   mockHasSolvedChallenge.mockResolvedValue(true);
   mockGetLifetimePointsByUserIds.mockResolvedValue(new Map());
   mockGroupBy.mockResolvedValue([]);
+  mockVoteGroupBy.mockResolvedValue([]);
+  mockVoteFindMany.mockResolvedValue([]);
   ownHashRows = [];
   groupRows = [makeRow()];
   mockFindMany.mockImplementation((args: { select?: Record<string, unknown> }) =>
@@ -151,6 +159,8 @@ describe("GET /api/challenge/[id]/solutions", () => {
         ],
         submissionCount: 12,
         own: false,
+        votes: { best_practices: 0, clever: 0 },
+        myVotes: { best_practices: false, clever: false },
       },
     ]);
     expect(json.nextCursor).toBeNull();
@@ -266,6 +276,76 @@ describe("sorting and filtering the groups", () => {
       ["hash-b", false],
       ["hash-a", true],
     ]);
+  });
+});
+
+// ─── Votes on the list ───────────────────────────────────────────────────────
+
+describe("votes on the solution list", () => {
+  const hashA = makeGroup({ codeHash: "hash-a", firstAt: new Date("2026-08-01T00:00:00Z") });
+  const hashB = makeGroup({ codeHash: "hash-b", firstAt: new Date("2026-08-02T00:00:00Z") });
+
+  const hashes = (json: { groups: { codeHash: string }[] }) =>
+    json.groups.map((group) => group.codeHash);
+
+  it("reads all tallies of the challenge in two queries, not one per group", async () => {
+    mockGroupBy.mockResolvedValue([hashA, hashB]);
+    await call();
+    expect(mockVoteGroupBy).toHaveBeenCalledTimes(1);
+    expect(mockVoteFindMany).toHaveBeenCalledTimes(1);
+    expect(mockVoteGroupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        by: ["codeHash", "kind"],
+        where: { challengeId: "challenge-1" },
+      }),
+    );
+  });
+
+  it("carries the counts and the own state of each group", async () => {
+    mockGroupBy.mockResolvedValue([hashA]);
+    mockVoteGroupBy.mockResolvedValue([
+      { codeHash: "hash-a", kind: "clever", _count: { _all: 3 } },
+    ]);
+    mockVoteFindMany.mockResolvedValue([{ codeHash: "hash-a", kind: "clever" }]);
+
+    const json = await (await call()).json();
+    expect(json.groups[0].votes).toEqual({ best_practices: 0, clever: 3 });
+    expect(json.groups[0].myVotes).toEqual({ best_practices: false, clever: true });
+  });
+
+  it("sorts by the requested kind, not by the other one", async () => {
+    mockGroupBy.mockResolvedValue([hashA, hashB]);
+    mockVoteGroupBy.mockResolvedValue([
+      { codeHash: "hash-a", kind: "best_practices", _count: { _all: 9 } },
+      { codeHash: "hash-b", kind: "clever", _count: { _all: 9 } },
+    ]);
+
+    const byPractice = await (
+      await call("http://localhost/api/challenge/challenge-1/solutions?sort=best_practices")
+    ).json();
+    expect(hashes(byPractice)).toEqual(["hash-a", "hash-b"]);
+
+    const byClever = await (
+      await call("http://localhost/api/challenge/challenge-1/solutions?sort=clever")
+    ).json();
+    expect(hashes(byClever)).toEqual(["hash-b", "hash-a"]);
+  });
+
+  /**
+   * Vote counts move while a reader pages through. Without a second, unique criterion two
+   * groups on the same count would swap places between requests and the cursor would either
+   * repeat one or step over the other.
+   */
+  it("keeps a stable order for groups on the same count", async () => {
+    mockGroupBy.mockResolvedValue([hashA, hashB]);
+    mockVoteGroupBy.mockResolvedValue([
+      { codeHash: "hash-a", kind: "clever", _count: { _all: 4 } },
+      { codeHash: "hash-b", kind: "clever", _count: { _all: 4 } },
+    ]);
+    const json = await (
+      await call("http://localhost/api/challenge/challenge-1/solutions?sort=clever")
+    ).json();
+    expect(hashes(json)).toEqual(["hash-b", "hash-a"]);
   });
 });
 
