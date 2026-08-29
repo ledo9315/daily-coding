@@ -213,6 +213,7 @@ describe("GET /api/user/profile", () => {
 
   const submission = {
     id: "sub-1",
+    challengeId: "chal-1",
     status: "completed",
     rank: 2,
     createdAt: new Date("2026-03-15T10:00:00Z"),
@@ -290,6 +291,7 @@ describe("GET /api/user/profile", () => {
     expect(json.challengeHistory).toHaveLength(1);
     expect(json.challengeHistory[0]).toMatchObject({
       id: "sub-1",
+      challengeId: "chal-1",
       title: "Two Sum",
       status: "completed",
       points: 200,

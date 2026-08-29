@@ -82,6 +82,7 @@ export async function getUserProfileData(
     achievements,
     challengeHistory: user.submissions.map((s) => ({
       id: s.id,
+      challengeId: s.challengeId,
       title: s.challenge.title,
       date: formatDate(s.createdAt),
       difficulty: s.challenge.difficulty,

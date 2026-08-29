@@ -58,6 +58,7 @@ const mockSubmissionFindMany = vi.fn();
 const mockSubmissionAggregate = vi.fn();
 const mockSubmissionCount = vi.fn();
 const mockCreate = vi.fn();
+const mockAchievementDefFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -83,6 +84,9 @@ vi.mock("@/lib/prisma", () => ({
       aggregate: (...args: unknown[]) => mockSubmissionAggregate(...args),
       count: (...args: unknown[]) => mockSubmissionCount(...args),
     },
+    achievementDef: {
+      findMany: (...args: unknown[]) => mockAchievementDefFindMany(...args),
+    },
   },
 }));
 
@@ -93,6 +97,9 @@ beforeEach(() => {
   mockSubmissionFindFirst.mockResolvedValue(null);
   mockSubmissionFindMany.mockResolvedValue([{ createdAt: new Date() }]);
   mockSubmissionCount.mockResolvedValue(3);
+  mockCreate.mockResolvedValue({ id: "sub-1" });
+  mockPersistAchievementUnlocks.mockResolvedValue([]);
+  mockAchievementDefFindMany.mockResolvedValue([]);
   mockUserUpdate.mockResolvedValue({ streak: 1, streakRecord: 1 });
   mockAuth.mockResolvedValue(null);
   // The daily is the ring: the active pool plus a pointer at where it stands.
@@ -630,20 +637,62 @@ describe("POST /api/challenge/[id]/submit", () => {
     expect(statuses.every((s: string) => s === "passed")).toBe(true);
   });
 
-  it("returns celebration payload with streak and community stats on success", async () => {
+  it("returns the id of the row today's attempt was stored in", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
-    mockCreate.mockResolvedValueOnce({});
+    mockCreate.mockResolvedValueOnce({ id: "sub-42" });
     const res = await submitHandler(makeRequest("ch-1"), {
       params: Promise.resolve({ id: "ch-1" }),
     });
-    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.celebration).toBeDefined();
-    expect(json.celebration).toEqual({
-      streak: 1,
-      streakRecord: 1,
-      completionsToday: 3,
+    expect(json.submissionId).toBe("sub-42");
+    expect(mockCreate.mock.calls[0][0].select).toEqual({ id: true });
+  });
+
+  it("marks the attempt that turns the day green as the first solve", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
     });
-    expect(mockSubmissionCount).toHaveBeenCalled();
+    expect((await res.json()).firstSolveToday).toBe(true);
+  });
+
+  it("does not mark a repeat solve on an already completed day as the first solve", async () => {
+    mockSubmissionFindFirst.mockResolvedValueOnce({ id: "existing-sub", status: "completed" });
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect((await res.json()).firstSolveToday).toBe(false);
+  });
+
+  it("returns the definitions of the achievements this submission unlocked", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockPersistAchievementUnlocks.mockResolvedValueOnce(["ach-1"]);
+    mockAchievementDefFindMany.mockResolvedValueOnce([
+      { id: "ach-1", title: "Erste Schritte", description: "Erste Challenge gelöst" },
+    ]);
+    const res = await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const json = await res.json();
+    expect(json.unlockedAchievements).toEqual([
+      { id: "ach-1", title: "Erste Schritte", description: "Erste Challenge gelöst" },
+    ]);
+    expect(mockAchievementDefFindMany).toHaveBeenCalledWith({
+      where: { id: { in: ["ach-1"] } },
+      select: { id: true, title: true, description: true },
+    });
+  });
+
+  it("returns an empty achievement list when the attempt failed", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockRunChallengeTests.mockResolvedValueOnce({ testCases: [], runtimeOk: false });
+    const res = await submitHandler(makeRequest("ch-1", "kaputter code"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const json = await res.json();
+    expect(json.unlockedAchievements).toEqual([]);
+    expect(json.firstSolveToday).toBe(false);
+    expect(mockAchievementDefFindMany).not.toHaveBeenCalled();
   });
 });

@@ -4,6 +4,7 @@ import { ChallengeHistory } from "@/components/challenge-history";
 
 const entry = {
   id: "1",
+  challengeId: "chal-1",
   title: "Array Manipulation Challenge mit sehr langem Titel",
   difficulty: "medium" as const,
   status: "completed" as const,
@@ -31,5 +32,19 @@ describe("ChallengeHistory on narrow screens", () => {
 
   it("keeps the points chip from being squeezed", () => {
     expect(html).toContain("shrink-0");
+  });
+});
+
+describe("ChallengeHistory links to the result page", () => {
+  it("links a solved entry", () => {
+    const html = renderToStaticMarkup(<ChallengeHistory entries={[entry]} />);
+    expect(html).toContain('href="/challenge/chal-1/loesungen"');
+  });
+
+  it("leaves an unsolved entry unlinked", () => {
+    const html = renderToStaticMarkup(
+      <ChallengeHistory entries={[{ ...entry, status: "failed" as const }]} />
+    );
+    expect(html).not.toContain("href=");
   });
 });
