@@ -56,7 +56,11 @@ describe("icon assignments", () => {
 
   it("labels nothing but a placement with Trophy", () => {
     // The iconMap entry stays: it is the glyph of a single achievement, not a card label.
-    expect(/icon=\{Trophy\}/.test(profilePage)).toBe(false);
+    const trophyCards = profilePage
+      .split("<StatsCard")
+      .filter((card) => card.includes("icon={Trophy}"))
+      .map((card) => /title="(\w+)"/.exec(card)?.[1]);
+    expect(trophyCards).toEqual(["PLATZIERUNG"]);
     expect(feedItem).not.toContain("Trophy");
   });
 
