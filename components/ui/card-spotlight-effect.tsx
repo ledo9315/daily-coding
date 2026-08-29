@@ -11,7 +11,7 @@ const CanvasRevealEffect = dynamic(
   { ssr: false },
 );
 
-export function DesktopCardSpotlightEffect({
+export function CardSpotlightEffect({
   radius,
   color,
 }: {
@@ -25,12 +25,11 @@ export function DesktopCardSpotlightEffect({
     const element = containerRef.current;
     if (!element) return;
 
-    const desktop = window.matchMedia("(min-width: 1024px)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let nearViewport = false;
 
     const update = () => {
-      setActive(desktop.matches && !reducedMotion.matches && nearViewport);
+      setActive(!reducedMotion.matches && nearViewport);
     };
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -41,12 +40,10 @@ export function DesktopCardSpotlightEffect({
     );
 
     observer.observe(element);
-    desktop.addEventListener("change", update);
     reducedMotion.addEventListener("change", update);
 
     return () => {
       observer.disconnect();
-      desktop.removeEventListener("change", update);
       reducedMotion.removeEventListener("change", update);
     };
   }, []);
@@ -57,7 +54,7 @@ export function DesktopCardSpotlightEffect({
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="hidden lg:block pointer-events-none absolute -inset-px z-0 rounded-md"
+      className="pointer-events-none absolute -inset-px z-0 rounded-md"
       data-card-spotlight-effect
       style={{
         backgroundColor: color,

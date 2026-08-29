@@ -32,25 +32,24 @@ describe("landing performance budget", () => {
     expect(features).not.toContain("FlickeringGrid");
   });
 
-  it("loads the original card shader only near desktop cards", () => {
+  it("loads the card shader near a card on every viewport", () => {
     const html = renderToStaticMarkup(
       <CardSpotlight animatedDots>Inhalt</CardSpotlight>,
     );
     const routine = read("components", "landing", "routine.tsx");
-    const loader = read(
-      "components",
-      "ui",
-      "desktop-card-spotlight-effect.tsx",
-    );
+    const loader = read("components", "ui", "card-spotlight-effect.tsx");
     const shader = read("components", "ui", "canvas-reveal-effect.tsx");
 
     expect(html).toContain("Inhalt");
     expect(html).toContain("data-card-spotlight-effect");
-    expect(html).toContain("hidden lg:block");
+    expect(html).not.toContain("lg:block");
     expect(html).not.toContain("<canvas");
     expect(routine.match(/<CardSpotlight[^>]*animatedDots/g)).toHaveLength(4);
     expect(loader).toContain("dynamic(");
-    expect(loader).toContain("(min-width: 1024px)");
+    // The viewport width no longer gates the shader; proximity and motion preference still do.
+    expect(loader).not.toContain("min-width");
+    expect(loader).toContain("IntersectionObserver");
+    expect(loader).toContain("prefers-reduced-motion");
     expect(loader).toContain("CanvasRevealEffect");
     expect(shader).toContain('frameloop="demand"');
     expect(shader).toContain("dpr={1}");

@@ -1,6 +1,6 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { DesktopCardSpotlightEffect } from "@/components/ui/desktop-card-spotlight-effect";
+import { CardSpotlightEffect } from "@/components/ui/card-spotlight-effect";
 
 /** Static spotlight treatment without a dedicated WebGL renderer per card. */
 export function CardSpotlight({
@@ -32,7 +32,7 @@ export function CardSpotlight({
       {...props}
     >
       {animatedDots ? (
-        <DesktopCardSpotlightEffect color={color} radius={radius} />
+        <CardSpotlightEffect color={color} radius={radius} />
       ) : null}
       {children}
     </div>
