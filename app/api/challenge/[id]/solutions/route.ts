@@ -140,6 +140,21 @@ export async function GET(
     ...new Set(rowsByGroup.flat().map((row) => row.userId)),
   ]);
 
+  // The thread hangs on the representative row, so that is the row whose comments are
+  // counted. One query for the page, not one per card.
+  const commentCounts = await prisma.comment.groupBy({
+    by: ["submissionId"],
+    where: {
+      submissionId: {
+        in: rowsByGroup.map((rows) => rows[0]?.id).filter((id): id is string => !!id),
+      },
+    },
+    _count: { _all: true },
+  });
+  const commentsBySubmission = new Map(
+    commentCounts.map((row) => [row.submissionId, row._count._all])
+  );
+
   const solutionGroups = page.flatMap((group, index) => {
     const rows = rowsByGroup[index];
     const [representative] = rows;
@@ -162,6 +177,7 @@ export async function GET(
         })),
         submissionCount: group._count._all,
         own: ownHashes.has(group.codeHash),
+        commentCount: commentsBySubmission.get(representative.id) ?? 0,
         votes: votes.countsOf(group.codeHash),
         myVotes: votes.stateOf(group.codeHash),
       },

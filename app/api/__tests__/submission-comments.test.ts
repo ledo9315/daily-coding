@@ -13,6 +13,7 @@ const mockCommentCreate = vi.fn();
 const mockGetSessionUserId = vi.fn();
 const mockHasSolvedChallenge = vi.fn();
 const mockCheckRateLimit = vi.fn();
+const mockGetLifetimePointsByUserIds = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -36,6 +37,11 @@ vi.mock("@/lib/server/solution-access", () => ({
 
 vi.mock("@/lib/server/rate-limiter", () => ({
   checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
+}));
+
+vi.mock("@/lib/server/user-points", () => ({
+  getLifetimePointsByUserIds: (...args: unknown[]) =>
+    mockGetLifetimePointsByUserIds(...args),
 }));
 
 const createdAt = new Date("2026-08-01T10:00:00.000Z");
@@ -64,6 +70,7 @@ beforeEach(() => {
   mockCheckRateLimit.mockResolvedValue(true);
   mockCommentFindMany.mockResolvedValue([]);
   mockCommentCreate.mockResolvedValue(makeRow({ userId: "user-me" }));
+  mockGetLifetimePointsByUserIds.mockResolvedValue(new Map());
 });
 
 const params = Promise.resolve({ id: "sub-1" });
@@ -150,7 +157,7 @@ describe("GET /api/submission/[id]/comments", () => {
       comments: [
         {
           id: "comment-1",
-          author: { name: "Alice Müller", initials: "AM", avatar: "🐱" },
+          author: { name: "Alice Müller", initials: "AM", avatar: "🐱", level: 1 },
           body: "Schöne Lösung!",
           createdAt: createdAt.toISOString(),
           own: false,

@@ -2,6 +2,7 @@
 
 import { Fragment, useState } from "react";
 import Link from "next/link";
+import { Message } from "@nsmr/pixelart-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CodeBlock } from "@/components/code-block";
 import { CommentThread } from "@/components/challenge-result/comment-thread";
@@ -16,29 +17,38 @@ import { formatDate } from "@/lib/format";
 /** Avatars in the stack; more than three overlap into an unreadable smudge. */
 const AVATARS_SHOWN = 3;
 
+const ACTION_BASE =
+  "inline-flex items-center gap-2 border-2 px-3 py-1.5 text-base uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+/** Open toggles carry the same treatment as a cast vote, so state reads without hovering. */
+function actionClass(open: boolean): string {
+  return `${ACTION_BASE} ${
+    open
+      ? "border-primary bg-primary/15 text-primary"
+      : "border-border bg-secondary text-foreground hover:border-primary/60 hover:text-primary"
+  }`;
+}
+
 export function SolutionCard({
   challengeId,
   group,
   ownCode,
   ownLanguage,
-  defaultOpen = false,
 }: {
   challengeId: string;
   group: ChallengeSolutionGroup;
   ownCode: string;
   ownLanguage: CodeLanguageId;
-  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
   const [comparing, setComparing] = useState(false);
+  const [discussing, setDiscussing] = useState(false);
+  const [commentCount, setCommentCount] = useState(group.commentCount);
   const { authors, submissionCount } = group;
   const unnamed = submissionCount - authors.length;
 
   return (
     <article
-      className={`border-2 bg-card transition-colors ${
-        group.own ? "border-primary/50" : "border-border hover:border-border/80"
-      }`}
+      className={`border-2 bg-card ${group.own ? "border-primary/50" : "border-border"}`}
     >
       <div className="flex flex-col gap-4 p-4 sm:flex-row">
         <div className="flex shrink-0 -space-x-3">
@@ -50,7 +60,7 @@ export function SolutionCard({
           ))}
         </div>
 
-        <div className="min-w-0 flex-1 space-y-3">
+        <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <p className="min-w-0 text-lg leading-snug">
               {authors.map((author, index) => (
@@ -62,6 +72,7 @@ export function SolutionCard({
                   >
                     {author.name}
                   </Link>
+                  <span className="text-muted-foreground"> (Level {author.level})</span>
                 </Fragment>
               ))}
               {unnamed > 0 && (
@@ -85,70 +96,75 @@ export function SolutionCard({
             <span className="border border-border bg-secondary px-2 py-0.5 text-muted-foreground">
               {languageLabel(group.language)}
             </span>
-            {authors.length === 1 && (
-              <span className="text-muted-foreground">Level {authors[0].level}</span>
-            )}
             {/* A count of one says nothing the card does not already show. */}
             {submissionCount > 1 && (
-              <>
-                {authors.length === 1 && (
-                  <span aria-hidden className="text-border">
-                    ·
-                  </span>
-                )}
-                <span className="text-muted-foreground">
-                  {submissionCount} identische Abgaben
-                </span>
-              </>
-            )}
-          </div>
-
-          <SolutionVotes challengeId={challengeId} group={group} />
-
-          <div className="flex flex-wrap gap-2 pt-1">
-            <button
-              type="button"
-              aria-expanded={open}
-              onClick={() => setOpen((v) => !v)}
-              className="border-2 border-border bg-secondary px-3 py-1.5 text-base uppercase tracking-wider transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {open ? "Code verbergen" : "Code anzeigen"}
-            </button>
-
-            {open && (
-              <button
-                type="button"
-                aria-expanded={comparing}
-                onClick={() => setComparing((v) => !v)}
-                className="border-2 border-border bg-secondary px-3 py-1.5 text-base uppercase tracking-wider transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {comparing ? "Vergleich verbergen" : "Mit deiner Lösung vergleichen"}
-              </button>
+              <span className="text-muted-foreground">
+                {submissionCount} identische Abgaben
+              </span>
             )}
           </div>
         </div>
       </div>
 
-      {open && (
+      {/* Always open. The page exists to be read, and a click between the reader and every
+          single solution turns reading into a chore. */}
+      <div className="px-4">
+        <CodeBlock code={group.code} language={group.language} className="max-h-[32rem]" />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 p-4">
+        <SolutionVotes challengeId={challengeId} group={group} />
+
+        <span aria-hidden className="mx-1 hidden h-7 w-0.5 bg-border sm:block" />
+
+        <button
+          type="button"
+          aria-expanded={discussing}
+          onClick={() => setDiscussing((v) => !v)}
+          className={actionClass(discussing)}
+        >
+          <Message className="h-4 w-4 shrink-0" aria-hidden fill="currentColor" />
+          Kommentare
+          <span
+            className={`min-w-6 border px-1.5 text-center font-code text-xs ${
+              discussing
+                ? "border-primary/40 bg-primary/10"
+                : "border-border bg-background text-muted-foreground"
+            }`}
+          >
+            {commentCount}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          aria-expanded={comparing}
+          onClick={() => setComparing((v) => !v)}
+          className={actionClass(comparing)}
+        >
+          Mit deiner Lösung vergleichen
+        </button>
+      </div>
+
+      {comparing && (
         <div className="border-t-2 border-border p-4">
-          <CodeBlock
-            code={group.code}
-            language={group.language}
-            className="max-h-[32rem]"
+          <SolutionDiff
+            mine={ownCode}
+            mineLanguage={ownLanguage}
+            theirs={group.code}
+            theirsLanguage={group.language}
           />
+        </div>
+      )}
 
-          {comparing && (
-            <SolutionDiff
-              mine={ownCode}
-              mineLanguage={ownLanguage}
-              theirs={group.code}
-              theirsLanguage={group.language}
-            />
-          )}
-
-          {/* Mounted with the expanded body so a list of ten solutions does not fire ten
-              comment requests on page load. */}
-          <CommentThread submissionId={group.submissionId} />
+      {/* Mounted with the toggle, so a list of ten solutions does not fire ten comment
+          requests on page load. */}
+      {discussing && (
+        <div className="border-t-2 border-border p-4">
+          <CommentThread
+            submissionId={group.submissionId}
+            onCountChange={setCommentCount}
+          />
         </div>
       )}
     </article>

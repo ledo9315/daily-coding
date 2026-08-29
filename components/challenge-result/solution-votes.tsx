@@ -54,8 +54,9 @@ export function SolutionVotes({
     }
   }
 
+  // A fragment, not a row of its own: the card lines the votes up with the other actions.
   return (
-    <div className="flex flex-wrap gap-2">
+    <>
       {KINDS.map(({ kind, label, icon: Icon }) => (
         <button
           key={kind}
@@ -85,6 +86,6 @@ export function SolutionVotes({
           </span>
         </button>
       ))}
-    </div>
+    </>
   );
 }

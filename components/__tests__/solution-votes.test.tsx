@@ -14,6 +14,7 @@ function makeGroup(overrides: Partial<ChallengeSolutionGroup> = {}): ChallengeSo
     authors: [{ name: "Lisa Müller", initials: "LM", avatar: "", level: 4 }],
     submissionCount: 1,
     own: false,
+    commentCount: 0,
     votes: { best_practices: 2, clever: 7 },
     myVotes: { best_practices: false, clever: true },
     ...overrides,

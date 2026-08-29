@@ -22,7 +22,14 @@ const PAGE_SIZE = 10;
 /** Below this many characters left, the counter appears. */
 const COUNTER_THRESHOLD = 200;
 
-export function CommentThread({ submissionId }: { submissionId: string }) {
+export function CommentThread({
+  submissionId,
+  onCountChange,
+}: {
+  submissionId: string;
+  /** Keeps the count on the card's toggle in step with what the thread does. */
+  onCountChange?: (count: number) => void;
+}) {
   const [comments, setComments] = useState<SubmissionComment[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,7 +88,10 @@ export function CommentThread({ submissionId }: { submissionId: string }) {
     setSending(true);
     try {
       const created = await createSubmissionComment(submissionId, body);
-      setComments((prev) => [created, ...prev]);
+      setComments((prev) => {
+        onCountChange?.(prev.length + 1);
+        return [created, ...prev];
+      });
       setBody("");
     } catch (e) {
       toast.error(
@@ -96,7 +106,11 @@ export function CommentThread({ submissionId }: { submissionId: string }) {
     setDeletingId(id);
     try {
       await deleteSubmissionComment(submissionId, id);
-      setComments((prev) => prev.filter((c) => c.id !== id));
+      setComments((prev) => {
+        const next = prev.filter((c) => c.id !== id);
+        onCountChange?.(next.length);
+        return next;
+      });
     } catch (e) {
       toast.error(
         e instanceof Error ? e.message : "Kommentar konnte nicht gelöscht werden."
@@ -111,15 +125,8 @@ export function CommentThread({ submissionId }: { submissionId: string }) {
   const remaining = COMMENT_MAX_LENGTH - [...body].length;
 
   return (
-    <section className="mt-6 border-t-2 border-border pt-5">
-      <h3 className="text-base uppercase tracking-wider text-muted-foreground">
-        Kommentare
-        {comments.length > 0 && (
-          <span className="ml-2 font-code text-xs">{comments.length}</span>
-        )}
-      </h3>
-
-      <form onSubmit={onSubmit} className="mt-3 space-y-2">
+    <section>
+      <form onSubmit={onSubmit} className="space-y-2">
         {/* The shadcn default is a transparent field, which on this page sits invisibly on
             the card it is placed in. Inputs get `--input`, the token the palette already
             reserves for them. */}
@@ -181,6 +188,9 @@ export function CommentThread({ submissionId }: { submissionId: string }) {
                   >
                     {comment.author.name}
                   </Link>
+                  <span className="text-base text-muted-foreground">
+                    Level {comment.author.level}
+                  </span>
                   <span className="font-code text-xs text-muted-foreground">
                     {formatDate(new Date(comment.createdAt))}
                   </span>
