@@ -1,18 +1,12 @@
+import { Fragment } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { Check, Close, Clock } from "@nsmr/pixelart-react";
+import { challengeResultPath } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-
-interface ChallengeHistoryEntry {
-  id: string;
-  title: string;
-  date: string;
-  difficulty: "easy" | "medium" | "hard";
-  status: "pending" | "completed" | "failed" | "skipped";
-  points: number;
-  rank?: number;
-}
+import type { ChallengeHistoryEntry } from "@/lib/api";
 
 interface ChallengeHistoryProps {
   entries: ChallengeHistoryEntry[];
@@ -56,11 +50,14 @@ export function ChallengeHistory({
           {entries.map((entry) => {
             const config = statusConfig[entry.status];
             const StatusIcon = config.icon;
+            const solved = entry.status === "completed";
 
-            return (
+            const row = (
               <div
-                key={entry.id}
-                className="flex items-center gap-4 border-2 border-border bg-card p-4"
+                className={cn(
+                  "flex items-center gap-4 border-2 border-border bg-card p-4",
+                  solved && "transition-colors hover:border-primary"
+                )}
               >
                 <div className={cn("shrink-0", config.className)}>
                   <StatusIcon className="h-5 w-5" />
@@ -85,12 +82,21 @@ export function ChallengeHistory({
                 </div>
 
                 <div className="shrink-0">
-                  <PointsChip
-                    points={entry.status === "completed" ? entry.points : 0}
-                    variant="default"
-                  />
+                  <PointsChip points={solved ? entry.points : 0} variant="default" />
                 </div>
               </div>
+            );
+
+            return solved ? (
+              <Link
+                key={entry.id}
+                href={challengeResultPath(entry.challengeId)}
+                className="block focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                {row}
+              </Link>
+            ) : (
+              <Fragment key={entry.id}>{row}</Fragment>
             );
           })}
         </div>

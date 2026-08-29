@@ -90,7 +90,7 @@ export async function POST(
 
   // A re-submission overwrites today's row rather than adding one (#200). The day keeps
   // exactly one submission, so points, level and streak still count it once.
-  await prisma.submission.upsert({
+  const submission = await prisma.submission.upsert({
     where: { userId_submissionDay: { userId, submissionDay } },
     create: {
       userId,
@@ -108,15 +108,10 @@ export async function POST(
       status,
       testResults: storedResults,
     },
+    select: { id: true },
   });
 
-  let celebration:
-    | {
-        streak: number;
-        streakRecord: number;
-        completionsToday: number;
-      }
-    | undefined;
+  let unlockedAchievements: { id: string; title: string; description: string }[] = [];
 
   if (runtimeOk) {
     const newStreak = await computeConsecutiveStreakDays(userId);
@@ -124,28 +119,23 @@ export async function POST(
       where: { id: userId },
       select: { streakRecord: true },
     });
-    const updated = await prisma.user.update({
+    await prisma.user.update({
       where: { id: userId },
       data: {
         streak: newStreak,
         streakRecord: Math.max(u?.streakRecord ?? 0, newStreak),
       },
-      select: { streak: true, streakRecord: true },
     });
 
     // After the streak update, because two of the rules read `streakRecord`. Freezes what
     // has been reached so a later re-submission cannot recompute it away (#205).
-    await persistAchievementUnlocks(prisma, userId);
-
-    const completionsToday = await prisma.submission.count({
-      where: { challengeId, status: "completed", createdAt: utcDayRange() },
-    });
-
-    celebration = {
-      streak: updated.streak,
-      streakRecord: updated.streakRecord,
-      completionsToday,
-    };
+    const unlockedIds = await persistAchievementUnlocks(prisma, userId);
+    if (unlockedIds.length > 0) {
+      unlockedAchievements = await prisma.achievementDef.findMany({
+        where: { id: { in: unlockedIds } },
+        select: { id: true, title: true, description: true },
+      });
+    }
   }
 
   return NextResponse.json({
@@ -153,9 +143,13 @@ export async function POST(
     // The stored status, which a failed retry on an already solved day leaves at
     // "completed" — the panel would otherwise claim a failure until the next reload.
     status,
+    submissionId: submission.id,
+    // Decided here rather than on the client so a reload between two attempts cannot
+    // make a retry look like the first solve of the day.
+    firstSolveToday: runtimeOk && alreadyToday?.status !== "completed",
+    unlockedAchievements,
     testCases: testResults,
     language,
     ...(compileError ? { compileError } : {}),
-    ...(celebration ? { celebration } : {}),
   });
 }

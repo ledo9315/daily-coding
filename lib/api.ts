@@ -76,6 +76,8 @@ export interface Achievement {
 
 export interface ChallengeHistoryEntry {
   id: string;
+  /** The challenge behind the submission — `id` above is the submission itself. */
+  challengeId: string;
   title: string;
   date: string;
   difficulty: "easy" | "medium" | "hard";
@@ -107,12 +109,11 @@ export interface ChallengeTestCase {
   time?: string;
 }
 
-/** Extra data for the success UI shown after a passing submission. */
-export interface SubmitCelebration {
-  streak: number;
-  streakRecord: number;
-  /** Number of completed submissions for this challenge on the current UTC day. */
-  completionsToday: number;
+/** An achievement this very submission unlocked, for the one-off toast on the result page. */
+export interface UnlockedAchievement {
+  id: string;
+  title: string;
+  description: string;
 }
 
 export interface DailyChallenge {
@@ -262,13 +263,17 @@ export function submitSolution(
     success: boolean;
     /** Stored status of today's submission after this attempt. */
     status: "completed" | "failed";
+    /** Row that now holds today's attempt — the result page is addressed through it. */
+    submissionId: string;
+    /** True only for the attempt that turns the day green. */
+    firstSolveToday: boolean;
+    unlockedAchievements: UnlockedAchievement[];
     testCases: ChallengeTestCase[];
     language?: CodeLanguageId;
     /** Whether runtime/compilation (Piston) succeeded; always true for the stub. */
     runtimeOk?: boolean;
     /** Set when the compiler rejected the program, so no test ever ran. */
     compileError?: string;
-    celebration?: SubmitCelebration;
   }> {
   return apiFetch(`/api/challenge/${challengeId}/submit`, {
     method: "POST",

@@ -8,11 +8,11 @@ const read = (...parts: string[]) =>
 const profilePage = read("app", "profile", "page.tsx");
 const dashboardPage = read("app", "page.tsx");
 const feedItem = read("components", "feed-item.tsx");
-const successModal = read("components", "challenge-success-modal.tsx");
+const resultPage = read("app", "challenge", "[id]", "loesungen", "page.tsx");
 const rankingTable = read("components", "ranking-table.tsx");
 
 /**
- * #37: `Trophy` stood for rank, level, badges and — in the success modal — points.
+ * #37: `Trophy` stood for rank, level, badges and — on the result page — points.
  * LEVEL and BADGES sat side by side in the same grid carrying the identical glyph, so
  * the icons made the cards harder to tell apart instead of easier.
  *
@@ -61,6 +61,6 @@ describe("icon assignments", () => {
   });
 
   it("marks points with the star established in #38, not with a trophy", () => {
-    expect(successModal).not.toContain("Trophy");
+    expect(resultPage).not.toContain("Trophy");
   });
 });

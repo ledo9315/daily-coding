@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import ChallengeLoading from "./loading";
@@ -34,9 +35,9 @@ import {
   runTests,
   submitSolution,
   type CodeLanguageId,
-  type SubmitCelebration,
 } from "@/lib/api";
-import { ChallengeSuccessModal } from "@/components/challenge-success-modal";
+import { storeResultHandover } from "@/lib/challenge-result-handover";
+import { challengeResultPath } from "@/lib/navigation";
 import { languageFileName, languageLabel } from "@/lib/challenge-languages";
 import { notifyUserStatsChanged } from "@/lib/user-stats-events";
 import {
@@ -60,9 +61,6 @@ export default function ChallengePage() {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [compileError, setCompileError] = useState<string | null>(null);
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
-  const [testRunCount, setTestRunCount] = useState(0);
-  const [celebrationOpen, setCelebrationOpen] = useState(false);
-  const [celebration, setCelebration] = useState<SubmitCelebration | null>(null);
   const [submitWarningDismissed, setSubmitWarningDismissed] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("challenge_submit_warning_dismissed") === "true";
@@ -71,6 +69,7 @@ export default function ChallengePage() {
   });
 
   const prevChallengeIdRef = useRef<string | null>(null);
+  const router = useRouter();
 
   const {
     data: challenge,
@@ -115,7 +114,6 @@ export default function ChallengePage() {
       setTestCases(
         (storedResults?.length ? storedResults : challenge.testCases) as TestCase[]
       );
-      setTestRunCount(0);
 
       if (challenge.todaySubmission) {
         const { status, submittedAt } = challenge.todaySubmission;
@@ -143,7 +141,6 @@ export default function ChallengePage() {
     onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
       setCompileError(result.compileError ?? null);
-      setTestRunCount((c) => c + 1);
       if (result.compileError) {
         toast.error("Kompilieren fehlgeschlagen", {
           description: "Der Code wurde nicht ausgeführt.",
@@ -174,12 +171,21 @@ export default function ChallengePage() {
 
       if (result.success) {
         notifyUserStatsChanged();
-        if (result.celebration) {
-          setCelebration(result.celebration);
-          setCelebrationOpen(true);
+        storeResultHandover(window.sessionStorage, result.submissionId, {
+          unlockedAchievements: result.unlockedAchievements,
+        });
+
+        if (result.firstSolveToday) {
+          router.push(challengeResultPath(challenge!.id));
         } else {
-          toast.success("Lösung eingereicht", {
-            description: "Alle Tests wurden bestanden.",
+          // Staying put on a repeat submission: navigating away would throw the user
+          // out of the editor every time they improve an already passing solution.
+          toast.success("Lösung aktualisiert", {
+            description: "Deine Abgabe für heute wurde ersetzt.",
+            action: {
+              label: "Zum Ergebnis",
+              onClick: () => router.push(challengeResultPath(challenge!.id)),
+            },
           });
         }
       } else {
@@ -255,20 +261,6 @@ export default function ChallengePage() {
       </div>
 
       <Header />
-
-      {celebration ? (
-        <ChallengeSuccessModal
-          open={celebrationOpen}
-          onOpenChange={(o) => {
-            setCelebrationOpen(o);
-            if (!o) setCelebration(null);
-          }}
-          celebration={celebration}
-          testRunsBeforeSubmit={testRunCount}
-          pointsEarned={challenge.points}
-          testCases={testCases}
-        />
-      ) : null}
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
