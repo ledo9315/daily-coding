@@ -19,7 +19,7 @@ function getAppUrl(): string {
 
 /**
  * `renderEmail` escapes every piece of content, so names from the registration form are
- * safe to pass through here — they used to be interpolated into the HTML raw (#105).
+ * safe to pass through here. They used to be interpolated into the HTML raw (#105).
  */
 async function send(to: string, subject: string, content: EmailContent): Promise<void> {
   const { html, text } = renderEmail(content);
@@ -45,7 +45,7 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
     lines: ["Du kannst hier ein neues Passwort für dein Konto setzen."],
     action: { label: "Neues Passwort setzen", url },
     footer:
-      "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail — dein Passwort bleibt unverändert.",
+      "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail. Dein Passwort bleibt unverändert.",
   });
 }
 
@@ -53,7 +53,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   await send(to, "Willkommen bei Daily Coding!", {
     heading: `Willkommen, ${name}`,
     lines: [
-      "Jeden Tag wartet eine neue Coding-Challenge auf dich — in deiner Sprache.",
+      "Jeden Tag wartet eine neue Coding-Challenge auf dich, in deiner Sprache.",
       "Löse sie, sammle Punkte und halte deine Serie am Leben.",
     ],
     action: { label: "Zur heutigen Challenge", url: `${getAppUrl()}/challenge` },

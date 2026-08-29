@@ -3,7 +3,7 @@
  *
  * Run: pnpm tsx scripts/preview-emails.ts && open .email-preview.html
  *
- * The output is gitignored — it is a look at the templates, not an artefact. What the
+ * The output is gitignored: it is a look at the templates, not an artefact. What the
  * preview cannot show is how Gmail or Outlook rewrite the markup; for that a real send
  * to a test address is the only check.
  */
@@ -32,7 +32,7 @@ const MAILS: { subject: string; content: EmailContent }[] = [
       lines: ["Du kannst hier ein neues Passwort für dein Konto setzen."],
       action: { label: "Neues Passwort setzen", url: `${APP}/auth/reset-password?token=demo` },
       footer:
-        "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail — dein Passwort bleibt unverändert.",
+        "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail. Dein Passwort bleibt unverändert.",
     },
   },
   {
@@ -40,7 +40,7 @@ const MAILS: { subject: string; content: EmailContent }[] = [
     content: {
       heading: "Willkommen, Lisa Müller",
       lines: [
-        "Jeden Tag wartet eine neue Coding-Challenge auf dich — in deiner Sprache.",
+        "Jeden Tag wartet eine neue Coding-Challenge auf dich, in deiner Sprache.",
         "Löse sie, sammle Punkte und halte deine Serie am Leben.",
       ],
       action: { label: "Zur heutigen Challenge", url: `${APP}/challenge` },
