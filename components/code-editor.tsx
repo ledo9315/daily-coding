@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import type { editor } from "monaco-editor";
 import type { Monaco } from "@monaco-editor/react";
 import { monacoLanguageId, type CodeLanguageId } from "@/lib/challenge-languages";
@@ -16,7 +16,7 @@ const Editor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex min-h-[500px] items-center justify-center bg-secondary/20 font-code text-sm text-muted-foreground">
+      <div className="flex h-full items-center justify-center bg-secondary/20 font-code text-sm text-muted-foreground">
         Editor wird geladen…
       </div>
     ),
@@ -30,6 +30,9 @@ interface CodeEditorProps {
   /** Syntax highlighting / language mode (Monaco). */
   language?: CodeLanguageId;
   onChange?: (value: string) => void;
+  /** Ctrl/Cmd+S while the editor has focus. Registered as a Monaco keybinding, so it
+   *  fires only there and never steals the browser's save dialog elsewhere on the page. */
+  onSaveShortcut?: () => void;
   className?: string;
   readOnly?: boolean;
 }
@@ -51,19 +54,29 @@ export function CodeEditor({
   fileName = "solution.js",
   language = "javascript",
   onChange,
+  onSaveShortcut,
   className,
   readOnly = false,
 }: CodeEditorProps) {
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : defaultValue;
 
+  // The command is registered once on mount; the ref keeps it calling the current handler
+  // instead of the one that existed back then.
+  const saveShortcutRef = useRef(onSaveShortcut);
+  saveShortcutRef.current = onSaveShortcut;
+
   const handleBeforeMount = useCallback((monaco: Monaco) => {
     registerCatppuccinFrappeTheme(monaco);
   }, []);
 
   const handleMount = useCallback(
-    (_ed: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+    (ed: editor.IStandaloneCodeEditor, monaco: Monaco) => {
       registerCatppuccinFrappeTheme(monaco);
+      // CtrlCmd is Cmd on macOS and Ctrl everywhere else.
+      ed.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
+        saveShortcutRef.current?.()
+      );
     },
     []
   );
@@ -104,7 +117,9 @@ export function CodeEditor({
   );
 
   return (
-    <div className={cn("pixel-box overflow-hidden", className)}>
+    // The height lives on the outer box so a caller can stretch it — `h-[500px]` is the
+    // default that `cn` lets a passed class override. Monaco itself fills what it is given.
+    <div className={cn("pixel-box flex h-[500px] flex-col overflow-hidden", className)}>
       <div className="flex items-center gap-2 border-b border-border/50 bg-secondary/30 px-4 py-2">
         <div className="flex gap-1.5">
           <div className="h-3 w-3 rounded-full bg-rose-500/80" />
@@ -114,10 +129,10 @@ export function CodeEditor({
         <span className="font-code text-xs text-muted-foreground">{fileName}</span>
       </div>
 
-      <div className="max-h-[500px] min-h-[320px] overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-hidden">
         <Editor
           key={`${monacoLanguageId(language)}-${fileName}`}
-          height="500px"
+          height="100%"
           theme={MONACO_THEME_FRAPPE}
           language={monacoLanguageId(language)}
           path={fileName}
