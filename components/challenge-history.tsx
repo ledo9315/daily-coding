@@ -55,7 +55,7 @@ export function ChallengeHistory({
             const row = (
               <div
                 className={cn(
-                  "flex items-center gap-4 border-2 border-border bg-card p-4",
+                  "flex items-center gap-3 border-2 border-border bg-card p-3 sm:gap-4 sm:p-4",
                   solved && "transition-colors hover:border-primary"
                 )}
               >
