@@ -1,51 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentThread } from "@/components/challenge-result/comment-thread";
 import { Card } from "@/components/ui/card";
-import type { ChallengeSolution } from "@/lib/api";
+import type { ChallengeSolutionGroup } from "@/lib/api";
 import { avatarImageSrc } from "@/lib/avatar-src";
 import { languageLabel } from "@/lib/challenge-languages";
 import { publicProfilePath } from "@/lib/display-name";
 import { formatDate } from "@/lib/format";
 
+/** Avatars in the stack; more than three overlap into an unreadable smudge. */
+const AVATARS_SHOWN = 3;
+
 export function SolutionCard({
-  solution,
+  group,
   defaultOpen = false,
 }: {
-  solution: ChallengeSolution;
+  group: ChallengeSolutionGroup;
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const { user } = solution;
+  const { authors, submissionCount } = group;
+  const unnamed = submissionCount - authors.length;
 
   return (
     <Card>
       <div className="flex gap-4">
-        <Avatar className="h-12 w-12 border-2 border-border">
-          <AvatarImage src={avatarImageSrc(user.avatar)} alt={user.name} />
-          <AvatarFallback>{user.initials}</AvatarFallback>
-        </Avatar>
+        <div className="flex shrink-0 -space-x-3">
+          {authors.slice(0, AVATARS_SHOWN).map((author) => (
+            <Avatar key={author.name} className="h-12 w-12 border-2 border-border bg-card">
+              <AvatarImage src={avatarImageSrc(author.avatar)} alt={author.name} />
+              <AvatarFallback>{author.initials}</AvatarFallback>
+            </Avatar>
+          ))}
+        </div>
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <Link
-              href={publicProfilePath(user.name)}
-              className="font-bold hover:text-primary transition-colors"
-            >
-              {user.name}
-            </Link>
+            <p className="min-w-0 text-sm">
+              {authors.map((author, index) => (
+                <Fragment key={author.name}>
+                  {index > 0 && <span className="text-muted-foreground">, </span>}
+                  <Link
+                    href={publicProfilePath(author.name)}
+                    className="font-bold hover:text-primary transition-colors"
+                  >
+                    {author.name}
+                  </Link>
+                </Fragment>
+              ))}
+              {unnamed > 0 && (
+                <span className="text-muted-foreground"> +{unnamed} weitere</span>
+              )}
+            </p>
             <span className="text-xs text-muted-foreground">
-              {formatDate(new Date(solution.createdAt))}
-              {solution.revised ? " · überarbeitet" : ""}
+              {formatDate(new Date(group.createdAt))}
+              {/* Only meaningful while the group is one row — a group of many has no one
+                  history to have been revised. */}
+              {submissionCount === 1 && group.revised ? " · überarbeitet" : ""}
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
-            <span>Level {user.level}</span>
-            <span>{languageLabel(solution.language)}</span>
+            {authors.length === 1 && <span>Level {authors[0].level}</span>}
+            <span>{languageLabel(group.language)}</span>
+            <span>{submissionCount === 1 ? "1 Abgabe" : `${submissionCount} Abgaben`}</span>
           </div>
 
           <button
@@ -60,12 +81,12 @@ export function SolutionCard({
           {open && (
             <>
               <pre className="mt-3 max-h-[32rem] overflow-auto border border-border bg-background p-4 font-code text-xs leading-relaxed sm:text-sm">
-                <code>{solution.code}</code>
+                <code>{group.code}</code>
               </pre>
 
               {/* Mounted with the expanded body so a list of ten solutions does not fire
                   ten comment requests on page load. */}
-              <CommentThread submissionId={solution.id} />
+              <CommentThread submissionId={group.submissionId} />
             </>
           )}
         </div>

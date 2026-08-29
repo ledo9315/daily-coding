@@ -7,6 +7,8 @@ import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
+/** Authors listed by name on a card; everyone beyond that is summed up as "+N". */
+const AUTHORS_SHOWN = 5;
 
 function parseLimit(rawLimit: string | null): number {
   if (!rawLimit) return DEFAULT_LIMIT;
@@ -36,48 +38,99 @@ export async function GET(
   const cursor = searchParams.get("cursor")?.trim() || undefined;
   const limit = parseLimit(searchParams.get("limit"));
 
-  const submissions = await prisma.submission.findMany({
+  const scope = {
+    challengeId,
+    status: "completed" as const,
     /** Own row is rendered separately above the list and must not appear in it twice. */
-    where: { challengeId, status: "completed", userId: { not: userId } },
-    /**
-     * Ordered and paginated by `createdAt`, never `updatedAt`: the upsert from #200 moves
-     * `updatedAt` on every re-submission, so rows would jump between pages while reading.
-     */
-    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    take: limit + 1,
-    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    select: {
-      id: true,
-      userId: true,
-      code: true,
-      language: true,
-      createdAt: true,
-      updatedAt: true,
-      user: { select: { name: true, initials: true, avatar: true } },
-    },
+    userId: { not: userId },
+    /** Rows from before the column existed; scripts/backfill-submission-code-hash.ts fills them. */
+    codeHash: { not: null },
+  };
+
+  const groups = await prisma.submission.groupBy({
+    by: ["codeHash"],
+    where: scope,
+    _count: { _all: true },
+    _min: { createdAt: true },
   });
 
-  const hasMore = submissions.length > limit;
-  const page = hasMore ? submissions.slice(0, limit) : submissions;
-  const nextCursor = hasMore && page.length > 0 ? page[page.length - 1].id : null;
+  /**
+   * Sorted and paged in memory rather than by the database.
+   *
+   * The sort key is an aggregate over the group, and a keyset predicate on an aggregate plus
+   * a tie-break is not expressible through Prisma's `having`. Doing it here keeps the cursor
+   * pointing at a *group* instead of at an offset, so a submission arriving between two pages
+   * can neither duplicate a group nor push one out of the list unseen.
+   *
+   * ponytail: fine while a challenge has a few thousand distinct solutions; beyond that this
+   * wants a keyset query over the aggregate in raw SQL.
+   */
+  const sorted = groups
+    .filter((group): group is typeof group & { codeHash: string } => group.codeHash !== null)
+    .sort(
+      (a, b) =>
+        (b._min.createdAt?.getTime() ?? 0) - (a._min.createdAt?.getTime() ?? 0) ||
+        (a.codeHash < b.codeHash ? 1 : a.codeHash > b.codeHash ? -1 : 0)
+    );
+
+  const start = cursor ? sorted.findIndex((group) => group.codeHash === cursor) + 1 : 0;
+  // A cursor whose group is gone ends the list instead of restarting it — `findIndex`
+  // returns -1 there, and serving page one again would read as an endless feed.
+  const page = cursor && start === 0 ? [] : sorted.slice(start, start + limit);
+  const nextCursor =
+    page.length > 0 && start + page.length < sorted.length
+      ? page[page.length - 1].codeHash
+      : null;
+
+  // One indexed lookup per group on the page, capped by `limit`. A single query cannot bound
+  // the rows per group, and an unbounded one would pull every copy of a popular solution.
+  const rowsByGroup = await Promise.all(
+    page.map((group) =>
+      prisma.submission.findMany({
+        where: { ...scope, codeHash: group.codeHash },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        take: AUTHORS_SHOWN,
+        select: {
+          id: true,
+          userId: true,
+          code: true,
+          language: true,
+          createdAt: true,
+          updatedAt: true,
+          user: { select: { name: true, initials: true, avatar: true } },
+        },
+      })
+    )
+  );
 
   const lifetimePoints = await getLifetimePointsByUserIds([
-    ...new Set(page.map((submission) => submission.userId)),
+    ...new Set(rowsByGroup.flat().map((row) => row.userId)),
   ]);
 
-  const solutions = page.map((submission) => ({
-    id: submission.id,
-    user: {
-      name: submission.user.name,
-      initials: submission.user.initials,
-      avatar: submission.user.avatar,
-      level: calculateLevel(lifetimePoints.get(submission.userId) ?? 0),
-    },
-    language: submission.language,
-    code: submission.code,
-    createdAt: submission.createdAt.toISOString(),
-    revised: submission.updatedAt.getTime() !== submission.createdAt.getTime(),
-  }));
+  const solutionGroups = page.flatMap((group, index) => {
+    const rows = rowsByGroup[index];
+    const [representative] = rows;
+    if (!representative) return [];
 
-  return NextResponse.json({ solutions, nextCursor });
+    return [
+      {
+        codeHash: group.codeHash,
+        // The oldest row of the group carries the code shown and the comment thread.
+        submissionId: representative.id,
+        language: representative.language,
+        code: representative.code,
+        createdAt: (group._min.createdAt ?? representative.createdAt).toISOString(),
+        revised: representative.updatedAt.getTime() !== representative.createdAt.getTime(),
+        authors: rows.map((row) => ({
+          name: row.user.name,
+          initials: row.user.initials,
+          avatar: row.user.avatar,
+          level: calculateLevel(lifetimePoints.get(row.userId) ?? 0),
+        })),
+        submissionCount: group._count._all,
+      },
+    ];
+  });
+
+  return NextResponse.json({ groups: solutionGroups, nextCursor });
 }

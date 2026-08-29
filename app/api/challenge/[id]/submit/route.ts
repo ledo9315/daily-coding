@@ -12,6 +12,7 @@ import {
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { codeHash } from "@/lib/server/code-hash";
 import {
   codeExceedsLimit,
   MAX_CHALLENGE_REQUEST_BYTES,
@@ -99,6 +100,7 @@ export async function POST(
       userId,
       challengeId,
       code,
+      codeHash: codeHash(code),
       language: language as CodeLanguage,
       status,
       submissionDay,
@@ -107,6 +109,7 @@ export async function POST(
     update: {
       challengeId,
       code,
+      codeHash: codeHash(code),
       language: language as CodeLanguage,
       status,
       testResults: storedResults,
