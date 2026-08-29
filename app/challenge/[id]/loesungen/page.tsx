@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Zap } from "@nsmr/pixelart-react";
 import { auth } from "@/auth";
+import { CodeBlock } from "@/components/code-block";
 import { Header } from "@/components/header";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PixelStar, PointsChip } from "@/components/points-chip";
@@ -108,9 +109,11 @@ export default async function ChallengeResultPage({ params }: PageProps) {
               {languageLabel(submission.language as CodeLanguageId)}
             </span>
           </div>
-          <pre className="max-h-[32rem] overflow-auto border border-border bg-background p-4 font-code text-xs leading-relaxed sm:text-sm">
-            <code>{submission.code}</code>
-          </pre>
+          <CodeBlock
+            code={submission.code}
+            language={submission.language}
+            className="max-h-[32rem]"
+          />
         </Card>
 
 

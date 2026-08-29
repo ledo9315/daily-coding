@@ -43,6 +43,68 @@
   --warning-foreground: #0d1117;
 }
 
+/**
+ * Syntax highlighting, mapped onto the palette above instead of one of highlight.js' own
+ * themes: those ship their own background and their own greys, and drop a foreign-looking
+ * block into the middle of the terminal look. The hues follow GitHub dark, which this
+ * palette already is.
+ */
+.hljs-comment,
+.hljs-quote {
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-name {
+  color: #ff7b72;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-template-tag {
+  color: #a5d6ff;
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-variable.constant_ {
+  color: #79c0ff;
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_,
+.hljs-section {
+  color: #d2a8ff;
+}
+
+.hljs-built_in,
+.hljs-type,
+.hljs-attr,
+.hljs-attribute,
+.hljs-params {
+  color: #ffa657;
+}
+
+.hljs-meta,
+.hljs-deletion {
+  color: var(--muted-foreground);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
 @theme inline {
   --font-sans: "VT323", monospace;
   --font-mono: "VT323", monospace;

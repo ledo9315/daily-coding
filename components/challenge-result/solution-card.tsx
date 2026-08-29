@@ -3,6 +3,7 @@
 import { Fragment, useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CodeBlock } from "@/components/code-block";
 import { CommentThread } from "@/components/challenge-result/comment-thread";
 import { SolutionDiff } from "@/components/challenge-result/solution-diff";
 import { SolutionVotes } from "@/components/challenge-result/solution-votes";
@@ -92,9 +93,11 @@ export function SolutionCard({
 
           {open && (
             <>
-              <pre className="mt-3 max-h-[32rem] overflow-auto border border-border bg-background p-4 font-code text-xs leading-relaxed sm:text-sm">
-                <code>{group.code}</code>
-              </pre>
+              <CodeBlock
+                code={group.code}
+                language={group.language}
+                className="mt-3 max-h-[32rem]"
+              />
 
               <button
                 type="button"
