@@ -76,6 +76,7 @@ model User {
   streak       Int          @default(0)
   streakRecord Int          @default(0)
   submissions    Submission[]
+  comments       Comment[]
   achievements   UserAchievement[]
   rankingEntries RankingEntry[]
   createdAt    DateTime     @default(now())
@@ -172,10 +173,27 @@ model Submission {
   submissionDay DateTime
   user        User             @relation(fields: [userId], references: [id])
   challenge   Challenge        @relation(fields: [challengeId], references: [id])
+  comments    Comment[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
   @@unique([userId, submissionDay])
+}
+
+/// A remark under one submission. Both cascades are needed: deleting an account removes the
+/// submissions it wrote in an explicit transaction, and a comment left under someone else's
+/// solution has to go with its author.
+model Comment {
+  id           String     @id @default(cuid())
+  submissionId String
+  userId       String
+  body         String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([submissionId, createdAt])
 }
 
 /** Shared across serverless instances; keys are SHA-256 hashes, never raw emails or IPs. */

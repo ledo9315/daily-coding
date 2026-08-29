@@ -195,6 +195,25 @@ export interface ChallengeSolutionsPage {
   nextCursor: string | null;
 }
 
+/** One remark under a submission. */
+export interface SubmissionComment {
+  id: string;
+  author: {
+    name: string;
+    initials: string;
+    avatar: string;
+  };
+  body: string;
+  createdAt: string;
+  /** True when the signed-in user wrote it and may therefore delete it. */
+  own: boolean;
+}
+
+export interface SubmissionCommentsPage {
+  comments: SubmissionComment[];
+  nextCursor: string | null;
+}
+
 export interface CommunityFeedPage {
   items: CommunityFeedItem[];
   nextCursor: string | null;
@@ -347,4 +366,37 @@ export function getChallengeSolutions(
   const q = sp.toString();
   const base = `/api/challenge/${challengeId}/solutions`;
   return apiFetch<ChallengeSolutionsPage>(q ? `${base}?${q}` : base);
+}
+
+// ─── Submission Comments ──────────────────────────────────────────────────────
+
+export function getSubmissionComments(
+  submissionId: string,
+  params?: { cursor?: string | null; limit?: number }
+): Promise<SubmissionCommentsPage> {
+  const sp = new URLSearchParams();
+  if (params?.cursor) sp.set("cursor", params.cursor);
+  if (params?.limit != null) sp.set("limit", String(params.limit));
+  const q = sp.toString();
+  const base = `/api/submission/${submissionId}/comments`;
+  return apiFetch<SubmissionCommentsPage>(q ? `${base}?${q}` : base);
+}
+
+export function createSubmissionComment(
+  submissionId: string,
+  body: string
+): Promise<SubmissionComment> {
+  return apiFetch(`/api/submission/${submissionId}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+}
+
+export function deleteSubmissionComment(
+  submissionId: string,
+  commentId: string
+): Promise<{ success: true }> {
+  return apiFetch(`/api/submission/${submissionId}/comments/${commentId}`, {
+    method: "DELETE",
+  });
 }
