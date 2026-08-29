@@ -178,7 +178,9 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-primary/20 cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                    // Cancels the ghost variant's orange `--accent` tint. Same modifiers on purpose:
+                    // only then does tailwind-merge drop it instead of losing on specificity.
+                    className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-card dark:hover:bg-card cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
                   >
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage src={avatar || undefined} alt={displayName} />
