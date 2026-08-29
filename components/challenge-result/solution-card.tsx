@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CommentThread } from "@/components/challenge-result/comment-thread";
 import { Card } from "@/components/ui/card";
 import type { ChallengeSolution } from "@/lib/api";
 import { avatarImageSrc } from "@/lib/avatar-src";
@@ -57,9 +58,15 @@ export function SolutionCard({
           </button>
 
           {open && (
-            <pre className="mt-3 max-h-[32rem] overflow-auto border border-border bg-background p-4 font-code text-xs leading-relaxed sm:text-sm">
-              <code>{solution.code}</code>
-            </pre>
+            <>
+              <pre className="mt-3 max-h-[32rem] overflow-auto border border-border bg-background p-4 font-code text-xs leading-relaxed sm:text-sm">
+                <code>{solution.code}</code>
+              </pre>
+
+              {/* Mounted with the expanded body so a list of ten solutions does not fire
+                  ten comment requests on page load. */}
+              <CommentThread submissionId={solution.id} />
+            </>
           )}
         </div>
       </div>
