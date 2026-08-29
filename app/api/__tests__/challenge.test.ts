@@ -626,6 +626,28 @@ describe("POST /api/challenge/[id]/submit", () => {
     expect(mockPersistAchievementUnlocks).not.toHaveBeenCalled();
   });
 
+  /**
+   * The "once passed, it stays passed" rule of #200 read the day's submission without
+   * asking which challenge it belonged to. The ring can move on within a UTC day when the
+   * live challenge is deactivated, so a failed attempt at the new challenge inherited the
+   * earlier solve — and with it, since #185, access to other people's solutions for a
+   * challenge that was never solved.
+   */
+  it("looks up today's submission for this challenge, not just for the day", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+
+    await submitHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+
+    const dayLookup = mockSubmissionFindFirst.mock.calls.find(
+      ([args]) => (args as { where?: { createdAt?: unknown } })?.where?.createdAt
+    );
+    expect(dayLookup?.[0]).toMatchObject({
+      where: { userId: "user-test", challengeId: "ch-1" },
+    });
+  });
+
   it("all stub test cases have status=passed on submit", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     mockCreate.mockResolvedValueOnce({});

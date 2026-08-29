@@ -71,7 +71,10 @@ export async function POST(
     );
   }
 
-  const alreadyToday = await findTodaySubmission(userId);
+  // Scoped to this challenge, not just to the day: the ring can move on within a UTC day
+  // when the live challenge is deactivated, and an unscoped row would let the "stays
+  // passed" rule below carry a solve over to a challenge that was never solved.
+  const alreadyToday = await findTodaySubmission(userId, challengeId);
 
   const { testCases: testResults, runtimeOk, compileError } = await runChallengeTests(
     challenge,
