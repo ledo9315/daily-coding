@@ -11,6 +11,7 @@ import { PixelStar, PointsChip } from "@/components/points-chip";
 import { StatsCard } from "@/components/stats-card";
 import { TestResults, type TestCase } from "@/components/test-results";
 import { ResultEffects } from "@/components/challenge-result/result-effects";
+import { SolutionList } from "@/components/challenge-result/solution-list";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
@@ -21,7 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { getOwnChallengeResult } from "@/lib/server/challenge-result";
 
 // Overrides the "Aufgabe" title of app/challenge/layout.tsx.
-export const metadata: Metadata = { title: "Deine Lösung" };
+export const metadata: Metadata = { title: "Lösungen" };
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -110,6 +111,8 @@ export default async function ChallengeResultPage({ params }: PageProps) {
         </Card>
 
         {testCases.length > 0 && <TestResults testCases={testCases} className="mt-6" />}
+
+        <SolutionList challengeId={challenge.id} />
 
         {isTodaysChallenge && (
           <div className="mt-6">

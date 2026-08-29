@@ -174,6 +174,27 @@ export interface CommunityFeedItem {
   };
 }
 
+/** One other user's passing solution, as shown on the result page. */
+export interface ChallengeSolution {
+  id: string;
+  user: {
+    name: string;
+    initials: string;
+    avatar: string;
+    level: number;
+  };
+  language: CodeLanguageId;
+  code: string;
+  /** ISO string; the row was solved then, and revised later if `revised` is true. */
+  createdAt: string;
+  revised: boolean;
+}
+
+export interface ChallengeSolutionsPage {
+  solutions: ChallengeSolution[];
+  nextCursor: string | null;
+}
+
 export interface CommunityFeedPage {
   items: CommunityFeedItem[];
   nextCursor: string | null;
@@ -312,4 +333,18 @@ export function getCommunityFeed(params?: {
   return apiFetch<CommunityFeedPage>(
     q ? `/api/community/feed?${q}` : "/api/community/feed"
   );
+}
+
+// ─── Challenge Solutions ──────────────────────────────────────────────────────
+
+export function getChallengeSolutions(
+  challengeId: string,
+  params?: { cursor?: string | null; limit?: number }
+): Promise<ChallengeSolutionsPage> {
+  const sp = new URLSearchParams();
+  if (params?.cursor) sp.set("cursor", params.cursor);
+  if (params?.limit != null) sp.set("limit", String(params.limit));
+  const q = sp.toString();
+  const base = `/api/challenge/${challengeId}/solutions`;
+  return apiFetch<ChallengeSolutionsPage>(q ? `${base}?${q}` : base);
 }
