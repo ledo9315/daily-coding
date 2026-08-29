@@ -61,7 +61,7 @@ export async function GET(
     challengeId,
     status: "completed" as const,
     /**
-     * `not: null` skips rows written before the column existed —
+     * `not: null` skips rows written before the column existed;
      * scripts/backfill-submission-code-hash.ts fills them.
      */
     codeHash: filter === "mine" ? { in: [...ownHashes] } : { not: null },
@@ -107,7 +107,7 @@ export async function GET(
     });
 
   const start = cursor ? sorted.findIndex((group) => group.codeHash === cursor) + 1 : 0;
-  // A cursor whose group is gone ends the list instead of restarting it — `findIndex`
+  // A cursor whose group is gone ends the list instead of restarting it: `findIndex`
   // returns -1 there, and serving page one again would read as an endless feed.
   const page = cursor && start === 0 ? [] : sorted.slice(start, start + limit);
   const nextCursor =

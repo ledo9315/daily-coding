@@ -6,7 +6,7 @@ import { languageLabel, type CodeLanguageId } from "@/lib/challenge-languages";
 import { diffLines, type DiffLine } from "@/lib/line-diff";
 
 /**
- * The marker, not the colour, carries the meaning — a red/green pair alone is unreadable for
+ * The marker, not the colour, carries the meaning: a red/green pair alone is unreadable for
  * anyone with a red-green deficiency, which is roughly one man in twelve.
  */
 const MARKER: Record<DiffLine["type"], string> = {
@@ -32,9 +32,9 @@ function DiffColumn({
 }) {
   return (
     <div className="min-w-0 flex-1">
-      <p className="mb-1 text-xs uppercase tracking-wider text-muted-foreground">{title}</p>
+      <p className="mb-2 text-sm uppercase tracking-wider text-muted-foreground">{title}</p>
       {/* Long lines scroll inside the column; the page itself never moves sideways. */}
-      <div className="overflow-x-auto border border-border bg-background py-2 font-code text-xs leading-[1.6]">
+      <div className="overflow-x-auto border-2 border-border bg-background py-2 font-code text-[13px] leading-[1.6]">
         {lines.map((line, index) =>
           line.type === hide ? (
             <div key={index} className="px-2 whitespace-pre" aria-hidden>
@@ -69,27 +69,30 @@ export function SolutionDiff({
 
   if (mineLanguage !== theirsLanguage) {
     return (
-      <p className="mt-3 border border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+      <p className="mt-4 border-2 border-border bg-secondary px-3 py-2 text-lg text-muted-foreground">
         Diese Lösung ist in {languageLabel(theirsLanguage)} geschrieben, deine in{" "}
-        {languageLabel(mineLanguage)}. Ein zeilenweiser Vergleich sagt darüber nichts aus —
-        lies sie nebeneinander statt gegeneinander.
+        {languageLabel(mineLanguage)}. Ein zeilenweiser Vergleich sagt darüber nichts aus.
       </p>
     );
   }
 
   if (normalizeCode(mine) === normalizeCode(theirs)) {
     return (
-      <p className="mt-3 border border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-        Das ist deine eigene Lösung, Zeile für Zeile — es gibt nichts zu vergleichen.
+      <p className="mt-4 border-2 border-border bg-secondary px-3 py-2 text-lg text-muted-foreground">
+        Das ist deine eigene Lösung, Zeile für Zeile. Es gibt nichts zu vergleichen.
       </p>
     );
   }
 
   return (
-    <div className="mt-3">
-      <p className="mb-2 text-xs text-muted-foreground">
-        <span className="font-code">-</span> nur bei dir ·{" "}
-        <span className="font-code">+</span> nur hier
+    <div className="mt-4">
+      <p className="mb-3 text-base text-muted-foreground">
+        <span className="border border-border bg-secondary px-1.5 font-code text-xs">-</span>{" "}
+        nur bei dir{"  "}
+        <span className="ml-2 border border-border bg-secondary px-1.5 font-code text-xs">
+          +
+        </span>{" "}
+        nur hier
       </p>
       <div className="flex flex-col gap-4 md:flex-row">
         <DiffColumn title="Deine Lösung" lines={lines} hide="added" />

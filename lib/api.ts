@@ -189,7 +189,7 @@ export interface SolutionAuthor {
  */
 export interface ChallengeSolutionGroup {
   codeHash: string;
-  /** The oldest submission of the group — it carries the code shown and the comment thread. */
+  /** The oldest submission of the group; it carries the code shown and the comment thread. */
   submissionId: string;
   language: CodeLanguageId;
   code: string;

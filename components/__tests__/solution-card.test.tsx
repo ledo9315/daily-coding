@@ -59,14 +59,14 @@ describe("SolutionCard", () => {
     );
     expect(html).toContain("Lisa Müller");
     expect(html).toContain("Bob Bauer");
-    expect(html).toContain("+38 weitere");
-    expect(html).toContain("40 Abgaben");
+    expect(html).toContain("und 38 weitere");
+    expect(html).toContain("40 identische Abgaben");
   });
 
-  it("leaves out the rest count when the group is fully named", () => {
+  it("leaves out the rest count and the tally when the group is a single solution", () => {
     const html = render(makeGroup());
     expect(html).not.toContain("weitere");
-    expect(html).toContain("1 Abgabe");
+    expect(html).not.toContain("Abgabe");
   });
 
   it("marks a revised single solution and leaves an unrevised one unmarked", () => {
