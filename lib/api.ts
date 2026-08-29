@@ -69,14 +69,14 @@ export interface Achievement {
   /**
    * How far along a locked achievement is. Absent once unlocked, and absent for targets
    * of one, where a bar would say nothing (#96). `label` prefixes the numbers when the
-   * value is not a plain count — the streak achievements measure a record.
+   * value is not a plain count - the streak achievements measure a record.
    */
   progress?: { current: number; target: number; label?: string };
 }
 
 export interface ChallengeHistoryEntry {
   id: string;
-  /** The challenge behind the submission — `id` above is the submission itself. */
+  /** The challenge behind the submission - `id` above is the submission itself. */
   challengeId: string;
   title: string;
   date: string;
@@ -137,7 +137,7 @@ export interface DailyChallenge {
   starterCode: string;
   /**
    * Set when signed in and a submission for this challenge already exists today
-   * (UTC). Otherwise null — including when not signed in.
+   * (UTC). Otherwise null - including when not signed in.
    */
   todaySubmission: {
     status: "completed" | "failed" | "pending";
@@ -146,7 +146,7 @@ export interface DailyChallenge {
     language: string;
     /**
      * Graded test cases of this submission. null for legacy rows without stored
-     * results — the challenge's template is used instead.
+     * results - the challenge's template is used instead.
      */
     testResults: ChallengeTestCase[] | null;
   } | null;
@@ -279,7 +279,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
         message = parsed.error;
       }
     } catch {
-      /* Body is not JSON — keep the fallback message */
+      /* Body is not JSON - keep the fallback message */
     }
     throw new Error(message);
   }
@@ -330,7 +330,7 @@ export function submitSolution(
     success: boolean;
     /** Stored status of today's submission after this attempt. */
     status: "completed" | "failed";
-    /** Row that now holds today's attempt — the result page is addressed through it. */
+    /** Row that now holds today's attempt - the result page is addressed through it. */
     submissionId: string;
     /** True only for the attempt that turns the day green. */
     firstSolveToday: boolean;

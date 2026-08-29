@@ -42,7 +42,7 @@ then restore (a dump from an older major restores into a newer one, not the reve
 ### Migration history
 
 `prisma/migrations` holds a single baseline, `0_init`, generated from the schema on
-2026-07-30. The previous 18 migrations were not replayable — several hand-written
+2026-07-30. The previous 18 migrations were not replayable - several hand-written
 directory names lacked a time component (`20260406_category_table`), and since `_`
 sorts after digits, they ran out of creation order: one migration dropped a default
 on `Submission.updatedAt` ten migrations before that column was created.
@@ -50,7 +50,7 @@ on `Submission.updatedAt` ten migrations before that column was created.
 Both the local and the Neon database were marked as having applied the baseline via
 `prisma migrate resolve --applied 0_init`; no data was touched. Consequence: history
 before 2026-07-30 is gone, and the baseline is the oldest reachable point. Never edit
-`0_init/migration.sql` — Prisma verifies checksums of applied migrations and both
+`0_init/migration.sql` - Prisma verifies checksums of applied migrations and both
 environments would fail.
 
 ## Architecture
@@ -62,11 +62,11 @@ environments would fail.
 | Layer | Location | Role |
 |---|---|---|
 | Pages / UI | `app/` | App Router pages (challenge, dashboard, login, profile, ranking, admin, community) |
-| API routes | `app/api/` | Next.js route handlers — grouped by domain (challenge, user, ranking, community, admin, auth) |
-| Server-only logic | `lib/server/` | DB queries, auth guards, code execution, ranking, streak — **never imported client-side** |
+| API routes | `app/api/` | Next.js route handlers - grouped by domain (challenge, user, ranking, community, admin, auth) |
+| Server-only logic | `lib/server/` | DB queries, auth guards, code execution, ranking, streak - **never imported client-side** |
 | Client fetch layer | `lib/api.ts` | Typed fetch wrappers + shared types; consumed by client components and pages |
 | Reusable UI | `components/` | Feature components + `components/ui/` (shadcn primitives) |
-| DB client | `lib/prisma.ts` | Singleton Prisma client — always import from here, never instantiate directly |
+| DB client | `lib/prisma.ts` | Singleton Prisma client - always import from here, never instantiate directly |
 
 ### Code execution pipeline
 
@@ -80,9 +80,9 @@ Challenges run user code via a **self-hosted Piston** container (port 2000). Flo
 4. Real execution is the **default**. Stub results (`challenge-run-stub.ts`) are returned only when
    `CODE_EXECUTION_ENABLED` is explicitly `false`, or under Vitest / `NODE_ENV=test`
    (`lib/server/code-execution-flag.ts`). To submit locally without a running Piston container, set
-   `CODE_EXECUTION_ENABLED=false` — otherwise the submission fails with `Ausführung fehlgeschlagen: fetch failed`.
+   `CODE_EXECUTION_ENABLED=false` - otherwise the submission fails with `Ausführung fehlgeschlagen: fetch failed`.
 
-Supported languages live in the **registry** in `lib/challenge-languages.ts` — one `LanguageSpec`
+Supported languages live in the **registry** in `lib/challenge-languages.ts` - one `LanguageSpec`
 per entry, holding everything about a language that is data: Piston package and file name, Monaco
 id, editor file name, version prefix, whether it is typed, whether Piston compiles it inside the
 run step and how a compile failure looks there. `piston-runner.ts`, the admin schema and form, the
@@ -91,7 +91,7 @@ complete and that the list matches the Prisma enum, order included.
 
 Adding a language means: registry entry, Prisma enum plus migration, a `case` in
 `buildWrappedProgram`, seed content, and the runtime on the Piston host. Everything else follows. Ruby's harness is the Python one with `to_json` instead of
-`json.dumps` — deliberately not `JSON.generate`, which refuses a bare String or Integer at the
+`json.dumps` - deliberately not `JSON.generate`, which refuses a bare String or Integer at the
 top level, and half the challenges return exactly that.
 
 Java, Go, C++, C# and Rust are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
@@ -100,18 +100,18 @@ literals. Both differ from the interpreted languages in ways worth knowing befor
 harness:
 
 - There is **no `data` without a type**, and Piston's images ship no JSON library for Java.
-  Hence the baked-in literals — so `buildWrappedProgram` needs the input and is called once per
+  Hence the baked-in literals - so `buildWrappedProgram` needs the input and is called once per
   test case, not once per submission.
-- Piston runs the **compiler inside the run step** for Java and Go — C++ and C# get a proper
+- Piston runs the **compiler inside the run step** for Java and Go - C++ and C# get a proper
   compile stage, so nothing special is needed there. A Java compile error arrives as exit 1 with
   `error: compilation failed`; Go exits 2 for both a rejected build and a panic, told apart by
   `# command-line-arguments` and `./main.go:line:col`.
-- Both burn CPU before running a line — javac plus JVM startup 2.5–3 s, the Go toolchain about
-  1.7 s — over Piston's 3000 ms default. The ceiling is raised in `docker-compose.yml`;
+- Both burn CPU before running a line - javac plus JVM startup 2.5–3 s, the Go toolchain about
+  1.7 s - over Piston's 3000 ms default. The ceiling is raised in `docker-compose.yml`;
   `piston-runner.ts` asks for the larger budget for Java and Go only. **A Piston host without
   those env vars kills every such submission with SIGKILL and an empty output.**
 - Go additionally needs `PISTON_MAX_PROCESS_COUNT` well above the default 64: its runtime starts
-  a thread per core and aborts with "Sandbox keeper received fatal signal 6" otherwise — while
+  a thread per core and aborts with "Sandbox keeper received fatal signal 6" otherwise - while
   compile errors keep coming back normally, which makes it look like a harness bug.
 - A Go solution **cannot add imports** and a C++ one no includes; both live in the harness
   header. Go's carries strconv, strings, sort, math, fmt and unicode and consumes each with a
@@ -119,21 +119,21 @@ harness:
   std`, which covers it in two lines.
 - C++ serialises by overload like Java, and the scalar overloads must precede the `vector<T>`
   template or nested vectors fail to resolve. C# uses one method with ordered type tests instead
-  — Mono has no `System.Text.Json`, and `string` must be answered before `IEnumerable` or every
+  - Mono has no `System.Text.Json`, and `string` must be answered before `IEnumerable` or every
   word comes back as a list of letters.
-- Rust puts the solution *first* — no class to nest in, so line numbers need no correction at
-  all — and serialises through a `ToJson` trait, where a blanket `impl<T: ToJson> for Vec<T>`
+- Rust puts the solution *first* - no class to nest in, so line numbers need no correction at
+  all - and serialises through a `ToJson` trait, where a blanket `impl<T: ToJson> for Vec<T>`
   covers nesting in one line. Its string escapes are `\u{XXXX}` with braces, unlike every other
   typed language here.
 - C# runs on **Mono**, not on the `csharp.net` runtime Piston also offers: that one scaffolds a
   project per execution, ten seconds of CPU with its progress on stdout. Mono cannot start under
   the QEMU emulation the amd64 image needs on Apple Silicon, so C# is only testable against the
-  real host — `piston-integration.test.ts` skips a runtime that dies in the sandbox keeper.
+  real host - `piston-integration.test.ts` skips a runtime that dies in the sandbox keeper.
 
 Java, Go, C++, C# and Rust are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
 out of `supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one
 array) and Binary Tree Traversal (recursive structure) are the two seeded challenges without
-them — Ruby covers both, since `data` there is just a value.
+them - Ruby covers both, since `data` there is just a value.
 
 ### Authentication
 
@@ -143,7 +143,7 @@ them — Ruby covers both, since `data` there is just a value.
 
 ### Data model highlights
 
-- `Challenge` stores per-language starter code in `starterCodes` (JSON map) — `starterCode` field is legacy JS-only
+- `Challenge` stores per-language starter code in `starterCodes` (JSON map) - `starterCode` field is legacy JS-only
 - `Challenge.evaluationConfig` holds `callableByLanguage` map for I/O test evaluation
 - `Submission` tracks code, language, status, test results (JSON), and timing
 - `RankingEntry` is pre-computed per period (today/week/month) with unique constraint on `(userId, period, periodDate)`
@@ -159,15 +159,15 @@ them — Ruby covers both, since `data` there is just a value.
 ## PR checklist (mandatory before opening)
 
 1. Vitest tests for new behavior (TDD; happy path + main error paths)
-2. `pnpm test` — zero failures
-3. `pnpm exec tsc --noEmit` — no type errors
-4. `pnpm lint` — no lint errors
+2. `pnpm test` - zero failures
+3. `pnpm exec tsc --noEmit` - no type errors
+4. `pnpm lint` - no lint errors
 
 ## Testing conventions
 
 - Unit tests: Vitest, colocated in `__tests__/` next to the code under test
 - No end-to-end tests exist. Playwright is not installed; `e2e/` does not exist.
-- Test environment is `node` (see `vitest.config.ts`) — no DOM globals by default
+- Test environment is `node` (see `vitest.config.ts`) - no DOM globals by default
 - Path alias `@/` resolves to project root
 - `describe`/`it` descriptions in English (see language convention below)
 
@@ -177,7 +177,7 @@ them — Ruby covers both, since `data` there is just a value.
 
 English: code comments, JSDoc, `describe`/`it` descriptions, identifiers.
 
-German — do not translate these:
+German - do not translate these:
 
 - UI strings in JSX, API error messages, email bodies, toasts, button labels
 - Challenge content in `prisma/seed.ts` (titles, descriptions, test-case names)
@@ -191,7 +191,7 @@ The convention covers config files too, not just `app/`, `lib/`, `components/`: 
 `pnpm-workspace.yaml`, `.github/workflows/`, `.env.example`. Scoping the sweep to the
 source directories is what let German comments survive in all of them.
 
-There is no lint rule for this — umlaut heuristics trip over proper nouns and over
+There is no lint rule for this - umlaut heuristics trip over proper nouns and over
 the German UI strings that are supposed to stay. A keyword list is not enough either:
 lines like `// Gleiche Tagesgrenze wie …` and `# Nach Start: …` contain neither an
 umlaut nor a common stop word. Read the candidate files rather than trusting a grep. When translating an old comment,

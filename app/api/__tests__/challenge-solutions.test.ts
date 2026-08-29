@@ -450,8 +450,8 @@ describe("paging through the groups", () => {
 });
 
 /**
- * #122: `include: { user: true }` loads the whole user row — `passwordHash`, `email`,
- * `nameKey` — into a handler that hands out foreign submissions. This pins the narrower
+ * #122: `include: { user: true }` loads the whole user row - `passwordHash`, `email`,
+ * `nameKey` - into a handler that hands out foreign submissions. This pins the narrower
  * query so a later `...submission.user` spread cannot turn it into a leak.
  */
 describe("the solutions query", () => {

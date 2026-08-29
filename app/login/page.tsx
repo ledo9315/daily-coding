@@ -25,7 +25,7 @@ function LoginPageContent() {
           <h1 className="mb-2 flex items-center justify-center gap-3 font-pixel text-2xl leading-tight tracking-tighter">
             <span className="text-4xl text-primary">{">_"}</span>
             {/* Stacked and left-aligned, the same shape as the header on every
-                signed-in page — one logo, not two. */}
+                signed-in page - one logo, not two. */}
             <span className="text-left">
               DAILY
               <br />

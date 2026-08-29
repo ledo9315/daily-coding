@@ -18,7 +18,7 @@ export async function DELETE(
   });
 
   /**
-   * The comment must belong to the submission from the path — otherwise any submission
+   * The comment must belong to the submission from the path - otherwise any submission
    * the caller may read would serve as a door to a foreign comment id.
    */
   if (!comment || comment.submissionId !== submissionId) {

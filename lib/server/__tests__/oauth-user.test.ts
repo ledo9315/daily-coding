@@ -30,7 +30,7 @@ const account = { provider: "google", providerAccountId: "115226194717317484936"
 
 /**
  * Providers do send a picture URL, and `OAuthProfile` no longer has a field for it.
- * The cast passes one anyway — that is the point: if someone re-adds `image` to the
+ * The cast passes one anyway - that is the point: if someone re-adds `image` to the
  * interface and wires it into `user.create`, the assertions below start failing.
  */
 const withProviderPicture = (image: string, email = "someone@gmail.com") =>
@@ -62,7 +62,7 @@ describe("findOrCreateOAuthUser", () => {
     const stored = mockUserCreate.mock.calls[0][0].data.avatar;
     expect(isAllowedUserAvatarPath(stored)).toBe(true);
     expect(stored).toBe(starterAvatarPath("Some One"));
-    // The seed is the display name, not the address — see the register-route test.
+    // The seed is the display name, not the address - see the register-route test.
     expect(stored).not.toBe(starterAvatarPath("someone@gmail.com"));
   });
 
@@ -127,7 +127,7 @@ describe("findOrCreateOAuthUser", () => {
 });
 
 /**
- * #107: rejecting is impossible on this path — the user is back from the provider and
+ * #107: rejecting is impossible on this path - the user is back from the provider and
  * expects an account, with no form left to show an error in. So the name gets a counter.
  */
 describe("findOrCreateOAuthUser and display names", () => {

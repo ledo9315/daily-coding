@@ -17,8 +17,8 @@ const bodyOf = (language: (typeof CODE_LANGUAGES)[number]) =>
  * The terminal on the landing was a fixed script that typed one command and printed five
  * passing tests. It now has one tab per supported language.
  *
- * The rendered markup carries only the tab labels and the command — the animation starts at
- * zero visible lines — so the output itself is checked as data.
+ * The rendered markup carries only the tab labels and the command - the animation starts at
+ * zero visible lines - so the output itself is checked as data.
  */
 describe("LandingCodeDemo", () => {
   it("offers a tab for every language the app accepts", () => {
@@ -34,7 +34,7 @@ describe("LandingCodeDemo", () => {
 
   it("keeps the headline and the claim next to it", () => {
     expect(html).toContain("OB ES PASST");
-    // The old copy promised "nutze deine vorhandenen Tools" — there is no CLI and no API.
+    // The old copy promised "nutze deine vorhandenen Tools" - there is no CLI and no API.
     // What the section may claim is that run and submit execute the same cases:
     // `runPistonIoCases` is not even passed the mode.
     expect(html).toContain("Dieselben Testfälle");
@@ -53,7 +53,7 @@ describe("LandingCodeDemo", () => {
   });
 
   it("names the entry point the harness really calls", () => {
-    // snake_case for Python, camelCase for the rest — same as evaluationConfig in the seed.
+    // snake_case for Python, camelCase for the rest - same as evaluationConfig in the seed.
     expect(bodyOf("python")).toContain("aufgerufen als binary_search()");
     for (const language of ["javascript", "typescript", "php"] as const) {
       expect(bodyOf(language)).toContain("aufgerufen als binarySearch()");

@@ -1,7 +1,7 @@
 /**
  * Catppuccin **Frappe** for the Monaco editor.
  * Colors: https://github.com/catppuccin/palette (Frappe)
- * There is no official `monaco-catppuccin` package — the token rules are modelled
+ * There is no official `monaco-catppuccin` package - the token rules are modelled
  * on the VSCode/Monaco scopes.
  */
 import type { Monaco } from "@monaco-editor/react";

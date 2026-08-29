@@ -32,7 +32,7 @@ const OG_ALT =
 export const metadata: Metadata = {
   /**
    * Without this, Open-Graph and canonical URLs come out relative, and a relative URL in
-   * metadata is useless — the readers are Slack, WhatsApp and search engines, all of them
+   * metadata is useless - the readers are Slack, WhatsApp and search engines, all of them
    * outside the site. A shared link then has no preview card (#111).
    *
    * Written out rather than read from `APP_URL`: this is the *canonical* address, which
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://daily-coding.de"),
   /**
    * `template` composes every other page's title, so no page repeats the brand by hand.
-   * Three different suffix styles had grown before that — `– Daily Coding`, `| Admin` and
+   * Three different suffix styles had grown before that - `– Daily Coding`, `| Admin` and
    * none at all (#131).
    *
    * The default is the landing's title: `/` renders the landing for visitors without a
@@ -98,7 +98,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-background">
         {/* Forced, not merely the default: every colour token lives on `:root` and is dark.
             Following the system would strip the `dark` class, switching off every `dark:`
-            override — the page would stay dark while shadcn's light-mode hovers took over
+            override - the page would stay dark while shadcn's light-mode hovers took over
             and turned `--accent` orange (#218). */}
         <ThemeProvider
           attribute="class"

@@ -18,8 +18,8 @@ export function outputsMatch(actual: string, expected: string): boolean {
 }
 
 /**
- * Reduces raw Piston stdout — which may carry e.g. PHP notices before the JSON
- * line — down to the usable JSON output.
+ * Reduces raw Piston stdout - which may carry e.g. PHP notices before the JSON
+ * line - down to the usable JSON output.
  */
 export function extractIoProgramOutput(raw: string): string {
   const t = raw.trim();
@@ -58,7 +58,7 @@ const JAVA_HEADER_LINES = ["import java.util.*;", "", "public class Main {"];
 /*
   Go's header carries more than the harness needs, on purpose.
 
-  Imports live at the top of the file, inside this block — a solution cannot add its own. Without
+  Imports live at the top of the file, inside this block - a solution cannot add its own. Without
   strconv there is no int-to-string conversion, which makes FizzBuzz unsolvable in idiomatic Go;
   the same goes for strings, sort and the rest. Go then rejects an import nobody uses, so each
   one is consumed by a blank assignment below.
@@ -122,8 +122,8 @@ export const HARNESS_LINE_OFFSETS: Partial<Record<CodeLanguageId, number>> = {
 /**
  * The shape of one argument, derived from a test case's JSON.
  *
- * Shared by every typed language: the classification — scalar or array, which element type, what
- * counts as unsupported — is the same everywhere, only the literal syntax differs. Java and Go
+ * Shared by every typed language: the classification - scalar or array, which element type, what
+ * counts as unsupported - is the same everywhere, only the literal syntax differs. Java and Go
  * each render this into their own form.
  */
 type ScalarKind = "int" | "long" | "double" | "bool" | "string";
@@ -132,7 +132,7 @@ type ArgShape =
   | { kind: "array"; elem: ScalarKind; values: (number | boolean | string)[] };
 
 /**
- * Escaped string literal, valid in both Java and Go — they agree on \" \\ \n \r \t and \uXXXX.
+ * Escaped string literal, valid in both Java and Go - they agree on \" \\ \n \r \t and \uXXXX.
  * Everything outside printable ASCII is escaped so the generated source stays byte-safe.
  */
 function quoteStringLiteral(s: string): string {
@@ -189,7 +189,7 @@ function classify(v: unknown): ArgShape {
 /**
  * One entry per parameter of the user's function.
  *
- * A JSON object becomes one parameter per key, in key order — that is what makes
+ * A JSON object becomes one parameter per key, in key order - that is what makes
  * `binarySearch(int[] arr, int target)` read like Java instead of like a bag of values. Anything
  * else is a single parameter called `__input`.
  */
@@ -238,7 +238,7 @@ function goLiteral(kind: ScalarKind, value: number | boolean | string): string {
 }
 
 /*
-  Rust escapes a code point as \u{XXXX}, with the braces — the \uXXXX that Java, Go, C++ and C#
+  Rust escapes a code point as \u{XXXX}, with the braces - the \uXXXX that Java, Go, C++ and C#
   share is a syntax error there.
 */
 function rustStringLiteral(str: string): string {
@@ -440,7 +440,7 @@ const JAVA_OUTPUT_HELPERS = String.raw`
  * callable(data), writes JSON.stringify(result) to stdout.
  *
  * Java is the exception. It has no untyped `data`, and Piston's image ships no JSON library, so
- * the test input is baked in as typed literals instead of parsed at runtime — which is why this
+ * the test input is baked in as typed literals instead of parsed at runtime - which is why this
  * function needs `input` for Java and ignores it everywhere else.
  */
 export function buildWrappedProgram(
@@ -463,7 +463,7 @@ process.stdout.write(JSON.stringify(result));
     case "typescript":
       /*
         Piston type-checks TypeScript before running it, and its image has no @types/node, so
-        the `require` and `process` the harness needs failed with TS2580 — every TypeScript
+        the `require` and `process` the harness needs failed with TS2580 - every TypeScript
         submission came back as 0/5 with a compiler error instead of a test result. Declaring
         exactly the two members used is enough and keeps the user's own type errors reportable,
         which `// @ts-nocheck` would swallow.
@@ -519,7 +519,7 @@ ${trimmed}
   Two things json.Marshal would get wrong on its own.
 
   A nil slice marshals to null, but declaring "var out []int" and never appending is ordinary Go
-  and means an empty list — every challenge returning one would fail on its empty test case.
+  and means an empty list - every challenge returning one would fail on its empty test case.
 
   And Marshal escapes the characters & < > for embedding in HTML, which turns a perfectly good
   string answer into a mismatch.
@@ -547,7 +547,7 @@ ${decls.join("\n")}
       }
       const { decls, names } = buildCppArguments(input);
       /*
-        Serialisation by overload, as in Java — C++ has no reflection and Piston's image has no
+        Serialisation by overload, as in Java - C++ has no reflection and Piston's image has no
         JSON library. The scalar overloads must be declared before the vector template so that
         nested vectors resolve at instantiation.
       */
@@ -642,7 +642,7 @@ ${decls.join("\n")}
       }
       const { decls, names } = buildRustArguments(input);
       /*
-        The solution goes first and the harness follows, so line numbers need no correction —
+        The solution goes first and the harness follows, so line numbers need no correction -
         Rust has no class to nest in and does not care about declaration order.
 
         Serialisation is a trait rather than overloads: Rust has neither those nor a JSON crate

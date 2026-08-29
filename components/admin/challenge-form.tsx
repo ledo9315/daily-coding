@@ -289,7 +289,7 @@ export function AdminChallengeForm({
             className="rounded-none max-w-md"
           />
           <p className="text-xs text-muted-foreground">
-            Der Tag gilt ganztägig in UTC — eine Uhrzeit gibt es bewusst nicht. Pro
+            Der Tag gilt ganztägig in UTC. Eine Uhrzeit gibt es bewusst nicht. Pro
             UTC-Tag ist nur eine Aufgabe möglich. Ohne Datum nimmt die Aufgabe an
             der täglichen Rotation teil.
           </p>

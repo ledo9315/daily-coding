@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Extend the existing NextAuth v5 + Prisma auth system with OAuth (GitHub/Google), email verification, password reset, and "Remember Me" — without migrating away from the current JWT strategy.
+**Goal:** Extend the existing NextAuth v5 + Prisma auth system with OAuth (GitHub/Google), email verification, password reset, and "Remember Me" - without migrating away from the current JWT strategy.
 
 **Architecture:** Keep JWT strategy and Credentials provider intact. Add three new Prisma models (Account, EmailVerificationToken, PasswordResetToken) + `emailVerified` field on User. New `lib/server/auth-service.ts` owns all token CRUD. OAuth users are created/linked in the JWT callback via `lib/server/oauth-user.ts`. E-mail delivery goes through `lib/server/email-service.ts` (Resend).
 
@@ -292,7 +292,7 @@ describe("markPasswordResetTokenUsed", () => {
 pnpm vitest run lib/server/__tests__/auth-service.test.ts
 ```
 
-Expected: FAIL — `Cannot find module '@/lib/server/auth-service'`
+Expected: FAIL - `Cannot find module '@/lib/server/auth-service'`
 
 - [ ] **Step 3: Implement `lib/server/auth-service.ts`**
 
@@ -454,7 +454,7 @@ describe("sendWelcomeEmail", () => {
 pnpm vitest run lib/server/__tests__/email-service.test.ts
 ```
 
-Expected: FAIL — `Cannot find module '@/lib/server/email-service'`
+Expected: FAIL - `Cannot find module '@/lib/server/email-service'`
 
 - [ ] **Step 3: Implement `lib/server/email-service.ts`**
 
@@ -580,7 +580,7 @@ describe("checkRateLimit", () => {
 pnpm vitest run lib/server/__tests__/rate-limiter.test.ts
 ```
 
-Expected: FAIL — `Cannot find module '@/lib/server/rate-limiter'`
+Expected: FAIL - `Cannot find module '@/lib/server/rate-limiter'`
 
 - [ ] **Step 3: Implement `lib/server/rate-limiter.ts`**
 
@@ -627,7 +627,7 @@ git commit -m "feat: add in-memory rate limiter"
 **Files:**
 - Create: `lib/server/oauth-user.ts`
 
-No unit tests for this file — it is a thin DB orchestration layer. Integration would require a real DB. The logic is verified through type-checking.
+No unit tests for this file - it is a thin DB orchestration layer. Integration would require a real DB. The logic is verified through type-checking.
 
 - [ ] **Step 1: Create `lib/server/oauth-user.ts`**
 
@@ -741,7 +741,7 @@ git commit -m "feat: add oauth-user helper (find-or-create with account linking)
 
 ---
 
-## Task 6: Extend `authorizeCredentials` — emailVerified gate + rememberMe (TDD)
+## Task 6: Extend `authorizeCredentials` - emailVerified gate + rememberMe (TDD)
 
 **Files:**
 - Modify: `lib/auth-credentials.ts`
@@ -890,7 +890,7 @@ git commit -m "feat: add emailVerified gate and rememberMe passthrough to author
 
 ---
 
-## Task 7: Extend `authJwtCallback` — rememberMe → token.exp (TDD)
+## Task 7: Extend `authJwtCallback` - rememberMe → token.exp (TDD)
 
 **Files:**
 - Modify: `lib/auth-callbacks.ts`
@@ -1015,12 +1015,12 @@ git commit -m "feat: add rememberMe → token.exp logic to authJwtCallback"
 
 ---
 
-## Task 8: Extend `auth.ts` — OAuth providers + JWT callback wiring
+## Task 8: Extend `auth.ts` - OAuth providers + JWT callback wiring
 
 **Files:**
 - Modify: `auth.ts`
 
-No new unit tests — this wires together already-tested functions. Type-check verifies correctness.
+No new unit tests - this wires together already-tested functions. Type-check verifies correctness.
 
 - [ ] **Step 1: Replace `auth.ts` with the extended version**
 
@@ -1591,12 +1591,12 @@ git commit -m "feat: add verify-email, forgot-password, reset-password API route
 
 ---
 
-## Task 10: UI — `components/auth/oauth-buttons.tsx`
+## Task 10: UI - `components/auth/oauth-buttons.tsx`
 
 **Files:**
 - Create: `components/auth/oauth-buttons.tsx`
 
-No unit tests — pure presentational component. Verified by `tsc`.
+No unit tests - pure presentational component. Verified by `tsc`.
 
 - [ ] **Step 1: Create `components/auth/oauth-buttons.tsx`**
 
@@ -1689,7 +1689,7 @@ git commit -m "feat: add OAuthButtons component (GitHub + Google)"
 
 ---
 
-## Task 11: UI — Extend `LoginForm` + `RegisterForm`
+## Task 11: UI - Extend `LoginForm` + `RegisterForm`
 
 **Files:**
 - Modify: `components/login-form.tsx`
@@ -1917,12 +1917,12 @@ NEXT_PUBLIC_GOOGLE_ENABLED=false
 
 Set to `true` when `GITHUB_CLIENT_ID` / `GOOGLE_CLIENT_ID` are configured.
 
-- [ ] **Step 3: Update `components/register-form.tsx`** — stop auto-logging in when email verification is required
+- [ ] **Step 3: Update `components/register-form.tsx`** - stop auto-logging in when email verification is required
 
 In `handleSubmit`, replace the `signIn` call block (after `if (!res.ok) { ... }`) with:
 
 ```tsx
-// After successful registration, don't auto-login — wait for email verification
+// After successful registration, don't auto-login - wait for email verification
 toast.success("Konto erstellt!", {
   description:
     "Bitte bestätige deine E-Mail-Adresse. Wir haben dir eine Verifizierungs-E-Mail gesendet.",
@@ -1963,7 +1963,7 @@ git commit -m "feat: add Remember Me, OAuth buttons, and verification notice to 
 
 ---
 
-## Task 12: Auth Pages — verify-email, forgot-password, reset-password
+## Task 12: Auth Pages - verify-email, forgot-password, reset-password
 
 **Files:**
 - Create: `app/auth/verify-email/page.tsx`
@@ -1972,7 +1972,7 @@ git commit -m "feat: add Remember Me, OAuth buttons, and verification notice to 
 
 - [ ] **Step 1: Create `app/auth/verify-email/page.tsx`**
 
-This is a Server Component — it calls `verifyEmailToken` directly and redirects.
+This is a Server Component - it calls `verifyEmailToken` directly and redirects.
 
 ```tsx
 import { verifyEmailToken } from "@/lib/server/auth-service";
@@ -2312,15 +2312,15 @@ git commit -m "feat: add verify-email, forgot-password, reset-password pages"
 
 ---
 
-## Task 13: Final wiring — `.env.local` + middleware guard for `/auth/*`
+## Task 13: Final wiring - `.env.local` + middleware guard for `/auth/*`
 
 **Files:**
-- No code changes needed — `/auth/*` paths are not in `middleware.ts` protected list, so they're public by default.
+- No code changes needed - `/auth/*` paths are not in `middleware.ts` protected list, so they're public by default.
 - Add env vars documentation to `.env.local`.
 
 - [ ] **Step 1: Verify `/auth/*` routes are unprotected**
 
-Open `middleware.ts` and confirm that `/auth` is NOT listed in `PROTECTED_PATHS` or `ADMIN_PREFIX`. Expected: correct — auth pages are already public.
+Open `middleware.ts` and confirm that `/auth` is NOT listed in `PROTECTED_PATHS` or `ADMIN_PREFIX`. Expected: correct - auth pages are already public.
 
 - [ ] **Step 2: Add env vars to `.env.local`**
 

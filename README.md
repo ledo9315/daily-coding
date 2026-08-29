@@ -8,12 +8,12 @@ Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bew
 
 ## Was es kann
 
-- **Tägliche Challenge** — eine Aufgabe pro Tag, für alle Nutzer dieselbe. Die Auswahl rotiert deterministisch aus dem UTC-Kalendertag (`lib/server/challenge-day.ts`), es braucht also keinen Cronjob.
-- **Zehn Sprachen** — JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java, Go, C++, C# und Rust stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
-- **Bewertung gegen Testfälle** — der eingereichte Code wird pro Testfall mit einem Harness aufgerufen und das Ergebnis verglichen. Kein Vergleich von Konsolenausgaben.
+- **Tägliche Challenge** - eine Aufgabe pro Tag, für alle Nutzer dieselbe. Die Auswahl rotiert deterministisch aus dem UTC-Kalendertag (`lib/server/challenge-day.ts`), es braucht also keinen Cronjob.
+- **Zehn Sprachen** - JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java, Go, C++, C# und Rust stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
+- **Bewertung gegen Testfälle** - der eingereichte Code wird pro Testfall mit einem Harness aufgerufen und das Ergebnis verglichen. Kein Vergleich von Konsolenausgaben.
 - **Bestenliste** für Woche und Monat, mit Podium und Platzierungen nach Wettkampfregel (Gleichstand teilt den Platz).
-- **Fortschritt** — Punkte, Level, Streak samt Rekord, sechs Abzeichen, Monatsübersicht der gelösten Tage.
-- **Community-Feed** — wer hat welche Challenge gelöst und wer ist im Level aufgestiegen.
+- **Fortschritt** - Punkte, Level, Streak samt Rekord, sechs Abzeichen, Monatsübersicht der gelösten Tage.
+- **Community-Feed** - wer hat welche Challenge gelöst und wer ist im Level aufgestiegen.
 - **Konten** per E-Mail und Passwort oder über GitHub und Google. E-Mail-Verifizierung, Passwort-Zurücksetzen, Konto-Löschung.
 - **Admin-Bereich** zum Anlegen und Bearbeiten von Challenges samt Testfällen.
 
@@ -48,7 +48,7 @@ pnpm dev
 
 Danach läuft die App auf `http://localhost:3000`. Der Seed legt Demo-Konten an; anmelden kannst du dich mit `max.mustermann@company.com` und dem Passwort aus `SEED_DEV_PASSWORD` (Standard `DailyDev2024!`).
 
-**Ohne Docker geht es auch** — dann `CODE_EXECUTION_ENABLED=false` setzen. Challenges lassen sich damit nicht lösen, alles andere funktioniert.
+**Ohne Docker geht es auch** - dann `CODE_EXECUTION_ENABLED=false` setzen. Challenges lassen sich damit nicht lösen, alles andere funktioniert.
 
 ### Umgebungsvariablen
 
@@ -95,16 +95,16 @@ prisma/              Schema, Migrationen, Seed
 docs/DEPLOYMENT.md   Anleitung vom Repository zur laufenden Seite
 ```
 
-Die Trennung, die den Rest erklärt: `lib/prisma.ts` beginnt mit `import "server-only"`. Alles, was den Datenbank-Client benutzt — also praktisch jede Datei unter `lib/server/` — lässt sich damit nicht in eine Client-Komponente importieren; der Build bricht ab. Der Client redet ausschließlich über `lib/api.ts` mit dem Server.
+Die Trennung, die den Rest erklärt: `lib/prisma.ts` beginnt mit `import "server-only"`. Alles, was den Datenbank-Client benutzt - also praktisch jede Datei unter `lib/server/` - lässt sich damit nicht in eine Client-Komponente importieren; der Build bricht ab. Der Client redet ausschließlich über `lib/api.ts` mit dem Server.
 
 ### Wie eine Lösung bewertet wird
 
 1. `POST /api/challenge/[id]/submit` nimmt Code und Sprache an.
 2. `lib/server/challenge-execution.ts` entscheidet die Betriebsart. Liegen strukturierte Testfälle und ein Eintrag in `evaluationConfig.callableByLanguage` vor, wird der Code mit einem Harness (`lib/server/io-harness.ts`) umschlossen und **pro Testfall** ausgeführt.
-3. Fehlt beides, läuft der Code einmal durch und der Exit-Code entscheidet — der Rückfallweg für Aufgaben ohne Testfälle.
+3. Fehlt beides, läuft der Code einmal durch und der Exit-Code entscheidet - der Rückfallweg für Aufgaben ohne Testfälle.
 4. `lib/server/piston-runner.ts` spricht mit Piston über HTTP.
 
-Echte Ausführung ist der Standard. Feste Ergebnisse aus `challenge-run-stub.ts` gibt es nur, wenn `CODE_EXECUTION_ENABLED` ausdrücklich auf `false` steht — ohne laufenden Piston-Container ist das der Weg, lokal abzugeben. Die Testsuite läuft immer in diesem Modus.
+Echte Ausführung ist der Standard. Feste Ergebnisse aus `challenge-run-stub.ts` gibt es nur, wenn `CODE_EXECUTION_ENABLED` ausdrücklich auf `false` steht - ohne laufenden Piston-Container ist das der Weg, lokal abzugeben. Die Testsuite läuft immer in diesem Modus.
 
 ## Tests
 
@@ -112,7 +112,7 @@ Echte Ausführung ist der Standard. Feste Ergebnisse aus `challenge-run-stub.ts`
 pnpm test
 ```
 
-Die Tests liegen in `__tests__/`-Ordnern neben dem geprüften Code. Die Testumgebung ist `node`, es gibt also keine DOM-Globals — Komponenten werden über `renderToStaticMarkup` geprüft.
+Die Tests liegen in `__tests__/`-Ordnern neben dem geprüften Code. Die Testumgebung ist `node`, es gibt also keine DOM-Globals - Komponenten werden über `renderToStaticMarkup` geprüft.
 
 End-to-End-Tests gibt es bislang nicht.
 
@@ -122,7 +122,7 @@ Vor jedem Pull Request müssen `pnpm test`, `pnpm exec tsc --noEmit` und `pnpm l
 
 Zweige heißen nach der Issue-Nummer, Commits folgen [Conventional Commits](https://www.conventionalcommits.org/) (`feat(#42): …`). Direkt auf `main` wird nicht committet.
 
-Neues Verhalten kommt mit Tests. Die Konventionen im Detail — auch die Sprachregel, dass Code und Kommentare englisch sind und alles Nutzersichtbare deutsch — stehen in [`CLAUDE.md`](CLAUDE.md).
+Neues Verhalten kommt mit Tests. Die Konventionen im Detail - auch die Sprachregel, dass Code und Kommentare englisch sind und alles Nutzersichtbare deutsch - stehen in [`CLAUDE.md`](CLAUDE.md).
 
 ## Lizenz
 

@@ -212,8 +212,8 @@ describe("GET /api/community/feed", () => {
 });
 
 /**
- * #122: the route used `include: { user: true }`, which loads the whole user row —
- * `passwordHash`, `email`, `nameKey` — into a handler that answers a public feed. The
+ * #122: the route used `include: { user: true }`, which loads the whole user row -
+ * `passwordHash`, `email`, `nameKey` - into a handler that answers a public feed. The
  * response was always built from an explicit object, so nothing leaked; this pins the
  * narrower query so a later `...submission.user` spread cannot turn it into a leak.
  */

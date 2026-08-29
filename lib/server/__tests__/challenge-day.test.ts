@@ -20,7 +20,7 @@ beforeEach(() => {
 
 /**
  * #35: the check "submitted for this challenge today (UTC)?" was copied into both
- * the submit and the daily route. The helper is now the single source — for the
+ * the submit and the daily route. The helper is now the single source - for the
  * submit lock, the daily response and the dashboard card.
  */
 describe("findTodaySubmission", () => {

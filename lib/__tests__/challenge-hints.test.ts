@@ -19,7 +19,7 @@ describe("normalizeHints", () => {
   });
 
   it("returns nothing for a column that holds no array", () => {
-    // A challenge without hints is normal — the panel is simply left out.
+    // A challenge without hints is normal - the panel is simply left out.
     for (const value of [null, undefined, {}, "Halbiere den Suchbereich.", 7]) {
       expect(normalizeHints(value)).toEqual([]);
     }

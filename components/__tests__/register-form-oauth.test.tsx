@@ -16,7 +16,7 @@ const render = (props: Parameters<typeof RegisterForm>[0]) =>
 /**
  * #137: the OAuth buttons only sat on `/login`, although `findOrCreateOAuthUser` creates an
  * account for a first-time provider sign-in. Registration via GitHub or Google already
- * worked — it was just invisible on the page new users actually land on.
+ * worked - it was just invisible on the page new users actually land on.
  */
 describe("RegisterForm", () => {
   it("offers GitHub when it is enabled", () => {

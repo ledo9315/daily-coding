@@ -20,7 +20,7 @@ const binarySearch = {
 
 /**
  * Every seeded challenge used a hand-written `update: { ...xFields }` that listed only the
- * mechanical fields — languages, test cases, starter code. Prose lived in the `create` branch
+ * mechanical fields - languages, test cases, starter code. Prose lived in the `create` branch
  * alone, so a re-seed never refreshed it and each row kept the text it was first created with:
  * Binary Search still read "Implementiere eine effiziente binäre Suche." long after the seed
  * had a far better description.

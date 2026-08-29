@@ -36,7 +36,7 @@ describe("outputsMatch", () => {
 describe("buildJavaArguments", () => {
   it("turns object keys into one typed parameter each, in key order", () => {
     // This is what makes binarySearch(int[] arr, int target) read like Java rather than like a
-    // bag of values — and it fixes the argument order the harness passes.
+    // bag of values - and it fixes the argument order the harness passes.
     const { decls, names } = buildJavaArguments('{"arr":[1,3,5],"target":5}');
     expect(names).toEqual(["arr", "target"]);
     expect(decls[0]).toContain("int[] arr = new int[]{1,3,5};");
@@ -71,7 +71,7 @@ describe("buildWrappedProgram", () => {
 
   it("TypeScript: declares require and process, which Piston's image lacks", () => {
     // Without the declarations every TypeScript submission failed to compile with TS2580 and
-    // came back as 0/5 — a compiler error where a test result belonged.
+    // came back as 0/5 - a compiler error where a test result belonged.
     const src = buildWrappedProgram("typescript", "function f(a: number): number { return a; }", "f");
     expect(src).toContain("declare function require(");
     expect(src).toContain("declare const process:");
@@ -153,7 +153,7 @@ describe("buildWrappedProgram", () => {
     // A bare value has no key to take a name from, so it becomes the single parameter __input.
     expect(src).toContain("__input := 5");
     expect(src).toContain("__emit(fizzBuzz(__input))");
-    // A solution cannot add imports of its own — without strconv there is no int-to-string
+    // A solution cannot add imports of its own - without strconv there is no int-to-string
     // conversion and FizzBuzz is unsolvable in idiomatic Go.
     expect(src).toContain('"strconv"');
     expect(src).toContain("_ = strconv.Itoa");

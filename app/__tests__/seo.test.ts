@@ -40,7 +40,7 @@ describe("sitemap.xml", () => {
 
   it("lists exactly the pages that carry content", () => {
     expect(urls).toEqual([
-      // The landing lives on the apex URL since #130 — `/landing` only redirects there.
+      // The landing lives on the apex URL since #130 - `/landing` only redirects there.
       `${SITE}/`,
       `${SITE}/changelog`,
       `${SITE}/impressum`,
@@ -50,7 +50,7 @@ describe("sitemap.xml", () => {
 
   /**
    * #132: a sitemap recommends what to index, and nobody searches for a sign-in form.
-   * Excluded from the recommendation, not from crawling — the assertion below is the
+   * Excluded from the recommendation, not from crawling - the assertion below is the
    * other half of that.
    */
   it.each(["/login", "/register"])("does not recommend the %s form", (path) => {

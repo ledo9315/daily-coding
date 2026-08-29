@@ -23,7 +23,7 @@ function addUtcDays(d: Date, delta: number): Date {
 }
 
 /*
-  PROD_DATABASE_URL wins, and no .env file may touch it — same contract as
+  PROD_DATABASE_URL wins, and no .env file may touch it - same contract as
   prisma.production.config.ts. The two loadEnv calls above run with override: true, so a
   DATABASE_URL passed on the command line is silently replaced by whatever sits in .env.local:
   the seed then reports success against the local database while the caller believes it wrote to
@@ -317,7 +317,7 @@ async function main() {
   /*
     The typed languages need the shape of a test case to be expressible as typed parameters, so
     they are opt-in per challenge rather than part of the base set. Hash Map (values of mixed type in one
-    array) and Binary Tree Traversal (a recursive node structure) stay without them — offering a
+    array) and Binary Tree Traversal (a recursive node structure) stay without them - offering a
     language whose submission cannot pass is worse than not offering it. The two share one list
     because the limit is the same: it comes from the test data, not from the language.
   */
@@ -1786,13 +1786,13 @@ async function main() {
 
   /*
     Operational state, and therefore off-limits to a content refresh. `challengeUpsertArgs`
-    already keeps isActive, position and date out of its update — this block wrote all three
+    already keeps isActive, position and date out of its update - this block wrote all three
     anyway, plus the ring pointer, so refreshing prose on a running instance reset the order
     someone arranged in the admin and jumped the daily challenge to the front of the ring.
   */
   if (!contentOnly) {
   // Since #67, `isActive` means "part of the rotation pool", not "is today's
-  // challenge". Every finished challenge is eligible — otherwise the rotation would
+  // challenge". Every finished challenge is eligible - otherwise the rotation would
   // hold a single element and the app would serve the same challenge forever.
   await prisma.challenge.updateMany({ data: { isActive: true } });
   /**

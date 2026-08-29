@@ -36,7 +36,7 @@ const RESULT = "text-primary";
  * is called as `binary_search` and reads the input as a dict, TypeScript carries its types,
  * PHP its sigils. That is the answer to "is my language properly supported, or transpiled?".
  *
- * Entry points match `evaluationConfig.callableByLanguage` in the seed — snake_case for Python,
+ * Entry points match `evaluationConfig.callableByLanguage` in the seed - snake_case for Python,
  * camelCase everywhere else.
  */
 const SOLUTIONS: Record<
@@ -126,7 +126,7 @@ const SOLUTIONS: Record<
   },
   /*
     The millisecond values are not decoration. Java and Go compile on every single test case,
-    which costs a second or more each — showing 12 ms like JavaScript would promise something
+    which costs a second or more each - showing 12 ms like JavaScript would promise something
     the platform does not deliver.
   */
   rust: {
@@ -217,7 +217,7 @@ const SOLUTIONS: Record<
 
 /**
  * The five test cases of the Binary Search challenge, verbatim from `prisma/seed.ts:357`, padded
- * to a fixed width so the timings line up — the output renders with `whitespace-pre`.
+ * to a fixed width so the timings line up - the output renders with `whitespace-pre`.
  */
 const TESTS = [
   "Wert in der Mitte",
@@ -227,7 +227,7 @@ const TESTS = [
   "Leeres Array",
 ];
 
-/** What the challenge is worth in the seed (`prisma/seed.ts:389`) — not a made-up number. */
+/** What the challenge is worth in the seed (`prisma/seed.ts:389`) - not a made-up number. */
 const POINTS = 120;
 
 /**
@@ -280,7 +280,7 @@ export function LandingCodeDemo() {
             {/*
               "Nutze deine vorhandenen Tools" was not true: there is no CLI and no API, code runs
               in the editor on the challenge page. What is true is the thing a visitor wants to
-              know before signing up — the same test cases that grade the submission run
+              know before signing up - the same test cases that grade the submission run
               beforehand, as often as you like.
             */}
             <h2 className="font-heading text-3xl sm:text-4xl">

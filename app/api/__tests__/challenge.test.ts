@@ -23,7 +23,7 @@ vi.mock("@/auth", () => ({
 }));
 
 // Partial mock: every test keeps the real stub runner, a single one overrides it to
-// simulate a failing attempt — the stub always passes on submit.
+// simulate a failing attempt - the stub always passes on submit.
 type ChallengeExecution = typeof import("@/lib/server/challenge-execution");
 const { mockRunChallengeTests } = vi.hoisted(() => ({ mockRunChallengeTests: vi.fn() }));
 vi.mock("@/lib/server/challenge-execution", async (importOriginal) => {
@@ -297,7 +297,7 @@ describe("GET /api/challenge/daily", () => {
   });
 
   // #47: the start time is returned so the page can display the elapsed working
-  // time — the server stays the source of truth.
+  // time - the server stays the source of truth.
 });
 
 // ─── /api/challenge/today ─────────────────────────────────────────────────────
@@ -645,7 +645,7 @@ describe("POST /api/challenge/[id]/submit", () => {
    * The "once passed, it stays passed" rule of #200 read the day's submission without
    * asking which challenge it belonged to. The ring can move on within a UTC day when the
    * live challenge is deactivated, so a failed attempt at the new challenge inherited the
-   * earlier solve — and with it, since #185, access to other people's solutions for a
+   * earlier solve - and with it, since #185, access to other people's solutions for a
    * challenge that was never solved.
    */
   it("looks up today's submission for this challenge, not just for the day", async () => {

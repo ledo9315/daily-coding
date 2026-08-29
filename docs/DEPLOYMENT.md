@@ -5,7 +5,7 @@ is a Next.js 16 server app with Prisma/Postgres and a self-hosted **Piston**
 code-execution engine.
 
 The one hard constraint: **Piston needs a privileged Docker host** (it sandboxes
-user code with isolate/nsjail). It therefore cannot run on Vercel/serverless —
+user code with isolate/nsjail). It therefore cannot run on Vercel/serverless -
 it lives on a small VM you control. Everything else is standard.
 
 ## Recommended stack
@@ -17,7 +17,7 @@ it lives on a small VM you control. Everything else is standard.
 | Code execution | **Piston on a small VPS** | Needs privileged Docker (Hetzner CX22, DigitalOcean, Fly.io …) |
 
 If you prefer a single box: run app + db + Piston with `docker compose` on one
-VPS behind a reverse proxy. That needs an app Dockerfile (not in the repo yet) —
+VPS behind a reverse proxy. That needs an app Dockerfile (not in the repo yet) -
 open an issue/ask and it can be added. The steps below use the recommended split.
 
 > **Fast path:** You can go live *without* code execution first by setting
@@ -33,7 +33,7 @@ open an issue/ask and it can be added. The steps below use the recommended split
    ```bash
    DATABASE_URL="<neon-direct-url>" pnpm prisma migrate deploy
    ```
-3. (Optional) Seed baseline data. Do **not** ship the default admin — set a strong
+3. (Optional) Seed baseline data. Do **not** ship the default admin - set a strong
    password first:
    ```bash
    DATABASE_URL="<neon-direct-url>" SEED_ADMIN_PASSWORD="<strong>" pnpm db:seed
@@ -52,7 +52,7 @@ open an issue/ask and it can be added. The steps below use the recommended split
    - `NEXTAUTH_URL` and `APP_URL` → your final `https://…` domain
    - `RESEND_API_KEY`, `EMAIL_FROM` (on a domain verified in Resend)
    - `REQUIRE_EMAIL_VERIFICATION=true`
-   - Piston: `PISTON_API_URL` (from step 3) — or `CODE_EXECUTION_ENABLED=false` for the fast path
+   - Piston: `PISTON_API_URL` (from step 3) - or `CODE_EXECUTION_ENABLED=false` for the fast path
    - OAuth vars only if you enable social login
 3. Add your custom domain and deploy. Set `NEXTAUTH_URL`/`APP_URL` to the final
    domain **before** relying on the email links (they embed this URL).
@@ -101,4 +101,4 @@ curl https://piston.your-domain.example/api/v2/runtimes
 - **Secrets naming:** the canonical secret is `AUTH_SECRET` (NextAuth v5 reads it
   automatically; middleware also accepts the legacy `NEXTAUTH_SECRET`).
 - **Email domain:** `EMAIL_FROM` must be verified in Resend or delivery fails
-  silently — this is the most common "why didn't I get the email" cause.
+  silently - this is the most common "why didn't I get the email" cause.

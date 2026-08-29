@@ -32,7 +32,7 @@ describe("challenge loading state", () => {
     );
   });
 
-  // ponytail: a source check instead of rendering the page — rendering page.tsx
+  // ponytail: a source check instead of rendering the page - rendering page.tsx
   // would need mocks for react-query, Monaco and the icon package (ESM resolution
   // breaks in the node env). Upgrade to a real render test once the page is split
   // up for testability anyway.

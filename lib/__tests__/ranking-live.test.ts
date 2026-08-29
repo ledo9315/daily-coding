@@ -28,7 +28,7 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("getLiveRanking — week/month", () => {
+describe("getLiveRanking - week/month", () => {
   const d1 = new Date("2026-04-07T00:00:00.000Z");
   const d2 = new Date("2026-04-08T00:00:00.000Z");
 

@@ -21,7 +21,7 @@ describe("AchievementBadge", () => {
   it("shows the standing and a bar for a locked achievement", () => {
     const html = render({ unlocked: false, progress: { current: 3, target: 10 } });
     expect(html).toContain("3/10");
-    // 3 of 10 — the bar has to be readable as a width, not just as a number.
+    // 3 of 10 - the bar has to be readable as a width, not just as a number.
     expect(html).toContain("width:30%");
   });
 
@@ -51,7 +51,7 @@ describe("AchievementBadge", () => {
 
 /**
  * #79: the profile page was cut off on the right. Cause: `truncate` on a title inside
- * nested flex containers without `min-w-0` — a flex item defaults to `min-width: auto`,
+ * nested flex containers without `min-w-0` - a flex item defaults to `min-width: auto`,
  * so the title refused to shrink, and a grid track takes its minimum from `min-content`.
  * The card therefore widened the whole page.
  */

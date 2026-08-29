@@ -13,7 +13,7 @@ export function utcDayRange(now: Date = new Date()): { gte: Date; lt: Date } {
 /**
  * Latest submission for this challenge on the running UTC day, otherwise null.
  *
- * The single source for "already submitted today?" — used by the submit lock,
+ * The single source for "already submitted today?" - used by the submit lock,
  * the challenge API and the dashboard card. The check used to be copied into two
  * routes.
  */
@@ -47,7 +47,7 @@ export function publicSubmissionStatus(
 
 /**
  * The active pool in ring order. `position` first, `id` as the tie-break, matching
- * `compareRingEntries` — the admin list and the daily must agree on the order.
+ * `compareRingEntries` - the admin list and the daily must agree on the order.
  */
 export async function findRingPool() {
   return prisma.challenge.findMany({
@@ -69,7 +69,7 @@ export async function findRingPool() {
  * job: one moving part fewer, and a day without traffic costs nothing because the catch-up is
  * computed from the number of days elapsed.
  *
- * ponytail: with N challenges the ring repeats after N days — accepted on purpose, better than
+ * ponytail: with N challenges the ring repeats after N days - accepted on purpose, better than
  * standing still. The cure is more content, not more code.
  */
 export async function findDailyChallengeForApp() {

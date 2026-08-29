@@ -1,11 +1,11 @@
 /**
- * Display names have to be distinguishable: two accounts with the same name and — since
- * the starter avatar is drawn from a set of 20 (#101) — possibly the same picture were
+ * Display names have to be distinguishable: two accounts with the same name and - since
+ * the starter avatar is drawn from a set of 20 (#101) - possibly the same picture were
  * indistinguishable in the ranking, the feed and on the podium (#107).
  *
  * `User.nameKey` carries the value below and holds the unique constraint, so the database
  * enforces it rather than the application alone. Postgres would need an index over
- * `lower(name)` for that, and Prisma cannot express a functional index in the schema —
+ * `lower(name)` for that, and Prisma cannot express a functional index in the schema -
  * one added by hand counts as drift and the next `migrate dev` would drop it.
  */
 export function nameKeyOf(name: string): string {
@@ -56,7 +56,7 @@ const MAX_ATTEMPTS = 50;
  * changed underneath them.
  *
  * ponytail: one query per attempt instead of fetching all similar names at once. It stops
- * on the first free variant, so a collision costs two queries — the loop only gets long
+ * on the first free variant, so a collision costs two queries - the loop only gets long
  * for a name that dozens of people share, and then a bulk query would be the fix.
  */
 export async function uniqueDisplayName(

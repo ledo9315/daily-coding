@@ -4,11 +4,11 @@ export interface ChallengeHint {
   body: string;
 }
 
-/** Longest title the admin form accepts — it has to stay readable as an accordion trigger. */
+/** Longest title the admin form accepts - it has to stay readable as an accordion trigger. */
 export const HINT_TITLE_MAX = 120;
 
 /**
- * `Challenge.hints` is a Json column, so its shape is whatever was written into it — a legacy
+ * `Challenge.hints` is a Json column, so its shape is whatever was written into it - a legacy
  * row, a hand-edited record, a botched import. Normalizing here keeps the accordion from
  * mapping over something that is not an array.
  *

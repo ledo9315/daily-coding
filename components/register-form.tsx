@@ -22,7 +22,7 @@ interface RegisterFormProps {
 /**
  * The provider buttons belong here as much as on the login form: `findOrCreateOAuthUser`
  * creates an account for a first-time provider sign-in, so registering via GitHub or Google
- * already worked — it was only invisible on the page new visitors land on (#137).
+ * already worked - it was only invisible on the page new visitors land on (#137).
  */
 export function RegisterForm({
   githubEnabled = false,

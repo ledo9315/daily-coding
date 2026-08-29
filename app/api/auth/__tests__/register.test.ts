@@ -100,7 +100,7 @@ describe("POST /api/auth/register", () => {
   });
 
   /**
-   * The starter avatar is public — it shows up in the feed, in the ranking and on the
+   * The starter avatar is public - it shows up in the feed, in the ranking and on the
    * public profile page. Seeded from the address, it turned a guessed e-mail into a
    * testable claim: compute the hash, compare it with the rendered `img`, and a mismatch
    * rules the guess out. The display name is public already, so seeding from it tells an

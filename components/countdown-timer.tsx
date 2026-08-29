@@ -12,7 +12,7 @@ interface CountdownTimerProps {
    * makes the clock the focal point of a section: digit plates in the pixel face.
    *
    * The landing used to scale the inline variant up by 1.5, which magnified a widget instead
-   * of showing a clock — the pixel icon and the 12px labels grew along with it.
+   * of showing a clock - the pixel icon and the 12px labels grew along with it.
    */
   variant?: "inline" | "display";
 }

@@ -69,6 +69,17 @@ describe("renderEmail", () => {
     expect(evil.html).not.toContain("<b>fett</b>");
   });
 
+  /**
+   * Without it the inbox preview takes whatever comes first in the markup, which is the
+   * wordmark, and every mail we send looks identical in the list.
+   */
+  it("puts the first line into the hidden preheader", () => {
+    expect(mail.html).toContain("mso-hide:all");
+    expect(mail.html.indexOf("Klicke auf den Button.")).toBeLessThan(
+      mail.html.indexOf("DAILY CODING")
+    );
+  });
+
   it("omits the button block when there is no action", () => {
     const plain = renderEmail({ heading: "Konto gelöscht", lines: ["Fertig."], footer: "" });
     expect(plain.html).not.toContain("<a ");

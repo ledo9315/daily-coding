@@ -23,7 +23,7 @@ export type LiveRankingUser = {
   avatar: string;
 };
 
-/** One API row — ranked by the number of daily challenges solved, points as the sum. */
+/** One API row - ranked by the number of daily challenges solved, points as the sum. */
 export type LiveRankingRow = {
   userId: string;
   rank: number;

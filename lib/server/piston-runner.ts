@@ -20,7 +20,7 @@ type PistonExecuteBody = {
 };
 
 /**
- * Extra CPU budget for the languages Piston compiles inside the run step — nothing for the rest.
+ * Extra CPU budget for the languages Piston compiles inside the run step - nothing for the rest.
  *
  * The compiler's own cost counts against the program's budget there. javac plus JVM startup
  * measured 2500-3100 ms and the Go toolchain about 1700 ms, against Piston's 3000 ms default:
@@ -91,7 +91,7 @@ export async function fetchPistonRuntimes(
     throw new Error(`Piston runtimes: HTTP ${res.status} ${text.slice(0, 200)}`);
   }
   const list = (await res.json()) as PistonRuntimeInfo[];
-  // Never cache an empty list — it would stay empty forever after `pnpm piston:install`.
+  // Never cache an empty list - it would stay empty forever after `pnpm piston:install`.
   if (list.length > 0) runtimeCache.set(runtimesUrl, list);
   return list;
 }
@@ -117,7 +117,7 @@ function pickVersion(
 ): PistonRuntimeInfo {
   /*
     Node ships twice in Piston, under the same language name and two runtimes; the others differ
-    only by version, and Piston keeps the outdated ones around — Ruby 2.5 next to 3.0, TypeScript
+    only by version, and Piston keeps the outdated ones around - Ruby 2.5 next to 3.0, TypeScript
     4.2 next to 5.0. Picking the first match would be a coin flip.
   */
   const name = pistonLanguageName(language);
@@ -143,7 +143,7 @@ function fileForLanguage(language: CodeLanguageId, code: string) {
 }
 
 /**
- * Java and Go have no compile stage in Piston — the compiler runs inside the run step, so a
+ * Java and Go have no compile stage in Piston - the compiler runs inside the run step, so a
  * rejected program looks like a failed run. Without this the caller would treat a compiler
  * message as the program's output and run the same broken program once per test case.
  *
@@ -168,7 +168,7 @@ export type PistonRunResult = {
   compileStderr: string;
   /**
    * The program never ran: the compiler rejected it. Callers must not present the output as a
-   * test result — it is not what the program produced, it is why it produced nothing.
+   * test result - it is not what the program produced, it is why it produced nothing.
    */
   compileFailed: boolean;
   /** Everything the compiler said. tsc writes its errors to stdout, not stderr. */
@@ -240,7 +240,7 @@ export async function executeWithPiston(
 
   const stdout = run?.stdout ?? "";
   /*
-    A program killed for exceeding its budget writes nothing at all — no stdout, no stderr, exit
+    A program killed for exceeding its budget writes nothing at all - no stdout, no stderr, exit
     code null. Without Piston's message the user was told "Exit -1" and had no way to tell a
     timeout from a crash.
   */
@@ -269,7 +269,7 @@ export async function executeWithPiston(
     compileStderr,
     compileFailed: Boolean(compileFail),
     /*
-      When the compiler ran inside the run step its message lives in stderrRun — the joined
+      When the compiler ran inside the run step its message lives in stderrRun - the joined
       `stderr` above would hand the caller a block labelled "Run:" for a compile error.
     */
     compileOutput:

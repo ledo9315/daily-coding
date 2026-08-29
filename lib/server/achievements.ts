@@ -23,7 +23,7 @@ type CompletedSubmission = {
 
 /**
  * „Polyglott“ (ach-3): solved in three different languages. Replaces the former
- * „Blitzschnell“, which needed a solve duration — that measurement went away with the
+ * „Blitzschnell“, which needed a solve duration - that measurement went away with the
  * daily ranking (#91).
  *
  * Counted across days, not across attempts: since #200 a second submission overwrites the
@@ -52,7 +52,7 @@ export type AchievementRule = {
  * Evaluates the six rules against a user's completed submissions.
  *
  * Split out from the view because `persistAchievementUnlocks` needs the raw dates rather
- * than the formatted strings the view produces — and both must read the same rules.
+ * than the formatted strings the view produces - and both must read the same rules.
  */
 export function deriveAchievementRules(
   completedSubmissions: CompletedSubmission[],
@@ -64,7 +64,7 @@ export function deriveAchievementRules(
   const totalSolved = byDate.length;
   const hardByDate = byDate.filter((s) => s.challenge?.difficulty === "hard");
   /**
-   * The submission that first completes the third distinct language — used both as the
+   * The submission that first completes the third distinct language - used both as the
    * unlock condition and as the unlock date.
    */
   const seenLanguages = new Set<string>();
@@ -83,7 +83,7 @@ export function deriveAchievementRules(
   /**
    * id -> { unlocked by a derived rule, unlock date where derivable, how far along }
    *
-   * `current`/`target` are the same numbers the `unlocked` check already runs on — a
+   * `current`/`target` are the same numbers the `unlocked` check already runs on - a
    * locked achievement used to name its goal without ever saying where you stood (#96).
    * The streak rules read the record rather than the running streak, so they carry a
    * label; „5/7" alone would read as a series still going.

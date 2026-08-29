@@ -30,7 +30,7 @@ async function redirectSources(): Promise<string[]> {
 }
 
 /**
- * Comments legitimately mention the old path — `landing-page.tsx` explains why it moved.
+ * Comments legitimately mention the old path - `landing-page.tsx` explains why it moved.
  * Stripped rather than pattern-matched on link syntax, so the check stays blind to whether
  * the link is a `href`, a `callbackUrl` or a `redirect()`.
  */
@@ -38,7 +38,7 @@ const withoutComments = (source: string) =>
   source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
 
 /**
- * #130 moved the landing to `/` and left `/landing` as a redirect — but three internal
+ * #130 moved the landing to `/` and left `/landing` as a redirect - but three internal
  * links still pointed at the old path, so the logo and the sign-out took a 308 hop, and a
  * crawler following them saw a redirect where a page should be.
  */

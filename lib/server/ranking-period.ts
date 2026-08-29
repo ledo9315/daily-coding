@@ -1,6 +1,6 @@
 import type { RankingPeriod } from "@/lib/generated/prisma/enums";
 
-/** UTC midnight for the calendar day of `d` — a pure date boundary, consistent with the seed. */
+/** UTC midnight for the calendar day of `d` - a pure date boundary, consistent with the seed. */
 export function startOfUtcDay(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
@@ -20,7 +20,7 @@ export function startOfUtcMonth(d: Date): Date {
 }
 
 /**
- * `periodDate` for RankingEntry queries — must match the seed and the DB exactly.
+ * `periodDate` for RankingEntry queries - must match the seed and the DB exactly.
  */
 export function getPeriodDateForRanking(
   period: RankingPeriod,

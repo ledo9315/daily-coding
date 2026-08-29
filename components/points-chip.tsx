@@ -10,7 +10,7 @@ interface PointsChipProps {
 /**
  * Pixel star on a 9x9 grid, one `rect` per horizontal run.
  *
- * `@nsmr/pixelart-react` ships no plain star — only `MoonStar`/`MoonStars`, which mean
+ * `@nsmr/pixelart-react` ships no plain star - only `MoonStar`/`MoonStars`, which mean
  * something else. Drawing nine rectangles is cheaper than pulling in a second icon
  * library for a single glyph, and `crispEdges` keeps the blocky look of the set.
  *

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
  * highest first. Replaces the position in today's speed ranking that "your rank" used
  * to show on the dashboard and in the profile (#91).
  *
- * Competition ranking — a tie shares a place and the next distinct total skips ahead
+ * Competition ranking - a tie shares a place and the next distinct total skips ahead
  * (200, 200, 100 gives places 1, 1, 3). Everyone gets a place, including someone with
  * no points at all: "#14 of 14" tells you more than a dash.
  *

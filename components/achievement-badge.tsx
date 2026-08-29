@@ -111,7 +111,7 @@ export function AchievementBadge({
         </div>
         <div className="min-w-0 flex-1">
           {/* `min-w-0` down the whole flex chain, otherwise the title refuses to shrink
-              and widens the card past the viewport (#79). Wrapping, not truncating — the
+              and widens the card past the viewport (#79). Wrapping, not truncating - the
               rarity label drops to its own line when the title needs the width. */}
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
             <h4 className="min-w-0 font-semibold break-words">{title}</h4>
@@ -136,7 +136,7 @@ export function AchievementBadge({
                 {progress.current}/{progress.target}
               </p>
               {/* ponytail: a div with an inline width, not the shadcn Progress
-                  primitive — that one animates via a transform and would not survive
+                  primitive - that one animates via a transform and would not survive
                   the grayscale/opacity treatment of a locked badge as legibly. */}
               <div
                 className="mt-1 h-1.5 w-full bg-muted"

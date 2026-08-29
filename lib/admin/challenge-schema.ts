@@ -46,7 +46,7 @@ export const adminCreateChallengeSchema = z.object({
 
     Typed languages are optional, the rest are not. A typed harness needs the test input
     expressible as typed parameters, which rules out challenges whose cases mix types in one
-    array or nest a structure — leaving the function name empty is how such a challenge says
+    array or nest a structure - leaving the function name empty is how such a challenge says
     "not this language", and supportedLanguages then omits it.
   */
   evaluationConfig: z.object({
@@ -63,7 +63,7 @@ export const adminCreateChallengeSchema = z.object({
 
 export type AdminCreateChallengeInput = z.infer<typeof adminCreateChallengeSchema>;
 
-/** Same fields as create, minus the id — that one lives in the URL. */
+/** Same fields as create, minus the id - that one lives in the URL. */
 export const adminUpdateChallengeSchema = adminCreateChallengeSchema.omit({
   id: true,
 });

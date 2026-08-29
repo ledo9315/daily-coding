@@ -89,14 +89,15 @@ describe("every mail", () => {
     await sendWelcomeEmail("user@test.com", '<a href="http://phish.example">Konto</a>');
     const sent = mockSend.mock.calls[0][0] as { html: string };
     /**
-     * The URL still appears as visible text, and some clients turn bare URLs into links
-     * on their own — that we cannot prevent. What we control is that we do not author the
-     * anchor ourselves, and the only href we emit is our own action link.
+     * The mail carries two anchors, the button and the fallback address below it, and
+     * both must point at the action URL. A name from the registration form may not add
+     * a third: that is the phishing link no client filters, because it strips scripts,
+     * not anchors.
      */
     expect(sent.html).not.toContain('href="http://phish.example"');
     expect(sent.html).toContain("&lt;a href=");
     const hrefs = [...sent.html.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
-    expect(hrefs).toEqual(["https://app.example.com/challenge"]);
+    expect(new Set(hrefs)).toEqual(new Set(["https://app.example.com/challenge"]));
   });
 
   it("escapes the name in the deletion mail too", async () => {

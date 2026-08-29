@@ -131,7 +131,7 @@ export function TestResults({ testCases, className, hideHeader }: TestResultsPro
                       >
                         {testCase.actual != null && testCase.actual !== ""
                           ? String(testCase.actual)
-                          : "—"}
+                          : "-"}
                       </span>
                     </div>
                   </div>

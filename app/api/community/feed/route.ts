@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     /**
      * `select`, not `include: { user: true }`. The response only ever contained name,
-     * initials and avatar, but the whole row — `passwordHash`, `email`, `nameKey` — was
+     * initials and avatar, but the whole row - `passwordHash`, `email`, `nameKey` - was
      * being loaded into the memory of a route that answers a feed. Nothing leaked; the
      * point is that what is never loaded cannot be handed out by a later change (#122).
      */

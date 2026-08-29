@@ -40,7 +40,7 @@ describe("comment policy", () => {
   /**
    * An adversarial pass got both of these past the check: `trim()` removes whitespace but
    * not format characters, so a body of nothing but U+200B was stored and rendered as an
-   * empty paragraph — and a NUL reached Postgres, whose `text` type refuses it, turning a
+   * empty paragraph - and a NUL reached Postgres, whose `text` type refuses it, turning a
    * validation problem into a 500.
    */
   it.each(["\u200b", "\u200c\u200d", "\u2060", "\u180e", "\u034f", " \u200b \n "])(

@@ -1,14 +1,14 @@
-# Auth System Design — daily-coding-challenge
+# Auth System Design - daily-coding-challenge
 
 **Date:** 2026-04-12  
 **Status:** Approved  
-**Approach:** Option B — JWT-Strategie beibehalten, Custom Service Layer
+**Approach:** Option B - JWT-Strategie beibehalten, Custom Service Layer
 
 ---
 
 ## Kontext
 
-Die App nutzt bereits NextAuth v5 (beta) mit JWT-Strategie und einem Credentials-Provider (E-Mail/Passwort). bcryptjs (SALT 12) ist im Einsatz. Das bestehende System wird erweitert — keine Migration auf PrismaAdapter.
+Die App nutzt bereits NextAuth v5 (beta) mit JWT-Strategie und einem Credentials-Provider (E-Mail/Passwort). bcryptjs (SALT 12) ist im Einsatz. Das bestehende System wird erweitert - keine Migration auf PrismaAdapter.
 
 **Scope dieser Erweiterung:**
 - OAuth Login (GitHub + Google, plug-in-ready via Env-Vars)
@@ -62,7 +62,7 @@ emailVerified Boolean @default(false)
 
 ### Token-Sicherheit
 
-Tokens werden als `crypto.randomBytes(32).toString('hex')` generiert (256 Bit Entropie, nicht rateable). Kein JWT für Verification/Reset-Tokens — direktes DB-Lookup ermöglicht sofortige Invalidierung.
+Tokens werden als `crypto.randomBytes(32).toString('hex')` generiert (256 Bit Entropie, nicht rateable). Kein JWT für Verification/Reset-Tokens - direktes DB-Lookup ermöglicht sofortige Invalidierung.
 
 ---
 
@@ -70,7 +70,7 @@ Tokens werden als `crypto.randomBytes(32).toString('hex')` generiert (256 Bit En
 
 ### `lib/server/auth-service.ts`
 
-Zentrales Modul für alle Token-Operationen. API-Routes rufen ausschließlich diesen Service auf — nie direkt Prisma für Auth-Tokens.
+Zentrales Modul für alle Token-Operationen. API-Routes rufen ausschließlich diesen Service auf - nie direkt Prisma für Auth-Tokens.
 
 ```
 createEmailVerificationToken(userId)  → token string
@@ -98,7 +98,7 @@ In-Memory-Rate-Limiting (keine externe Dependency):
 - `POST /api/auth/forgot-password` → 3 Requests / 15min pro E-Mail
 - `POST /api/auth/register` → 5 Requests / 1h pro IP
 
-### `auth.ts` — Erweiterungen
+### `auth.ts` - Erweiterungen
 
 **OAuth Provider (plug-in-ready):**
 ```typescript
@@ -112,10 +112,10 @@ providers: [
 **JWT maxAge (Remember Me):**
 - `rememberMe` wird als Custom-Credential beim Sign-in übergeben und im JWT-Callback in `token.rememberMe` gespeichert
 - Im JWT-Callback bei `trigger === "signIn"`: wenn `rememberMe: false`, wird `token.exp` explizit auf `now + 24h` gesetzt; bei `rememberMe: true` bleibt das Standard-Cookie-Expiry (30 Tage, global in `session.maxAge` konfiguriert)
-- NextAuth v5 respektiert das `exp`-Feld im JWT — kurzlebige Sessions werden dadurch serverseitig erzwungen, auch wenn der Cookie länger lebt
+- NextAuth v5 respektiert das `exp`-Feld im JWT - kurzlebige Sessions werden dadurch serverseitig erzwungen, auch wenn der Cookie länger lebt
 
 **OAuth Account Linking:**
-Im `signIn`-Callback: wenn ein User mit gleicher E-Mail bereits existiert, wird der OAuth-Account in der `Account`-Tabelle verknüpft — kein Duplikat.
+Im `signIn`-Callback: wenn ein User mit gleicher E-Mail bereits existiert, wird der OAuth-Account in der `Account`-Tabelle verknüpft - kein Duplikat.
 
 **Email-Verifikations-Gate:**
 In `authorizeCredentials`: wenn `REQUIRE_EMAIL_VERIFICATION=true` und `user.emailVerified === false` → `null` (Login verweigert).
@@ -135,7 +135,7 @@ Alle Routes unter `app/api/auth/`. Input-Validierung via Zod.
 
 ### Sicherheits-Details
 
-- `forgot-password` antwortet immer `200 OK` — unabhängig davon ob die E-Mail existiert (verhindert User Enumeration)
+- `forgot-password` antwortet immer `200 OK` - unabhängig davon ob die E-Mail existiert (verhindert User Enumeration)
 - `reset-password` setzt `used: true` sofort nach Nutzung (Single-Use)
 - `verify-email` löscht den Token nach Erfolg
 - Alle sensiblen Fehler (abgelaufener Token, bereits genutzter Token) geben generische `400`-Responses
@@ -159,8 +159,8 @@ Alle Routes unter `app/api/auth/`. Input-Validierung via Zod.
 
 ### Neue Komponenten
 
-- `components/auth/oauth-buttons.tsx` — GitHub + Google Buttons, rendern nur wenn Provider konfiguriert
-- `components/auth/remember-me-checkbox.tsx` — Checkbox für persistente Session
+- `components/auth/oauth-buttons.tsx` - GitHub + Google Buttons, rendern nur wenn Provider konfiguriert
+- `components/auth/remember-me-checkbox.tsx` - Checkbox für persistente Session
 
 ### UI-Verhalten
 
@@ -179,14 +179,14 @@ Vitest, Node-Environment, colocated `__tests__/`.
 
 ### Neue Unit Tests
 
-- `lib/server/__tests__/auth-service.test.ts` — Token-Generierung, Validierung, Expiry, Single-Use-Enforcement (Prisma gemockt)
-- `lib/server/__tests__/email-service.test.ts` — Resend-Aufrufe gemockt, korrekte Template-Parameter
-- `lib/server/__tests__/rate-limiter.test.ts` — Limit-Logik, Reset nach Zeitfenster
+- `lib/server/__tests__/auth-service.test.ts` - Token-Generierung, Validierung, Expiry, Single-Use-Enforcement (Prisma gemockt)
+- `lib/server/__tests__/email-service.test.ts` - Resend-Aufrufe gemockt, korrekte Template-Parameter
+- `lib/server/__tests__/rate-limiter.test.ts` - Limit-Logik, Reset nach Zeitfenster
 
 ### Erweiterungen bestehender Tests
 
-- `lib/__tests__/auth-credentials.test.ts` — unverifizierter User mit Flag `true`, OAuth-User ohne `passwordHash`
-- `lib/__tests__/auth-callbacks.test.ts` — `rememberMe`-Flag im JWT, `maxAge`-Setzung
+- `lib/__tests__/auth-credentials.test.ts` - unverifizierter User mit Flag `true`, OAuth-User ohne `passwordHash`
+- `lib/__tests__/auth-callbacks.test.ts` - `rememberMe`-Flag im JWT, `maxAge`-Setzung
 
 ### API-Route-Tests (Prisma gemockt)
 
@@ -207,18 +207,18 @@ Vitest, Node-Environment, colocated `__tests__/`.
 # Bestehend
 AUTH_SECRET=...
 
-# Neu — E-Mail
+# Neu - E-Mail
 RESEND_API_KEY=...
 APP_URL=https://...
 EMAIL_FROM=noreply@yourdomain.com
 
-# Neu — OAuth (optional, Provider nur aktiv wenn gesetzt)
+# Neu - OAuth (optional, Provider nur aktiv wenn gesetzt)
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 
-# Neu — Feature Flag
+# Neu - Feature Flag
 REQUIRE_EMAIL_VERIFICATION=true   # oder false
 ```
 
@@ -228,4 +228,4 @@ REQUIRE_EMAIL_VERIFICATION=true   # oder false
 
 1. Prisma-Migration für neue Modelle + `emailVerified`-Feld
 2. Bestehende User: `emailVerified: false` als Default (non-breaking)
-3. Kein Downtime — alle neuen Felder sind optional oder haben Defaults
+3. Kein Downtime - alle neuen Felder sind optional oder haben Defaults

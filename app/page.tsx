@@ -31,7 +31,7 @@ export default async function DashboardPage() {
   const session = await auth();
   /**
    * Rendered, not redirected to. A visitor without a session is the one this page has to
-   * convince, and `/` is the URL they arrive on — a redirect handed crawlers a login form
+   * convince, and `/` is the URL they arrive on - a redirect handed crawlers a login form
    * on the canonical URL of the site (#130).
    */
   if (!session?.user?.id) {

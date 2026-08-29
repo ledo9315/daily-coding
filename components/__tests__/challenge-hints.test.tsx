@@ -38,7 +38,7 @@ describe("ChallengeHints", () => {
 
   it("lets the steps stay open together", () => {
     // The steps build on each other, so opening step 2 must not close step 1. Radix decides
-    // that via `type`, which leaves no trace in the markup — hence the source assertion.
+    // that via `type`, which leaves no trace in the markup - hence the source assertion.
     const source = readFileSync(
       resolve(process.cwd(), "components", "challenge-hints.tsx"),
       "utf8"

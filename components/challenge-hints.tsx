@@ -13,7 +13,7 @@ import type { ChallengeHint } from "@/lib/challenge-hints";
  * Help in unfoldable steps instead of one open box.
  *
  * A single always-visible sentence handed the approach to everyone who opened the page,
- * including the people who wanted to work it out — and a challenge that awards points and a
+ * including the people who wanted to work it out - and a challenge that awards points and a
  * daily rank should not do that. Collapsed, help costs nothing to whoever does not want it.
  *
  * `type="multiple"`: the steps build on each other, so reading step 2 must not close step 1.

@@ -4,7 +4,7 @@ import { Home, Tournament, Trophy, User } from "@nsmr/pixelart-react";
  * The primary navigation, shared by the desktop bar and the mobile sheet (#79).
  *
  * One list on purpose: the header's nav is hidden below `md`, and for a while nothing
- * replaced it — on a phone there was no way to reach the challenge or the ranking at all.
+ * replaced it - on a phone there was no way to reach the challenge or the ranking at all.
  * Two copies of the list would drift the moment an entry is added.
  */
 export const NAV_ITEMS = [

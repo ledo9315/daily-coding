@@ -106,7 +106,7 @@ export default async function AdminChallengesPage() {
 
                         Row 0 is live and cannot take part. The pointer remembers the challenge,
                         not the slot, so moving the live row wrote to the database and changed
-                        nothing on screen — it stayed on top because the list rotates around it.
+                        nothing on screen - it stayed on top because the list rotates around it.
                         Row 1 may not swap upwards for the same reason: it would not become
                         today's, it would land at the far end of the list.
                       */
@@ -150,7 +150,7 @@ export default async function AdminChallengesPage() {
                   <td className="p-3 align-top">
                     {/* Ordering an inactive challenge is meaningless: it is not in the ring.
                         It takes its place by position once it is switched on. */}
-                    <span className="text-xs text-muted-foreground">—</span>
+                    <span className="text-xs text-muted-foreground">-</span>
                   </td>
                   <td className="p-3 align-top">
                     <ChallengeRowActions

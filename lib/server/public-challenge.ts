@@ -1,7 +1,7 @@
 const VALID_STATUS = new Set(["pending", "passed", "failed"]);
 
 /**
- * Strips sensitive fields from test cases for the public challenge APIs — no
+ * Strips sensitive fields from test cases for the public challenge APIs - no
  * `expected` before grading. Fills a missing `status` with `pending` so clients
  * such as TestResults do not crash.
  */

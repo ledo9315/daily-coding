@@ -3,7 +3,7 @@ import { startOfUtcDay } from "@/lib/server/ranking-period";
 /**
  * The daily as a ring the admin can see and reorder.
  *
- * Before this, the order was `(date, id)` and the position in it was `dayNumber % poolSize` —
+ * Before this, the order was `(date, id)` and the position in it was `dayNumber % poolSize` -
  * correct, but invisible, uneditable, and it jumped whenever a challenge was added or
  * deactivated, because `poolSize` is part of the formula. The admin panel needed three sentences
  * to explain what the list meant.
@@ -45,7 +45,7 @@ export function compareRingEntries(a: RingEntry, b: RingEntry): number {
  *
  * `currentId` missing from the pool is the case that matters in practice: the live challenge got
  * deactivated or deleted. Starting over at 0 would be wrong (it would repeat the front of the
- * list), so the stored position is used as the entry point instead — the ring continues where
+ * list), so the stored position is used as the entry point instead - the ring continues where
  * the removed entry stood.
  */
 export function resolveRingIndex(

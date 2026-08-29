@@ -9,7 +9,7 @@ export const SITE_URL = "https://daily-coding.de";
  * The pages worth recommending in the sitemap: those that carry content. The landing sits
  * on the apex URL since #130.
  *
- * This used to be `PUBLIC_PATHS`, "reachable without an account" — a different question,
+ * This used to be `PUBLIC_PATHS`, "reachable without an account" - a different question,
  * and answering it put `/login` and `/register` in the sitemap, which recommends a sign-in
  * form for indexing (#132). Both stay crawlable; they are simply not recommended.
  */

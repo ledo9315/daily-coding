@@ -10,7 +10,7 @@ const footerLinkClass = "transition-colors hover:text-primary focus-visible:text
  *
  * Two of the four columns were commented-out placeholder links (Über uns, Blog, Karriere, Kontakt,
  * all `href="#"`), so the grid rendered two thirds empty. What is actually here is a brand, two
- * legal pages and a line of small print — which fits on one row. Repository, feedback and
+ * legal pages and a line of small print - which fits on one row. Repository, feedback and
  * support now sit beside the legal links and wrap as a compact link rail on small screens.
  */
 export function LandingFooter() {

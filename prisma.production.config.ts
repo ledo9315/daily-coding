@@ -5,7 +5,7 @@ import { defineConfig } from "prisma/config";
  *
  * A separate config, and a differently named variable, on purpose. `prisma.config.ts` loads
  * `.env.local` with `override: true`, so an exported `DATABASE_URL` is silently replaced by the
- * local one — a migration meant for production then runs against Docker and reports success.
+ * local one - a migration meant for production then runs against Docker and reports success.
  * `PROD_DATABASE_URL` cannot be overwritten that way because nothing else reads it.
  *
  * Deliberately loads no env file: the URL has to be passed in for the one command, so it cannot

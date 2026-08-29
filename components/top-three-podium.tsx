@@ -18,7 +18,7 @@ interface TopThreePodiumProps {
   first: TopUser;
   /**
    * Places 2 and 3 are missing until enough people have solved the challenge. The
-   * ranking page passes index accesses (`ranking[1]`) that are then `undefined` —
+   * ranking page passes index accesses (`ranking[1]`) that are then `undefined` -
    * declared as required props, that took the whole page down (#81).
    */
   second?: TopUser;
