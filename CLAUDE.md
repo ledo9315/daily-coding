@@ -77,7 +77,10 @@ Challenges run user code via a **self-hosted Piston** container (port 2000). Flo
    - **I/O evaluation** (when `Challenge.evaluationConfig.callableByLanguage` + structured `testCases` exist): wraps user code with a harness (`lib/server/io-harness.ts`) and runs each test case via Piston
    - **Smoke execution** (fallback): runs code once through Piston, marks all slots passed/failed based on exit code
 3. `lib/server/piston-runner.ts` handles HTTP calls to Piston (`PISTON_API_URL` env var, defaults to `http://127.0.0.1:2000`)
-4. When `CODE_EXECUTION_ENABLED` env is not `true`, stub results are returned (`challenge-run-stub.ts`)
+4. Real execution is the **default**. Stub results (`challenge-run-stub.ts`) are returned only when
+   `CODE_EXECUTION_ENABLED` is explicitly `false`, or under Vitest / `NODE_ENV=test`
+   (`lib/server/code-execution-flag.ts`). To submit locally without a running Piston container, set
+   `CODE_EXECUTION_ENABLED=false` — otherwise the submission fails with `Ausführung fehlgeschlagen: fetch failed`.
 
 Supported languages live in the **registry** in `lib/challenge-languages.ts` — one `LanguageSpec`
 per entry, holding everything about a language that is data: Piston package and file name, Monaco

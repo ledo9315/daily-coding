@@ -104,7 +104,7 @@ Die Trennung, die den Rest erklärt: `lib/prisma.ts` beginnt mit `import "server
 3. Fehlt beides, läuft der Code einmal durch und der Exit-Code entscheidet — der Rückfallweg für Aufgaben ohne Testfälle.
 4. `lib/server/piston-runner.ts` spricht mit Piston über HTTP.
 
-Ist `CODE_EXECUTION_ENABLED` nicht `true`, liefert `challenge-run-stub.ts` feste Ergebnisse. Die Testsuite läuft immer in diesem Modus.
+Echte Ausführung ist der Standard. Feste Ergebnisse aus `challenge-run-stub.ts` gibt es nur, wenn `CODE_EXECUTION_ENABLED` ausdrücklich auf `false` steht — ohne laufenden Piston-Container ist das der Weg, lokal abzugeben. Die Testsuite läuft immer in diesem Modus.
 
 ## Tests
 

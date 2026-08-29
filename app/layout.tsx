@@ -96,10 +96,14 @@ export default function RootLayout({
       className={`${vt323.variable} ${pressStart.variable} ${jetbrainsMono.variable}`}
     >
       <body className="font-sans antialiased bg-background">
+        {/* Forced, not merely the default: every colour token lives on `:root` and is dark.
+            Following the system would strip the `dark` class, switching off every `dark:`
+            override — the page would stay dark while shadcn's light-mode hovers took over
+            and turned `--accent` orange (#218). */}
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           <SessionProvider>
