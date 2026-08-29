@@ -61,6 +61,11 @@ export default async function PublicProfilePage({ params }: PageProps) {
         maxOpacity={0.2}
         flickerChance={0.1}
       />
+      {/* Same ambient purple as the own profile and the challenge pages. */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] h-150 w-150 bg-chart-5/15 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 bg-chart-5/15 blur-[100px] rounded-full opacity-50 mix-blend-screen" />
+      </div>
 
       <Header />
 
