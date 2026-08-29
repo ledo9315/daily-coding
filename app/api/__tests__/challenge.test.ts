@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { codeHash } from "@/lib/server/code-hash";
 import { NextRequest } from "next/server";
 import { GET as getDailyHandler } from "../challenge/daily/route";
 import { GET as getTodayHandler } from "../challenge/today/route";
@@ -565,6 +566,20 @@ describe("POST /api/challenge/[id]/submit", () => {
         }),
       })
     );
+  });
+
+  // #223 groups identical solutions by this hash. A branch of the upsert that forgets it
+  // leaves the row out of the grouped list, where it simply looks like it was never solved.
+  it("writes the code hash in both branches of the upsert", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    mockCreate.mockResolvedValueOnce({});
+    await submitHandler(makeRequest("ch-1", "  my code  ", "typescript"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    const expected = codeHash("  my code  ");
+    expect(expected).toBe(codeHash("my code"));
+    expect(mockCreate.mock.calls[0][0].create.codeHash).toBe(expected);
+    expect(mockCreate.mock.calls[0][0].update.codeHash).toBe(expected);
   });
 
   // #91: the solve-time measurement is gone; no duration may be written any more.

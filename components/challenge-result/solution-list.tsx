@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { SolutionCard } from "@/components/challenge-result/solution-card";
-import { getChallengeSolutions, type ChallengeSolution } from "@/lib/api";
+import { getChallengeSolutions, type ChallengeSolutionGroup } from "@/lib/api";
 
 const PAGE_SIZE = 10;
 
 export function SolutionList({ challengeId }: { challengeId: string }) {
-  const [solutions, setSolutions] = useState<ChallengeSolution[]>([]);
+  const [groups, setGroups] = useState<ChallengeSolutionGroup[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -22,9 +22,7 @@ export function SolutionList({ challengeId }: { challengeId: string }) {
         limit: PAGE_SIZE,
       });
       setNextCursor(page.nextCursor);
-      setSolutions((prev) =>
-        cursor ? [...prev, ...page.solutions] : page.solutions,
-      );
+      setGroups((prev) => (cursor ? [...prev, ...page.groups] : page.groups));
     },
     [challengeId],
   );
@@ -94,11 +92,11 @@ export function SolutionList({ challengeId }: { challengeId: string }) {
           <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
           <span className="sr-only">Lösungen werden geladen</span>
         </div>
-      ) : error && solutions.length === 0 ? (
+      ) : error && groups.length === 0 ? (
         <p className="mt-4 border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
-      ) : solutions.length === 0 ? (
+      ) : groups.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">
           Diese Challenge hat bisher noch niemand sonst gelöst — schau später
           wieder vorbei.
@@ -106,8 +104,8 @@ export function SolutionList({ challengeId }: { challengeId: string }) {
       ) : (
         <>
           <div className="mt-4 grid gap-4">
-            {solutions.map((solution) => (
-              <SolutionCard key={solution.id} solution={solution} />
+            {groups.map((group) => (
+              <SolutionCard key={group.codeHash} group={group} />
             ))}
           </div>
 

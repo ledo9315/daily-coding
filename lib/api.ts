@@ -174,24 +174,36 @@ export interface CommunityFeedItem {
   };
 }
 
-/** One other user's passing solution, as shown on the result page. */
-export interface ChallengeSolution {
-  id: string;
-  user: {
-    name: string;
-    initials: string;
-    avatar: string;
-    level: number;
-  };
+export interface SolutionAuthor {
+  name: string;
+  initials: string;
+  avatar: string;
+  level: number;
+}
+
+/**
+ * All submissions of a challenge that carry byte-identical code, as one card (#223).
+ *
+ * A popular one-liner is submitted by hundreds of people; listing each of them separately
+ * makes the page unreadable, so the code appears once and the authors are listed under it.
+ */
+export interface ChallengeSolutionGroup {
+  codeHash: string;
+  /** The oldest submission of the group — it carries the code shown and the comment thread. */
+  submissionId: string;
   language: CodeLanguageId;
   code: string;
-  /** ISO string; the row was solved then, and revised later if `revised` is true. */
+  /** ISO string of the oldest submission in the group. */
   createdAt: string;
+  /** Whether the representative row was rewritten after it was first solved. */
   revised: boolean;
+  /** The first few authors; `submissionCount` says how many there are in total. */
+  authors: SolutionAuthor[];
+  submissionCount: number;
 }
 
 export interface ChallengeSolutionsPage {
-  solutions: ChallengeSolution[];
+  groups: ChallengeSolutionGroup[];
   nextCursor: string | null;
 }
 

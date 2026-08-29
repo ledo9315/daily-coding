@@ -171,6 +171,9 @@ model Submission {
   testResults Json?
   /// UTC day reserved for the one-attempt constraint. Legacy rows are backfilled with createdAt.
   submissionDay DateTime
+  /// SHA-256 over the normalized code, the key identical solutions are grouped by (#223).
+  /// Nullable only for rows written before the column existed; the backfill script fills them.
+  codeHash    String?
   user        User             @relation(fields: [userId], references: [id])
   challenge   Challenge        @relation(fields: [challengeId], references: [id])
   comments    Comment[]
@@ -178,6 +181,7 @@ model Submission {
   updatedAt   DateTime         @updatedAt
 
   @@unique([userId, submissionDay])
+  @@index([challengeId, codeHash])
 }
 
 /// A remark under one submission. Both cascades are needed: deleting an account removes the
