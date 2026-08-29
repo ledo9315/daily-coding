@@ -3,8 +3,10 @@ name: CI
 on:
   push:
     branches: [main]
+  # No branch filter: `branches` here matches the *base* of the pull request, so
+  # `[main]` silently skipped every stacked PR, the ones aimed at another feature
+  # branch. Those are exactly the ones nobody checks by hand before merging.
   pull_request:
-    branches: [main]
 
 jobs:
   typecheck:

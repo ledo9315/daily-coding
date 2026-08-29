@@ -61,7 +61,7 @@ export async function GET(
     challengeId,
     status: "completed" as const,
     /**
-     * `not: null` skips rows written before the column existed —
+     * `not: null` skips rows written before the column existed;
      * scripts/backfill-submission-code-hash.ts fills them.
      */
     codeHash: filter === "mine" ? { in: [...ownHashes] } : { not: null },
@@ -107,7 +107,7 @@ export async function GET(
     });
 
   const start = cursor ? sorted.findIndex((group) => group.codeHash === cursor) + 1 : 0;
-  // A cursor whose group is gone ends the list instead of restarting it — `findIndex`
+  // A cursor whose group is gone ends the list instead of restarting it: `findIndex`
   // returns -1 there, and serving page one again would read as an endless feed.
   const page = cursor && start === 0 ? [] : sorted.slice(start, start + limit);
   const nextCursor =
@@ -140,6 +140,21 @@ export async function GET(
     ...new Set(rowsByGroup.flat().map((row) => row.userId)),
   ]);
 
+  // The thread hangs on the representative row, so that is the row whose comments are
+  // counted. One query for the page, not one per card.
+  const commentCounts = await prisma.comment.groupBy({
+    by: ["submissionId"],
+    where: {
+      submissionId: {
+        in: rowsByGroup.map((rows) => rows[0]?.id).filter((id): id is string => !!id),
+      },
+    },
+    _count: { _all: true },
+  });
+  const commentsBySubmission = new Map(
+    commentCounts.map((row) => [row.submissionId, row._count._all])
+  );
+
   const solutionGroups = page.flatMap((group, index) => {
     const rows = rowsByGroup[index];
     const [representative] = rows;
@@ -162,6 +177,7 @@ export async function GET(
         })),
         submissionCount: group._count._all,
         own: ownHashes.has(group.codeHash),
+        commentCount: commentsBySubmission.get(representative.id) ?? 0,
         votes: votes.countsOf(group.codeHash),
         myVotes: votes.stateOf(group.codeHash),
       },

@@ -4,6 +4,8 @@ import { getSessionUserId } from "@/lib/auth-session";
 import { normalizeCommentBody } from "@/lib/comment-policy";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
+import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
+import { calculateLevel } from "@/lib/level";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
@@ -25,18 +27,25 @@ type CommentRow = {
 };
 
 /** `userId` is only used to derive `own` and must never reach the client. */
-function toComment(comment: CommentRow, userId: string) {
+function toComment(comment: CommentRow, userId: string, level: number) {
   return {
     id: comment.id,
     author: {
       name: comment.user.name,
       initials: comment.user.initials,
       avatar: comment.user.avatar,
+      level,
     },
     body: comment.body,
     createdAt: comment.createdAt.toISOString(),
     own: comment.userId === userId,
   };
+}
+
+/** One query for the whole page, so a thread of ten does not become ten point lookups. */
+async function levelsOf(userIds: string[]): Promise<Map<string, number>> {
+  const points = await getLifetimePointsByUserIds([...new Set(userIds)]);
+  return new Map(userIds.map((id) => [id, calculateLevel(points.get(id) ?? 0)]));
 }
 
 function parseLimit(rawLimit: string | null): number {
@@ -113,8 +122,10 @@ export async function GET(
   const page = hasMore ? rows.slice(0, limit) : rows;
   const nextCursor = hasMore && page.length > 0 ? page[page.length - 1].id : null;
 
+  const levels = await levelsOf(page.map((row) => row.userId));
+
   return NextResponse.json({
-    comments: page.map((row) => toComment(row, userId)),
+    comments: page.map((row) => toComment(row, userId, levels.get(row.userId) ?? 1)),
     nextCursor,
   });
 }
@@ -149,5 +160,9 @@ export async function POST(
     select: commentSelect,
   });
 
-  return NextResponse.json(toComment(created, userId), { status: 201 });
+  const levels = await levelsOf([userId]);
+
+  return NextResponse.json(toComment(created, userId, levels.get(userId) ?? 1), {
+    status: 201,
+  });
 }

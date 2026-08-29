@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * The ten languages of the registry, registered by hand rather than through
- * `highlight.js/lib/common` — that bundle carries three dozen grammars nobody here submits in.
+ * `highlight.js/lib/common`, whose bundle carries three dozen grammars nobody here submits in.
  */
 const GRAMMARS: Record<CodeLanguageId, LanguageFn> = {
   javascript,
@@ -38,7 +38,7 @@ for (const [id, grammar] of Object.entries(GRAMMARS)) {
  * A read-only block of solution code.
  *
  * `hljs.highlight` escapes the source while it wraps it, so the markup below is the library's
- * own output and never the user's — a solution consisting of `<script>` stays text.
+ * own output and never the user's: a solution consisting of `<script>` stays text.
  */
 export function CodeBlock({
   code,
@@ -57,7 +57,7 @@ export function CodeBlock({
   return (
     <pre
       className={cn(
-        "overflow-auto border border-border bg-background p-4 font-code text-xs leading-[1.6] sm:text-sm",
+        "overflow-auto border-2 border-border bg-background p-4 font-code text-[13px] leading-[1.6] sm:text-sm",
         className
       )}
     >

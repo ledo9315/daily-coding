@@ -189,7 +189,7 @@ export interface SolutionAuthor {
  */
 export interface ChallengeSolutionGroup {
   codeHash: string;
-  /** The oldest submission of the group — it carries the code shown and the comment thread. */
+  /** The oldest submission of the group; it carries the code shown and the comment thread. */
   submissionId: string;
   language: CodeLanguageId;
   code: string;
@@ -202,6 +202,8 @@ export interface ChallengeSolutionGroup {
   submissionCount: number;
   /** True when one of the signed-in user's own submissions belongs to this group. */
   own: boolean;
+  /** Comments on the representative submission, so the card can label its toggle. */
+  commentCount: number;
   votes: SolutionVoteCounts;
   /** Whether the signed-in user has already cast each kind of vote on this group. */
   myVotes: SolutionVoteState;
@@ -226,6 +228,7 @@ export interface SubmissionComment {
     name: string;
     initials: string;
     avatar: string;
+    level: number;
   };
   body: string;
   createdAt: string;

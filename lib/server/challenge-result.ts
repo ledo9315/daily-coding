@@ -35,11 +35,6 @@ export async function getOwnChallengeResult(userId: string, challengeId: string)
 
   if (!submission) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { streak: true, streakRecord: true },
-  });
-
   const { challenge, ...rest } = submission;
 
   return {
@@ -52,7 +47,5 @@ export async function getOwnChallengeResult(userId: string, challengeId: string)
       points: challenge.points,
       category: challenge.category.name,
     },
-    streak: user?.streak ?? 0,
-    streakRecord: user?.streakRecord ?? 0,
   };
 }

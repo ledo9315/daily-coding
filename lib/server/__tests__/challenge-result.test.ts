@@ -39,7 +39,7 @@ beforeEach(() => {
 });
 
 describe("getOwnChallengeResult", () => {
-  it("returns submission, challenge and streaks of the own solution", async () => {
+  it("returns the submission and its challenge", async () => {
     const result = await getOwnChallengeResult("user-1", "ch-1");
 
     expect(result).toMatchObject({
@@ -51,16 +51,22 @@ describe("getOwnChallengeResult", () => {
         points: 100,
         category: "Arrays",
       },
-      streak: 4,
-      streakRecord: 9,
     });
   });
 
-  it("returns null without touching the user table when nothing was solved", async () => {
-    mockSubmissionFindFirst.mockResolvedValue(null);
-
-    expect(await getOwnChallengeResult("user-1", "ch-1")).toBeNull();
+  /**
+   * Streak and record used to ride along for two stat cards on the result page. Those are
+   * gone: a streak belongs to the account, not to one solution, and the page never showed
+   * it anywhere the profile does not.
+   */
+  it("reads the user table not at all", async () => {
+    await getOwnChallengeResult("user-1", "ch-1");
     expect(mockUserFindUnique).not.toHaveBeenCalled();
+  });
+
+  it("returns null when nothing was solved", async () => {
+    mockSubmissionFindFirst.mockResolvedValue(null);
+    expect(await getOwnChallengeResult("user-1", "ch-1")).toBeNull();
   });
 
   it("asks for the newest completed submission of that user", async () => {
@@ -83,13 +89,6 @@ describe("getOwnChallengeResult", () => {
     expect(args.select.challenge.select.title).toBe(true);
     expect(args.select.challenge.select.category.select.name).toBe(true);
     expect(args.select.challenge).not.toHaveProperty("include");
-  });
-
-  it("selects no private user columns for the streaks", async () => {
-    await getOwnChallengeResult("user-1", "ch-1");
-
-    const select = mockUserFindUnique.mock.calls[0][0].select;
-    expect(Object.keys(select).sort()).toEqual(["streak", "streakRecord"]);
   });
 });
 
