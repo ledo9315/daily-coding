@@ -64,13 +64,21 @@ const makeRow = (
   },
 });
 
+/** The route asks `submission.findMany` two different questions; `select` tells them apart. */
+let ownHashRows: { codeHash: string }[] = [];
+let groupRows: ReturnType<typeof makeRow>[] = [];
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockGetSessionUserId.mockResolvedValue({ userId: "user-me" });
   mockHasSolvedChallenge.mockResolvedValue(true);
   mockGetLifetimePointsByUserIds.mockResolvedValue(new Map());
   mockGroupBy.mockResolvedValue([]);
-  mockFindMany.mockResolvedValue([makeRow()]);
+  ownHashRows = [];
+  groupRows = [makeRow()];
+  mockFindMany.mockImplementation((args: { select?: Record<string, unknown> }) =>
+    Promise.resolve(args?.select?.code ? groupRows : ownHashRows),
+  );
 });
 
 const params = Promise.resolve({ id: "challenge-1" });
@@ -99,7 +107,7 @@ describe("GET /api/challenge/[id]/solutions", () => {
     expect(mockGroupBy).not.toHaveBeenCalled();
   });
 
-  it("groups by codeHash, excluding the own rows and the unhashed ones", async () => {
+  it("groups by codeHash over every hashed row of the challenge", async () => {
     await call();
     expect(mockGroupBy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -107,25 +115,25 @@ describe("GET /api/challenge/[id]/solutions", () => {
         where: {
           challengeId: "challenge-1",
           status: "completed",
-          userId: { not: "user-me" },
           codeHash: { not: null },
         },
       }),
     );
   });
 
-  it("returns an empty page when nobody else has solved the challenge", async () => {
+  it("returns an empty page when nobody has solved the challenge", async () => {
     const json = await (await call()).json();
     expect(json).toEqual({ groups: [], nextCursor: null });
-    expect(mockFindMany).not.toHaveBeenCalled();
+    // Only the lookup of the own hashes, no per-group query.
+    expect(mockFindMany).toHaveBeenCalledTimes(1);
   });
 
   it("maps a group to one card with its authors and the total submission count", async () => {
     mockGroupBy.mockResolvedValue([makeGroup({ count: 12 })]);
-    mockFindMany.mockResolvedValue([
+    groupRows = [
       makeRow({ id: "sub-1", userId: "user-alice" }),
       makeRow({ id: "sub-2", userId: "user-bob", name: "Bob Bauer" }),
-    ]);
+    ];
     mockGetLifetimePointsByUserIds.mockResolvedValue(new Map([["user-alice", 700]]));
 
     const json = await (await call()).json();
@@ -142,6 +150,7 @@ describe("GET /api/challenge/[id]/solutions", () => {
           { name: "Bob Bauer", initials: "AM", avatar: "🐱", level: 1 },
         ],
         submissionCount: 12,
+        own: false,
       },
     ]);
     expect(json.nextCursor).toBeNull();
@@ -150,16 +159,14 @@ describe("GET /api/challenge/[id]/solutions", () => {
   it("takes the code and the comment thread from the oldest row of the group", async () => {
     mockGroupBy.mockResolvedValue([makeGroup()]);
     await call();
-    const args = mockFindMany.mock.calls[0][0] as { orderBy: unknown; take: number };
+    const args = mockFindMany.mock.calls[1][0] as { orderBy: unknown; take: number };
     expect(args.orderBy).toEqual([{ createdAt: "asc" }, { id: "asc" }]);
     expect(args.take).toBe(5);
   });
 
   it("marks a single-row group as revised when updatedAt differs from createdAt", async () => {
     mockGroupBy.mockResolvedValue([makeGroup()]);
-    mockFindMany.mockResolvedValue([
-      makeRow({ updatedAt: new Date("2026-08-02T10:00:00.000Z") }),
-    ]);
+    groupRows = [makeRow({ updatedAt: new Date("2026-08-02T10:00:00.000Z") })];
     const json = await (await call()).json();
     expect(json.groups[0].revised).toBe(true);
   });
@@ -185,6 +192,79 @@ describe("GET /api/challenge/[id]/solutions", () => {
     expect(json.groups.map((g: { codeHash: string }) => g.codeHash)).toEqual([
       "hash-b",
       "hash-a",
+    ]);
+  });
+});
+
+// ─── Sorting and filtering ───────────────────────────────────────────────────
+
+describe("sorting and filtering the groups", () => {
+  const older = makeGroup({
+    codeHash: "hash-old",
+    firstAt: new Date("2026-07-01T00:00:00.000Z"),
+  });
+  const newer = makeGroup({
+    codeHash: "hash-new",
+    firstAt: new Date("2026-08-20T00:00:00.000Z"),
+  });
+
+  const hashes = (json: { groups: { codeHash: string }[] }) =>
+    json.groups.map((group) => group.codeHash);
+
+  it("puts the oldest group first when sort=oldest", async () => {
+    mockGroupBy.mockResolvedValue([newer, older]);
+    const json = await (
+      await call("http://localhost/api/challenge/challenge-1/solutions?sort=oldest")
+    ).json();
+    expect(hashes(json)).toEqual(["hash-old", "hash-new"]);
+  });
+
+  it("falls back to newest for an unknown sort value", async () => {
+    mockGroupBy.mockResolvedValue([older, newer]);
+    const json = await (
+      await call("http://localhost/api/challenge/challenge-1/solutions?sort=beliebt")
+    ).json();
+    expect(hashes(json)).toEqual(["hash-new", "hash-old"]);
+  });
+
+  it("flips the tie-break with the direction so the order stays total", async () => {
+    mockGroupBy.mockResolvedValue([makeGroup({ codeHash: "hash-a" }), makeGroup({ codeHash: "hash-b" })]);
+    const json = await (
+      await call("http://localhost/api/challenge/challenge-1/solutions?sort=oldest")
+    ).json();
+    expect(hashes(json)).toEqual(["hash-a", "hash-b"]);
+  });
+
+  it("restricts the query to the own hashes when filter=mine", async () => {
+    ownHashRows = [{ codeHash: "hash-mine" }];
+    await call("http://localhost/api/challenge/challenge-1/solutions?filter=mine");
+    expect(mockGroupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ codeHash: { in: ["hash-mine"] } }),
+      }),
+    );
+  });
+
+  it("finds nothing for filter=mine when the user has no hashed solution", async () => {
+    await call("http://localhost/api/challenge/challenge-1/solutions?filter=mine");
+    expect(mockGroupBy).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ codeHash: { in: [] } }) }),
+    );
+  });
+
+  it("marks the group the own solution belongs to", async () => {
+    ownHashRows = [{ codeHash: "hash-a" }];
+    mockGroupBy.mockResolvedValue([
+      makeGroup({ codeHash: "hash-a" }),
+      makeGroup({ codeHash: "hash-b" }),
+    ]);
+
+    const json = await (await call()).json();
+    expect(
+      json.groups.map((group: { codeHash: string; own: boolean }) => [group.codeHash, group.own]),
+    ).toEqual([
+      ["hash-b", false],
+      ["hash-a", true],
     ]);
   });
 });
@@ -272,7 +352,7 @@ describe("the solutions query", () => {
 
   it("selects only the three user fields the response uses", async () => {
     await call();
-    const args = mockFindMany.mock.calls[0][0] as {
+    const args = mockFindMany.mock.calls[1][0] as {
       include?: unknown;
       select?: { user?: { select?: Record<string, boolean> } };
     };
@@ -286,7 +366,7 @@ describe("the solutions query", () => {
 
   it("never asks the database for the password hash, the email or the name key", async () => {
     await call();
-    const serialised = JSON.stringify(mockFindMany.mock.calls[0][0]);
+    const serialised = JSON.stringify(mockFindMany.mock.calls[1][0]);
     expect(serialised).not.toContain("passwordHash");
     expect(serialised).not.toContain("email");
     expect(serialised).not.toContain("nameKey");

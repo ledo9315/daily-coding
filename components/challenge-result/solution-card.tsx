@@ -64,6 +64,7 @@ export function SolutionCard({
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
+            {group.own && <span className="text-primary">Deine Lösung</span>}
             {authors.length === 1 && <span>Level {authors[0].level}</span>}
             <span>{languageLabel(group.language)}</span>
             <span>{submissionCount === 1 ? "1 Abgabe" : `${submissionCount} Abgaben`}</span>

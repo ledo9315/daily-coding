@@ -25,9 +25,10 @@ const newest = {
   challenge: {
     id: "ch-1",
     title: "Zwei Summen",
-    description: "…",
+    description: "Finde zwei Zahlen …",
     difficulty: "easy",
     points: 100,
+    testCases: [{ id: 1, name: "Beispiel", input: "[1,2]", expected: "3" }],
     category: { name: "Arrays" },
   },
 };
@@ -90,5 +91,35 @@ describe("getOwnChallengeResult", () => {
 
     const select = mockUserFindUnique.mock.calls[0][0].select;
     expect(Object.keys(select).sort()).toEqual(["streak", "streakRecord"]);
+  });
+});
+
+/**
+ * #224 puts the challenge's own test cases on the result page. They carry the expected
+ * outputs, so they are as much of a spoiler as a foreign solution — and the rule that keeps
+ * them from an unsolved account has to live here, not in the component that renders them.
+ */
+describe("the test cases of the challenge", () => {
+  it("come along with the own solution, parsed into slots", async () => {
+    const result = await getOwnChallengeResult("user-1", "ch-1");
+    expect(result?.challenge.testCases).toEqual([
+      { id: 1, name: "Beispiel", input: "[1,2]", expected: "3" },
+    ]);
+    expect(result?.challenge.description).toBe("Finde zwei Zahlen …");
+  });
+
+  it("are read through the own submission, never by a lookup on the URL id", async () => {
+    await getOwnChallengeResult("user-1", "ch-1");
+    const args = mockSubmissionFindFirst.mock.calls[0][0] as {
+      where: Record<string, unknown>;
+      select: { challenge: { select: Record<string, boolean> } };
+    };
+    expect(args.where).toEqual({ userId: "user-1", challengeId: "ch-1", status: "completed" });
+    expect(args.select.challenge.select.testCases).toBe(true);
+  });
+
+  it("stay unreachable without a completed submission of the user", async () => {
+    mockSubmissionFindFirst.mockResolvedValue(null);
+    expect(await getOwnChallengeResult("user-1", "ch-1")).toBeNull();
   });
 });
