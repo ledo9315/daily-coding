@@ -49,7 +49,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Interval for the silent API check that picks up a new UTC day / new challenge. */
@@ -64,13 +63,6 @@ export default function ChallengePage() {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [compileError, setCompileError] = useState<string | null>(null);
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
-  const [submitWarningDismissed, setSubmitWarningDismissed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("challenge_submit_warning_dismissed") === "true";
-    }
-    return false;
-  });
-
   const prevChallengeIdRef = useRef<string | null>(null);
   const router = useRouter();
 
@@ -467,34 +459,6 @@ export default function ChallengePage() {
               }
               submittedAt={submittedAtLabel}
             />
-
-            {!submitWarningDismissed && (
-              <Alert
-                variant="destructive"
-                className="relative border-amber-500/30 bg-amber-500/10 text-accent [&>svg]:text-accent rounded-none pr-12"
-              >
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1 h-8 w-8 rounded-none text-muted-foreground hover:text-foreground hover:bg-amber-500/20"
-                  onClick={() => {
-                    setSubmitWarningDismissed(true);
-                    localStorage.setItem("challenge_submit_warning_dismissed", "true");
-                  }}
-                  aria-label="Hinweis schließen"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-                <AlertIcon className="h-4 w-4" fill="currentColor" />
-                <AlertTitle className="text-lg leading-none mb-2">Achtung</AlertTitle>
-                <AlertDescription className="text-sm">
-                  Pro Kalendertag (UTC) zählt genau eine Abgabe. Bis zum Tageswechsel
-                  kannst du sie beliebig oft überschreiben — eine bestandene Challenge
-                  bleibt dabei bestanden.
-                </AlertDescription>
-              </Alert>
-            )}
 
             <Button
               size="lg"
