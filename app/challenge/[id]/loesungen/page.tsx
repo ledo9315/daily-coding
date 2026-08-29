@@ -118,7 +118,11 @@ export default async function ChallengeResultPage({ params }: PageProps) {
 
         {testCases.length > 0 && <TestResults testCases={testCases} className="mt-6" />}
 
-        <SolutionList challengeId={challenge.id} />
+        <SolutionList
+          challengeId={challenge.id}
+          ownCode={submission.code}
+          ownLanguage={submission.language as CodeLanguageId}
+        />
 
         {isTodaysChallenge && (
           <div className="mt-6">
