@@ -37,14 +37,26 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const cursor = searchParams.get("cursor")?.trim() || undefined;
   const limit = parseLimit(searchParams.get("limit"));
+  const sort = searchParams.get("sort") === "oldest" ? "oldest" : "newest";
+  const filter = searchParams.get("filter") === "mine" ? "mine" : "all";
+
+  // The user's own solutions are part of the list and marked there (#224). The result page
+  // still shows the own submission above it, because that card carries points, streak and
+  // test results a solution card does not.
+  const ownRows = await prisma.submission.findMany({
+    where: { userId, challengeId, status: "completed", codeHash: { not: null } },
+    select: { codeHash: true },
+  });
+  const ownHashes = new Set(ownRows.map((row) => row.codeHash as string));
 
   const scope = {
     challengeId,
     status: "completed" as const,
-    /** Own row is rendered separately above the list and must not appear in it twice. */
-    userId: { not: userId },
-    /** Rows from before the column existed; scripts/backfill-submission-code-hash.ts fills them. */
-    codeHash: { not: null },
+    /**
+     * `not: null` skips rows written before the column existed —
+     * scripts/backfill-submission-code-hash.ts fills them.
+     */
+    codeHash: filter === "mine" ? { in: [...ownHashes] } : { not: null },
   };
 
   const groups = await prisma.submission.groupBy({
@@ -65,13 +77,16 @@ export async function GET(
    * ponytail: fine while a challenge has a few thousand distinct solutions; beyond that this
    * wants a keyset query over the aggregate in raw SQL.
    */
+  const direction = sort === "oldest" ? -1 : 1;
   const sorted = groups
     .filter((group): group is typeof group & { codeHash: string } => group.codeHash !== null)
-    .sort(
-      (a, b) =>
-        (b._min.createdAt?.getTime() ?? 0) - (a._min.createdAt?.getTime() ?? 0) ||
-        (a.codeHash < b.codeHash ? 1 : a.codeHash > b.codeHash ? -1 : 0)
-    );
+    .sort((a, b) => {
+      const byAge = (b._min.createdAt?.getTime() ?? 0) - (a._min.createdAt?.getTime() ?? 0);
+      // The tie-break flips with the direction as well: only a totally ordered list lets a
+      // cursor mean the same thing on the way back.
+      const byHash = a.codeHash < b.codeHash ? 1 : a.codeHash > b.codeHash ? -1 : 0;
+      return (byAge || byHash) * direction;
+    });
 
   const start = cursor ? sorted.findIndex((group) => group.codeHash === cursor) + 1 : 0;
   // A cursor whose group is gone ends the list instead of restarting it — `findIndex`
@@ -128,6 +143,7 @@ export async function GET(
           level: calculateLevel(lifetimePoints.get(row.userId) ?? 0),
         })),
         submissionCount: group._count._all,
+        own: ownHashes.has(group.codeHash),
       },
     ];
   });

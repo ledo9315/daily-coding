@@ -15,6 +15,7 @@ function makeGroup(
     revised: false,
     authors: [{ name: "Lisa Müller", initials: "LM", avatar: "", level: 4 }],
     submissionCount: 1,
+    own: false,
     ...overrides,
   };
 }
@@ -70,6 +71,13 @@ describe("SolutionCard", () => {
       <SolutionCard group={makeGroup({ revised: true, submissionCount: 7 })} />
     );
     expect(html).not.toContain("überarbeitet");
+  });
+
+  it("marks the group the own solution belongs to", () => {
+    const own = renderToStaticMarkup(<SolutionCard group={makeGroup({ own: true })} />);
+    const other = renderToStaticMarkup(<SolutionCard group={makeGroup()} />);
+    expect(own).toContain("Deine Lösung");
+    expect(other).not.toContain("Deine Lösung");
   });
 
   it("escapes code that looks like markup", () => {

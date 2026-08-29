@@ -99,6 +99,14 @@ export interface UserProfile {
   monthlyActivity: MonthlyActivity;
 }
 
+/** A challenge's own test case: what goes in and what must come out, with no run attached. */
+export interface ChallengeTestCaseSpec {
+  id: number;
+  name: string;
+  input?: string;
+  expected?: string;
+}
+
 export interface ChallengeTestCase {
   id: number;
   name: string;
@@ -200,7 +208,12 @@ export interface ChallengeSolutionGroup {
   /** The first few authors; `submissionCount` says how many there are in total. */
   authors: SolutionAuthor[];
   submissionCount: number;
+  /** True when one of the signed-in user's own submissions belongs to this group. */
+  own: boolean;
 }
+
+export type SolutionSort = "newest" | "oldest";
+export type SolutionFilter = "all" | "mine";
 
 export interface ChallengeSolutionsPage {
   groups: ChallengeSolutionGroup[];
@@ -370,11 +383,18 @@ export function getCommunityFeed(params?: {
 
 export function getChallengeSolutions(
   challengeId: string,
-  params?: { cursor?: string | null; limit?: number }
+  params?: {
+    cursor?: string | null;
+    limit?: number;
+    sort?: SolutionSort;
+    filter?: SolutionFilter;
+  }
 ): Promise<ChallengeSolutionsPage> {
   const sp = new URLSearchParams();
   if (params?.cursor) sp.set("cursor", params.cursor);
   if (params?.limit != null) sp.set("limit", String(params.limit));
+  if (params?.sort) sp.set("sort", params.sort);
+  if (params?.filter) sp.set("filter", params.filter);
   const q = sp.toString();
   const base = `/api/challenge/${challengeId}/solutions`;
   return apiFetch<ChallengeSolutionsPage>(q ? `${base}?${q}` : base);

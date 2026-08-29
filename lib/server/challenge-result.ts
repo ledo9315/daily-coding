@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { parseTestCasesIo } from "@/lib/server/challenge-execution";
 
 /**
  * The result page for the user's own solution of a challenge.
@@ -24,8 +25,14 @@ export async function getOwnChallengeResult(userId: string, challengeId: string)
         select: {
           id: true,
           title: true,
+          description: true,
           difficulty: true,
           points: true,
+          // The test cases carry the expected outputs, so they are as much of a spoiler as
+          // a foreign solution. They ride along with the own submission on purpose: the
+          // query above has no row to join to unless this user solved the challenge, which
+          // makes the access rule part of the data source rather than of the page.
+          testCases: true,
           category: { select: { name: true } },
         },
       },
@@ -46,8 +53,10 @@ export async function getOwnChallengeResult(userId: string, challengeId: string)
     challenge: {
       id: challenge.id,
       title: challenge.title,
+      description: challenge.description,
       difficulty: challenge.difficulty,
       points: challenge.points,
+      testCases: parseTestCasesIo(challenge.testCases),
       category: challenge.category.name,
     },
     streak: user?.streak ?? 0,
