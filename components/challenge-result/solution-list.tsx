@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { SolutionCard } from "@/components/challenge-result/solution-card";
+import type { CodeLanguageId } from "@/lib/challenge-languages";
 import {
   getChallengeSolutions,
   type ChallengeSolutionGroup,
@@ -19,7 +20,16 @@ const SORT_LABELS: Record<SolutionSort, string> = {
   clever: "Clever",
 };
 
-export function SolutionList({ challengeId }: { challengeId: string }) {
+export function SolutionList({
+  challengeId,
+  ownCode,
+  ownLanguage,
+}: {
+  challengeId: string;
+  /** The user's own solution, so a card can diff against it without a second request. */
+  ownCode: string;
+  ownLanguage: CodeLanguageId;
+}) {
   const [groups, setGroups] = useState<ChallengeSolutionGroup[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -168,6 +178,8 @@ export function SolutionList({ challengeId }: { challengeId: string }) {
                 key={group.codeHash}
                 challengeId={challengeId}
                 group={group}
+                ownCode={ownCode}
+                ownLanguage={ownLanguage}
               />
             ))}
           </div>
