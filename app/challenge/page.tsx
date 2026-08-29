@@ -374,7 +374,12 @@ export default function ChallengePage() {
                       <SelectTrigger size="sm" className="w-full rounded-none font-sans sm:w-[180px]">
                         <SelectValue placeholder="Sprache" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-none">
+                      {/*
+                        Above the maximize overlay. The list is portalled to the body, and
+                        Radix copies this z-index onto the positioned wrapper, which would
+                        otherwise land on 50 and paint behind the overlay's 60.
+                      */}
+                      <SelectContent className="z-[70] rounded-none">
                         {challenge.supportedLanguages.map((id) => (
                           <SelectItem key={id} value={id}>
                             {languageLabel(id)}
