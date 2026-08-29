@@ -15,6 +15,8 @@ const PAGE_SIZE = 10;
 const SORT_LABELS: Record<SolutionSort, string> = {
   newest: "Neueste zuerst",
   oldest: "Älteste zuerst",
+  best_practices: "Best Practices",
+  clever: "Clever",
 };
 
 export function SolutionList({ challengeId }: { challengeId: string }) {
@@ -162,7 +164,11 @@ export function SolutionList({ challengeId }: { challengeId: string }) {
         <>
           <div className="mt-4 grid gap-4">
             {groups.map((group) => (
-              <SolutionCard key={group.codeHash} group={group} />
+              <SolutionCard
+                key={group.codeHash}
+                challengeId={challengeId}
+                group={group}
+              />
             ))}
           </div>
 

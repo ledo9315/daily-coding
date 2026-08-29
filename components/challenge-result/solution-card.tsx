@@ -4,6 +4,7 @@ import { Fragment, useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentThread } from "@/components/challenge-result/comment-thread";
+import { SolutionVotes } from "@/components/challenge-result/solution-votes";
 import { Card } from "@/components/ui/card";
 import type { ChallengeSolutionGroup } from "@/lib/api";
 import { avatarImageSrc } from "@/lib/avatar-src";
@@ -15,9 +16,11 @@ import { formatDate } from "@/lib/format";
 const AVATARS_SHOWN = 3;
 
 export function SolutionCard({
+  challengeId,
   group,
   defaultOpen = false,
 }: {
+  challengeId: string;
   group: ChallengeSolutionGroup;
   defaultOpen?: boolean;
 }) {
@@ -69,6 +72,8 @@ export function SolutionCard({
             <span>{languageLabel(group.language)}</span>
             <span>{submissionCount === 1 ? "1 Abgabe" : `${submissionCount} Abgaben`}</span>
           </div>
+
+          <SolutionVotes challengeId={challengeId} group={group} />
 
           <button
             type="button"

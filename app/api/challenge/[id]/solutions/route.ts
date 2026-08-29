@@ -4,11 +4,19 @@ import { getSessionUserId } from "@/lib/auth-session";
 import { calculateLevel } from "@/lib/level";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
+import { loadChallengeVotes } from "@/lib/server/solution-votes";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
 /** Authors listed by name on a card; everyone beyond that is summed up as "+N". */
 const AUTHORS_SHOWN = 5;
+
+const SORTS = ["newest", "oldest", "best_practices", "clever"] as const;
+type Sort = (typeof SORTS)[number];
+
+function parseSort(raw: string | null): Sort {
+  return SORTS.includes(raw as Sort) ? (raw as Sort) : "newest";
+}
 
 function parseLimit(rawLimit: string | null): number {
   if (!rawLimit) return DEFAULT_LIMIT;
@@ -37,7 +45,7 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const cursor = searchParams.get("cursor")?.trim() || undefined;
   const limit = parseLimit(searchParams.get("limit"));
-  const sort = searchParams.get("sort") === "oldest" ? "oldest" : "newest";
+  const sort = parseSort(searchParams.get("sort"));
   const filter = searchParams.get("filter") === "mine" ? "mine" : "all";
 
   // The user's own solutions are part of the list and marked there (#224). The result page
@@ -77,7 +85,10 @@ export async function GET(
    * ponytail: fine while a challenge has a few thousand distinct solutions; beyond that this
    * wants a keyset query over the aggregate in raw SQL.
    */
+  const votes = await loadChallengeVotes(challengeId, userId);
+  const byVotes = sort === "best_practices" || sort === "clever" ? sort : null;
   const direction = sort === "oldest" ? -1 : 1;
+
   const sorted = groups
     .filter((group): group is typeof group & { codeHash: string } => group.codeHash !== null)
     .sort((a, b) => {
@@ -85,7 +96,14 @@ export async function GET(
       // The tie-break flips with the direction as well: only a totally ordered list lets a
       // cursor mean the same thing on the way back.
       const byHash = a.codeHash < b.codeHash ? 1 : a.codeHash > b.codeHash ? -1 : 0;
-      return (byAge || byHash) * direction;
+      const byAgeThenHash = (byAge || byHash) * direction;
+      if (!byVotes) return byAgeThenHash;
+      // Votes decide, age and hash break the tie. Without that fallback two groups on the
+      // same count would swap places between two requests and the cursor would lose them.
+      return (
+        votes.countsOf(b.codeHash)[byVotes] - votes.countsOf(a.codeHash)[byVotes] ||
+        byAgeThenHash
+      );
     });
 
   const start = cursor ? sorted.findIndex((group) => group.codeHash === cursor) + 1 : 0;
@@ -144,6 +162,8 @@ export async function GET(
         })),
         submissionCount: group._count._all,
         own: ownHashes.has(group.codeHash),
+        votes: votes.countsOf(group.codeHash),
+        myVotes: votes.stateOf(group.codeHash),
       },
     ];
   });

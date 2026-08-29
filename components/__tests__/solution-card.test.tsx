@@ -16,18 +16,20 @@ function makeGroup(
     authors: [{ name: "Lisa Müller", initials: "LM", avatar: "", level: 4 }],
     submissionCount: 1,
     own: false,
+    votes: { best_practices: 0, clever: 0 },
+    myVotes: { best_practices: false, clever: false },
     ...overrides,
   };
 }
 
 describe("SolutionCard", () => {
   it("links the name to the public profile path", () => {
-    const html = renderToStaticMarkup(<SolutionCard group={makeGroup()} />);
+    const html = renderToStaticMarkup(<SolutionCard challengeId="ch-1" group={makeGroup()} />);
     expect(html).toContain('href="/u/lisa%20m%C3%BCller"');
   });
 
   it("keeps the code out of the markup while collapsed", () => {
-    const html = renderToStaticMarkup(<SolutionCard group={makeGroup()} />);
+    const html = renderToStaticMarkup(<SolutionCard challengeId="ch-1" group={makeGroup()} />);
     expect(html).not.toContain("const answer = 42;");
     expect(html).toContain('aria-expanded="false"');
     expect(html).toContain("Code anzeigen");
@@ -36,6 +38,7 @@ describe("SolutionCard", () => {
   it("lists every named author and sums up the rest", () => {
     const html = renderToStaticMarkup(
       <SolutionCard
+        challengeId="ch-1"
         group={makeGroup({
           authors: [
             { name: "Lisa Müller", initials: "LM", avatar: "", level: 4 },
@@ -52,37 +55,37 @@ describe("SolutionCard", () => {
   });
 
   it("leaves out the rest count when the group is fully named", () => {
-    const html = renderToStaticMarkup(<SolutionCard group={makeGroup()} />);
+    const html = renderToStaticMarkup(<SolutionCard challengeId="ch-1" group={makeGroup()} />);
     expect(html).not.toContain("weitere");
     expect(html).toContain("1 Abgabe");
   });
 
   it("marks a revised single solution and leaves an unrevised one unmarked", () => {
     const revised = renderToStaticMarkup(
-      <SolutionCard group={makeGroup({ revised: true })} />
+      <SolutionCard challengeId="ch-1" group={makeGroup({ revised: true })} />
     );
-    const plain = renderToStaticMarkup(<SolutionCard group={makeGroup()} />);
+    const plain = renderToStaticMarkup(<SolutionCard challengeId="ch-1" group={makeGroup()} />);
     expect(revised).toContain("überarbeitet");
     expect(plain).not.toContain("überarbeitet");
   });
 
   it("does not claim a group of many was revised", () => {
     const html = renderToStaticMarkup(
-      <SolutionCard group={makeGroup({ revised: true, submissionCount: 7 })} />
+      <SolutionCard challengeId="ch-1" group={makeGroup({ revised: true, submissionCount: 7 })} />
     );
     expect(html).not.toContain("überarbeitet");
   });
 
   it("marks the group the own solution belongs to", () => {
-    const own = renderToStaticMarkup(<SolutionCard group={makeGroup({ own: true })} />);
-    const other = renderToStaticMarkup(<SolutionCard group={makeGroup()} />);
+    const own = renderToStaticMarkup(<SolutionCard challengeId="ch-1" group={makeGroup({ own: true })} />);
+    const other = renderToStaticMarkup(<SolutionCard challengeId="ch-1" group={makeGroup()} />);
     expect(own).toContain("Deine Lösung");
     expect(other).not.toContain("Deine Lösung");
   });
 
   it("escapes code that looks like markup", () => {
     const html = renderToStaticMarkup(
-      <SolutionCard group={makeGroup({ code: "<script>alert(1)</script>" })} defaultOpen />
+      <SolutionCard challengeId="ch-1" group={makeGroup({ code: "<script>alert(1)</script>" })} defaultOpen />
     );
     expect(html).not.toContain("<script>");
     expect(html).toContain("&lt;script&gt;");

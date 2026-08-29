@@ -210,9 +210,16 @@ export interface ChallengeSolutionGroup {
   submissionCount: number;
   /** True when one of the signed-in user's own submissions belongs to this group. */
   own: boolean;
+  votes: SolutionVoteCounts;
+  /** Whether the signed-in user has already cast each kind of vote on this group. */
+  myVotes: SolutionVoteState;
 }
 
-export type SolutionSort = "newest" | "oldest";
+export type SolutionVoteKind = "best_practices" | "clever";
+export type SolutionVoteCounts = Record<SolutionVoteKind, number>;
+export type SolutionVoteState = Record<SolutionVoteKind, boolean>;
+
+export type SolutionSort = "newest" | "oldest" | SolutionVoteKind;
 export type SolutionFilter = "all" | "mine";
 
 export interface ChallengeSolutionsPage {
@@ -398,6 +405,17 @@ export function getChallengeSolutions(
   const q = sp.toString();
   const base = `/api/challenge/${challengeId}/solutions`;
   return apiFetch<ChallengeSolutionsPage>(q ? `${base}?${q}` : base);
+}
+
+export function voteOnSolution(
+  challengeId: string,
+  codeHash: string,
+  kind: SolutionVoteKind
+): Promise<{ votes: SolutionVoteCounts; myVotes: SolutionVoteState }> {
+  return apiFetch(`/api/challenge/${challengeId}/votes`, {
+    method: "POST",
+    body: JSON.stringify({ codeHash, kind }),
+  });
 }
 
 // ─── Submission Comments ──────────────────────────────────────────────────────
