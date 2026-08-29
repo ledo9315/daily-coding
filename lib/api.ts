@@ -99,14 +99,6 @@ export interface UserProfile {
   monthlyActivity: MonthlyActivity;
 }
 
-/** A challenge's own test case: what goes in and what must come out, with no run attached. */
-export interface ChallengeTestCaseSpec {
-  id: number;
-  name: string;
-  input?: string;
-  expected?: string;
-}
-
 export interface ChallengeTestCase {
   id: number;
   name: string;

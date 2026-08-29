@@ -9,7 +9,7 @@ import { Header } from "@/components/header";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PixelStar, PointsChip } from "@/components/points-chip";
 import { StatsCard } from "@/components/stats-card";
-import { TestResults, type TestCase } from "@/components/test-results";
+import type { TestCase } from "@/components/test-results";
 import { ChallengePanels } from "@/components/challenge-result/challenge-panels";
 import { ResultEffects } from "@/components/challenge-result/result-effects";
 import { SolutionList } from "@/components/challenge-result/solution-list";
@@ -89,10 +89,7 @@ export default async function ChallengeResultPage({ params }: PageProps) {
           </div>
         </div>
 
-        <ChallengePanels
-          description={challenge.description}
-          testCases={challenge.testCases}
-        />
+        <ChallengePanels description={challenge.description} testResults={testCases} />
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <StatsCard title="PUNKTE" value={challenge.points} icon={PixelStar} />
@@ -116,7 +113,6 @@ export default async function ChallengeResultPage({ params }: PageProps) {
           </pre>
         </Card>
 
-        {testCases.length > 0 && <TestResults testCases={testCases} className="mt-6" />}
 
         <SolutionList
           challengeId={challenge.id}

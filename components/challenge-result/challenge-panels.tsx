@@ -1,29 +1,34 @@
 "use client";
 
+import { TestResults, type TestCase } from "@/components/test-results";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import type { ChallengeTestCaseSpec } from "@/lib/api";
 
 /**
- * Task description and test cases, both folded away.
+ * Task description and the own test run, both folded away.
  *
  * On the result page the code is the point, so neither belongs in the way — but reading a
  * foreign solution without being able to look the task up again is guesswork.
+ *
+ * The challenge's own test cases are deliberately not a third panel: the run below already
+ * shows input and expected output per case, plus what the code actually returned.
  */
 export function ChallengePanels({
   description,
-  testCases,
+  testResults,
 }: {
   description: string;
-  testCases: ChallengeTestCaseSpec[];
+  testResults: TestCase[];
 }) {
+  const passed = testResults.filter((testCase) => testCase.status === "passed").length;
+
   return (
     <Accordion type="multiple" className="mt-6 border-2 border-border px-4">
-      <AccordionItem value="description">
+      <AccordionItem value="description" className={testResults.length === 0 ? "border-b-0" : ""}>
         <AccordionTrigger className="text-sm uppercase tracking-wider hover:no-underline">
           Aufgabenstellung
         </AccordionTrigger>
@@ -33,40 +38,20 @@ export function ChallengePanels({
         </AccordionContent>
       </AccordionItem>
 
-      {testCases.length > 0 && (
-        <AccordionItem value="test-cases" className="border-b-0">
+      {testResults.length > 0 && (
+        <AccordionItem value="test-results" className="border-b-0">
           <AccordionTrigger className="text-sm uppercase tracking-wider hover:no-underline">
-            Testfälle
-            <span className="ml-auto mr-2 font-mono text-xs text-muted-foreground">
-              {testCases.length}
+            Testergebnisse
+            <span
+              className={`ml-auto mr-2 font-mono text-xs ${
+                passed === testResults.length ? "text-emerald-500" : "text-muted-foreground"
+              }`}
+            >
+              {passed}/{testResults.length} bestanden
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="space-y-3">
-              {testCases.map((testCase) => (
-                <li key={testCase.id} className="border border-border p-3">
-                  <p className="text-sm font-bold">{testCase.name}</p>
-                  <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                    <div className="min-w-0">
-                      <dt className="text-xs uppercase tracking-wider text-muted-foreground">
-                        Eingabe
-                      </dt>
-                      <dd className="mt-1 overflow-x-auto font-code text-xs">
-                        <pre>{testCase.input ?? "—"}</pre>
-                      </dd>
-                    </div>
-                    <div className="min-w-0">
-                      <dt className="text-xs uppercase tracking-wider text-muted-foreground">
-                        Erwartet
-                      </dt>
-                      <dd className="mt-1 overflow-x-auto font-code text-xs">
-                        <pre>{testCase.expected ?? "—"}</pre>
-                      </dd>
-                    </div>
-                  </dl>
-                </li>
-              ))}
-            </ul>
+            <TestResults testCases={testResults} hideHeader className="border-0" />
           </AccordionContent>
         </AccordionItem>
       )}
