@@ -130,7 +130,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
     <td align="center" style="padding:44px 24px 56px 24px;">
       <table role="presentation" width="480" cellpadding="0" cellspacing="0" border="0" style="width:480px;max-width:100%;">
         <tr>
-          <td style="padding-bottom:40px;font-family:${MONO};font-size:12px;line-height:18px;letter-spacing:2.5px;color:${MUTED};"><span style="color:${ACCENT};">&gt;_</span>&nbsp;DAILY CODING</td>
+          <td style="padding-bottom:40px;font-family:${MONO};font-size:13px;line-height:18px;color:${MUTED};"><span style="color:${ACCENT};">&gt;_</span>&nbsp;DAILY CODING</td>
         </tr>
         <tr>
           <td style="padding-bottom:14px;font-family:${SANS};font-size:23px;line-height:30px;font-weight:600;letter-spacing:-0.2px;color:${TEXT};">${heading}</td>
