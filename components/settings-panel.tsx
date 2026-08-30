@@ -8,9 +8,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Notification, Lock, Trash } from "@nsmr/pixelart-react";
+import { cn } from "@/lib/utils";
 import { getEmailNotificationSetting, setEmailNotificationSetting } from "@/lib/api";
 
+/** Sidebar entries; the id doubles as the key of the panel shown next to it. */
+const SECTIONS = [
+  { id: "notifications", label: "Benachrichtigungen", icon: Notification },
+  { id: "security", label: "Sicherheit", icon: Lock },
+  { id: "account", label: "Konto", icon: Trash },
+] as const;
+
+type SectionId = (typeof SECTIONS)[number]["id"];
+
 export function SettingsPanel() {
+  // Client state, not a route per section: the panels are three forms, and a URL per form
+  // would mean three pages that all render the same shell.
+  const [section, setSection] = useState<SectionId>("notifications");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -116,121 +130,148 @@ export function SettingsPanel() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Card className="pixel-box bg-card">
-        <CardHeader>
-          <CardTitle className="font-sans uppercase tracking-wide">Passwort ändern</CardTitle>
-          <CardDescription>
-            Wenn dein Konto bereits ein Passwort hat, gib zuerst dein aktuelles Passwort ein.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={onChangePassword}>
-            <div className="space-y-2">
-              <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="bg-background"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">Neues Passwort</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="bg-background"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Neues Passwort wiederholen</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="bg-background"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={changingPassword}>
-              {changingPassword ? "Speichert..." : "Passwort speichern"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card className="pixel-box bg-card">
-        <CardHeader>
-          <CardTitle className="font-sans uppercase tracking-wide">
-            Benachrichtigungen
-          </CardTitle>
-          <CardDescription>
-            Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in der
-            Glocke im Kopfbereich. Zusätzlich per E-Mail:
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="notifyByEmail" className="text-lg">
-              Benachrichtigungen per E-Mail
-            </Label>
-            <Switch
-              id="notifyByEmail"
-              checked={notifyByEmail ?? true}
-              disabled={notifyByEmail === null}
-              onCheckedChange={onToggleEmails}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="pixel-box bg-card border-destructive/40 flex flex-col">
-        <CardHeader>
-          <CardTitle className="font-sans uppercase tracking-wide text-destructive">
-            Konto löschen
-          </CardTitle>
-          <CardDescription>
-            Dieser Schritt ist endgültig. Alle Submissions, Achievements und Rankings werden entfernt.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-1 flex-col">
-          <form className="flex flex-1 flex-col space-y-4" onSubmit={onDeleteAccount}>
-            <div className="space-y-2">
-              <Label htmlFor="deleteConfirmText">Zur Bestätigung KONTO LÖSCHEN eingeben</Label>
-              <Input
-                id="deleteConfirmText"
-                value={deleteConfirmText}
-                onChange={(e) => setDeleteConfirmText(e.target.value)}
-                className="bg-background"
-                placeholder="KONTO LÖSCHEN"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="deletePassword">Aktuelles Passwort</Label>
-              <Input
-                id="deletePassword"
-                type="password"
-                value={deletePassword}
-                onChange={(e) => setDeletePassword(e.target.value)}
-                className="bg-background"
-                placeholder="Bei OAuth ohne Passwort ggf. leer lassen"
-              />
-            </div>
-            <Button
-              type="submit"
-              variant="destructive"
-              className="mt-auto w-full"
-              disabled={deletingAccount}
+    <div className="grid items-start gap-6 lg:grid-cols-[15rem_1fr]">
+      {/* Stacked above the panel on small screens, beside it from `lg` on. A scrolling row
+          was the alternative and pushed the active entry out of sight on a phone. */}
+      <nav aria-label="Bereiche" className="flex flex-col gap-2">
+        {SECTIONS.map((entry) => {
+          const active = section === entry.id;
+          return (
+            <button
+              key={entry.id}
+              type="button"
+              aria-current={active ? "page" : undefined}
+              onClick={() => setSection(entry.id)}
+              className={cn(
+                "flex w-full items-center gap-2 border-2 px-4 py-2.5 text-left text-lg uppercase tracking-wider transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                active
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary hover:text-foreground",
+              )}
             >
-              {deletingAccount ? "Löscht..." : "Konto endgültig löschen"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <entry.icon className="h-5 w-5 shrink-0" />
+              {entry.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {section === "notifications" && (
+        <Card className="pixel-box bg-card">
+          <CardHeader>
+            <CardTitle className="font-sans uppercase tracking-wide">
+              Benachrichtigungen
+            </CardTitle>
+            <CardDescription>
+              Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in
+              der Glocke im Kopfbereich. Zusätzlich per E-Mail:
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4 border-2 border-border bg-background px-4 py-3">
+              <Label htmlFor="notifyByEmail" className="text-lg">
+                Benachrichtigungen per E-Mail
+              </Label>
+              <Switch
+                id="notifyByEmail"
+                checked={notifyByEmail ?? true}
+                disabled={notifyByEmail === null}
+                onCheckedChange={onToggleEmails}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {section === "security" && (
+        <Card className="pixel-box bg-card">
+          <CardHeader>
+            <CardTitle className="font-sans uppercase tracking-wide">Passwort ändern</CardTitle>
+            <CardDescription>
+              Wenn dein Konto bereits ein Passwort hat, gib zuerst dein aktuelles Passwort ein.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="max-w-md space-y-4" onSubmit={onChangePassword}>
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="bg-background"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Neues Passwort</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="bg-background"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Neues Passwort wiederholen</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="bg-background"
+                />
+              </div>
+              <Button type="submit" disabled={changingPassword}>
+                {changingPassword ? "Speichert..." : "Passwort speichern"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {section === "account" && (
+        <Card className="pixel-box border-destructive/40 bg-card">
+          <CardHeader>
+            <CardTitle className="font-sans uppercase tracking-wide text-destructive">
+              Konto löschen
+            </CardTitle>
+            <CardDescription>
+              Dieser Schritt ist endgültig. Alle Submissions, Achievements und Rankings werden entfernt.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="max-w-md space-y-4" onSubmit={onDeleteAccount}>
+              <div className="space-y-2">
+                <Label htmlFor="deleteConfirmText">Zur Bestätigung KONTO LÖSCHEN eingeben</Label>
+                <Input
+                  id="deleteConfirmText"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  className="bg-background"
+                  placeholder="KONTO LÖSCHEN"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="deletePassword">Aktuelles Passwort</Label>
+                <Input
+                  id="deletePassword"
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  className="bg-background"
+                  placeholder="Bei OAuth ohne Passwort ggf. leer lassen"
+                />
+              </div>
+              <Button type="submit" variant="destructive" disabled={deletingAccount}>
+                {deletingAccount ? "Löscht..." : "Konto endgültig löschen"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
