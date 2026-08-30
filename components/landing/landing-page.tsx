@@ -20,7 +20,11 @@ export function LandingPage({
   todaysChallengeTitle: string | null;
 }) {
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground">
+    // `[&+footer]:mt-0`: the footer keeps every other page off its own content with a top
+    // margin, but here the last thing on the page is the artwork, whose bottom row is meant
+    // to touch the footer border. The landing root is the footer's immediate sibling, so it
+    // can cancel that margin without the footer knowing which page it sits under.
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground [&+footer]:mt-0">
       <LandingNavbar />
       <main>
         <LandingHero todaysChallengeTitle={todaysChallengeTitle} />
