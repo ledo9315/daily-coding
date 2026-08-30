@@ -68,9 +68,9 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
               placeholder="deine@email.de"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-background pl-9"
+              className="pl-9"
             />
-            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
         <div className="space-y-2">
@@ -89,9 +89,9 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-background pl-9"
+              className="pl-9"
             />
-            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
 

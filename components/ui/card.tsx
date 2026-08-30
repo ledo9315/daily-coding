@@ -22,7 +22,10 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        // `mb-6` by default: the header carried no space to the content, so every card that
+        // has both glued its description to the first field. `last:mb-0` keeps header-only
+        // cards from ending in dead space.
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 mb-6 last:mb-0 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
         className,
       )}
       {...props}

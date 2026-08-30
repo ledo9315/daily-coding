@@ -125,9 +125,9 @@ export function RegisterForm({
             minLength={2}
             maxLength={DISPLAY_NAME_MAX_LENGTH}
             aria-describedby="name-requirements"
-            className="bg-background pl-9"
+            className="pl-9"
           />
-          <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
         <p id="name-requirements" className="text-xs text-muted-foreground">
           Mindestens zwei Buchstaben oder Zahlen, maximal {DISPLAY_NAME_MAX_LENGTH} Zeichen.
@@ -143,9 +143,9 @@ export function RegisterForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             
-            className="bg-background pl-9"
+            className="pl-9"
           />
-          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
       <div className="space-y-2">
@@ -158,9 +158,9 @@ export function RegisterForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
-            className="bg-background pl-9"
+            className="pl-9"
           />
-          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
 
