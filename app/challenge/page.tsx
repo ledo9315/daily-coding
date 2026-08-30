@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -454,19 +455,41 @@ export default function ChallengePage() {
               submittedAt={submittedAtLabel}
             />
 
-            <Button
-              size="lg"
-              className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-              onClick={handleSubmit}
-              disabled={!language || isSubmitting}
-            >
-              <ArrowRight className="h-4 w-4" fill="currentColor" />
-              {isSubmitting
-                ? "Wird gesendet…"
-                : submitOutcome === "none"
-                  ? "Final abgeben"
-                  : "Erneut abgeben"}
-            </Button>
+            {/* The two together, tighter than the column's rhythm: they are one decision. */}
+            <div className="space-y-3">
+              <Button
+                size="lg"
+                className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={handleSubmit}
+                disabled={!language || isSubmitting}
+              >
+                <ArrowRight className="h-4 w-4" fill="currentColor" />
+                {isSubmitting
+                  ? "Wird gesendet…"
+                  : submitOutcome === "none"
+                    ? "Final abgeben"
+                    : "Erneut abgeben"}
+              </Button>
+
+              {/* Only after a passing submission: the result page needs one, and a repeat
+                  submission keeps the user in the editor (see the toast above), so without
+                  this the way back to the discussion was that toast alone. */}
+              {submitOutcome === "success" ? (
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  // The outline variant's hairline disappears on this ground, so the border
+                  // carries the button here. Spelled with `dark:` as well: the app forces the
+                  // dark theme, and the variant's own `dark:` rules would otherwise win.
+                  className="w-full gap-2 rounded-none border-2 border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-transparent dark:hover:border-primary dark:hover:bg-primary/10 dark:hover:text-primary"
+                >
+                  {/* No icon: the arrow of the button above it is the one that means
+                      „weiter", and twice in a row it read as a list rather than as a choice. */}
+                  <Link href={challengeResultPath(challenge.id)}>Zum Ergebnis</Link>
+                </Button>
+              ) : null}
+            </div>
 
             {isMaximized ? null : runOutcome}
           </div>
