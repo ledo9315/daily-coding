@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { LandingNavbar } from "@/components/landing/navbar";
-import { LandingFooter } from "@/components/landing/footer";
 import { PageAmbience } from "@/components/page-ambience";
 import { MarkChangelogSeen } from "@/components/changelog-link";
 import { CHANGELOG } from "@/lib/changelog";
@@ -66,7 +65,6 @@ export default function ChangelogPage() {
           </ol>
         )}
       </main>
-      <LandingFooter />
     </div>
   );
 }

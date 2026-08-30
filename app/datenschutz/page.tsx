@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { LandingNavbar } from "@/components/landing/navbar";
-import { LandingFooter } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
   title: "Datenschutzerklärung",
@@ -229,7 +228,6 @@ export default function DatenschutzPage() {
           </section>
         </div>
       </main>
-      <LandingFooter />
     </div>
   );
 }

@@ -7,15 +7,18 @@ const SUPPORT_EMAIL = "leonid.domahalskyy@icloud.com";
 const footerLinkClass = "transition-colors hover:text-primary focus-visible:text-primary";
 
 /**
- * Brand column plus two labelled link groups, over a separated bottom bar.
+ * Brand column plus two labelled link groups, over a separated bottom bar. Rendered once by
+ * the root layout, so Impressum and Datenschutz are one click away from every page (#265).
  *
  * The four-column grid this replaces was two thirds placeholder links (Über uns, Blog, Karriere,
  * Kontakt, all `href="#"`), so it was cut down to a single row. The row read like an afterthought;
  * the groups below carry only links that exist, which is what the placeholders never did.
  */
-export function LandingFooter() {
+export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-card text-card-foreground">
+    // `mt-16` because the footer now follows arbitrary page content: on the challenge page
+    // the editor ended and the footer began, with barely a line between them.
+    <footer className="mt-16 border-t border-border bg-card text-card-foreground sm:mt-24">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
