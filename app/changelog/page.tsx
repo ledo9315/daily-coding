@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingFooter } from "@/components/landing/footer";
 import { PageAmbience } from "@/components/page-ambience";
+import { MarkChangelogSeen } from "@/components/changelog-link";
 import { CHANGELOG } from "@/lib/changelog";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function ChangelogPage() {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground font-sans">
       <PageAmbience />
+      <MarkChangelogSeen />
       <LandingNavbar />
       <main className="relative mx-auto w-full max-w-3xl flex-1 px-4 pt-32 pb-16 sm:px-6 lg:px-8">
         <h1 className="mb-2 font-pixel text-3xl uppercase tracking-tight">Changelog</h1>
