@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Notification as Bell } from "@nsmr/pixelart-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
   markNotificationsRead,
   type NotificationItem,
 } from "@/lib/api";
+import { useMenuFocusReturn } from "@/hooks/use-menu-focus-return";
 import { avatarImageSrc } from "@/lib/avatar-src";
 import { formatDate } from "@/lib/format";
 
@@ -27,8 +28,7 @@ export function NotificationBell() {
   const pathname = usePathname();
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unread, setUnread] = useState(0);
-  /** Which input closed the menu; see `onCloseAutoFocus` below. */
-  const usedPointer = useRef(false);
+  const { triggerProps, contentProps } = useMenuFocusReturn();
 
   const load = useCallback(() => {
     getNotifications(SHOWN)
@@ -61,8 +61,7 @@ export function NotificationBell() {
           aria-label={
             unread > 0 ? `Benachrichtigungen, ${unread} ungelesen` : "Benachrichtigungen"
           }
-          onPointerDown={() => (usedPointer.current = true)}
-          onKeyDown={() => (usedPointer.current = false)}
+          {...triggerProps}
           /* Shaped like the streak chip next to it, and coloured like it once there is
              something to report - a lone grey square read as an unfinished button.
              `hover:text-*` is spelled out because the ghost variant's `accent-foreground`
@@ -90,14 +89,7 @@ export function NotificationBell() {
         className="w-80 max-w-[calc(100vw-2rem)] border-2 border-border rounded-none"
         align="end"
         forceMount
-        /**
-         * Radix hands focus back to the trigger when the menu closes, which left the focus
-         * border standing after a click. Kept for the keyboard, where losing the place would
-         * be worse than a visible ring.
-         */
-        onCloseAutoFocus={(event) => {
-          if (usedPointer.current) event.preventDefault();
-        }}
+        {...contentProps}
       >
         <p className="border-b-2 border-border p-3 font-sans text-sm uppercase tracking-wider text-muted-foreground">
           Benachrichtigungen
@@ -112,10 +104,7 @@ export function NotificationBell() {
             <DropdownMenuItem
               key={item.id}
               asChild
-              /* The menu item's default highlight is `bg-primary`, and the coloured spans
-                 inside keep their own text colour on top of it - green on green, unreadable.
-                 A grey row is what the rest of the header uses anyway. */
-              className="rounded-none whitespace-normal items-start gap-3 py-3 focus:bg-secondary focus:text-foreground"
+              className="rounded-none whitespace-normal items-start gap-3 py-3"
             >
               <Link href={item.href} className="cursor-pointer">
                 <Avatar className="h-8 w-8 shrink-0 border-2 border-border bg-card">
