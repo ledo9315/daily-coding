@@ -3,9 +3,11 @@
 import type { CodeLanguageId, StarterCodesMap } from "@/lib/challenge-languages";
 import type { MonthlyActivity } from "@/lib/monthly-activity";
 import type { ChallengeHint } from "@/lib/challenge-hints";
+import type { NotificationKindId } from "@/lib/notification-view";
 
 export type { CodeLanguageId, StarterCodesMap };
 export type { ChallengeHint };
+export type { NotificationKindId };
 export type { MonthlyActivity, MonthlyActivityDayCell } from "@/lib/monthly-activity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -241,6 +243,22 @@ export interface SubmissionCommentsPage {
   nextCursor: string | null;
 }
 
+export interface NotificationItem {
+  id: string;
+  kind: NotificationKindId;
+  /** Ready-made German sentence; the client only renders it. */
+  text: string;
+  actor: { name: string; initials: string; avatar: string };
+  href: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface NotificationsPage {
+  items: NotificationItem[];
+  unreadCount: number;
+}
+
 export interface CommunityFeedPage {
   items: CommunityFeedItem[];
   nextCursor: string | null;
@@ -443,5 +461,28 @@ export function deleteSubmissionComment(
 ): Promise<{ success: true }> {
   return apiFetch(`/api/submission/${submissionId}/comments/${commentId}`, {
     method: "DELETE",
+  });
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+export function getNotifications(limit = 10): Promise<NotificationsPage> {
+  return apiFetch<NotificationsPage>(`/api/notifications?limit=${limit}`);
+}
+
+export function markNotificationsRead(): Promise<{ read: number }> {
+  return apiFetch("/api/notifications/read", { method: "POST" });
+}
+
+export function getEmailNotificationSetting(): Promise<{ notifyByEmail: boolean }> {
+  return apiFetch("/api/user/notifications");
+}
+
+export function setEmailNotificationSetting(
+  notifyByEmail: boolean
+): Promise<{ notifyByEmail: boolean }> {
+  return apiFetch("/api/user/notifications", {
+    method: "PATCH",
+    body: JSON.stringify({ notifyByEmail }),
   });
 }

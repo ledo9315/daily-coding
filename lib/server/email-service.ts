@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { renderEmail, type EmailContent } from "@/lib/server/email-template";
+import { notificationText, type NotificationKindId } from "@/lib/notification-view";
 
 function getResend(): Resend {
   const apiKey = process.env.RESEND_API_KEY;
@@ -70,5 +71,26 @@ export async function sendAccountDeletionEmail(to: string, name: string): Promis
     ],
     footer:
       "Wenn du das nicht selbst veranlasst hast, melde dich bitte sofort bei uns. Diese Adresse kann jederzeit für ein neues Konto verwendet werden.",
+  });
+}
+
+export async function sendSolutionActivityEmail(
+  to: string,
+  activity: {
+    actorName: string;
+    kind: NotificationKindId;
+    challengeTitle: string;
+    /** App-relative link to the solution; the absolute URL is built here. */
+    path: string;
+  }
+): Promise<void> {
+  await send(to, "Neue Aktivität an deiner Lösung – Daily Coding", {
+    heading: "Aktivität an deiner Lösung",
+    lines: [
+      notificationText(activity.kind, activity.actorName, activity.challengeTitle),
+    ],
+    action: { label: "Zur Lösung", url: `${getAppUrl()}${activity.path}` },
+    footer:
+      "Diese Benachrichtigungen kannst du in deinen Einstellungen jederzeit abschalten.",
   });
 }

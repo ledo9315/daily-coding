@@ -14,6 +14,7 @@ const mockGetSessionUserId = vi.fn();
 const mockHasSolvedChallenge = vi.fn();
 const mockCheckRateLimit = vi.fn();
 const mockGetLifetimePointsByUserIds = vi.fn();
+const mockNotify = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -37,6 +38,10 @@ vi.mock("@/lib/server/solution-access", () => ({
 
 vi.mock("@/lib/server/rate-limiter", () => ({
   checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
+}));
+
+vi.mock("@/lib/server/notifications", () => ({
+  notifySolutionActivity: (...args: unknown[]) => mockNotify(...args),
 }));
 
 vi.mock("@/lib/server/user-points", () => ({
@@ -65,8 +70,10 @@ beforeEach(() => {
     userId: "user-alice",
     challengeId: "challenge-1",
     status: "completed",
+    codeHash: "d".repeat(64),
   });
   mockHasSolvedChallenge.mockResolvedValue(true);
+  mockNotify.mockResolvedValue(undefined);
   mockCheckRateLimit.mockResolvedValue(true);
   mockCommentFindMany.mockResolvedValue([]);
   mockCommentCreate.mockResolvedValue(makeRow({ userId: "user-me" }));
@@ -263,6 +270,37 @@ describe("POST /api/submission/[id]/comments", () => {
  * `nameKey` - into a handler that hands out foreign comments. This pins the narrower
  * query so a later `...comment.user` spread cannot turn it into a leak.
  */
+describe("notifications for a new comment", () => {
+  it("notifies the authors of the commented code, not the submission owner", async () => {
+    await post({ body: "Schöne Lösung" });
+    expect(mockNotify).toHaveBeenCalledWith({
+      challengeId: "challenge-1",
+      codeHash: "d".repeat(64),
+      actorId: "user-me",
+      kind: "comment",
+    });
+  });
+
+  it("skips legacy rows without a code hash", async () => {
+    mockSubmissionFindUnique.mockResolvedValue({
+      id: "sub-1",
+      userId: "user-alice",
+      challengeId: "challenge-1",
+      status: "completed",
+      codeHash: null,
+    });
+    await post({ body: "Schöne Lösung" });
+    expect(mockNotify).not.toHaveBeenCalled();
+  });
+
+  /** The comment row is written before the mail; a failing mail must not swallow it. */
+  it("still answers 201 when the notification fails", async () => {
+    mockNotify.mockRejectedValue(new Error("resend down"));
+    const res = await post({ body: "Schöne Lösung" });
+    expect(res.status).toBe(201);
+  });
+});
+
 describe("the comments query", () => {
   it("selects only the three user fields the response uses", async () => {
     await get();

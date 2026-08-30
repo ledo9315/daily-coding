@@ -24,6 +24,7 @@ import {
 import { User, Tournament, Zap, Sliders, Logout } from "@nsmr/pixelart-react";
 import { NAV_ITEMS } from "@/lib/navigation";
 import { MobileNav } from "@/components/mobile-nav";
+import { NotificationBell } from "@/components/notification-bell";
 
 
 export function Header() {
@@ -174,6 +175,8 @@ export function Header() {
                 </span>
               </div>
 
+              <NotificationBell />
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -252,6 +255,7 @@ export function Header() {
                 className="h-12 w-[114px] animate-pulse border-2 border-orange-500/20 bg-muted/40"
                 aria-hidden
               />
+              <div className="h-12 w-12 animate-pulse border-2 border-border bg-muted/40" aria-hidden />
               <div className="h-12 w-12 animate-pulse border-2 border-border bg-muted/40" aria-hidden />
               <span className="sr-only">Anmeldung wird geprüft</span>
             </>

@@ -5,6 +5,7 @@ import { normalizeCommentBody } from "@/lib/comment-policy";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
+import { notifySolutionActivity } from "@/lib/server/notifications";
 import { calculateLevel } from "@/lib/level";
 
 const DEFAULT_LIMIT = 10;
@@ -63,8 +64,8 @@ function parseLimit(rawLimit: string | null): number {
  * out what the gate on the solutions protects.
  */
 async function authorize(submissionId: string): Promise<
-  | { error: NextResponse; userId?: never; challengeId?: never }
-  | { error?: never; userId: string; challengeId: string }
+  | { error: NextResponse; userId?: never; challengeId?: never; codeHash?: never }
+  | { error?: never; userId: string; challengeId: string; codeHash: string | null }
 > {
   const session = await getSessionUserId();
   if (session.error) return { error: session.error };
@@ -72,7 +73,7 @@ async function authorize(submissionId: string): Promise<
 
   const submission = await prisma.submission.findUnique({
     where: { id: submissionId },
-    select: { id: true, userId: true, challengeId: true, status: true },
+    select: { id: true, userId: true, challengeId: true, status: true, codeHash: true },
   });
 
   if (!submission || submission.status !== "completed") {
@@ -93,7 +94,11 @@ async function authorize(submissionId: string): Promise<
     };
   }
 
-  return { userId, challengeId: submission.challengeId };
+  return {
+    userId,
+    challengeId: submission.challengeId,
+    codeHash: submission.codeHash,
+  };
 }
 
 export async function GET(
@@ -138,7 +143,7 @@ export async function POST(
 
   const access = await authorize(submissionId);
   if (access.error) return access.error;
-  const { userId } = access;
+  const { userId, challengeId, codeHash } = access;
 
   if (!(await checkRateLimit(`comment-create:${userId}`, 10, 60_000))) {
     return NextResponse.json(
@@ -159,6 +164,21 @@ export async function POST(
     data: { submissionId, userId, body: normalized.body },
     select: commentSelect,
   });
+
+  // `codeHash` is null only for rows written before the column existed; those solutions
+  // have no group to notify.
+  if (codeHash) {
+    try {
+      await notifySolutionActivity({
+        challengeId,
+        codeHash,
+        actorId: userId,
+        kind: "comment",
+      });
+    } catch {
+      /* The comment is written; a failing mail must not undo it. */
+    }
+  }
 
   const levels = await levelsOf([userId]);
 

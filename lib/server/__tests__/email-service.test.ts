@@ -20,6 +20,7 @@ import {
   sendPasswordResetEmail,
   sendWelcomeEmail,
   sendAccountDeletionEmail,
+  sendSolutionActivityEmail,
 } from "@/lib/server/email-service";
 
 beforeEach(() => vi.clearAllMocks());
@@ -106,5 +107,26 @@ describe("every mail", () => {
     const sent = mockSend.mock.calls[0][0] as { html: string; subject: string };
     expect(sent.html).not.toContain("<b>Max</b>");
     expect(sent.subject).toContain("gelöscht");
+  });
+});
+
+describe("sendSolutionActivityEmail", () => {
+  it("links to the solution the activity happened at", async () => {
+    mockSend.mockResolvedValueOnce({ data: { id: "e5" }, error: null });
+    await sendSolutionActivityEmail("author@test.com", {
+      actorName: "Watson",
+      kind: "clever",
+      challengeTitle: "Two Sum",
+      path: "/challenge/chal-1/loesungen?loesung=abc",
+    });
+    expect(mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "author@test.com",
+        html: expect.stringContaining(
+          "https://app.example.com/challenge/chal-1/loesungen?loesung=abc"
+        ),
+      })
+    );
+    expect(mockSend.mock.calls[0][0].text).toContain("Watson");
   });
 });

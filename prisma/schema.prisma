@@ -49,6 +49,13 @@ enum SolutionVoteKind {
   clever
 }
 
+/// What happened at a solution: a comment, or one of the two ways it can be praised (#257).
+enum NotificationKind {
+  comment
+  best_practices
+  clever
+}
+
 enum CodeLanguage {
   javascript
   typescript
@@ -79,6 +86,9 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   role         UserRole     @default(user)
 
+  /// Opt-out for activity mails; the in-app bell is not affected by it (#257).
+  notifyByEmail Boolean     @default(true)
+
   streak       Int          @default(0)
   streakRecord Int          @default(0)
   submissions    Submission[]
@@ -86,6 +96,8 @@ model User {
   solutionVotes  SolutionVote[]
   achievements   UserAchievement[]
   rankingEntries RankingEntry[]
+  notifications     Notification[] @relation("NotificationRecipient")
+  notificationsSent Notification[] @relation("NotificationActor")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -147,6 +159,7 @@ model Challenge {
   date        DateTime?    @unique
   submissions Submission[]
   solutionVotes SolutionVote[]
+  notifications Notification[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -224,6 +237,29 @@ model Comment {
   updatedAt    DateTime   @updatedAt
 
   @@index([submissionId, createdAt])
+}
+
+/// Activity at one solution, addressed to one of its authors (#257).
+///
+/// Points at `(challengeId, codeHash)` for the same reason `SolutionVote` does: the thread and
+/// the votes belong to a piece of code, not to the submission row that happens to carry them.
+/// Nothing of the message is stored - the text is built from `kind` and the actor when read,
+/// so a renamed user is not quoted under the old name forever.
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  actorId     String
+  kind        NotificationKind
+  challengeId String
+  codeHash    String
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+
+  user      User      @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor     User      @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 /** Shared across serverless instances; keys are SHA-256 hashes, never raw emails or IPs. */
