@@ -25,6 +25,7 @@ import { User, Tournament, Zap, Sliders, Logout } from "@nsmr/pixelart-react";
 import { NAV_ITEMS } from "@/lib/navigation";
 import { MobileNav } from "@/components/mobile-nav";
 import { NotificationBell } from "@/components/notification-bell";
+import { useMenuFocusReturn } from "@/hooks/use-menu-focus-return";
 
 
 export function Header() {
@@ -39,6 +40,7 @@ export function Header() {
   const [streak, setStreak] = useState<number | null>(() => readHeaderStats().streak);
   const [level, setLevel] = useState<number | null>(() => readHeaderStats().level);
   const [isAdminFromDb, setIsAdminFromDb] = useState(() => readHeaderStats().isAdmin);
+  const { triggerProps, contentProps } = useMenuFocusReturn();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -181,9 +183,11 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
+                    {...triggerProps}
                     // Cancels the ghost variant's orange `--accent` tint. Same modifiers on purpose:
                     // only then does tailwind-merge drop it instead of losing on specificity.
-                    className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-card dark:hover:bg-card cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                    // `focus-visible:border-primary` replaces the base button's blue ring border.
+                    className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-card dark:hover:bg-card cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary outline-none"
                   >
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage src={avatar || undefined} alt={displayName} />
@@ -197,6 +201,7 @@ export function Header() {
                   className="w-56 border-2 border-border rounded-none"
                   align="end"
                   forceMount
+                  {...contentProps}
                 >
                   <div className="flex items-center justify-start gap-2 p-3 border-b-2 border-border">
                     <div className="flex flex-col space-y-1 leading-none">
