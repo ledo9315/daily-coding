@@ -34,21 +34,32 @@ export function SolutionCard({
   group,
   ownCode,
   ownLanguage,
+  focused = false,
 }: {
   challengeId: string;
   group: ChallengeSolutionGroup;
   ownCode: string;
   ownLanguage: CodeLanguageId;
+  /** Target of a notification link: highlighted, with the discussion already open. */
+  focused?: boolean;
 }) {
   const [comparing, setComparing] = useState(false);
-  const [discussing, setDiscussing] = useState(false);
+  const [discussing, setDiscussing] = useState(focused);
   const [commentCount, setCommentCount] = useState(group.commentCount);
   const { authors, submissionCount } = group;
   const unnamed = submissionCount - authors.length;
 
   return (
     <article
-      className={`border-2 bg-card ${group.own ? "border-primary/50" : "border-border"}`}
+      id={`loesung-${group.codeHash}`}
+      // scroll-mt keeps the sticky header from covering the card the link jumped to.
+      className={`scroll-mt-24 border-2 bg-card ${
+        focused
+          ? "border-primary shadow-[0_0_0_2px_var(--primary)]"
+          : group.own
+            ? "border-primary/50"
+            : "border-border"
+      }`}
     >
       <div className="flex flex-col gap-4 p-4 sm:flex-row">
         <div className="flex shrink-0 -space-x-3">

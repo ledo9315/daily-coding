@@ -36,7 +36,7 @@ export default async function SettingsPage() {
             Einstellungen
           </h1>
           <p className="text-muted-foreground uppercase tracking-wider text-sm">
-            Passwort ändern oder Konto löschen
+            Benachrichtigungen, Passwort und Konto
           </p>
         </div>
 

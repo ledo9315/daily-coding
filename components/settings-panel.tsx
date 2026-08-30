@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { getEmailNotificationSetting, setEmailNotificationSetting } from "@/lib/api";
 
 export function SettingsPanel() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -14,9 +16,32 @@ export function SettingsPanel() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
 
+  // null until loaded: rendering the switch as "off" first would tell the user their mails
+  // are disabled for a moment, which is the opposite of the default.
+  const [notifyByEmail, setNotifyByEmail] = useState<boolean | null>(null);
+
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
   const [deletingAccount, setDeletingAccount] = useState(false);
+
+  useEffect(() => {
+    getEmailNotificationSetting()
+      .then((data) => setNotifyByEmail(data.notifyByEmail))
+      .catch(() => {});
+  }, []);
+
+  async function onToggleEmails(next: boolean) {
+    const previous = notifyByEmail;
+    setNotifyByEmail(next);
+    try {
+      await setEmailNotificationSetting(next);
+    } catch (error) {
+      setNotifyByEmail(previous);
+      toast.error(
+        error instanceof Error ? error.message : "Einstellung konnte nicht gespeichert werden."
+      );
+    }
+  }
 
   async function onChangePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -135,6 +160,31 @@ export function SettingsPanel() {
               {changingPassword ? "Speichert..." : "Passwort speichern"}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card className="pixel-box bg-card">
+        <CardHeader>
+          <CardTitle className="font-sans uppercase tracking-wide">
+            Benachrichtigungen
+          </CardTitle>
+          <CardDescription>
+            Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in der
+            Glocke im Kopfbereich. Zusätzlich per E-Mail:
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between gap-4">
+            <Label htmlFor="notifyByEmail" className="text-lg">
+              Benachrichtigungen per E-Mail
+            </Label>
+            <Switch
+              id="notifyByEmail"
+              checked={notifyByEmail ?? true}
+              disabled={notifyByEmail === null}
+              onCheckedChange={onToggleEmails}
+            />
+          </div>
         </CardContent>
       </Card>
 

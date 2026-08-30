@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { SolutionCard } from "@/components/challenge-result/solution-card";
 import type { CodeLanguageId } from "@/lib/challenge-languages";
@@ -30,6 +31,12 @@ export function SolutionList({
   ownCode: string;
   ownLanguage: CodeLanguageId;
 }) {
+  /**
+   * Set by a notification link. The list starts on „Meine" then: the wanted solution is one
+   * of the user's own and there are few of those, so it is on the first page - without the
+   * filter the list would have to page blindly until the hash shows up.
+   */
+  const focusHash = useSearchParams().get("loesung");
   const [groups, setGroups] = useState<ChallengeSolutionGroup[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -38,8 +45,9 @@ export function SolutionList({
   // Client state, not the URL: the list loads its pages client-side anyway, and putting the
   // choice in the URL would re-render the whole server component for a reordering.
   const [sort, setSort] = useState<SolutionSort>("newest");
-  const [filter, setFilter] = useState<SolutionFilter>("all");
+  const [filter, setFilter] = useState<SolutionFilter>(focusHash ? "mine" : "all");
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const scrolledToFocus = useRef(false);
 
   const loadPage = useCallback(
     async (cursor: string | null) => {
@@ -110,6 +118,17 @@ export function SolutionList({
     obs.observe(el);
     return () => obs.disconnect();
   }, [onLoadMore]);
+
+  // Once per visit: scrolling again after „Mehr laden" would yank the reader back up.
+  useEffect(() => {
+    if (!focusHash || scrolledToFocus.current || initialLoading) return;
+    const card = document.getElementById(`loesung-${focusHash}`);
+    if (!card) return;
+    scrolledToFocus.current = true;
+    // Jump, not glide: the link promises a place, and a smooth scroll of a whole page
+    // length only delays it (and does nothing at all in a browser that reduces motion).
+    card.scrollIntoView({ block: "start" });
+  }, [focusHash, initialLoading, groups]);
 
   return (
     <section className="mt-12">
@@ -186,6 +205,7 @@ export function SolutionList({
                 group={group}
                 ownCode={ownCode}
                 ownLanguage={ownLanguage}
+                focused={group.codeHash === focusHash}
               />
             ))}
           </div>

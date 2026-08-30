@@ -4,6 +4,7 @@ import { getSessionUserId } from "@/lib/auth-session";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
 import { parseVoteKind, readSolutionVotes } from "@/lib/server/solution-votes";
+import { forgetSolutionVote, notifySolutionActivity } from "@/lib/server/notifications";
 
 /** Toggles one vote. POST rather than PUT/DELETE: the client never knows the current state. */
 export async function POST(
@@ -64,6 +65,19 @@ export async function POST(
   });
   if (removed.count === 0) {
     await prisma.solutionVote.create({ data: { challengeId, codeHash, userId, kind } });
+  }
+
+  // The vote itself is cast at this point; a failing notification or mail must not turn
+  // that into an error the voter sees.
+  try {
+    const activity = { challengeId, codeHash, actorId: userId, kind };
+    if (removed.count === 0) {
+      await notifySolutionActivity(activity);
+    } else {
+      await forgetSolutionVote(activity);
+    }
+  } catch {
+    /* Notification is a side effect of the vote, not part of it. */
   }
 
   const tallies = await readSolutionVotes(challengeId, codeHash, userId);

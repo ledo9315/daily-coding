@@ -12,6 +12,8 @@ const mockVoteFindMany = vi.fn();
 const mockGetSessionUserId = vi.fn();
 const mockHasSolvedChallenge = vi.fn();
 const mockCheckRateLimit = vi.fn();
+const mockNotify = vi.fn();
+const mockForget = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -39,6 +41,11 @@ vi.mock("@/lib/server/rate-limiter", () => ({
   checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
 }));
 
+vi.mock("@/lib/server/notifications", () => ({
+  notifySolutionActivity: (...args: unknown[]) => mockNotify(...args),
+  forgetSolutionVote: (...args: unknown[]) => mockForget(...args),
+}));
+
 const HASH = "a".repeat(64);
 
 /** The own-row check runs before the existence check; both use `submission.findFirst`. */
@@ -59,6 +66,8 @@ beforeEach(() => {
   mockVoteCreate.mockResolvedValue({});
   mockVoteGroupBy.mockResolvedValue([]);
   mockVoteFindMany.mockResolvedValue([]);
+  mockNotify.mockResolvedValue(undefined);
+  mockForget.mockResolvedValue(undefined);
   submissionAnswers();
 });
 
@@ -165,6 +174,35 @@ describe("POST /api/challenge/[id]/votes", () => {
     const { data } = mockVoteCreate.mock.calls[0][0] as { data: Record<string, unknown> };
     expect(data).not.toHaveProperty("submissionId");
     expect(data.codeHash).toBe(HASH);
+  });
+
+  it("notifies the authors of the solution about a cast vote", async () => {
+    await call();
+    expect(mockNotify).toHaveBeenCalledWith({
+      challengeId: "challenge-1",
+      codeHash: HASH,
+      actorId: "user-me",
+      kind: "clever",
+    });
+  });
+
+  it("withdraws the notification together with the vote", async () => {
+    mockVoteDeleteMany.mockResolvedValue({ count: 1 });
+    await call();
+    expect(mockNotify).not.toHaveBeenCalled();
+    expect(mockForget).toHaveBeenCalledWith({
+      challengeId: "challenge-1",
+      codeHash: HASH,
+      actorId: "user-me",
+      kind: "clever",
+    });
+  });
+
+  /** The vote is already written when the mail goes out; a dead mail server must not undo it. */
+  it("still answers 200 when the notification fails", async () => {
+    mockNotify.mockRejectedValue(new Error("resend down"));
+    expect((await call()).status).toBe(200);
+    expect(mockVoteCreate).toHaveBeenCalled();
   });
 
   it("keeps both kinds independent", async () => {

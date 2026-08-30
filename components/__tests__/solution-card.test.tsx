@@ -23,13 +23,14 @@ function makeGroup(
   };
 }
 
-function render(group: ChallengeSolutionGroup) {
+function render(group: ChallengeSolutionGroup, focused = false) {
   return renderToStaticMarkup(
     <SolutionCard
       challengeId="ch-1"
       group={group}
       ownCode="const answer = 1;"
       ownLanguage="javascript"
+      focused={focused}
     />
   );
 }
@@ -115,5 +116,17 @@ describe("SolutionCard", () => {
     const html = render(makeGroup({ code: "<script>alert(1)</script>" }));
     expect(html).not.toContain("<script>");
     expect(html).toContain("&lt;script&gt;");
+  });
+});
+
+describe("a card a notification links to", () => {
+  it("carries the anchor the link scrolls to", () => {
+    expect(render(makeGroup())).toContain('id="loesung-hash-a"');
+  });
+
+  it("has its discussion open, since that is what the notification was about", () => {
+    const focused = render(makeGroup(), true);
+    expect(focused).toContain('aria-expanded="true"');
+    expect(render(makeGroup())).not.toContain('aria-expanded="true"');
   });
 });
