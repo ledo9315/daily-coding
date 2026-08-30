@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  calculateLevel,
-  nextLevelThreshold,
-  levelTitleDe,
-  levelUpSentenceDe,
-} from "../level";
+import { calculateLevel, nextLevelThreshold } from "../level";
 
 describe("calculateLevel", () => {
   it("returns level 1 for 0 points", () => {
@@ -40,27 +35,6 @@ describe("calculateLevel", () => {
 
   it("never returns level below 1", () => {
     expect(calculateLevel(0)).toBeGreaterThanOrEqual(1);
-  });
-});
-
-describe("levelTitleDe", () => {
-  it("maps level bands to German titles", () => {
-    expect(levelTitleDe(1)).toBe("Einsteiger");
-    expect(levelTitleDe(2)).toBe("Aufsteiger");
-    expect(levelTitleDe(3)).toBe("Aufsteiger");
-    expect(levelTitleDe(4)).toBe("Experte");
-    expect(levelTitleDe(8)).toBe("Legende");
-  });
-
-  it("clamps invalid levels to at least Einsteiger", () => {
-    expect(levelTitleDe(0)).toBe("Einsteiger");
-  });
-});
-
-describe("levelUpSentenceDe", () => {
-  it("includes the tier name in parentheses (not stripped)", () => {
-    expect(levelUpSentenceDe(3)).toBe("hat Level 3 (Aufsteiger) erreicht");
-    expect(levelUpSentenceDe(3)).toMatch(/\([^)]+\)/);
   });
 });
 

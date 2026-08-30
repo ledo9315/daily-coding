@@ -1,7 +1,6 @@
 import type { CommunityFeedItem } from "@/lib/api";
 import type { FeedItemProps } from "@/components/feed-item";
 import { avatarImageSrc } from "@/lib/avatar-src";
-import { levelTitleDe } from "@/lib/level";
 
 export function communityFeedItemToFeedItem(item: CommunityFeedItem): FeedItemProps {
   const baseUser = {
@@ -14,7 +13,7 @@ export function communityFeedItemToFeedItem(item: CommunityFeedItem): FeedItemPr
   if (item.levelUp) {
     const { previousLevel, newLevel } = item.levelUp;
     const title = "Challenge gelöst & Level-Aufstieg";
-    const desc = `hat die Challenge „${item.challenge}“ gelöst (+${item.points} Punkte) und ist von Stufe ${previousLevel} auf Stufe ${newLevel} (${levelTitleDe(newLevel)}) gestiegen`;
+    const desc = `hat die Challenge „${item.challenge}“ gelöst (+${item.points} Punkte) und ist von Stufe ${previousLevel} auf Stufe ${newLevel} gestiegen`;
 
     return {
       user: baseUser,
