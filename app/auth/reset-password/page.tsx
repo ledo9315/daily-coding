@@ -76,9 +76,9 @@ function ResetPasswordForm() {
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
             required
-            className="bg-background pl-9"
+            className="pl-9"
           />
-          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
       <div className="space-y-2">
@@ -91,9 +91,9 @@ function ResetPasswordForm() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             required
-            className="bg-background pl-9"
+            className="pl-9"
           />
-          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
       <Button
