@@ -112,7 +112,10 @@ export function NotificationBell() {
             <DropdownMenuItem
               key={item.id}
               asChild
-              className="rounded-none whitespace-normal items-start gap-3 py-3"
+              /* The menu item's default highlight is `bg-primary`, and the coloured spans
+                 inside keep their own text colour on top of it - green on green, unreadable.
+                 A grey row is what the rest of the header uses anyway. */
+              className="rounded-none whitespace-normal items-start gap-3 py-3 focus:bg-secondary focus:text-foreground"
             >
               <Link href={item.href} className="cursor-pointer">
                 <Avatar className="h-8 w-8 shrink-0 border-2 border-border bg-card">
