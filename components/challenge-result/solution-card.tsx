@@ -40,7 +40,7 @@ export function SolutionCard({
   group: ChallengeSolutionGroup;
   ownCode: string;
   ownLanguage: CodeLanguageId;
-  /** Target of a notification link: highlighted, with the discussion already open. */
+  /** Target of a notification link: scrolled to, with the discussion already open. */
   focused?: boolean;
 }) {
   const [comparing, setComparing] = useState(false);
@@ -52,13 +52,12 @@ export function SolutionCard({
   return (
     <article
       id={`loesung-${group.codeHash}`}
-      // scroll-mt keeps the sticky header from covering the card the link jumped to.
+      // scroll-mt keeps the sticky header from covering the card the link jumped to. No
+      // extra frame for `focused`: the jump plus the open discussion already say which card
+      // was meant, and a second green outline around a card that is often the own one made
+      // the page shout.
       className={`scroll-mt-24 border-2 bg-card ${
-        focused
-          ? "border-primary shadow-[0_0_0_2px_var(--primary)]"
-          : group.own
-            ? "border-primary/50"
-            : "border-border"
+        group.own ? "border-primary/50" : "border-border"
       }`}
     >
       <div className="flex flex-col gap-4 p-4 sm:flex-row">
