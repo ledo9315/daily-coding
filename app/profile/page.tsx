@@ -22,7 +22,7 @@ import {
   Tournament,
   Trophy,
 } from "@nsmr/pixelart-react";
-import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
+import { PageAmbience } from "@/components/page-ambience";
 import { getUserProfileData } from "@/lib/server/profile-data";
 import type { Achievement } from "@/lib/api";
 
@@ -38,19 +38,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <AnimatedFlickeringGrid
-        className="absolute inset-x-0 top-0 z-0 h-[300px] mask-[radial-gradient(300px_circle_at_top,white,transparent)]"
-        squareSize={6}
-        gridGap={1}
-        color="#A371F7"
-        maxOpacity={0.2}
-        flickerChance={0.1}
-      />
-      {/* Ambient Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-15%] right-[-10%] h-200 w-200 bg-chart-5/30 blur-[140px] rounded-full opacity-50 mix-blend-screen" />
-        <div className="absolute bottom-[-15%] left-[-10%] h-175 w-175 bg-chart-5/30 blur-[120px] rounded-full opacity-50 mix-blend-screen" />
-      </div>
+      <PageAmbience />
 
       <Header />
 
@@ -63,10 +51,10 @@ export default async function ProfilePage() {
               name={profile.name}
             />
             <div>
-              <h1 className="text-2xl font-sans font-bold tracking-widest uppercase">
+              <h1 className="text-2xl font-sans font-bold tracking-tight uppercase">
                 {profile.name}
               </h1>
-              <p className="text-muted-foreground uppercase tracking-wider text-sm">
+              <p className="text-muted-foreground uppercase tracking-wide text-sm">
                 {profile.role}
               </p>
               <div className="mt-2 flex items-center gap-3">
