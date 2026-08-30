@@ -13,7 +13,7 @@ function TestIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 describe("dashboard effects", () => {
-  it("uses the animated flickering grid across authenticated app routes", () => {
+  it("draws its ambience from the shared component, not from a copy per route", () => {
     const routes = [
       ["app", "page.tsx"],
       ["app", "challenge", "page.tsx"],
@@ -27,12 +27,17 @@ describe("dashboard effects", () => {
       const source = read(...route);
 
       expect(source, route.join("/")).toContain(
-        'import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid"',
+        'import { PageAmbience } from "@/components/page-ambience"',
       );
-      expect(source, route.join("/")).toContain("<AnimatedFlickeringGrid");
-      expect(source, route.join("/")).toContain("h-[300px]");
+      expect(source, route.join("/")).toContain("<PageAmbience />");
+      // The grid used to be pasted into every route; a copy would drift on the next change.
+      expect(source, route.join("/")).not.toContain("<AnimatedFlickeringGrid");
       expect(source, route.join("/")).not.toContain("<FlickeringGrid");
     }
+
+    const ambience = read("components", "page-ambience.tsx");
+    expect(ambience).toContain("<AnimatedFlickeringGrid");
+    expect(ambience).toContain("h-[300px]");
   });
 
   it("enables the animated dot reveal on dashboard stat cards", () => {
