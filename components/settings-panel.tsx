@@ -138,7 +138,7 @@ export function SettingsPanel() {
         </CardContent>
       </Card>
 
-      <Card className="pixel-box bg-card border-destructive/40">
+      <Card className="pixel-box bg-card border-destructive/40 flex flex-col">
         <CardHeader>
           <CardTitle className="font-sans uppercase tracking-wide text-destructive">
             Konto löschen
@@ -147,8 +147,8 @@ export function SettingsPanel() {
             Dieser Schritt ist endgültig. Alle Submissions, Achievements und Rankings werden entfernt.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={onDeleteAccount}>
+        <CardContent className="flex flex-1 flex-col">
+          <form className="flex flex-1 flex-col space-y-4" onSubmit={onDeleteAccount}>
             <div className="space-y-2">
               <Label htmlFor="deleteConfirmText">Zur Bestätigung KONTO LÖSCHEN eingeben</Label>
               <Input
@@ -173,7 +173,7 @@ export function SettingsPanel() {
             <Button
               type="submit"
               variant="destructive"
-              className="w-full"
+              className="mt-auto w-full"
               disabled={deletingAccount}
             >
               {deletingAccount ? "Löscht..." : "Konto endgültig löschen"}

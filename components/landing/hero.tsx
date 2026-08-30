@@ -49,8 +49,8 @@ export function LandingHero({
       {/* Background patterns */}
       <Meteors number={20} />
       <div className="absolute inset-0 z-0 opacity-20 scanlines" />
-      <div className="absolute top-20 right-0 h-100 w-100 bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
-      <div className="absolute bottom-0 left-0 h-75 w-75 bg-chart-5/20 blur-[100px] rounded-full mix-blend-screen" />
+      <div className="absolute top-20 right-0 h-150 w-150 bg-chart-5/35 blur-[130px] rounded-full mix-blend-screen" />
+      <div className="absolute bottom-0 left-0 h-125 w-125 bg-chart-5/35 blur-[110px] rounded-full mix-blend-screen" />
 
       <motion.div
         className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center z-10"
