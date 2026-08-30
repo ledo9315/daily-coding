@@ -23,7 +23,7 @@ export function AmbientGlow({
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute h-100 w-100 rounded-full bg-chart-5/20 blur-[100px] mix-blend-screen",
+        "pointer-events-none absolute h-150 w-150 rounded-full bg-chart-5/35 blur-[130px] mix-blend-screen",
         // Vertically centred, so it can only ever overhang symmetrically. Pinned to a percentage
         // it stuck out past the bottom of the shorter sections, and that edge is visible.
         "top-1/2 -translate-y-1/2",
