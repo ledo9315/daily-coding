@@ -24,7 +24,6 @@ import {
 } from "@nsmr/pixelart-react";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { getUserProfileData } from "@/lib/server/profile-data";
-import { levelTitleDe } from "@/lib/level";
 import type { Achievement } from "@/lib/api";
 
 export const metadata: Metadata = { title: "Profil" };
@@ -101,7 +100,7 @@ export default async function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <ProgressBar
-                  label={`Level ${profile.stats.level} – ${levelTitleDe(profile.stats.level)}`}
+                  label={`Level ${profile.stats.level}`}
                   value={parseInt(profile.stats.points.replace(".", ""), 10)}
                   max={profile.stats.levelMax}
                   variant="default"

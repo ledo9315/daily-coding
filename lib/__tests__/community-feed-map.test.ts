@@ -39,6 +39,5 @@ describe("communityFeedItemToFeedItem", () => {
     expect(props.event.description).toContain("Two Sum");
     expect(props.event.description).toContain("Stufe 3");
     expect(props.event.description).toContain("Stufe 4");
-    expect(props.event.description).toContain("Experte");
   });
 });

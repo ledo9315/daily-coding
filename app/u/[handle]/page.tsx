@@ -22,7 +22,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 import { avatarImageSrc } from "@/lib/avatar-src";
-import { levelTitleDe } from "@/lib/level";
 import { getPublicProfile } from "@/lib/server/public-profile";
 
 type PageProps = { params: Promise<{ handle: string }> };
@@ -82,7 +81,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
               {profile.name}
             </h1>
             <p className="text-muted-foreground uppercase tracking-wider text-sm">
-              Level {profile.level} – {levelTitleDe(profile.level)}
+              Level {profile.level}
             </p>
             <p className="mt-1 text-xs text-muted-foreground/80">
               Dabei seit {profile.memberSince}
