@@ -20,6 +20,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     version: "v0.2.0",
     date: "2026-08-30",
     changes: [
+      "Nach einer bestandenen Abgabe führt ein Knopf direkt zur Ergebnisseite, statt nur der Toast, der nach ein paar Sekunden weg ist.",
       "Die Lösungsseite ist neu gebaut: fremde Lösungen stehen in Panels, lassen sich sortieren und filtern, und identische Lösungen sind zu einer Gruppe zusammengefasst.",
       "Fremde Lösungen lassen sich mit „Best Practices“ und „Clever“ bewerten und direkt mit der eigenen vergleichen.",
       "Abgegebener Code wird mit Syntaxhervorhebung angezeigt.",
