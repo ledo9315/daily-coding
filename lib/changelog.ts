@@ -17,6 +17,30 @@ export type ChangelogEntry = {
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "v0.2.0",
+    date: "2026-08-30",
+    changes: [
+      "Die Lösungsseite ist neu gebaut: fremde Lösungen stehen in Panels, lassen sich sortieren und filtern, und identische Lösungen sind zu einer Gruppe zusammengefasst.",
+      "Fremde Lösungen lassen sich mit „Best Practices“ und „Clever“ bewerten und direkt mit der eigenen vergleichen.",
+      "Abgegebener Code wird mit Syntaxhervorhebung angezeigt.",
+      "Über der Lösung stehen die Testergebnisse eingeklappt statt der ausgeschriebenen Testfälle.",
+      "Kommentare und Bewertungen zur eigenen Lösung erscheinen als Benachrichtigung im Menü.",
+      "Die Einstellungen sind in Bereiche mit eigener Seitenleiste aufgeteilt.",
+      "Das Profil zeigt die Allzeit-Platzierung an der Stelle der bisherigen Badges-Karte.",
+      "Der Footer steht auf allen Seiten, ist in Marken- und Linkspalten gegliedert und weist auf ein neues Release hin.",
+      "Level werden ohne Titel geführt.",
+      "Beim Teilen erscheint die Startseite als Vorschaubild statt des gezeichneten Motivs.",
+      "E-Mails sind als Brief gesetzt statt als Karte.",
+      "Das öffentliche Profil bekommt den lila Ambient-Blur der übrigen Seiten, das ambiente Leuchten ist insgesamt heller.",
+      "Die Dot-Animation der Karten läuft auch auf Mobilgeräten.",
+      "Das Löschen des Kontos ist lesbar und hinter einer klaren Bestätigung.",
+      "Formularfelder sind wieder sichtbar abgesetzt, Überschriften auf Profil und Einstellungen einheitlich.",
+      "Dropdowns heben grau statt farbig hervor und behalten nach einem Klick keinen Fokusrahmen.",
+      "Auf Mobilgeräten hatten Karten doppeltes Padding. Behoben.",
+      "Die Sprachauswahl liegt im maximierten Editor wieder über dem Overlay.",
+    ],
+  },
+  {
     version: "v0.1.0",
     date: "2026-08-29",
     changes: [
