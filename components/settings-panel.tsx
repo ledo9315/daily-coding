@@ -21,6 +21,8 @@ const SECTIONS = [
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
+const CONFIRM_PHRASE = "KONTO LÖSCHEN";
+
 export function SettingsPanel() {
   // Client state, not a route per section: the panels are three forms, and a URL per form
   // would mean three pages that all render the same shell.
@@ -99,7 +101,7 @@ export function SettingsPanel() {
   async function onDeleteAccount(e: React.FormEvent) {
     e.preventDefault();
 
-    if (deleteConfirmText !== "KONTO LÖSCHEN") {
+    if (deleteConfirmText !== CONFIRM_PHRASE) {
       toast.error("Bitte gib exakt KONTO LÖSCHEN ein.");
       return;
     }
@@ -163,7 +165,7 @@ export function SettingsPanel() {
             <CardTitle className="font-sans uppercase tracking-wide">
               Benachrichtigungen
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base leading-relaxed">
               Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in
               der Glocke im Kopfbereich. Zusätzlich per E-Mail:
             </CardDescription>
@@ -188,20 +190,21 @@ export function SettingsPanel() {
         <Card className="pixel-box bg-card">
           <CardHeader>
             <CardTitle className="font-sans uppercase tracking-wide">Passwort ändern</CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base leading-relaxed">
               Wenn dein Konto bereits ein Passwort hat, gib zuerst dein aktuelles Passwort ein.
+              Mindestens 8 Zeichen.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="max-w-md space-y-4" onSubmit={onChangePassword}>
+            <form className="max-w-md space-y-5" onSubmit={onChangePassword}>
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
                 <Input
                   id="currentPassword"
                   type="password"
+                  autoComplete="current-password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="bg-background"
                 />
               </div>
               <div className="space-y-2">
@@ -209,9 +212,9 @@ export function SettingsPanel() {
                 <Input
                   id="newPassword"
                   type="password"
+                  autoComplete="new-password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="bg-background"
                 />
               </div>
               <div className="space-y-2">
@@ -219,9 +222,9 @@ export function SettingsPanel() {
                 <Input
                   id="confirmPassword"
                   type="password"
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="bg-background"
                 />
               </div>
               <Button type="submit" disabled={changingPassword}>
@@ -238,20 +241,26 @@ export function SettingsPanel() {
             <CardTitle className="font-sans uppercase tracking-wide text-destructive">
               Konto löschen
             </CardTitle>
-            <CardDescription>
-              Dieser Schritt ist endgültig. Alle Submissions, Achievements und Rankings werden entfernt.
+            <CardDescription className="text-base leading-relaxed">
+              Dieser Schritt ist endgültig: Abgaben, Achievements, Platzierungen und deine
+              Serie werden gelöscht und lassen sich nicht wiederherstellen.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="max-w-md space-y-4" onSubmit={onDeleteAccount}>
+            <form className="max-w-md space-y-5" onSubmit={onDeleteAccount}>
               <div className="space-y-2">
-                <Label htmlFor="deleteConfirmText">Zur Bestätigung KONTO LÖSCHEN eingeben</Label>
+                <Label htmlFor="deleteConfirmText">
+                  Tippe <span className="font-code text-destructive">{CONFIRM_PHRASE}</span> zur
+                  Bestätigung
+                </Label>
+                {/* No placeholder repeating the phrase: it would turn the gate into something
+                    to copy rather than something to mean. */}
                 <Input
                   id="deleteConfirmText"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  className="bg-background"
-                  placeholder="KONTO LÖSCHEN"
+                  autoComplete="off"
+                  spellCheck={false}
                 />
               </div>
               <div className="space-y-2">
@@ -259,13 +268,21 @@ export function SettingsPanel() {
                 <Input
                   id="deletePassword"
                   type="password"
+                  autoComplete="current-password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
-                  className="bg-background"
-                  placeholder="Bei OAuth ohne Passwort ggf. leer lassen"
+                  aria-describedby="deletePasswordHint"
                 />
+                {/* Was a placeholder, where it vanished with the first keystroke. */}
+                <p id="deletePasswordHint" className="text-sm text-muted-foreground">
+                  Bei einem Konto über GitHub oder Google ohne Passwort leer lassen.
+                </p>
               </div>
-              <Button type="submit" variant="destructive" disabled={deletingAccount}>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={deletingAccount || deleteConfirmText !== CONFIRM_PHRASE}
+              >
                 {deletingAccount ? "Löscht..." : "Konto endgültig löschen"}
               </Button>
             </form>
