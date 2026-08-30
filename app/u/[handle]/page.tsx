@@ -10,7 +10,6 @@ import {
   Zap,
 } from "@nsmr/pixelart-react";
 import { Header } from "@/components/header";
-import { LandingFooter } from "@/components/landing/footer";
 import { StatsCard } from "@/components/stats-card";
 import { PixelStar } from "@/components/points-chip";
 import {
@@ -136,7 +135,6 @@ export default async function PublicProfilePage({ params }: PageProps) {
         </div>
       </main>
 
-      <LandingFooter />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { LandingNavbar } from "@/components/landing/navbar";
 import { LandingHero } from "@/components/landing/hero";
 import { LandingCTA } from "@/components/landing/cta";
-import { LandingFooter } from "@/components/landing/footer";
 import { AmbientGlow } from "@/components/landing/ambient-glow";
 import { LandingFeatures } from "@/components/landing/features";
 import { LandingRoutine } from "@/components/landing/routine";
@@ -46,7 +45,6 @@ export function LandingPage({
         </section>
         <LandingCTA />
       </main>
-      <LandingFooter />
     </div>
   );
 }

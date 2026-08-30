@@ -1,4 +1,5 @@
 import React from "react";
+import { SiteFooter } from "@/components/site-footer";
 import type { Metadata } from "next";
 import { VT323, Press_Start_2P, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -113,6 +114,9 @@ export default function RootLayout({
           <SessionProvider>
             <Providers>
               {children}
+              {/* Once, for every page: Impressum and Datenschutz have to be reachable from
+                  anywhere, and behind the login nothing linked them (#265). */}
+              <SiteFooter />
             </Providers>
           </SessionProvider>
           <Toaster />
