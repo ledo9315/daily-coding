@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChangelogLink } from "@/components/changelog-link";
 
 const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
 const BUG_REPORT_URL = `${REPOSITORY_URL}/issues/new?template=bug_report.yml`;
@@ -49,9 +50,7 @@ export function LandingFooter() {
                 </a>
               </li>
               <li>
-                <Link href="/changelog" className={footerLinkClass}>
-                  Changelog
-                </Link>
+                <ChangelogLink className={footerLinkClass} />
               </li>
               <li>
                 <a
