@@ -221,7 +221,8 @@ describe("withEditorFileName", () => {
     expect(withEditorFileName("Main.java:2: error: x", "java")).toContain("Main.java:2:");
   });
 
-  it("renames Piston's file to the one the editor shows", () => {
-    expect(withEditorFileName("main.ts.ts(3,1): error", "typescript")).toContain("solution.ts");
+  it("renames Piston's file to the one the editor shows and drops the TypeScript header line", () => {
+    // The lib directive sits above the user's code, so tsc counts one line too many.
+    expect(withEditorFileName("main.ts.ts(3,1): error", "typescript")).toBe("solution.ts(2,1): error");
   });
 });
