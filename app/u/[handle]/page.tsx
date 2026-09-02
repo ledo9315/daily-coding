@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   ArrowBarUp,
-  Bookmark,
   Bullseye,
   CalendarToday,
   Zap,
@@ -12,10 +11,7 @@ import {
 import { Header } from "@/components/header";
 import { StatsCard } from "@/components/stats-card";
 import { PixelStar } from "@/components/points-chip";
-import {
-  AchievementBadge,
-  resolveAchievementIcon,
-} from "@/components/achievement-badge";
+import { AchievementsCard } from "@/components/achievements-card";
 import { MonthlyActivityView } from "@/components/monthly-activity";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,28 +92,14 @@ export default async function PublicProfilePage({ params }: PageProps) {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          {/* Unlocked only, so no progress bars: a stranger has no use for someone else's standing. */}
           {profile.achievements.length > 0 && (
-            <Card>
-              <CardHeader className="mb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <Bookmark className="h-5 w-5 text-amber-500" />
-                  Abzeichen {profile.achievements.length}/{profile.badgesTotal}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {profile.achievements.map((achievement) => (
-                  <AchievementBadge
-                    key={achievement.id}
-                    title={achievement.title}
-                    description={achievement.description}
-                    icon={resolveAchievementIcon(achievement.iconKey)}
-                    unlocked
-                    rarity={achievement.rarity}
-                    unlockedAt={achievement.unlockedAt}
-                  />
-                ))}
-              </CardContent>
-            </Card>
+            <AchievementsCard
+              achievements={profile.achievements}
+              unlockedCount={profile.achievements.length}
+              total={profile.badgesTotal}
+              showProgress={false}
+            />
           )}
 
           {/* Without badges next to it the activity card would sit in half a grid. */}

@@ -35,7 +35,11 @@ vi.mock("@/lib/prisma", () => ({
     },
     submission: {
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
+      groupBy: () => Promise.resolve([]),
     },
+    // Read by `loadAchievementFacts`; nothing in these tests depends on them.
+    comment: { findMany: () => Promise.resolve([]) },
+    solutionVote: { findMany: () => Promise.resolve([]) },
     achievementDef: {
       findMany: (...args: unknown[]) => mockAchievementDefFindMany(...args),
     },
@@ -91,9 +95,9 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockGetAllTimeRankNumber.mockResolvedValueOnce(2);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 100 }, createdAt: new Date() },
-      { challenge: { points: 150 }, createdAt: new Date() },
-      { challenge: { points: 200 }, createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 100 }, code: "// solved", createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 150 }, code: "// solved", createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 200 }, code: "// solved", createdAt: new Date() },
     ]);
     mockUserAchievementFindMany.mockResolvedValueOnce([
       { achievementId: "ach-1", unlockedAt: new Date() },
@@ -138,8 +142,8 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 1000 }, createdAt: new Date() },
-      { challenge: { points: 500 }, createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 1000 }, code: "// solved", createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 500 }, code: "// solved", createdAt: new Date() },
     ]);
     const res = await getUserStatsHandler();
     const json = await res.json();
@@ -150,9 +154,9 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 100 }, createdAt: new Date() },
-      { challenge: { points: 100 }, createdAt: new Date() },
-      { challenge: { points: 100 }, createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 100 }, code: "// solved", createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 100 }, code: "// solved", createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 100 }, code: "// solved", createdAt: new Date() },
     ]);
     mockUserCount.mockResolvedValueOnce(156);
     const res = await getUserStatsHandler();
@@ -194,7 +198,8 @@ describe("GET /api/user/stats", () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
     await getUserStatsHandler();
-    expect(mockUserFindUnique).toHaveBeenCalledTimes(1);
+    // Once for the user row, once inside `loadAchievementFacts` for the streak record.
+    expect(mockUserFindUnique).toHaveBeenCalledTimes(2);
     expect(mockGetAllTimeRankNumber).toHaveBeenCalledTimes(1);
     expect(mockSubmissionFindMany).toHaveBeenCalledTimes(1);
     expect(mockAchievementDefFindMany).toHaveBeenCalledTimes(1);
@@ -324,8 +329,8 @@ describe("GET /api/user/profile", () => {
     mockUserFindUnique.mockResolvedValueOnce({ ...baseUser, achievements: [], submissions: [] });
     mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
     mockSubmissionFindMany.mockResolvedValueOnce([
-      { challenge: { points: 150 }, createdAt: new Date() },
-      { challenge: { points: 100 }, createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 150 }, code: "// solved", createdAt: new Date() },
+      { challenge: { id: "c", difficulty: "easy", points: 100 }, code: "// solved", createdAt: new Date() },
     ]);
     const res = await getUserProfileHandler();
     const json = await res.json();

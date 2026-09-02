@@ -6,6 +6,7 @@ import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
 import { notifySolutionActivity } from "@/lib/server/notifications";
+import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 import { calculateLevel } from "@/lib/level";
 
 const DEFAULT_LIMIT = 10;
@@ -178,6 +179,14 @@ export async function POST(
     } catch {
       /* The comment is written; a failing mail must not undo it. */
     }
+  }
+
+  // „Wortmeldung" counts the commenter's comments; freezing it here keeps a later delete
+  // from recomputing the unlock away (#205).
+  try {
+    await persistAchievementUnlocks(prisma, userId);
+  } catch {
+    /* The comment is written; a failing unlock write must not undo it. */
   }
 
   const levels = await levelsOf([userId]);

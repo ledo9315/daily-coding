@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@/lib/generated/prisma/client";
+import { loadAchievementFacts } from "@/lib/server/achievement-facts";
 import { deriveAchievementRules } from "@/lib/server/achievements";
 
 /**
@@ -11,12 +12,12 @@ import { deriveAchievementRules } from "@/lib/server/achievements";
  * back to two and took „Polyglott" away again. A written date cannot be recomputed away -
  * `buildUserAchievementsView` gives it precedence over the rules.
  *
- * The date comes from the rule wherever the submissions can supply one, so a badge earned
+ * The date comes from the rule wherever the facts can supply one, so a badge earned
  * months ago keeps its original date instead of today's. The streak rules read
  * `streakRecord`, which carries no date at all; those get `now`.
  *
- * ponytail: takes the client as a parameter rather than importing it, matching
- * `seedAchievementDefs`. `lib/prisma` is `server-only` and cannot be imported from the
+ * Takes the client as a parameter rather than importing it, like `loadAchievementFacts`
+ * and `seedAchievementDefs`: `lib/prisma` is `server-only` and cannot be imported from the
  * backfill script, which needs this same function.
  */
 export async function persistAchievementUnlocks(
@@ -24,23 +25,15 @@ export async function persistAchievementUnlocks(
   userId: string,
   now: Date = new Date()
 ): Promise<string[]> {
-  const [completed, existing, user] = await Promise.all([
-    client.submission.findMany({
-      where: { userId, status: "completed" },
-      select: {
-        createdAt: true,
-        language: true,
-        challenge: { select: { difficulty: true } },
-      },
-    }),
+  const [facts, existing] = await Promise.all([
+    loadAchievementFacts(client, userId),
     client.userAchievement.findMany({
       where: { userId },
       select: { achievementId: true, unlockedAt: true },
     }),
-    client.user.findUnique({ where: { id: userId }, select: { streakRecord: true } }),
   ]);
 
-  const rules = deriveAchievementRules(completed, user?.streakRecord ?? 0);
+  const rules = deriveAchievementRules(facts);
   const frozenAt = new Map(existing.map((row) => [row.achievementId, row.unlockedAt]));
 
   // `== null` covers both cases worth writing: no row at all, and a row the seed created

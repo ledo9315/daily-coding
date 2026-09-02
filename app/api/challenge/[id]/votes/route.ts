@@ -5,6 +5,7 @@ import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
 import { parseVoteKind, readSolutionVotes } from "@/lib/server/solution-votes";
 import { forgetSolutionVote, notifySolutionActivity } from "@/lib/server/notifications";
+import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 
 /** Toggles one vote. POST rather than PUT/DELETE: the client never knows the current state. */
 export async function POST(
@@ -78,6 +79,24 @@ export async function POST(
     }
   } catch {
     /* Notification is a side effect of the vote, not part of it. */
+  }
+
+  // „Vorbild" and „Trickreich" count votes the *authors* received, so the unlock is frozen
+  // for them, not the voter. Only on a cast vote: a retracted one leaves a frozen unlock
+  // in place by design (#205).
+  if (removed.count === 0) {
+    try {
+      const authors = await prisma.submission.findMany({
+        where: { challengeId, codeHash, status: "completed" },
+        select: { userId: true },
+        distinct: ["userId"],
+      });
+      for (const author of authors) {
+        await persistAchievementUnlocks(prisma, author.userId);
+      }
+    } catch {
+      /* The vote is cast; a failing unlock write must not undo it. */
+    }
   }
 
   const tallies = await readSolutionVotes(challengeId, codeHash, userId);

@@ -86,7 +86,7 @@ export default function ProfileLoading() {
                 <Skeleton className="h-5 w-28" />
               </CardHeader>
               <CardContent className="space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => (
+                {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-full shrink-0" />
                     <div className="space-y-1.5 flex-1">
@@ -95,6 +95,7 @@ export default function ProfileLoading() {
                     </div>
                   </div>
                 ))}
+                <Skeleton className="h-9 w-full" />
               </CardContent>
             </Card>
 

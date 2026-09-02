@@ -5,6 +5,7 @@ import { POST as voteHandler } from "../challenge/[id]/votes/route";
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
 const mockSubmissionFindFirst = vi.fn();
+const mockSubmissionFindMany = vi.fn();
 const mockVoteDeleteMany = vi.fn();
 const mockVoteCreate = vi.fn();
 const mockVoteGroupBy = vi.fn();
@@ -14,11 +15,13 @@ const mockHasSolvedChallenge = vi.fn();
 const mockCheckRateLimit = vi.fn();
 const mockNotify = vi.fn();
 const mockForget = vi.fn();
+const mockPersistAchievementUnlocks = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     submission: {
       findFirst: (...args: unknown[]) => mockSubmissionFindFirst(...args),
+      findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
     },
     solutionVote: {
       deleteMany: (...args: unknown[]) => mockVoteDeleteMany(...args),
@@ -46,6 +49,10 @@ vi.mock("@/lib/server/notifications", () => ({
   forgetSolutionVote: (...args: unknown[]) => mockForget(...args),
 }));
 
+vi.mock("@/lib/server/achievement-unlocks", () => ({
+  persistAchievementUnlocks: (...args: unknown[]) => mockPersistAchievementUnlocks(...args),
+}));
+
 const HASH = "a".repeat(64);
 
 /** The own-row check runs before the existence check; both use `submission.findFirst`. */
@@ -68,6 +75,8 @@ beforeEach(() => {
   mockVoteFindMany.mockResolvedValue([]);
   mockNotify.mockResolvedValue(undefined);
   mockForget.mockResolvedValue(undefined);
+  mockSubmissionFindMany.mockResolvedValue([{ userId: "user-alice" }, { userId: "user-bob" }]);
+  mockPersistAchievementUnlocks.mockResolvedValue([]);
   submissionAnswers();
 });
 
@@ -203,6 +212,48 @@ describe("POST /api/challenge/[id]/votes", () => {
     mockNotify.mockRejectedValue(new Error("resend down"));
     expect((await call()).status).toBe(200);
     expect(mockVoteCreate).toHaveBeenCalled();
+  });
+
+  /**
+   * „Vorbild" and „Trickreich" (#271) count votes the authors *received*, so the unlock is
+   * frozen for every author of the voted code, not for the voter (#205).
+   */
+  describe("achievement unlocks for the authors", () => {
+    it("freezes the unlocks of each distinct author when a vote is cast", async () => {
+      await call();
+      expect(mockSubmissionFindMany).toHaveBeenCalledWith({
+        where: { challengeId: "challenge-1", codeHash: HASH, status: "completed" },
+        select: { userId: true },
+        distinct: ["userId"],
+      });
+      expect(mockPersistAchievementUnlocks).toHaveBeenCalledTimes(2);
+      expect(mockPersistAchievementUnlocks.mock.calls.map((c) => c[1])).toEqual([
+        "user-alice",
+        "user-bob",
+      ]);
+    });
+
+    it("never freezes anything for the voter", async () => {
+      await call();
+      expect(mockPersistAchievementUnlocks.mock.calls.map((c) => c[1])).not.toContain(
+        "user-me",
+      );
+    });
+
+    it("leaves the unlocks alone when the vote is taken back", async () => {
+      mockVoteDeleteMany.mockResolvedValue({ count: 1 });
+      await call();
+      expect(mockSubmissionFindMany).not.toHaveBeenCalled();
+      expect(mockPersistAchievementUnlocks).not.toHaveBeenCalled();
+    });
+
+    it("still answers with the tallies when freezing the unlock fails", async () => {
+      mockPersistAchievementUnlocks.mockRejectedValue(new Error("db down"));
+      mockVoteGroupBy.mockResolvedValue([{ kind: "clever", _count: { _all: 1 } }]);
+      const res = await call();
+      expect(res.status).toBe(200);
+      expect((await res.json()).votes).toEqual({ best_practices: 0, clever: 1 });
+    });
   });
 
   it("keeps both kinds independent", async () => {
