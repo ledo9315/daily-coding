@@ -86,12 +86,17 @@ export default async function DashboardPage() {
             title="PUNKTE"
             value={userStats.points}
             icon={Bullseye}
-            trend={{ value: userStats.pointsTrendPercent, label: "diesen Monat" }}
+            // A loss reads as a reproach on the dashboard; the number is on the profile.
+            trend={
+              userStats.pointsTrendPercent > 0
+                ? { value: userStats.pointsTrendPercent, label: "diesen Monat" }
+                : undefined
+            }
           />
           <StatsCard
             title="STREAK"
             value={String(userStats.streak)}
-            description={`Rekord: ${userStats.streakRecord} Tage`}
+            footer={`Rekord: ${userStats.streakRecord} ${userStats.streakRecord === 1 ? "Tag" : "Tage"}`}
             icon={Zap}
           />
         </div>

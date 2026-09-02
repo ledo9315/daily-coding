@@ -12,6 +12,8 @@ interface StatsCardProps {
     label: string;
     unit?: "percent" | "number";
   };
+  /** Sits in the bottom row like `trend`, so cards without a trend line up with those that have one. */
+  footer?: string;
   className?: string;
 }
 
@@ -21,6 +23,7 @@ export function StatsCard({
   description,
   icon: Icon,
   trend,
+  footer,
   className,
 }: StatsCardProps) {
   const trendUnit = trend?.unit ?? "percent";
@@ -65,6 +68,9 @@ export function StatsCard({
             </span>
             <span className="text-md text-muted-foreground">{trend.label}</span>
           </div>
+        )}
+        {!trend && footer && (
+          <p className="mt-2 text-md text-muted-foreground">{footer}</p>
         )}
       </div>
     </CardSpotlight>
