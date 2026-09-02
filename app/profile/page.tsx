@@ -7,14 +7,13 @@ import { Header } from "@/components/header";
 import { StreakBadge } from "@/components/streak-badge";
 import { PointsChip } from "@/components/points-chip";
 import { StatsCard } from "@/components/stats-card";
-import { AchievementBadge, resolveAchievementIcon } from "@/components/achievement-badge";
+import { AchievementsCard } from "@/components/achievements-card";
 import { ProgressBar } from "@/components/progress-bar";
 import { ChallengeHistory } from "@/components/challenge-history";
 import { MonthlyActivityView } from "@/components/monthly-activity";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileAvatarPicker } from "@/components/profile-avatar-picker";
 import {
-  Bookmark,
   ArrowBarUp,
   Bullseye,
   Zap,
@@ -24,7 +23,6 @@ import {
 } from "@nsmr/pixelart-react";
 import { PageAmbience } from "@/components/page-ambience";
 import { getUserProfileData } from "@/lib/server/profile-data";
-import type { Achievement } from "@/lib/api";
 
 export const metadata: Metadata = { title: "Profil" };
 
@@ -106,28 +104,11 @@ export default async function ProfilePage() {
           </div>
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader className="mb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <Bookmark className="h-5 w-5 text-amber-500" />
-                  Achievements {profile.stats.badges}/{profile.stats.badgesTotal}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {profile.achievements.map((achievement: Achievement) => (
-                  <AchievementBadge
-                    key={achievement.id}
-                    title={achievement.title}
-                    description={achievement.description}
-                    icon={resolveAchievementIcon(achievement.iconKey)}
-                    unlocked={achievement.unlocked}
-                    rarity={achievement.rarity}
-                    unlockedAt={achievement.unlockedAt}
-                    progress={achievement.progress}
-                  />
-                ))}
-              </CardContent>
-            </Card>
+            <AchievementsCard
+              achievements={profile.achievements}
+              unlockedCount={profile.stats.badges}
+              total={profile.stats.badgesTotal}
+            />
 
             <Card>
               <CardHeader className="mb-2">

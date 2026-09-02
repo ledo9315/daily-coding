@@ -1,13 +1,11 @@
 import { describe, it, expect } from "vitest";
 import type { PrismaClient } from "@/lib/generated/prisma/client";
+import type { AchievementFacts, FactSubmission } from "@/lib/server/achievement-facts";
 import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 
-type CompletedRow = {
-  createdAt: Date;
-  language?: string | null;
-  challenge?: { difficulty?: string | null } | null;
-};
+/** The row shape `loadAchievementFacts` selects; the stub client hands it back verbatim. */
+type CompletedRow = FactSubmission & { codeHash: string | null; submissionDay: Date };
 
 type ExistingRow = { achievementId: string; unlockedAt: Date | null };
 
@@ -17,14 +15,23 @@ type UpsertCall = {
   update: { unlockedAt: Date };
 };
 
+/**
+ * Stubs the Prisma methods `loadAchievementFacts` and `persistAchievementUnlocks` call, so
+ * the test runs the real chain from the rows to the upserts.
+ */
 function stubClient(state: {
   completed?: CompletedRow[];
   existing?: ExistingRow[];
   streakRecord?: number;
+  comments?: { createdAt: Date }[];
+  votes?: { kind: "best_practices" | "clever"; createdAt: Date }[];
 }) {
   const upserts: UpsertCall[] = [];
   const client = {
-    submission: { findMany: async () => state.completed ?? [] },
+    submission: {
+      findMany: async () => state.completed ?? [],
+      groupBy: async () => [],
+    },
     userAchievement: {
       findMany: async () => state.existing ?? [],
       upsert: async (args: UpsertCall) => {
@@ -34,14 +41,31 @@ function stubClient(state: {
     user: {
       findUnique: async () => ({ streakRecord: state.streakRecord ?? 0 }),
     },
+    comment: { findMany: async () => state.comments ?? [] },
+    solutionVote: { findMany: async () => state.votes ?? [] },
   } as unknown as PrismaClient;
   return { client, upserts };
 }
 
+// Ten lines keep „Minimalist" and „Romanautor" out of these tests; one challenge id per day
+// keeps „Wiederholungstäter" out.
+const TEN_LINES = Array.from({ length: 10 }, (_, i) => `line ${i + 1};`).join("\n");
+
 const solve = (day: string, language: string, difficulty = "easy"): CompletedRow => ({
   createdAt: new Date(`${day}T12:00:00Z`),
   language,
-  challenge: { difficulty },
+  code: TEN_LINES,
+  codeHash: `hash-${day}`,
+  submissionDay: new Date(`${day}T00:00:00Z`),
+  challenge: { id: `ch-${day}`, difficulty, points: 100 },
+});
+
+const factsOf = (completed: FactSubmission[]): AchievementFacts => ({
+  completed,
+  streakRecord: 0,
+  comments: [],
+  votesReceived: [],
+  earliestCompletionByDay: new Map(),
 });
 
 const NOW = new Date("2026-08-29T10:00:00Z");
@@ -67,8 +91,18 @@ describe("persistAchievementUnlocks", () => {
   it("falls back to now for the streak rules, which carry no date", async () => {
     const { client, upserts } = stubClient({ streakRecord: 7 });
 
-    expect(await persistAchievementUnlocks(client, "user-1", NOW)).toEqual(["ach-2"]);
-    expect(upserts[0].create.unlockedAt).toEqual(NOW);
+    // A 7-day record reaches „Wochenend-Krieger" and „Dranbleiber" (3 days) alike.
+    expect(await persistAchievementUnlocks(client, "user-1", NOW)).toEqual(["ach-2", "ach-7"]);
+    expect(upserts.map((u) => u.create.unlockedAt)).toEqual([NOW, NOW]);
+  });
+
+  it("dates a comment achievement from the comment, read through the facts loader", async () => {
+    const { client, upserts } = stubClient({
+      comments: [{ createdAt: new Date("2026-05-01T08:00:00Z") }],
+    });
+
+    expect(await persistAchievementUnlocks(client, "user-1", NOW)).toEqual(["ach-19"]);
+    expect(upserts[0].create.unlockedAt).toEqual(new Date("2026-05-01T08:00:00Z"));
   });
 
   it("leaves an achievement that already carries a date untouched", async () => {
@@ -144,14 +178,14 @@ describe("Polyglott after a re-submission changes the language", () => {
     const { achievements } = buildUserAchievementsView(
       defs,
       [{ achievementId: "ach-3", unlockedAt: frozenRow.create.unlockedAt }],
-      afterRewrite
+      factsOf(afterRewrite)
     );
 
     expect(achievements[0].unlocked).toBe(true);
   });
 
   it("would be lost without that row - what the fix prevents", () => {
-    const { achievements } = buildUserAchievementsView(defs, [], afterRewrite);
+    const { achievements } = buildUserAchievementsView(defs, [], factsOf(afterRewrite));
     expect(achievements[0].unlocked).toBe(false);
   });
 

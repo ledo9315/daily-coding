@@ -15,6 +15,7 @@ const mockHasSolvedChallenge = vi.fn();
 const mockCheckRateLimit = vi.fn();
 const mockGetLifetimePointsByUserIds = vi.fn();
 const mockNotify = vi.fn();
+const mockPersistAchievementUnlocks = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -49,6 +50,10 @@ vi.mock("@/lib/server/user-points", () => ({
     mockGetLifetimePointsByUserIds(...args),
 }));
 
+vi.mock("@/lib/server/achievement-unlocks", () => ({
+  persistAchievementUnlocks: (...args: unknown[]) => mockPersistAchievementUnlocks(...args),
+}));
+
 const createdAt = new Date("2026-08-01T10:00:00.000Z");
 
 const makeRow = (
@@ -78,6 +83,7 @@ beforeEach(() => {
   mockCommentFindMany.mockResolvedValue([]);
   mockCommentCreate.mockResolvedValue(makeRow({ userId: "user-me" }));
   mockGetLifetimePointsByUserIds.mockResolvedValue(new Map());
+  mockPersistAchievementUnlocks.mockResolvedValue([]);
 });
 
 const params = Promise.resolve({ id: "sub-1" });
@@ -298,6 +304,33 @@ describe("notifications for a new comment", () => {
     mockNotify.mockRejectedValue(new Error("resend down"));
     const res = await post({ body: "Schöne Lösung" });
     expect(res.status).toBe(201);
+  });
+});
+
+/**
+ * „Wortmeldung" (#271) is derived from the commenter's comments. Freezing the unlock right
+ * after the write keeps a later delete from recomputing it away (#205).
+ */
+describe("achievement unlocks for a new comment", () => {
+  it("freezes the commenter's unlocks once after the comment is written", async () => {
+    await post({ body: "Schöne Lösung" });
+    expect(mockPersistAchievementUnlocks).toHaveBeenCalledTimes(1);
+    expect(mockPersistAchievementUnlocks.mock.calls[0][1]).toBe("user-me");
+    expect(mockCommentCreate.mock.invocationCallOrder[0]).toBeLessThan(
+      mockPersistAchievementUnlocks.mock.invocationCallOrder[0],
+    );
+  });
+
+  it("does not freeze anything when the comment was rejected", async () => {
+    await post({ body: "   " });
+    expect(mockPersistAchievementUnlocks).not.toHaveBeenCalled();
+  });
+
+  it("still answers 201 when freezing the unlock fails", async () => {
+    mockPersistAchievementUnlocks.mockRejectedValue(new Error("db down"));
+    const res = await post({ body: "Schöne Lösung" });
+    expect(res.status).toBe(201);
+    expect((await res.json()).own).toBe(true);
   });
 });
 

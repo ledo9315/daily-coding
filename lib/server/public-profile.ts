@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { nameKeyOf } from "@/lib/display-name";
 import { calculateLevel } from "@/lib/level";
 import { formatDate } from "@/lib/format";
+import { loadAchievementFacts } from "@/lib/server/achievement-facts";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
 import { utcDayKey } from "@/lib/streak-days";
@@ -73,32 +74,24 @@ export const getPublicProfile = cache(async (
   if (!user) return null;
 
   /**
-   * One query for every number on the page: points, the solved count, the last solve and
-   * the activity grid all come from these rows, and the achievements are derived from
-   * them too.
+   * The completed rows behind the achievements are also every number on the page: points,
+   * the solved count, the last solve and the activity grid all come from `facts.completed`.
    */
-  const [completed, achievementDefs, userAchievements] = await Promise.all([
-    prisma.submission.findMany({
-      where: { userId: user.id, status: "completed" },
-      orderBy: { createdAt: "desc" },
-      select: {
-        createdAt: true,
-        language: true,
-        challenge: { select: { points: true, difficulty: true } },
-      },
-    }),
+  const [facts, achievementDefs, userAchievements] = await Promise.all([
+    loadAchievementFacts(prisma, user.id),
     prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
     prisma.userAchievement.findMany({ where: { userId: user.id } }),
   ]);
 
+  const completed = facts.completed;
   const points = completed.reduce((sum, s) => sum + s.challenge.points, 0);
+  // `facts.completed` comes back in no particular order.
+  let lastSolvedAt: Date | null = null;
+  for (const s of completed) {
+    if (lastSolvedAt === null || s.createdAt > lastSolvedAt) lastSolvedAt = s.createdAt;
+  }
   const now = new Date();
-  const { achievements } = buildUserAchievementsView(
-    achievementDefs,
-    userAchievements,
-    completed,
-    user.streakRecord
-  );
+  const { achievements } = buildUserAchievementsView(achievementDefs, userAchievements, facts);
 
   return {
     name: user.name,
@@ -114,7 +107,7 @@ export const getPublicProfile = cache(async (
       year: "numeric",
       timeZone: "UTC",
     }),
-    lastSolvedAt: completed[0] ? formatDate(completed[0].createdAt) : null,
+    lastSolvedAt: lastSolvedAt ? formatDate(lastSolvedAt) : null,
     achievements: achievements.filter((achievement) => achievement.unlocked),
     badgesTotal: achievementDefs.length,
     monthlyActivity: buildMonthlyActivityGrid(

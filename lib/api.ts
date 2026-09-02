@@ -68,6 +68,8 @@ export interface Achievement {
   unlocked: boolean;
   rarity: "common" | "rare" | "epic" | "legendary";
   unlockedAt?: string;
+  /** The same instant as `unlockedAt`, unformatted, so the UI can sort by recency. */
+  unlockedAtIso?: string;
   /**
    * How far along a locked achievement is. Absent once unlocked, and absent for targets
    * of one, where a bar would say nothing (#96). `label` prefixes the numbers when the

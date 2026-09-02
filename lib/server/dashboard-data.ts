@@ -11,6 +11,7 @@ import {
   getAllTimeRankNumber,
   getLifetimePointsByUserIds,
 } from "@/lib/server/user-points";
+import { loadAchievementFacts } from "@/lib/server/achievement-facts";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 
@@ -82,13 +83,10 @@ export async function getUserStatsData(
     select: { rank: true },
   });
 
-  const [allTimeRank, completedSubmissions, achievementDefs, userAchievements, totalUsers] =
+  const [allTimeRank, facts, achievementDefs, userAchievements, totalUsers] =
     await Promise.all([
       getAllTimeRankNumber(resolvedUserId),
-      prisma.submission.findMany({
-        where: { userId: resolvedUserId, status: "completed" },
-        include: { challenge: { select: { points: true, difficulty: true } } },
-      }),
+      loadAchievementFacts(prisma, resolvedUserId),
       prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
       prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
       prisma.user.count(),
@@ -97,10 +95,10 @@ export async function getUserStatsData(
   const { unlockedCount: unlockedBadges } = buildUserAchievementsView(
     achievementDefs,
     userAchievements,
-    completedSubmissions,
-    user.streakRecord
+    facts
   );
 
+  const completedSubmissions = facts.completed;
   const points = completedSubmissions.reduce((sum, s) => sum + s.challenge.points, 0);
   const totalSolved = completedSubmissions.length;
   const level = calculateLevel(points);

@@ -3,9 +3,13 @@ import { getPublicProfile } from "../public-profile";
 
 const mockUserFindUnique = vi.fn();
 const mockSubmissionFindMany = vi.fn();
+const mockSubmissionGroupBy = vi.fn();
+const mockCommentFindMany = vi.fn();
+const mockSolutionVoteFindMany = vi.fn();
 const mockAchievementDefFindMany = vi.fn();
 const mockUserAchievementFindMany = vi.fn();
 
+// `loadAchievementFacts` shares this client, hence the groupBy, comment and vote methods.
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
@@ -13,6 +17,13 @@ vi.mock("@/lib/prisma", () => ({
     },
     submission: {
       findMany: (...args: unknown[]) => mockSubmissionFindMany(...args),
+      groupBy: (...args: unknown[]) => mockSubmissionGroupBy(...args),
+    },
+    comment: {
+      findMany: (...args: unknown[]) => mockCommentFindMany(...args),
+    },
+    solutionVote: {
+      findMany: (...args: unknown[]) => mockSolutionVoteFindMany(...args),
     },
     achievementDef: {
       findMany: (...args: unknown[]) => mockAchievementDefFindMany(...args),
@@ -23,19 +34,26 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+/** A row in the shape `loadAchievementFacts` selects. */
 const solved = (points: number, iso: string) => ({
   createdAt: new Date(iso),
   language: "javascript",
-  challenge: { points, difficulty: "easy" },
+  code: "return 1;",
+  codeHash: `hash-${iso}`,
+  submissionDay: new Date(iso.slice(0, 10)),
+  challenge: { id: `ch-${iso}`, points, difficulty: "easy" },
 });
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // Newest first, the order the query asks for.
+  // Oldest first: the loader orders nothing, so the last solve has to be picked out.
   mockSubmissionFindMany.mockResolvedValue([
-    solved(200, "2026-08-14T09:00:00Z"),
     solved(100, "2026-08-13T09:00:00Z"),
+    solved(200, "2026-08-14T09:00:00Z"),
   ]);
+  mockSubmissionGroupBy.mockResolvedValue([]);
+  mockCommentFindMany.mockResolvedValue([]);
+  mockSolutionVoteFindMany.mockResolvedValue([]);
   mockAchievementDefFindMany.mockResolvedValue([
     { id: "ach-a", title: "Erster Schritt", description: "…", iconKey: "Check", rarity: "common" },
     { id: "ach-b", title: "Unaufhaltsam", description: "…", iconKey: "Zap", rarity: "epic" },
@@ -60,6 +78,10 @@ function makeUserRow() {
     role: "admin",
   };
 }
+
+/** The lookups by handle; the facts loader also reads the user table, by id. */
+const handleLookups = () =>
+  mockUserFindUnique.mock.calls.filter((call) => "nameKey" in call[0].where);
 
 describe("getPublicProfile", () => {
   it("returns only the public fields and leaks no credentials", async () => {
@@ -107,7 +129,7 @@ describe("getPublicProfile", () => {
     const result = await getPublicProfile("anna schmidt");
 
     expect(result!.memberSince).toMatch(/2026/);
-    // The newest submission, not the oldest.
+    // The newest submission, not the first row returned.
     expect(result!.lastSolvedAt).toBe("14.08.2026");
   });
 
@@ -140,17 +162,21 @@ describe("getPublicProfile", () => {
 
     await getPublicProfile("anna schmidt");
 
-    const select = mockUserFindUnique.mock.calls[0][0].select;
-    expect(select).not.toHaveProperty("email");
-    expect(select).not.toHaveProperty("passwordHash");
-    expect(select).not.toHaveProperty("role");
+    for (const call of mockUserFindUnique.mock.calls) {
+      const select = call[0].select;
+      expect(select).not.toHaveProperty("email");
+      expect(select).not.toHaveProperty("passwordHash");
+      expect(select).not.toHaveProperty("role");
+    }
   });
 
   it("returns null for an unknown handle without further queries", async () => {
     mockUserFindUnique.mockResolvedValue(null);
 
     expect(await getPublicProfile("nobody")).toBeNull();
+    expect(mockUserFindUnique).toHaveBeenCalledTimes(1);
     expect(mockSubmissionFindMany).not.toHaveBeenCalled();
+    expect(mockCommentFindMany).not.toHaveBeenCalled();
     expect(mockAchievementDefFindMany).not.toHaveBeenCalled();
   });
 
@@ -161,10 +187,13 @@ describe("getPublicProfile", () => {
       await getPublicProfile(handle);
     }
 
-    for (const call of mockUserFindUnique.mock.calls) {
+    const lookups = handleLookups();
+    expect(lookups).toHaveLength(3);
+    for (const call of lookups) {
       expect(call[0].where.nameKey).toBe("anna schmidt");
     }
   });
+
   it("decodes the percent-encoded segment Next passes to the page", async () => {
     mockUserFindUnique.mockResolvedValue(null);
 

@@ -1,9 +1,27 @@
 import {
   Bookmark,
+  BookOpen,
   Bullseye,
+  CalendarCheck,
   CalendarWeek,
+  ChartBar,
   Check,
   Clock,
+  Code,
+  Coin,
+  Comment,
+  Downasaur,
+  Heart,
+  Hourglass,
+  Lightbulb,
+  Map,
+  Minus,
+  Power,
+  Repeat,
+  Shield,
+  Shuffle,
+  Sun,
+  TrendingUp,
   Trophy,
   Zap,
 } from "@nsmr/pixelart-react";
@@ -17,6 +35,24 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Trophy,
   Zap,
   Bullseye,
+  Code,
+  CalendarCheck,
+  TrendingUp,
+  Shuffle,
+  ChartBar,
+  Coin,
+  Power,
+  Map,
+  Shield,
+  Repeat,
+  Downasaur,
+  Hourglass,
+  Sun,
+  Comment,
+  Heart,
+  Lightbulb,
+  BookOpen,
+  Minus,
 };
 
 /** The glyph for an achievement's `iconKey`; anything unknown falls back to the bookmark. */
@@ -102,9 +138,11 @@ export function AchievementBadge({
             unlocked ? config.bgClassName : "bg-muted",
           )}
         >
+          {/* `fill-current`: the pixelart Lightbulb path ships without `fill="currentColor"`
+              and would render black. */}
           <Icon
             className={cn(
-              "h-6 w-6",
+              "h-6 w-6 fill-current",
               unlocked ? config.iconClassName : "text-muted-foreground",
             )}
           />
