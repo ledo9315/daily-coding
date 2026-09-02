@@ -34,6 +34,27 @@ export function sortAchievementsForDisplay(list: Achievement[]): Achievement[] {
   return [...withTime, ...withoutTime, ...locked];
 }
 
+/** Rarity from plainest to rarest - the order the full list groups by. */
+const RARITY_ORDER: Record<Achievement["rarity"], number> = {
+  common: 0,
+  rare: 1,
+  epic: 2,
+  legendary: 3,
+};
+
+/**
+ * Groups achievements by rarity, common first, and leaves everything else alone.
+ *
+ * Deliberately blind to whether an achievement is unlocked: the full list is a catalogue,
+ * and a locked entry that slid behind its unlocked neighbours would move around under the
+ * reader every time they earned something. Within a rarity the input order survives -
+ * `Array.prototype.sort` is stable, and the API hands the list over in the order of
+ * `ACHIEVEMENT_DEFS`, which is the intended display order.
+ */
+export function sortAchievementsByRarity(list: Achievement[]): Achievement[] {
+  return [...list].sort((a, b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]);
+}
+
 /**
  * The first `count` achievements in display order - what the profile card shows before
  * the dialog with the full list. A non-positive count yields an empty array.

@@ -3,6 +3,7 @@ import type { Achievement } from "@/lib/api";
 import {
   FEATURED_ACHIEVEMENT_COUNT,
   pickFeaturedAchievements,
+  sortAchievementsByRarity,
   sortAchievementsForDisplay,
 } from "@/lib/achievements-featured";
 
@@ -139,5 +140,46 @@ describe("pickFeaturedAchievements", () => {
 
   it("exposes a default count of four", () => {
     expect(FEATURED_ACHIEVEMENT_COUNT).toBe(4);
+  });
+});
+
+describe("sortAchievementsByRarity", () => {
+  const of = (id: string, rarity: Achievement["rarity"], unlocked: boolean) =>
+    ach({ id, rarity, unlocked });
+
+  it("puts the plainest rarity first", () => {
+    const input = [
+      of("legendary", "legendary", true),
+      of("rare", "rare", true),
+      of("common", "common", true),
+      of("epic", "epic", true),
+    ];
+    expect(ids(sortAchievementsByRarity(input))).toEqual([
+      "common",
+      "rare",
+      "epic",
+      "legendary",
+    ]);
+  });
+
+  it("leaves a locked entry between its unlocked neighbours", () => {
+    // The whole point of the grouping: a locked achievement that slid behind the unlocked
+    // ones would move under the reader every time they earned something.
+    const input = [
+      of("first", "common", true),
+      of("locked", "common", false),
+      of("third", "common", true),
+    ];
+    expect(ids(sortAchievementsByRarity(input))).toEqual(["first", "locked", "third"]);
+  });
+
+  it("keeps the input order within one rarity", () => {
+    const input = [of("b", "epic", false), of("a", "epic", true), of("c", "epic", false)];
+    expect(ids(sortAchievementsByRarity(input))).toEqual(["b", "a", "c"]);
+  });
+
+  it("returns a new array", () => {
+    const input = [of("a", "rare", true)];
+    expect(sortAchievementsByRarity(input)).not.toBe(input);
   });
 });
