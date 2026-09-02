@@ -101,6 +101,15 @@ const GO_HEADER_LINES = [
 */
 const CPP_HEADER_LINES = ["#include <bits/stdc++.h>", "using namespace std;", ""];
 
+/*
+  Piston runs plain `tsc file.ts` - no tsconfig, no flags - so the compiler checks against the ES5
+  library and rejects Map, Set, padStart, fill and includes (TS2583/TS2550) that Node then runs
+  without complaint. The directive adds the ES2020 library. The target stays ES5, so for…of and
+  spread over a Map or Set still fail with TS2802 (downlevelIteration); arrays, forEach and
+  Array.from are fine.
+*/
+const TS_HEADER_LINES = ['/// <reference lib="es2020" />'];
+
 /** Same idea for C#: a solution cannot add a `using`, so the header carries the usual ones. */
 const CSHARP_HEADER_LINES = [
   "using System;",
@@ -113,6 +122,7 @@ const CSHARP_HEADER_LINES = [
 ];
 
 export const HARNESS_LINE_OFFSETS: Partial<Record<CodeLanguageId, number>> = {
+  typescript: TS_HEADER_LINES.length,
   java: JAVA_HEADER_LINES.length,
   go: GO_HEADER_LINES.length,
   cpp: CPP_HEADER_LINES.length,
@@ -468,7 +478,8 @@ process.stdout.write(JSON.stringify(result));
         exactly the two members used is enough and keeps the user's own type errors reportable,
         which `// @ts-nocheck` would swallow.
       */
-      return `${trimmed}
+      return `${TS_HEADER_LINES.join("\n")}
+${trimmed}
 
 declare function require(id: string): { readFileSync(fd: number, encoding: string): string };
 declare const process: { stdout: { write(text: string): void } };

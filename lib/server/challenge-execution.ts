@@ -109,20 +109,20 @@ export function withEditorFileName(message: string, language: CodeLanguageId): s
 
     Two notations to cover: `Main.java:12` and, from Mono, `main.cs(12,7)`.
   */
-  const offset = HARNESS_LINE_OFFSETS[language];
-  if (offset) {
-    const file = name.replace(".", "\\.");
-    const pattern = new RegExp(`\\b${file}(?::(\\d+)|\\((\\d+),)`, "gu");
-    return withoutBanner.replaceAll(pattern, (whole, colon?: string, paren?: string) => {
-      const raw = colon ?? paren;
-      const line = Number(raw) - offset;
-      if (line < 1) return whole;
-      return colon ? `${name}:${line}` : `${name}(${line},`;
-    });
-  }
-  return withoutBanner
+  // Rename first: tsc reports `main.ts.ts(2,1)`, and its offset has to find the editor name.
+  const renamed = withoutBanner
     .replaceAll("main.ts.ts", name)
     .replaceAll(/\bmain\.(ts|js|py|php)\b/gu, name);
+  const offset = HARNESS_LINE_OFFSETS[language];
+  if (!offset) return renamed;
+  const file = name.replace(".", "\\.");
+  const pattern = new RegExp(`\\b${file}(?::(\\d+)|\\((\\d+),)`, "gu");
+  return renamed.replaceAll(pattern, (whole, colon?: string, paren?: string) => {
+    const raw = colon ?? paren;
+    const line = Number(raw) - offset;
+    if (line < 1) return whole;
+    return colon ? `${name}:${line}` : `${name}(${line},`;
+  });
 }
 
 async function runPistonIoCases(

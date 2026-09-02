@@ -80,6 +80,14 @@ describe("buildWrappedProgram", () => {
     expect(src).not.toContain("@ts-nocheck");
   });
 
+  it("TypeScript: opens with the ES2020 lib directive, above the user's code", () => {
+    // Piston runs plain `tsc`, which checks against ES5: Map, Set and padStart were compiler
+    // errors in TypeScript while the same code passed in JavaScript.
+    const src = buildWrappedProgram("typescript", "function f(a: number): number { return a; }", "f");
+    expect(src.split("\n")[0]).toBe('/// <reference lib="es2020" />');
+    expect(src.split("\n")[1]).toBe("function f(a: number): number { return a; }");
+  });
+
   it("Python: invokes callable with JSON-loaded input", () => {
     const src = buildWrappedProgram("python", "def g(x):\n    return x", "g");
     expect(src).toContain("def g(x):");
