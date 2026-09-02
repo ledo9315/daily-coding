@@ -16,10 +16,32 @@ loadEnv({ path: resolve(process.cwd(), ".env.local"), override: true });
  * run over all users closes that gap; a second run writes nothing.
  *
  *   pnpm exec tsx scripts/backfill-achievement-unlocks.ts
+ *   PROD_DATABASE_URL='postgresql://…' pnpm exec tsx scripts/backfill-achievement-unlocks.ts
  */
 async function main() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("DATABASE_URL ist nicht gesetzt.");
+  /*
+    PROD_DATABASE_URL wins, same contract as prisma.production.config.ts and the seed: the
+    two loadEnv calls above run with override: true, so a DATABASE_URL passed on the command
+    line is silently replaced by whatever sits in .env.local. The script would then report
+    success against the local database while the caller believes it wrote to production.
+  */
+  const connectionString =
+    process.env.PROD_DATABASE_URL?.trim() || process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("Weder PROD_DATABASE_URL noch DATABASE_URL ist gesetzt.");
+  }
+
+  if (process.env.PROD_DATABASE_URL?.trim()) {
+    // Host only: the URL carries credentials.
+    const host = (() => {
+      try {
+        return new URL(connectionString).host;
+      } catch {
+        return "(unlesbare URL)";
+      }
+    })();
+    console.log(`[backfill] PROD_DATABASE_URL gesetzt, Ziel ist ${host}`);
+  }
 
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   try {

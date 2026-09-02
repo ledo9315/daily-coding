@@ -17,6 +17,17 @@ export type ChangelogEntry = {
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "v0.3.0",
+    date: "2026-09-03",
+    changes: [
+      "25 neue Challenges, von 15 auf 40: die bekanntesten Aufgaben von LeetCode und Codewars, darunter Trapping Rain Water, Edit Distance, Coin Change und Who likes it? Verteilung danach: 21 leicht, 15 mittel, 4 schwer.",
+      "17 neue Achievements, von 6 auf 23, für Streaks, gelöste Sprachen, Kommentare und Bewertungen. Wer sie sich früher verdient hat, bekommt sie rückwirkend mit dem richtigen Datum.",
+      "Das Profil zeigt vier Achievements auf einer kompakten Karte; „Alle 23 anzeigen“ öffnet die vollständige Liste, nach Stufe gruppiert von gewöhnlich bis legendär.",
+      "TypeScript-Abgaben können Map, Set, padStart und Co. verwenden. Bisher lehnte die Prüfung sie ab, obwohl dasselbe in JavaScript lief.",
+      "Auf dem Dashboard steht der Streak-Rekord in der Fußzeile der Karte, und der Punkte-Trend erscheint nur, wenn es aufwärts ging.",
+    ],
+  },
+  {
     version: "v0.2.0",
     date: "2026-08-30",
     changes: [
