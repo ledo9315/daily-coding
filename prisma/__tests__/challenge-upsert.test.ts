@@ -58,16 +58,17 @@ describe("challengeUpsertArgs", () => {
     // `date` is unique and no longer drives the daily; leaving stale values around would only
     // wait to collide with a future write.
     const reset = seed.indexOf("challenge.updateMany({ data: { date: null } })");
-    const ring = seed.indexOf("const ringOrder = [");
+    const ring = seed.indexOf("const ringOrder = CHALLENGE_SEEDS.map(");
     expect(reset).toBeGreaterThan(-1);
     expect(ring).toBeGreaterThan(reset);
     expect(seed).toContain("rotationState.upsert");
   });
 
   it("is the only way the seed writes a challenge", () => {
-    // Structural, not per-challenge: a new challenge added with a hand-written `update`
-    // clause would silently bring the stale-prose bug back.
-    expect(seed).not.toMatch(/challenge\.upsert\(\s*\{/);
-    expect(seed.match(/challengeUpsertArgs\(/g)?.length).toBe(15);
+    // Structural, not per-challenge: a challenge written with a hand-rolled `update` clause
+    // would silently bring the stale-prose bug back. Since the content moved to
+    // challenges.json there is a single upsert, and it derives its arguments from here.
+    expect(seed).toContain("challengeUpsertArgs(data)");
+    expect(seed.match(/challengeUpsertArgs\(/g)?.length).toBe(1);
   });
 });

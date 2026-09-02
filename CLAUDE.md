@@ -148,6 +148,38 @@ them - Ruby covers both, since `data` there is just a value.
 - `Submission` tracks code, language, status, test results (JSON), and timing
 - `RankingEntry` is pre-computed per period (today/week/month) with unique constraint on `(userId, period, periodDate)`
 
+### Challenge content
+
+Challenges are written in the admin UI, so the database is where they come into being.
+`prisma/challenges.json` is the versioned copy: `pnpm challenges:export` writes the
+content of a database back into it, `prisma/seed.ts` reads it through
+`prisma/challenge-seeds.ts` and upserts every entry. Write a challenge in the admin, run
+the export, commit the JSON - otherwise it exists in exactly one database. That is how 25
+of the 40 challenges came to be missing from production while `db:reset` would have
+deleted them locally.
+
+The JSON holds **content only**. `isActive`, `position` and `date` describe what an
+instance does with a challenge, not what the challenge is: a full seed renumbers the ring
+from the order of the JSON, and a content-only run appends anything new behind the
+existing ring so the rotation pointer stays put. `challengeUpsertArgs` draws the same line
+for updates.
+
+`resolveJsonModule` gives the import no useful type - `difficulty` widens to `string`,
+the JSON columns to `unknown` - so `prisma/__tests__/challenge-seeds.test.ts` checks the
+shape instead, including that every offered language has both a starter template and a
+`callableByLanguage` entry. A language without one grades by smoke execution and passes an
+empty solution.
+
+Production gets content with `SEED_CONTENT_ONLY=true`, which skips demo users, fixture
+submissions and rankings:
+
+```bash
+SEED_CONTENT_ONLY=true PROD_DATABASE_URL='postgresql://…' pnpm exec tsx prisma/seed.ts
+```
+
+`PROD_DATABASE_URL` without that flag aborts - a full seed against production would create
+eleven accounts whose password is in the seed file.
+
 ## Git & PR workflow
 
 - Branch naming: `feature/DAI-<number>-<short-title>`
