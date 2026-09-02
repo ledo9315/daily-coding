@@ -125,9 +125,12 @@ export function AchievementBadge({
     <div
       className={cn(
         "relative overflow-hidden border-2 p-4 transition-all",
-        unlocked ? config.borderClassName : "border-border",
-        unlocked ? config.bgClassName : "bg-secondary/30",
-        !unlocked && "opacity-50 grayscale",
+        config.borderClassName,
+        config.bgClassName,
+        // Locked keeps the colour of its rarity and only fades: the full list groups by
+        // rarity, and a grey card would drop out of the group it belongs to. What is still
+        // open reads from the progress bar and the missing unlock date instead.
+        !unlocked && "opacity-60",
         className,
       )}
     >
@@ -135,16 +138,13 @@ export function AchievementBadge({
         <div
           className={cn(
             "flex h-12 w-12 shrink-0 items-center justify-center border-2 border-transparent",
-            unlocked ? config.bgClassName : "bg-muted",
+            config.bgClassName,
           )}
         >
           {/* `fill-current`: the pixelart Lightbulb path ships without `fill="currentColor"`
               and would render black. */}
           <Icon
-            className={cn(
-              "h-6 w-6 fill-current",
-              unlocked ? config.iconClassName : "text-muted-foreground",
-            )}
+            className={cn("h-6 w-6 fill-current", config.iconClassName)}
           />
         </div>
         <div className="min-w-0 flex-1">
@@ -153,13 +153,10 @@ export function AchievementBadge({
               rarity label drops to its own line when the title needs the width. */}
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
             <h4 className="min-w-0 font-semibold break-words">{title}</h4>
-            {unlocked && (
-              <span
-                className={cn("shrink-0 text-xs font-medium", config.labelClassName)}
-              >
-                {config.label}
-              </span>
-            )}
+            {/* Shown while locked too - it is what puts the card in its group. */}
+            <span className={cn("shrink-0 text-xs font-medium", config.labelClassName)}>
+              {config.label}
+            </span>
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
           {unlocked && unlockedAt && (

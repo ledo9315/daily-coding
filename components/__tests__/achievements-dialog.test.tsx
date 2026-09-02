@@ -3,8 +3,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   AchievementsDialog,
   AchievementsDialogBody,
-  filterAchievements,
-  type AchievementFilter,
 } from "@/components/achievements-dialog";
 import { Dialog } from "@/components/ui/dialog";
 import type { Achievement } from "@/lib/api";
@@ -28,11 +26,7 @@ function makeAchievements(count: number, unlocked: number): Achievement[] {
  * the body is rendered on its own. The bare Dialog root is only the context provider
  * DialogTitle and DialogDescription read from; it adds no markup of its own.
  */
-function renderBody(
-  achievements: Achievement[],
-  filter: AchievementFilter,
-  showProgress = true,
-) {
+function renderBody(achievements: Achievement[], showProgress = true) {
   const unlocked = achievements.filter((a) => a.unlocked).length;
   return renderToStaticMarkup(
     <Dialog open>
@@ -40,8 +34,6 @@ function renderBody(
         achievements={achievements}
         unlockedCount={unlocked}
         total={achievements.length}
-        filter={filter}
-        onFilterChange={() => {}}
         showProgress={showProgress}
       />
     </Dialog>,
@@ -51,55 +43,42 @@ function renderBody(
 const badgeCount = (html: string) => (html.match(/<h4/g) ?? []).length;
 
 describe("AchievementsDialogBody", () => {
-  it("labels all three filters with their counts", () => {
-    const html = renderBody(makeAchievements(23, 4), "all");
-    expect(html).toMatch(/Alle <span[^>]*>23<\/span>/);
-    expect(html).toMatch(/Freigeschaltet <span[^>]*>4<\/span>/);
-    expect(html).toMatch(/Offen <span[^>]*>19<\/span>/);
+  it("lists every achievement at once", () => {
+    const html = renderBody(makeAchievements(23, 4));
+    expect(badgeCount(html)).toBe(23);
     expect(html).toContain("Achievements 4/23");
     expect(html).toContain("Alle Achievements im Überblick");
   });
 
-  it("lists every achievement under the all filter", () => {
-    const html = renderBody(makeAchievements(23, 4), "all");
-    expect(badgeCount(html)).toBe(23);
+  it("offers no filters", () => {
+    // The three tabs split a list short enough to read in full; what they were for -
+    // seeing what is still open - the rarity grouping answers in place.
+    const html = renderBody(makeAchievements(23, 4));
+    expect(html).not.toContain("role=\"tablist\"");
+    expect(html).not.toContain("Freigeschaltet <span");
+    expect(html).not.toContain("Offen <span");
   });
 
-  it("shows only the locked ones under the open filter", () => {
-    const html = renderBody(makeAchievements(23, 4), "locked");
-    expect(badgeCount(html)).toBe(19);
-    expect(html).not.toContain("Freigeschaltet am");
+  it("shows the locked ones alongside the unlocked", () => {
+    const html = renderBody(makeAchievements(5, 2));
+    expect(badgeCount(html)).toBe(5);
+    expect(html).toContain("Freigeschaltet am");
+    expect(html).toContain("width:");
   });
 
-  it("explains an empty unlocked list instead of showing nothing", () => {
-    const html = renderBody(makeAchievements(23, 0), "unlocked");
-    expect(badgeCount(html)).toBe(0);
-    expect(html).toContain("Noch nichts freigeschaltet. Die erste Challenge wartet.");
-  });
-
-  it("congratulates when nothing is left open", () => {
-    const html = renderBody(makeAchievements(5, 5), "locked");
-    expect(badgeCount(html)).toBe(0);
-    expect(html).toContain("Alles freigeschaltet. Respekt.");
+  it("groups by rarity and leaves the order within a rarity alone", () => {
+    const list = makeAchievements(4, 0);
+    const rarities = ["epic", "common", "legendary", "common"] as const;
+    const mixed = list.map((a, i) => ({ ...a, rarity: rarities[i], title: `T${i + 1}` }));
+    const titles = [...renderBody(mixed).matchAll(/<h4[^>]*>([^<]+)<\/h4>/g)].map((m) => m[1]);
+    // The two commons keep their input order; nothing reorders by unlock state.
+    expect(titles).toEqual(["T2", "T4", "T1", "T3"]);
   });
 
   it("drops the progress bars when asked to", () => {
     const list = makeAchievements(6, 2);
-    expect(renderBody(list, "locked")).toContain("width:");
-    expect(renderBody(list, "locked", false)).not.toContain("width:");
-  });
-});
-
-describe("filterAchievements", () => {
-  const list = makeAchievements(5, 2);
-
-  it("passes everything through for all", () => {
-    expect(filterAchievements(list, "all")).toHaveLength(5);
-  });
-
-  it("splits unlocked and locked", () => {
-    expect(filterAchievements(list, "unlocked").map((a) => a.id)).toEqual(["ach-1", "ach-2"]);
-    expect(filterAchievements(list, "locked")).toHaveLength(3);
+    expect(renderBody(list)).toContain("width:");
+    expect(renderBody(list, false)).not.toContain("width:");
   });
 });
 
