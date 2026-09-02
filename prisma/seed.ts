@@ -12,6 +12,7 @@ import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 import bcrypt from "bcryptjs";
 import { challengeUpsertArgs } from "./challenge-upsert";
+import { EXTRA_CHALLENGES } from "./challenges";
 
 loadEnv({ path: resolve(process.cwd(), ".env") });
 loadEnv({ path: resolve(process.cwd(), ".env.local"), override: true });
@@ -1747,6 +1748,11 @@ async function main() {
       date: addUtcDays(anchor, -14),
     }),
   );
+
+  // Content modules under prisma/challenges; `isActive` false until an admin adds them to the ring.
+  for (const content of EXTRA_CHALLENGES) {
+    await prisma.challenge.upsert(challengeUpsertArgs({ ...content, isActive: false }));
+  }
 
   // These challenges are only created; nothing references them later.
   void [

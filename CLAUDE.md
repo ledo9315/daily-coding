@@ -141,6 +141,17 @@ them - Ruby covers both, since `data` there is just a value.
 - `middleware.ts` protects `/challenge`, `/profile`, `/ranking`, `/admin` paths via JWT token check
 - Admin role is checked **in route handlers** via `lib/server/require-admin-page.ts` / `lib/server/admin-session.ts` (not in middleware, to avoid stale JWT role data)
 
+### Challenge content
+
+The first fifteen challenges live inline in `prisma/seed.ts`; every later one is a module under
+`prisma/challenges/<slug>.ts` exporting `challenge: ChallengeContent`, listed in
+`prisma/challenges/index.ts` and upserted by the seed in one loop. `prisma/__tests__/challenge-catalog.test.ts`
+checks each module structurally (ids, hint titles, points, JSON validity, a callable and a starter
+per language, typed-harness compatibility of every test input). Before seeding a new challenge run
+`scripts/verify-challenge.ts` with reference solutions kept outside the repo - it executes them
+through the real harness on the local Piston. New challenges are created with `isActive: false`;
+an admin adds them to the ring.
+
 ### Data model highlights
 
 - `Challenge` stores per-language starter code in `starterCodes` (JSON map) - `starterCode` field is legacy JS-only
