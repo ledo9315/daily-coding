@@ -16,6 +16,7 @@ import type { AppLocale } from "@/lib/locale";
 import {
   getEmailNotificationSetting,
   setEmailNotificationSetting,
+  type EmailNotificationSettings,
   setLocaleSetting,
 } from "@/lib/api";
 
@@ -53,9 +54,9 @@ export function SettingsPanel() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
 
-  // null until loaded: rendering the switch as "off" first would tell the user their mails
-  // are disabled for a moment, which is the opposite of the default.
-  const [notifyByEmail, setNotifyByEmail] = useState<boolean | null>(null);
+  // null until loaded: rendering the switches as "off" first would tell the user their
+  // mails are disabled for a moment, which is the opposite of the default.
+  const [notifications, setNotifications] = useState<EmailNotificationSettings | null>(null);
 
   /**
    * Only set while the session has not caught up yet - `update()` below writes the new
@@ -71,17 +72,24 @@ export function SettingsPanel() {
 
   useEffect(() => {
     getEmailNotificationSetting()
-      .then((data) => setNotifyByEmail(data.notifyByEmail))
+      .then(setNotifications)
       .catch(() => {});
   }, []);
 
-  async function onToggleEmails(next: boolean) {
-    const previous = notifyByEmail;
-    setNotifyByEmail(next);
+  // Optimistic, and rolled back as a whole: the two switches share one request shape, so
+  // a failed write must not leave the other one showing a value that was never stored.
+  async function onToggleNotification(
+    key: keyof EmailNotificationSettings,
+    next: boolean
+  ) {
+    const previous = notifications;
+    if (!previous) return;
+
+    setNotifications({ ...previous, [key]: next });
     try {
-      await setEmailNotificationSetting(next);
+      await setEmailNotificationSetting({ [key]: next });
     } catch (error) {
-      setNotifyByEmail(previous);
+      setNotifications(previous);
       toast.error(
         error instanceof Error ? error.message : t("settings.notifications.saveFailed")
       );
@@ -220,17 +228,36 @@ export function SettingsPanel() {
               {t("settings.notifications.description")}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <div className="flex items-center justify-between gap-4 border-2 border-border bg-background px-4 py-3">
               <Label htmlFor="notifyByEmail" className="text-lg">
                 {t("settings.notifications.emailLabel")}
               </Label>
               <Switch
                 id="notifyByEmail"
-                checked={notifyByEmail ?? true}
-                disabled={notifyByEmail === null}
-                onCheckedChange={onToggleEmails}
+                checked={notifications?.notifyByEmail ?? true}
+                disabled={notifications === null}
+                onCheckedChange={(next) => onToggleNotification("notifyByEmail", next)}
               />
+            </div>
+
+            <div className="border-2 border-border bg-background px-4 py-3">
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor="notifyDailyReminder" className="text-lg">
+                  {t("settings.notifications.reminderLabel")}
+                </Label>
+                <Switch
+                  id="notifyDailyReminder"
+                  checked={notifications?.notifyDailyReminder ?? true}
+                  disabled={notifications === null}
+                  onCheckedChange={(next) =>
+                    onToggleNotification("notifyDailyReminder", next)
+                  }
+                />
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("settings.notifications.reminderHint")}
+              </p>
             </div>
           </CardContent>
         </Card>

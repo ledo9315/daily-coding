@@ -41,5 +41,31 @@
     "clever": "{actor} thinks your solution to \"{challenge}\" is clever.",
     "action": "Go to the solution",
     "footer": "You can switch these notifications off in your settings at any time."
+  },
+  "dailyReminder": {
+    "subject": "Today: {title} – Daily Coding",
+    "heading": "Today's challenge",
+    "task": "{title} · {difficulty} · {points, plural, one {# point} other {# points}}",
+    "streak": "Your streak stands at {days, plural, one {# day} other {# days}} and today is still open.",
+    "noStreak": "No streak yet. Today would be a good day to start one.",
+    "action": "Go to the challenge",
+    "footer": "This reminder arrives at most once a day, and only while the challenge is still open.",
+    "unsubscribe": "Stop these reminders",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    }
+  },
+  "unsubscribe": {
+    "metaTitle": "Stop reminders",
+    "doneTitle": "Reminders stopped",
+    "doneBody": "The daily reminder is off. Notifications about your solutions are not affected.",
+    "resume": "Turn reminders back on",
+    "resumedTitle": "Reminders are back on",
+    "resumedBody": "The daily reminder will arrive again while the challenge of the day is still open.",
+    "invalidTitle": "Invalid link",
+    "invalidBody": "This link belongs to no account. Reminders can be switched off in the settings at any time.",
+    "toChallenge": "Go to today's challenge"
   }
 }

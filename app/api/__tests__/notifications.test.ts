@@ -139,26 +139,44 @@ describe("POST /api/notifications/read", () => {
 });
 
 describe("/api/user/notifications", () => {
-  it("reads the current setting", async () => {
-    mockUserFindUnique.mockResolvedValue({ notifyByEmail: false });
+  it("reads both settings", async () => {
+    mockUserFindUnique.mockResolvedValue({
+      notifyByEmail: false,
+      notifyDailyReminder: true,
+    });
 
-    expect(await (await settingHandler()).json()).toEqual({ notifyByEmail: false });
-  });
-
-  it("stores a new setting", async () => {
-    mockUserUpdate.mockResolvedValue({});
-
-    const response = await patchSettingHandler(patchRequest({ notifyByEmail: false }));
-
-    expect(response.status).toBe(200);
-    expect(mockUserUpdate).toHaveBeenCalledWith({
-      where: { id: "user-me" },
-      data: { notifyByEmail: false },
+    expect(await (await settingHandler()).json()).toEqual({
+      notifyByEmail: false,
+      notifyDailyReminder: true,
     });
   });
 
+  /** The panel writes the switch that moved, so the body carries one key, not both. */
+  it.each(["notifyByEmail", "notifyDailyReminder"] as const)(
+    "stores %s on its own",
+    async (setting) => {
+      mockUserUpdate.mockResolvedValue({});
+
+      const response = await patchSettingHandler(patchRequest({ [setting]: false }));
+
+      expect(response.status).toBe(200);
+      expect(mockUserUpdate).toHaveBeenCalledWith({
+        where: { id: "user-me" },
+        data: { [setting]: false },
+        select: { notifyByEmail: true, notifyDailyReminder: true },
+      });
+    }
+  );
+
   it("refuses anything that is not a boolean", async () => {
     const response = await patchSettingHandler(patchRequest({ notifyByEmail: "ja" }));
+
+    expect(response.status).toBe(400);
+    expect(mockUserUpdate).not.toHaveBeenCalled();
+  });
+
+  it("refuses a body that names no setting at all", async () => {
+    const response = await patchSettingHandler(patchRequest({ somethingElse: true }));
 
     expect(response.status).toBe(400);
     expect(mockUserUpdate).not.toHaveBeenCalled();

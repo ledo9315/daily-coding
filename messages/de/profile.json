@@ -93,6 +93,8 @@
       "title": "Benachrichtigungen",
       "description": "Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in der Glocke im Kopfbereich. Zusätzlich per E-Mail:",
       "emailLabel": "Benachrichtigungen per E-Mail",
+      "reminderLabel": "Tägliche Erinnerung",
+      "reminderHint": "Eine E-Mail am Tag, und nur solange die Aufgabe des Tages noch offen ist.",
       "saveFailed": "Einstellung konnte nicht gespeichert werden."
     },
     "language": {
