@@ -109,6 +109,15 @@
     "yourCode": "Your code",
     "improveSolution": "Improve solution"
   },
+  "share": {
+    "title": "Share your result",
+    "hint": "The block gives away neither your code nor the solution – only your week and today's task.",
+    "streak": "{count, plural, one {# day in a row} other {# days in a row}}",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "copyFailed": "Copying did not work. Select the text and copy it by hand."
+  },
   "difficulty": {
     "easy": "Easy",
     "medium": "Medium",

@@ -10,15 +10,17 @@ export { utcDayKey, consecutiveStreakFromCompletedDaySet } from "@/lib/streak-da
 const LOOKBACK_DAYS = 400;
 
 /**
- * Current streak length: consecutive UTC calendar days with at least one completed
- * submission (`status === completed`), walking back from `asOf`.
+ * The UTC days with at least one completed submission, as `utcDayKey` values.
+ *
+ * No upper bound on the range: every caller walks backwards from its own reference day,
+ * so rows after it are read and ignored rather than filtered - which keeps the streak and
+ * the shared week strip on one query instead of two with different windows.
  */
-export async function computeConsecutiveStreakDays(
+export async function completedDayKeys(
   userId: string,
   asOf: Date = new Date()
-): Promise<number> {
-  const dayStart = startOfUtcDay(asOf);
-  const oldest = new Date(dayStart);
+): Promise<Set<string>> {
+  const oldest = startOfUtcDay(asOf);
   oldest.setUTCDate(oldest.getUTCDate() - LOOKBACK_DAYS);
 
   const rows = await prisma.submission.findMany({
@@ -30,10 +32,19 @@ export async function computeConsecutiveStreakDays(
     select: { createdAt: true },
   });
 
-  const completedDays = new Set<string>();
-  for (const r of rows) {
-    completedDays.add(utcDayKey(r.createdAt));
-  }
+  return new Set(rows.map((row) => utcDayKey(row.createdAt)));
+}
 
-  return consecutiveStreakFromCompletedDaySet(dayStart, completedDays);
+/**
+ * Current streak length: consecutive UTC calendar days with at least one completed
+ * submission (`status === completed`), walking back from `asOf`.
+ */
+export async function computeConsecutiveStreakDays(
+  userId: string,
+  asOf: Date = new Date()
+): Promise<number> {
+  return consecutiveStreakFromCompletedDaySet(
+    startOfUtcDay(asOf),
+    await completedDayKeys(userId, asOf)
+  );
 }
