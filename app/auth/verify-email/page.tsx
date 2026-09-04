@@ -3,8 +3,10 @@
 import { Suspense, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 function VerifyEmailPageContent() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -37,17 +39,19 @@ function VerifyEmailPageContent() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
-      <p className="text-sm text-muted-foreground">Dein Konto wird verifiziert und du wirst angemeldet...</p>
+      <p className="text-sm text-muted-foreground">{t("verifyEmail.status")}</p>
     </main>
   );
 }
 
 export default function VerifyEmailPage() {
+  const t = useTranslations("auth");
+
   return (
     <Suspense
       fallback={
         <main className="min-h-screen flex items-center justify-center px-4">
-          <p className="text-sm text-muted-foreground">Dein Konto wird verifiziert und du wirst angemeldet...</p>
+          <p className="text-sm text-muted-foreground">{t("verifyEmail.status")}</p>
         </main>
       }
     >

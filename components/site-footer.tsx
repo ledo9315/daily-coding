@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ChangelogLink } from "@/components/changelog-link";
 
 const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
@@ -14,7 +15,9 @@ const footerLinkClass = "transition-colors hover:text-primary focus-visible:text
  * Kontakt, all `href="#"`), so it was cut down to a single row. The row read like an afterthought;
  * the groups below carry only links that exist, which is what the placeholders never did.
  */
-export function SiteFooter() {
+export async function SiteFooter() {
+  const t = await getTranslations("community");
+
   return (
     // `mt-16` because the footer now follows arbitrary page content: on the challenge page
     // the editor ended and the footer began, with barely a line between them.
@@ -26,19 +29,19 @@ export function SiteFooter() {
               <span className="font-pixel text-xl tracking-tighter text-primary">
                 {">_"}
               </span>
+              {/* eslint-disable-next-line no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
               <span className="font-pixel text-xs tracking-tight text-foreground">
                 DAILY CODING
               </span>
             </Link>
             <p className="mt-4 max-w-sm font-code text-sm leading-relaxed text-muted-foreground">
-              Löse jeden Tag eine neue Coding-Challenge in deiner Programmiersprache
-              und steige im Ranking auf.
+              {t("footer.tagline")}
             </p>
           </div>
 
-          <nav aria-label="Projekt">
+          <nav aria-label={t("footer.project")}>
             <h2 className="font-pixel text-xs uppercase tracking-wider text-foreground">
-              Projekt
+              {t("footer.project")}
             </h2>
             <ul className="mt-4 space-y-3 font-code text-sm text-muted-foreground">
               <li>
@@ -47,9 +50,11 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={footerLinkClass}
-                  aria-label="GitHub-Repository in neuem Tab öffnen"
+                  aria-label={t("footer.githubLabel")}
                 >
+                  {/* eslint-disable no-restricted-syntax -- provider name, not copy. */}
                   GitHub
+                  {/* eslint-enable no-restricted-syntax */}
                 </a>
               </li>
               <li>
@@ -61,32 +66,32 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={footerLinkClass}
-                  aria-label="Fehler auf GitHub in neuem Tab melden"
+                  aria-label={t("footer.bugReportLabel")}
                 >
-                  Fehler melden
+                  {t("footer.bugReport")}
                 </a>
               </li>
               <li>
                 <a href={`mailto:${SUPPORT_EMAIL}`} className={footerLinkClass}>
-                  Support
+                  {t("footer.support")}
                 </a>
               </li>
             </ul>
           </nav>
 
-          <nav aria-label="Rechtliches">
+          <nav aria-label={t("footer.legal")}>
             <h2 className="font-pixel text-xs uppercase tracking-wider text-foreground">
-              Rechtliches
+              {t("footer.legal")}
             </h2>
             <ul className="mt-4 space-y-3 font-code text-sm text-muted-foreground">
               <li>
                 <Link href="/impressum" className={footerLinkClass}>
-                  Impressum
+                  {t("footer.imprint")}
                 </Link>
               </li>
               <li>
                 <Link href="/datenschutz" className={footerLinkClass}>
-                  Datenschutz
+                  {t("footer.privacy")}
                 </Link>
               </li>
             </ul>
@@ -95,7 +100,9 @@ export function SiteFooter() {
 
         <div className="mt-12 border-t border-border pt-6">
           <p className="font-code text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Daily Coding
+            {/* A string, not a number: as an ICU argument the year would be grouped
+                into „2.026". */}
+            {t("footer.copyright", { year: String(new Date().getFullYear()) })}
           </p>
         </div>
       </div>

@@ -6,7 +6,7 @@ const read = (...parts: string[]) =>
   readFileSync(resolve(process.cwd(), ...parts), "utf8");
 
 const page = read("app", "u", "[handle]", "page.tsx");
-const privacyPolicy = read("app", "datenschutz", "page.tsx");
+const privacyPolicy = read("messages", "de", "legal.json");
 
 /**
  * #34: the public profile is the first page that serves another user's data without a
@@ -15,7 +15,9 @@ const privacyPolicy = read("app", "datenschutz", "page.tsx");
  * ponytail: reads the page as text. It is a server component pulling in fonts, CSS and
  * next-auth, so it does not import in the node test environment - and what is at stake
  * is the coupling between two files, which text captures. The behaviour behind the page
- * is covered by `lib/server/__tests__/public-profile.test.ts`.
+ * is covered by `lib/server/__tests__/public-profile.test.ts`. The privacy passage is
+ * read from the German message catalogue, where the prose lives since DAI-202; the page
+ * under `app/datenschutz` only resolves keys.
  */
 describe("public profile page", () => {
   it("keeps the noindex the privacy policy promises", () => {

@@ -9,15 +9,21 @@ export function normaliseEmailAddress(email: string): string {
   return email.trim().normalize("NFKC").toLowerCase();
 }
 
-export function emailAddressValidationError(email: string): string | null {
+/**
+ * The single rejection reason: an address is either usable or not, and naming which rule
+ * it broke would only help someone probing for valid shapes.
+ */
+export type EmailAddressError = "invalid";
+
+export function emailAddressValidationError(email: string): EmailAddressError | null {
   const normalised = normaliseEmailAddress(email);
   if (!normalised || normalised.length > MAX_EMAIL_LENGTH) {
-    return "Ungültige E-Mail-Adresse.";
+    return "invalid";
   }
 
   const parts = normalised.split("@");
   if (parts.length !== 2) {
-    return "Ungültige E-Mail-Adresse.";
+    return "invalid";
   }
 
   const [localPart, domain] = parts;
@@ -29,7 +35,7 @@ export function emailAddressValidationError(email: string): string | null {
     localPart.includes("..") ||
     !LOCAL_PART_PATTERN.test(localPart)
   ) {
-    return "Ungültige E-Mail-Adresse.";
+    return "invalid";
   }
 
   const domainLabels = domain?.split(".") ?? [];
@@ -42,7 +48,7 @@ export function emailAddressValidationError(email: string): string | null {
         !DOMAIN_LABEL_PATTERN.test(label)
     )
   ) {
-    return "Ungültige E-Mail-Adresse.";
+    return "invalid";
   }
 
   return null;

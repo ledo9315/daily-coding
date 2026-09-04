@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { RankingTable } from "@/components/ranking-table";
@@ -76,6 +77,7 @@ function RankingSkeleton() {
 }
 
 export default function RankingPage() {
+  const t = useTranslations("profile");
   const [activeTab, setActiveTab] = useState<Period>("week");
 
   const { data: weekRanking = [], isLoading: weekLoading } = useQuery({
@@ -111,10 +113,10 @@ export default function RankingPage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8">
           <h1 className="text-3xl font-pixel uppercase tracking-tight mb-2">
-            Rangliste
+            {t("ranking.title")}
           </h1>
           <EncryptedText
-            text="Vergleiche dich mit anderen Nutzern"
+            text={t("ranking.subtitle")}
             revealDelayMs={20}
             className="text-xl text-muted-foreground uppercase tracking-wide"
           />
@@ -128,15 +130,15 @@ export default function RankingPage() {
           <TabsList className="w-full sm:w-auto sm:grid-cols-none rounded-none">
             <TabsTrigger value="week" className="gap-2 cursor-pointer rounded-none text-md">
               <CalendarWeek className="h-4 w-4 hidden sm:block" fill="currentColor" />
-              Woche
+              {t("ranking.tabWeek")}
             </TabsTrigger>
             <TabsTrigger value="month" className="gap-2 cursor-pointer rounded-none text-md">
               <CalendarMonth className="h-4 w-4 hidden sm:block" fill="currentColor" />
-              Monat
+              {t("ranking.tabMonth")}
             </TabsTrigger>
             <TabsTrigger value="all" className="gap-2 cursor-pointer rounded-none text-md">
               <Trophy className="h-4 w-4 hidden sm:block" fill="currentColor" />
-              Gesamt
+              {t("ranking.tabAll")}
             </TabsTrigger>
           </TabsList>
 
@@ -148,7 +150,7 @@ export default function RankingPage() {
                 {weekRanking.length > 0 && (
                   <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
                     <CardHeader>
-                      <CardTitle className="text-center">Top 3 der Woche</CardTitle>
+                      <CardTitle className="text-center">{t("ranking.podiumWeek")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <TopThreePodium
@@ -166,7 +168,7 @@ export default function RankingPage() {
                 {monthRanking.length > 0 && (
                   <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
                     <CardHeader>
-                      <CardTitle className="text-center">Top 3 des Monats</CardTitle>
+                      <CardTitle className="text-center">{t("ranking.podiumMonth")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <TopThreePodium
@@ -184,7 +186,7 @@ export default function RankingPage() {
                 {allTimeRanking.length > 0 && (
                   <Card className="shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] border-chart-5/50">
                     <CardHeader>
-                      <CardTitle className="text-center">Top 3 insgesamt</CardTitle>
+                      <CardTitle className="text-center">{t("ranking.podiumAll")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <TopThreePodium

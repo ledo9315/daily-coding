@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  DISPLAY_NAME_MAX_LENGTH,
   displayNameValidationError,
   nameKeyOf,
   publicProfilePath,
@@ -10,12 +11,19 @@ describe("displayNameValidationError", () => {
   it.each([".", "---", "_ _", "🎮", "A"])(
     "rejects a name without at least two letters or numbers: %s",
     (name) => {
-      expect(displayNameValidationError(name)).toMatch(/zwei Buchstaben oder Zahlen/);
+      expect(displayNameValidationError(name)).toEqual({ code: "tooFewAlphanumerics" });
     }
   );
 
+  it("rejects a name that normalises to nothing", () => {
+    expect(displayNameValidationError("   ")).toEqual({ code: "empty" });
+  });
+
   it("rejects names longer than 50 normalised characters", () => {
-    expect(displayNameValidationError("A".repeat(51))).toMatch(/höchstens 50 Zeichen/);
+    expect(displayNameValidationError("A".repeat(51))).toEqual({
+      code: "tooLong",
+      max: DISPLAY_NAME_MAX_LENGTH,
+    });
   });
 
   it.each(["Li", "O’Neil", "Müller-Lüdenscheidt", "coder42", "李雷"])(

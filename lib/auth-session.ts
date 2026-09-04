@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Retrieve the authenticated user ID from the current session.
@@ -11,9 +12,10 @@ export async function getSessionUserId(): Promise<
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) {
+    const t = await getTranslations("api");
     return {
       error: NextResponse.json(
-        { error: "Nicht authentifiziert." },
+        { error: t("auth.notAuthenticated") },
         { status: 401 }
       ),
     };

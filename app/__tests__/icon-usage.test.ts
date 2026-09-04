@@ -43,7 +43,7 @@ describe("icon assignments", () => {
   });
 
   it("uses the same icon for a level on the profile and in the feed", () => {
-    const levelCard = /title="LEVEL"[\s\S]*?icon=\{(\w+)\}/.exec(profilePage);
+    const levelCard = /profilePage\.statsLevel[\s\S]*?icon=\{(\w+)\}/.exec(profilePage);
     const levelUpEvent = /case "level-up":[\s\S]*?icon: (\w+),/.exec(feedItem);
     expect(levelCard?.[1]).toBe(levelUpEvent?.[1]);
   });
@@ -51,7 +51,8 @@ describe("icon assignments", () => {
   it("keeps Trophy for placements", () => {
     // Rank is the one meaning a trophy carries on its own.
     expect(rankingTable).toContain("Trophy");
-    expect(/title="DEIN RANG"[\s\S]*?icon=\{Trophy\}/.test(dashboardPage)).toBe(true);
+    // The label lives in the message catalogue now, so the key is what the call site shows.
+    expect(/home\.rank\.title[\s\S]*?icon=\{Trophy\}/.test(dashboardPage)).toBe(true);
   });
 
   it("labels nothing but a placement with Trophy", () => {
@@ -59,8 +60,8 @@ describe("icon assignments", () => {
     const trophyCards = profilePage
       .split("<StatsCard")
       .filter((card) => card.includes("icon={Trophy}"))
-      .map((card) => /title="(\w+)"/.exec(card)?.[1]);
-    expect(trophyCards).toEqual(["PLATZIERUNG"]);
+      .map((card) => /profilePage\.(\w+)"/.exec(card)?.[1]);
+    expect(trophyCards).toEqual(["statsRank"]);
     expect(feedItem).not.toContain("Trophy");
   });
 

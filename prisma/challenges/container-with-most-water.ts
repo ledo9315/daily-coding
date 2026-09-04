@@ -58,6 +58,58 @@ export const challenge: ChallengeContent = {
         "Behälter aus einer einzigen Linie fasst nichts.",
     },
   ],
+  translations: {
+    en: {
+      title: "Container With Most Water",
+      description:
+        "Implement maxArea(height).\n\n" +
+        "height describes vertical lines: height[i] is the height of the line at position i. Two " +
+        "lines together with the x-axis form a container, and it holds as much water as the " +
+        "shorter of the two is tall, times the distance between them. Return the largest area two " +
+        "lines can enclose. height has at least two entries, all heights are non-negative, and " +
+        "the container must not be tilted.\n\n" +
+        "Computing every pair costs O(n²). This task aims at ruling pairs out without looking at " +
+        "them: walking from the outside in, you know at every step which side has nothing better " +
+        "left to offer.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Start with the widest container: the leftmost line and the rightmost one. Every step " +
+            "inwards makes it narrower, so it only pays off if the height can grow – and the " +
+            "shorter line is what sets that height. Leaving the taller side where it is and " +
+            "moving the shorter one inwards is therefore the only move that can gain anything.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Two pointers, left = 0 and right = length - 1, plus a maximum. As long as left < " +
+            "right: compute min(height[left], height[right]) * (right - left) and keep the larger " +
+            "value. Then the pointer with the smaller height moves one step inwards; when they " +
+            "are equal it does not matter which. At the end you return the maximum.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The area is the height of the shorter line times the distance between the indices – " +
+            "not the sum of the heights, and not the distance plus one. For [1,1] the distance is " +
+            "1, so the area is 1.\n\n" +
+            "Moving the taller pointer loses width without any chance at more height: on the " +
+            "example [1,8,6,2,5,4,8,3,7] that yields only 8 instead of 49.\n\n" +
+            "The pointers must not pass each other: the loop ends when they meet. A container " +
+            "made of a single line holds nothing.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Two lines",
+        "3": "Equal at the ends",
+        "4": "Three lines",
+        "5": "Ascending",
+        "6": "With zeros",
+      },
+    },
+  },
   examples: [{ input: "[1,8,6,2,5,4,8,3,7]", output: "49" }],
   supportedLanguages: [...ALL_LANGUAGES],
   evaluationConfig: {

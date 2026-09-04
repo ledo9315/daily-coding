@@ -17,12 +17,12 @@ describe("comment policy", () => {
   it.each([["whitespace only", "   \n\t "], ["empty string", ""]])(
     "rejects %s",
     (_label, raw) => {
-      expect(normalizeCommentBody(raw)).toEqual({ error: "Kommentar darf nicht leer sein." });
+      expect(normalizeCommentBody(raw)).toEqual({ error: { code: "empty" } });
     }
   );
 
   it.each([null, undefined, 42, {}, ["text"]])("rejects non-string %s", (raw) => {
-    expect(normalizeCommentBody(raw)).toEqual({ error: "Kommentar darf nicht leer sein." });
+    expect(normalizeCommentBody(raw)).toEqual({ error: { code: "empty" } });
   });
 
   it("accepts a body at the length limit", () => {
@@ -33,7 +33,7 @@ describe("comment policy", () => {
   it("rejects one character over the limit", () => {
     const result = normalizeCommentBody("a".repeat(COMMENT_MAX_LENGTH + 1));
     expect(result).toEqual({
-      error: `Kommentar darf höchstens ${COMMENT_MAX_LENGTH} Zeichen lang sein.`,
+      error: { code: "tooLong", max: COMMENT_MAX_LENGTH },
     });
   });
 
@@ -46,9 +46,7 @@ describe("comment policy", () => {
   it.each(["\u200b", "\u200c\u200d", "\u2060", "\u180e", "\u034f", " \u200b \n "])(
     "rejects a body that only looks like text (%j)",
     (raw) => {
-      expect(normalizeCommentBody(raw)).toEqual({
-        error: "Kommentar darf nicht leer sein.",
-      });
+      expect(normalizeCommentBody(raw)).toEqual({ error: { code: "empty" } });
     }
   );
 

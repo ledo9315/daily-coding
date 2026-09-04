@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Bookmark } from "@nsmr/pixelart-react";
 import { AchievementBadge, resolveAchievementIcon } from "@/components/achievement-badge";
 import { AchievementsDialog } from "@/components/achievements-dialog";
@@ -27,6 +28,7 @@ export function AchievementsCard({
   showProgress = true,
   className,
 }: AchievementsCardProps) {
+  const t = useTranslations("profile");
   const [open, setOpen] = useState(false);
   const featured = pickFeaturedAchievements(achievements, FEATURED_ACHIEVEMENT_COUNT);
   const hasMore = achievements.length > FEATURED_ACHIEVEMENT_COUNT;
@@ -36,7 +38,7 @@ export function AchievementsCard({
       <CardHeader className="mb-2">
         <CardTitle className="flex items-center gap-2">
           <Bookmark className="h-5 w-5 text-amber-500" />
-          Achievements {unlockedCount}/{total}
+          {t("achievements.title", { unlocked: unlockedCount, total })}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -48,7 +50,7 @@ export function AchievementsCard({
             icon={resolveAchievementIcon(achievement.iconKey)}
             unlocked={achievement.unlocked}
             rarity={achievement.rarity}
-            unlockedAt={achievement.unlockedAt}
+            unlockedAtIso={achievement.unlockedAtIso}
             progress={showProgress ? achievement.progress : undefined}
           />
         ))}
@@ -59,7 +61,7 @@ export function AchievementsCard({
             className="w-full"
             onClick={() => setOpen(true)}
           >
-            Alle {total} anzeigen
+            {t("achievements.showAll", { total })}
           </Button>
         )}
       </CardContent>

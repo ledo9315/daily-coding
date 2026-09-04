@@ -207,7 +207,7 @@ describe("buildWrappedProgram", () => {
     // Every other language produces one program for all cases; Java's differs per case, so a
     // missing input is a programming error rather than something to paper over.
     expect(() => buildWrappedProgram("java", "static int f(int n) { return n; }", "f")).toThrow(
-      /Testeingabe/u
+      /test input/u
     );
   });
 

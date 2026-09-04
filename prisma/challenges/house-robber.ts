@@ -82,6 +82,59 @@ export const challenge: ChallengeContent = {
     { id: 6, name: "Alle gleich", input: "[3,3,3,3,3]", expected: "9" },
     { id: 7, name: "Zwei Häuser", input: "[2,9]", expected: "9" },
   ],
+  translations: {
+    en: {
+      title: "House Robber",
+      description:
+        "Implement rob(nums).\n\n" +
+        "nums[i] is the amount of money in the i-th house on a street. You may rob as many " +
+        "houses as you like, but never two neighboring ones – otherwise the alarm goes off. " +
+        "Return the highest amount you can get away with. All amounts are non-negative; an " +
+        "empty array yields 0.\n\n" +
+        "Simply taking every second house already fails on [2,7,9,3,1]. The task aims at " +
+        "reducing the decision at each house to what you already know about the two houses " +
+        "before it.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "At every house there are exactly two options. You take it: then you get the best " +
+            "up to two houses before it plus its amount. Or you skip it: then the best up to " +
+            "the previous house stays. The maximum of the two is the best up to here – and " +
+            "you never need to know more than these two running values.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Two variables, prev2 and prev1, both 0: the best up to two houses back and the " +
+            "best up to the last house. For every nums[i] you compute current = max(prev1, " +
+            "prev2 + nums[i]) and then shift along: prev2 = prev1, prev1 = current. After the " +
+            "last house the answer sits in prev1 – for an empty array that is 0, without any " +
+            "special case.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The greed for every second house: for [2,7,9,3,1] 2 + 9 + 1 = 12 beats " +
+            "7 + 3 = 10, for [2,1,1,2] the two outer ones give 4 instead of 3. Between two " +
+            "houses you take there may also be two or more.\n\n" +
+            "The order when shifting along: overwriting prev1 before saving it into prev2 " +
+            "means computing with the wrong value in the next step.\n\n" +
+            "An array with one house yields its amount, an empty one 0 – your loop should " +
+            "survive both without ever reaching for nums[1].",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Not every second house",
+        "3": "Outer instead of middle",
+        "4": "One house",
+        "5": "Empty",
+        "6": "All equal",
+        "7": "Two houses",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

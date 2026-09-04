@@ -2,13 +2,17 @@
 # settings from the "pnpm" field in package.json. Without an entry here even
 # `pnpm exec` aborts, because it runs a dependency check first.
 #
-# All five fetch or link platform-specific binaries:
+# All of them fetch or link platform-specific binaries:
 #   prisma / @prisma/engines  engine binaries (schema-engine) for prisma migrate
 #   esbuild                   transpiler binary, used by Vite/Vitest
 #   sharp                     libvips for Next.js image optimisation
 #   unrs-resolver             napi resolver, used by ESLint
+#   @swc/core                 next-intl's message extractor
+#   @parcel/watcher           next-intl's dev-time message reload
 allowBuilds:
+  '@parcel/watcher': true
   '@prisma/engines': true
+  '@swc/core': true
   esbuild: true
   prisma: true
   sharp: true

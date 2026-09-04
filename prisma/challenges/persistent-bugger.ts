@@ -89,6 +89,61 @@ export const challenge: ChallengeContent = {
     { id: 5, name: "Gleiche Ziffern", input: "77", expected: "4" },
     { id: 6, name: "Mit Null", input: "10", expected: "1" },
   ],
+  translations: {
+    en: {
+      title: "Persistent Bugger",
+      description:
+        "Implement persistence(n).\n\n" +
+        "Return the multiplicative persistence of n: how many times do you have to multiply " +
+        "the digits of n together until only a single digit is left? For 39 that takes three " +
+        "steps: 3 · 9 = 27, 2 · 7 = 14, 1 · 4 = 4. For 999 it takes four: 729, 126, 12, 2. A " +
+        "number that already has one digit has persistence 0.\n\n" +
+        "n is always a positive integer. The task is a loop around a digit product – the craft " +
+        "lies in building that product cleanly and leaving the loop at the right moment.\n\n" +
+        "If you have solved Digital Root you know the loop – the only new thing here is what a " +
+        "product does differently from a sum.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Two things that are easy on their own: multiplying the digits of a number, and " +
+            "repeating that as long as the number has at least two digits. A counter remembers " +
+            "how often you multiplied – it is the answer.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Set count = 0. As long as n >= 10: build the product of all digits of n, assign " +
+            "it to n and increase count by 1. Once the loop is over, return count. You get the " +
+            "digits either from the string representation or arithmetically: n % 10 is the last " +
+            "digit, n = Math.floor(n / 10) drops it.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The product starts at 1, not at 0 – otherwise every digit product is 0 and the " +
+            "loop ends after one step with the wrong counter.\n\n" +
+            "Single-digit numbers are done immediately: persistence(4) is 0, not 1. Increase " +
+            "the counter before the check, or reach for a do-while loop, and you count one step " +
+            "too many.\n\n" +
+            "If you take the digits from the string, you have to turn them back into numbers " +
+            "before multiplying. JavaScript silently coerces the strings in \"3\" * \"9\" into " +
+            "numbers and hands you 27; Python and Ruby raise an error at the same spot. So " +
+            "convert the digits explicitly everywhere before you multiply. With a zero among " +
+            "the digits the product is 0 and the loop ends – that is correct, persistence(10) " +
+            "is 1.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Four steps",
+        "3": "Single digit",
+        "4": "Two steps",
+        "5": "Same digits",
+        "6": "With a zero",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

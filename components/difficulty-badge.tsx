@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -8,22 +9,10 @@ interface DifficultyBadgeProps {
   size?: "sm" | "md" | "lg";
 }
 
-const difficultyConfig: Record<
-  Difficulty,
-  { label: string; className: string }
-> = {
-  easy: {
-    label: "Einfach",
-    className: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  },
-  medium: {
-    label: "Mittel",
-    className: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  },
-  hard: {
-    label: "Schwer",
-    className: "bg-rose-500/10 text-rose-500 border-rose-500/20",
-  },
+const difficultyClassName: Record<Difficulty, string> = {
+  easy: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  medium: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  hard: "bg-rose-500/10 text-rose-500 border-rose-500/20",
 };
 
 export function DifficultyBadge({
@@ -31,7 +20,7 @@ export function DifficultyBadge({
   size = "md",
   className,
 }: DifficultyBadgeProps) {
-  const config = difficultyConfig[difficulty];
+  const t = useTranslations("challenge");
 
   const sizeClasses = {
     sm: "px-2 h-6 text-xs border-2",
@@ -43,12 +32,12 @@ export function DifficultyBadge({
     <span
       className={cn(
         "inline-flex items-center border-2 font-bold font-sans uppercase tracking-wide",
-        config.className,
+        difficultyClassName[difficulty],
         sizeClasses[size],
         className,
       )}
     >
-      {config.label}
+      {t(`difficulty.${difficulty}`)}
     </span>
   );
 }

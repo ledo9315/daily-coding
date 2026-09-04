@@ -1,10 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { NAV_ITEMS } from "@/lib/navigation";
+import { renderWithIntl } from "@/components/__tests__/intl-render";
+import de from "@/messages/de/community.json";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 import { MobileNav } from "@/components/mobile-nav";
+
+function render() {
+  return renderWithIntl(<MobileNav />);
+}
 
 /**
  * #79: the header's nav is `hidden md:flex` and for a while nothing replaced it - on a
@@ -26,6 +31,11 @@ describe("NAV_ITEMS", () => {
       expect(typeof item.icon).toBe("function");
     }
   });
+
+  /** A destination without a key would render the German label from the list forever. */
+  it("has a translated label for every destination", () => {
+    expect(Object.keys(de.nav)).toHaveLength(NAV_ITEMS.length);
+  });
 });
 
 describe("MobileNav", () => {
@@ -35,12 +45,12 @@ describe("MobileNav", () => {
    * missing: without a labelled button there is no way in.
    */
   it("renders a labelled trigger", () => {
-    const html = renderToStaticMarkup(<MobileNav />);
-    expect(html).toContain('aria-label="Menü öffnen"');
+    const html = render();
+    expect(html).toContain(`aria-label="${de.mobileNav.open}"`);
   });
 
   it("hides the trigger from md upwards, where the nav bar takes over", () => {
-    const html = renderToStaticMarkup(<MobileNav />);
+    const html = render();
     expect(html).toContain("md:hidden");
   });
 });

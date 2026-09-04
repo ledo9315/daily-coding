@@ -56,6 +56,57 @@ export const challenge: ChallengeContent = {
         "nicht vier.",
     },
   ],
+  translations: {
+    en: {
+      title: "Bit Counting",
+      description:
+        "Implement countBits(n).\n\n" +
+        "Return how many ones the binary representation of the non-negative integer n contains. " +
+        "1234 is 10011010010 in binary and contains five ones, so the answer is 5. For 0 the " +
+        "answer is 0.\n\n" +
+        "n stays within the range of a signed 32-bit number, so the largest value is 2147483647 " +
+        "– and that one has 31 ones.\n\n" +
+        "This task checks whether you can read a number as a sequence of bits. The detour through " +
+        "a string works, but the actual idea is to ask for the bits one at a time with remainder " +
+        "and division – or with a shift and a bitwise and.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "The lowest bit of a number is n % 2, or n & 1. Halve n – integer division by 2, or " +
+            "n >> 1 – and the next bit moves down into that place. That way you peel the binary " +
+            "representation off bit by bit, without ever writing it out as a whole.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Start with count = 0. As long as n is greater than 0: add n & 1 to count and set n " +
+            "to n >> 1. At the end count holds the number of ones.\n\n" +
+            "Alternatively you convert n into a binary string and count the \"1\" characters – one " +
+            "line in most languages, and perfectly legitimate for this task.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "For 0 the loop has to stop right away and return 0, not 1. Counting first and " +
+            "checking afterwards counts one bit too many.\n\n" +
+            "In JavaScript, bitwise operators work on 32-bit numbers. 2147483647 just about fits; " +
+            "computing with % 2 and Math.floor(n / 2) makes you independent of that limit.\n\n" +
+            "What gets counted are the ones, not the digits: 8 is 1000 in binary and has a single " +
+            "one, not four.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Zero",
+        "2": "Power of two",
+        "3": "All ones",
+        "4": "Two ones",
+        "5": "Even number",
+        "6": "Example",
+        "7": "Largest 32-bit value",
+      },
+    },
+  },
   examples: [{ input: "1234", output: "5" }],
   supportedLanguages: [...ALL_LANGUAGES],
   evaluationConfig: {

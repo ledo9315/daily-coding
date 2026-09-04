@@ -1,6 +1,5 @@
 import type { AchievementRarity } from "@/lib/generated/prisma/enums";
-import { formatDate } from "@/lib/format";
-import type { Achievement } from "@/lib/api";
+import type { Achievement, ProgressLabel } from "@/lib/api";
 import type { AchievementFacts, FactSubmission } from "@/lib/server/achievement-facts";
 import { ACHIEVEMENT_DEFS } from "@/lib/server/achievement-defs";
 import { utcDayKey } from "@/lib/streak-days";
@@ -70,7 +69,8 @@ export type AchievementRule = {
   at: Date | null;
   current: number;
   target: number;
-  label?: string;
+  /** Message key, not text: the badge resolves it in the reader's language. */
+  label?: ProgressLabel;
 };
 
 type Dated = { createdAt: Date };
@@ -165,7 +165,7 @@ export function deriveAchievementRules(facts: AchievementFacts): Record<string, 
     at: null,
     current: streakRecord,
     target,
-    label: "Rekord",
+    label: "record",
   });
   const countOf = (list: Dated[], target: number): AchievementRule => ({
     unlocked: list.length >= target,
@@ -277,7 +277,6 @@ export function buildUserAchievementsView(
       iconKey: def.iconKey,
       unlocked,
       rarity: def.rarity,
-      unlockedAt: unlockedAtDate && formatDate(unlockedAtDate),
       unlockedAtIso: unlockedAtDate?.toISOString(),
       progress,
     };

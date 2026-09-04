@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { Check, Clock, WarningBox } from "@nsmr/pixelart-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 type Status = "not-submitted" | "submitted" | "pending" | "failed";
@@ -10,37 +11,33 @@ interface SubmissionStatusProps {
   className?: string;
 }
 
+/** Icon, colour and message-key segment per status; label and description come from there. */
 const statusConfig: Record<
   Status,
   {
     icon: ComponentType<{ className?: string }>;
-    label: string;
-    description: string;
+    messageKey: "notSubmitted" | "submitted" | "pending" | "failed";
     className: string;
   }
 > = {
   "not-submitted": {
     icon: Clock,
-    label: "Noch nicht abgegeben",
-    description: "Du kannst deine Lösung noch einreichen",
+    messageKey: "notSubmitted",
     className: "border-muted bg-muted/30 text-muted-foreground",
   },
   submitted: {
     icon: Check,
-    label: "Erfolgreich abgegeben",
-    description: "Deine Lösung wurde eingereicht",
+    messageKey: "submitted",
     className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
   },
   pending: {
     icon: WarningBox,
-    label: "Wird ausgewertet",
-    description: "Deine Lösung wird gerade überprüft",
+    messageKey: "pending",
     className: "border-amber-500/30 bg-amber-500/10 text-amber-500",
   },
   failed: {
     icon: WarningBox,
-    label: "Abgabe nicht bestanden",
-    description: "Die Tests waren nicht vollständig erfolgreich",
+    messageKey: "failed",
     className: "border-destructive/40 bg-destructive/10 text-destructive",
   },
 };
@@ -50,6 +47,7 @@ export function SubmissionStatus({
   submittedAt,
   className,
 }: SubmissionStatusProps) {
+  const t = useTranslations("challenge");
   const config = statusConfig[status];
   const Icon = config.icon;
 
@@ -63,9 +61,13 @@ export function SubmissionStatus({
     >
       <Icon className="h-8 w-8 shrink-0 text-current opacity-90" aria-hidden />
       <div>
-        <p className="font-medium">{config.label}</p>
+        <p className="font-medium">
+          {t(`submissionStatus.${config.messageKey}.label`)}
+        </p>
         <p className="text-sm opacity-80">
-          {submittedAt ? `Abgegeben um ${submittedAt}` : config.description}
+          {submittedAt
+            ? t("submissionStatus.submittedAt", { time: submittedAt })
+            : t(`submissionStatus.${config.messageKey}.description`)}
         </p>
       </div>
     </div>

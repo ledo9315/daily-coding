@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
 import { resolveRingIndex } from "@/lib/server/challenge-ring";
+import { localizeChallenge } from "@/lib/server/content-translations";
 
 /** Start and end (exclusive) of the running UTC calendar day. */
 export function utcDayRange(now: Date = new Date()): { gte: Date; lt: Date } {
@@ -90,7 +91,7 @@ export async function findDailyChallengeForApp() {
         day: startOfUtcDay(now),
       },
     });
-    return first;
+    return localizeChallenge(first);
   }
 
   const { index, changed } = resolveRingIndex(pool, state, now);
@@ -109,5 +110,8 @@ export async function findDailyChallengeForApp() {
     });
   }
 
-  return current;
+  // Translated at the exit, not per caller: the daily route, the dashboard card and the
+  // landing badge all read the challenge through here. The ring itself has no language -
+  // which challenge is live must not depend on who is asking.
+  return localizeChallenge(current);
 }

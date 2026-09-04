@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderWithIntl } from "./intl-render";
 
 import { TopThreePodium } from "@/components/top-three-podium";
 
@@ -15,7 +15,7 @@ const third = { name: "Max Mustermann", initials: "MM", points: 80, level: 1 };
 
 describe("TopThreePodium", () => {
   it("renders only first place when there is one entry", () => {
-    const markup = renderToStaticMarkup(<TopThreePodium first={first} />);
+    const markup = renderWithIntl(<TopThreePodium first={first} />);
 
     expect(markup).toContain("Leonid");
     expect(markup).not.toContain("Lisa Müller");
@@ -23,7 +23,7 @@ describe("TopThreePodium", () => {
   });
 
   it("renders first and second place when there are two entries", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderWithIntl(
       <TopThreePodium first={first} second={second} />,
     );
 
@@ -33,7 +33,7 @@ describe("TopThreePodium", () => {
   });
 
   it("renders all three places when there are three entries", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderWithIntl(
       <TopThreePodium first={first} second={second} third={third} />,
     );
 
@@ -46,7 +46,7 @@ describe("TopThreePodium", () => {
     const ranking = [first];
 
     expect(() =>
-      renderToStaticMarkup(
+      renderWithIntl(
         <TopThreePodium
           first={ranking[0]}
           second={ranking[1]}
@@ -57,7 +57,7 @@ describe("TopThreePodium", () => {
   });
 
   it("links every placement to its public profile (#34)", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderWithIntl(
       <TopThreePodium first={first} second={second} third={third} />,
     );
 

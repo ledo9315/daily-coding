@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderWithIntl } from "@/components/__tests__/intl-render";
+import de from "@/messages/de/community.json";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 vi.mock("next-auth/react", () => ({
@@ -18,11 +19,14 @@ import { Header } from "@/components/header";
  * check needs a signed-in session in a real browser.
  */
 describe("Header on small screens", () => {
-  const html = renderToStaticMarkup(<Header />);
+  const html = renderWithIntl(<Header />);
 
   it("offers the sheet trigger below md", () => {
-    expect(html).toContain('aria-label="Menü öffnen"');
-    expect(html).toMatch(/aria-label="Menü öffnen"[^>]*md:hidden|md:hidden[^>]*aria-label="Menü öffnen"/);
+    const label = de.mobileNav.open;
+    expect(html).toContain(`aria-label="${label}"`);
+    expect(html).toMatch(
+      new RegExp(`aria-label="${label}"[^>]*md:hidden|md:hidden[^>]*aria-label="${label}"`)
+    );
   });
 
   it("keeps the nav bar for md and up, so the two never show at once", () => {
@@ -37,5 +41,12 @@ describe("Header on small screens", () => {
 
   it("drops the STREAK label below sm, where the number alone has to do", () => {
     expect(html).toContain("sm:inline");
+    expect(html).toContain(de.header.streakLabel);
+  });
+
+  it("names every primary destination in the reader's language", () => {
+    for (const label of Object.values(de.nav)) {
+      expect(html).toContain(label);
+    }
   });
 });

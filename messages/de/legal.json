@@ -1,0 +1,99 @@
+{
+  "provider": {
+    "name": "Leonid Domahalskyy",
+    "street": "Rude 13",
+    "city": "24941 Flensburg",
+    "country": "Deutschland",
+    "email": "leonid.domagalsky@gmail.com",
+    "phone": "015205892880",
+    "emailLabel": "E-Mail:",
+    "phoneLabel": "Telefon:"
+  },
+  "imprint": {
+    "meta": {
+      "title": "Impressum",
+      "description": "Anbieterkennzeichnung und Kontaktdaten für daily-coding.de."
+    },
+    "title": "Impressum",
+    "provider": {
+      "title": "Angaben gemäß § 5 DDG"
+    },
+    "contact": {
+      "title": "Kontakt"
+    },
+    "responsible": {
+      "title": "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV"
+    },
+    "dispute": {
+      "title": "Streitschlichtung",
+      "platform": "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:",
+      "notice": "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+    },
+    "contentLiability": {
+      "title": "Haftung für Inhalte",
+      "body": "Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen."
+    },
+    "linkLiability": {
+      "title": "Haftung für Links",
+      "body": "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich."
+    }
+  },
+  "privacy": {
+    "meta": {
+      "title": "Datenschutzerklärung",
+      "description": "Welche Daten Daily Coding verarbeitet, zu welchem Zweck, an welche Dienstleister sie gehen und welche Rechte du hast."
+    },
+    "title": "Datenschutz\u00aderklärung",
+    "controller": {
+      "title": "1. Verantwortlicher",
+      "intro": "Verantwortlich für die Datenverarbeitung auf dieser Website ist:"
+    },
+    "registration": {
+      "title": "2. Verarbeitung bei Registrierung und Konto",
+      "p1": "Zur Nutzung von Daily Coding legst du ein Nutzerkonto an. Dabei verarbeiten wir deinen Namen, deine E-Mail-Adresse und dein Passwort. Das Passwort wird ausschließlich als kryptografischer Hash (bcrypt) gespeichert – es ist uns zu keiner Zeit im Klartext zugänglich. Zur Verifizierung deiner E-Mail-Adresse und für das Zurücksetzen des Passworts erzeugen wir zeitlich befristete Token.",
+      "p2": "Rechtsgrundlage ist die Erfüllung des Nutzungsvertrags gemäß Art. 6 Abs. 1 lit. b DSGVO."
+    },
+    "oauth": {
+      "title": "3. Anmeldung über Drittanbieter (OAuth)",
+      "p1": "Sofern du dich über GitHub oder Google anmeldest, erhalten wir von dem jeweiligen Anbieter deine E-Mail-Adresse, deinen Namen und gegebenenfalls dein Profilbild, um dein Konto anzulegen bzw. zu verknüpfen. Es werden keine Passwörter der Drittanbieter an uns übertragen. Rechtsgrundlage ist deine Einwilligung durch die Auswahl des Anmeldedienstes (Art. 6 Abs. 1 lit. a DSGVO) sowie die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO)."
+    },
+    "usageData": {
+      "title": "4. Nutzungsdaten (Challenges, Ranking, Streaks)",
+      "p1": "Wenn du Coding-Challenges bearbeitest, speichern wir den von dir eingereichten Quellcode, die gewählte Programmiersprache, den Lösungsstatus sowie daraus abgeleitete Punkte-, Ranglisten- und Streak-Daten. Diese Daten sind für die Kernfunktion der Plattform (Bewertung, Bestenliste, Fortschritt) erforderlich. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie unser berechtigtes Interesse an einer funktionsfähigen Plattform (Art. 6 Abs. 1 lit. f DSGVO).",
+      "p2": "Für andere sichtbar sind dabei dein Name, dein gewählter Avatar, dein Level, deine aktuelle Streak samt Streak-Rekord und die Anzahl der von dir gelösten Challenges. Das gilt in der Bestenliste, im Community-Feed und auf deiner öffentlichen Profilseite.",
+      "p3": "Diese Profilseite ist ohne Anmeldung abrufbar, also auch für Personen ohne Konto bei uns. Sie ist per Meta-Angabe von der Indexierung durch Suchmaschinen ausgenommen und nicht in unserer Sitemap verzeichnet. Deine E-Mail-Adresse und dein eingereichter Quellcode sind für andere Nutzer weiterhin nicht sichtbar."
+    },
+    "codeExecution": {
+      "title": "5. Ausführung von Quellcode",
+      "p1": "Zur Bewertung deiner Lösungen wird der eingereichte Code in einer isolierten, selbst betriebenen Ausführungsumgebung (Sandbox) ausgeführt. Diese läuft auf einem Server der Hetzner Online GmbH in Nürnberg, die insoweit als Auftragsverarbeiter (Art. 28 DSGVO) für uns tätig ist. Der Code wird ausschließlich zum Zweck der Bewertung verarbeitet und nicht an unbeteiligte Dritte weitergegeben."
+    },
+    "emailDelivery": {
+      "title": "6. E-Mail-Versand",
+      "p1": "Für den Versand von System-E-Mails (E-Mail-Verifizierung, Passwort-Zurücksetzen, Willkommens- und Konto-Löschbestätigungen) setzen wir den Dienstleister Resend (Resend, Inc.) als Auftragsverarbeiter ein. Dabei wird deine E-Mail-Adresse an den Dienstleister übermittelt; der Versand erfolgt über dessen Infrastruktur in Irland. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b und lit. f DSGVO."
+    },
+    "hosting": {
+      "title": "7. Hosting und Datenbank",
+      "p1": "Diese Website wird bei der Vercel Inc. betrieben; die Datenbank wird bei Neon in einem Rechenzentrum in Frankfurt am Main gehostet. Beide verarbeiten die oben genannten Daten in unserem Auftrag als Auftragsverarbeiter (Art. 28 DSGVO). Beim Aufruf der Website werden serverseitig technisch notwendige Zugriffsdaten (z. B. IP-Adresse, Zeitpunkt, aufgerufene Ressource) verarbeitet, um den sicheren und stabilen Betrieb zu gewährleisten (Art. 6 Abs. 1 lit. f DSGVO). Vercel Inc. und Resend, Inc. sind US-Unternehmen; soweit dabei Daten außerhalb der EU/des EWR verarbeitet werden, erfolgt dies auf Grundlage geeigneter Garantien (z. B. EU-Standardvertragsklauseln). Die Datenbank und die Ausführungsumgebung für Quellcode liegen innerhalb der EU."
+    },
+    "analytics": {
+      "title": "8. Reichweitenmessung",
+      "p1": "Zur Auswertung der Seitennutzung setzen wir Vercel Web Analytics der Vercel Inc. ein. Erhoben werden aufgerufene Seiten, Verweisquelle, Gerätetyp und Land. Der Dienst arbeitet ohne Cookies und ohne Speicherung deiner IP-Adresse; es werden keine geräteübergreifenden Profile gebildet. Rechtsgrundlage ist unser berechtigtes Interesse an der statistischen Auswertung der Nutzung (Art. 6 Abs. 1 lit. f DSGVO)."
+    },
+    "cookies": {
+      "title": "9. Cookies",
+      "p1": "Wir verwenden ein technisch notwendiges Cookie, um deine Anmeldung (Session) aufrechtzuerhalten. Dieses Cookie ist für den Betrieb des Login-Bereichs erforderlich; Rechtsgrundlage ist § 25 Abs. 2 TDDDG sowie Art. 6 Abs. 1 lit. f DSGVO. Tracking- oder Marketing-Cookies setzen wir nicht ein."
+    },
+    "retention": {
+      "title": "10. Speicherdauer",
+      "p1": "Wir speichern deine Daten, solange dein Konto besteht. Du kannst dein Konto jederzeit selbst in den Einstellungen löschen; dabei werden deine personenbezogenen Daten sowie die zugehörigen Einreichungen, Ranglisten- und Token-Daten gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen."
+    },
+    "rights": {
+      "title": "11. Deine Rechte",
+      "p1": "Dir stehen im Rahmen der gesetzlichen Vorgaben die folgenden Rechte zu: Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie Widerspruch gegen die Verarbeitung (Art. 21 DSGVO). Eine erteilte Einwilligung kannst du jederzeit mit Wirkung für die Zukunft widerrufen. Zur Ausübung genügt eine Nachricht an die oben genannten Kontaktdaten."
+    },
+    "complaints": {
+      "title": "12. Beschwerderecht",
+      "p1": "Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist das Unabhängige Landeszentrum für Datenschutz Schleswig-Holstein (ULD), Holstenstraße 98, 24103 Kiel."
+    }
+  }
+}

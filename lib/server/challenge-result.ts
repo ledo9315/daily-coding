@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { localizeChallenge } from "@/lib/server/content-translations";
 
 /**
  * The result page for the user's own solution of a challenge.
@@ -35,7 +36,8 @@ export async function getOwnChallengeResult(userId: string, challengeId: string)
 
   if (!submission) return null;
 
-  const { challenge, ...rest } = submission;
+  const { challenge: row, ...rest } = submission;
+  const challenge = await localizeChallenge(row);
 
   return {
     submission: rest,

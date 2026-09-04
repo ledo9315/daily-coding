@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Registrieren",
-  description:
-    "Erstelle ein kostenloses Konto und löse jeden Tag eine neue Coding-Challenge. Mit Rangliste, Streak und Abzeichen.",
-  alternates: { canonical: "/register" },
-};
+import { getTranslations } from "next-intl/server";
 
 // Client component page, so the metadata lives here (#131).
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth");
+
+  return {
+    title: t("registerMetadata.title"),
+    description: t("registerMetadata.description"),
+    alternates: { canonical: "/register" },
+  };
+}
+
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

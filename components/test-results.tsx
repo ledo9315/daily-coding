@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, CloseBox, Clock, WarningBox } from "@nsmr/pixelart-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface TestCase {
@@ -23,31 +24,30 @@ interface TestResultsProps {
 const statusConfig = {
   passed: {
     icon: Check,
-    label: "Bestanden",
     className: "text-emerald-500",
     bgClassName: "bg-emerald-500/10",
   },
   failed: {
     icon: CloseBox,
-    label: "Fehlgeschlagen",
     className: "text-rose-500",
     bgClassName: "bg-rose-500/10",
   },
   pending: {
     icon: WarningBox,
-    label: "Ausstehend",
     className: "text-muted-foreground",
     bgClassName: "bg-muted",
   },
   running: {
     icon: Clock,
-    label: "Läuft...",
     className: "text-amber-500 animate-pulse",
     bgClassName: "bg-amber-500/10",
   },
 };
 
 export function TestResults({ testCases, className, hideHeader }: TestResultsProps) {
+  // The heading and the score are the same two strings the result panels show, so both
+  // read `panels.*` rather than keeping a second copy of them.
+  const t = useTranslations("challenge");
   const passedCount = testCases.filter((tc) => tc.status === "passed").length;
   const totalCount = testCases.length;
 
@@ -55,7 +55,7 @@ export function TestResults({ testCases, className, hideHeader }: TestResultsPro
     <div className={cn("rounded-none border border-border bg-card", className)}>
       {!hideHeader && (
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h3 className="font-semibold">Testergebnisse</h3>
+        <h3 className="font-semibold">{t("panels.testResults")}</h3>
         <div className="flex items-center gap-2">
           <span
             className={cn(
@@ -65,7 +65,7 @@ export function TestResults({ testCases, className, hideHeader }: TestResultsPro
                 : "text-muted-foreground",
             )}
           >
-            {passedCount}/{totalCount} bestanden
+            {t("panels.passed", { passed: passedCount, total: totalCount })}
           </span>
         </div>
       </div>
@@ -111,17 +111,17 @@ export function TestResults({ testCases, className, hideHeader }: TestResultsPro
                     )}
                   >
                     <div>
-                      <span className="text-muted-foreground">Input: </span>
+                      <span className="text-muted-foreground">{t("testCase.input")}</span>
                       <span>{testCase.input}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Erwartet: </span>
+                      <span className="text-muted-foreground">{t("testCase.expected")}</span>
                       <span className="text-emerald-500">
                         {testCase.expected}
                       </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Erhalten: </span>
+                      <span className="text-muted-foreground">{t("testCase.actual")}</span>
                       <span
                         className={
                           st === "failed"

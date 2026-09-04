@@ -87,6 +87,57 @@ export const challenge: ChallengeContent = {
     { id: 7, name: "Vorzeichen", input: "[-1,1,-2,2]", expected: "false" },
     { id: 8, name: "Viele Duplikate", input: "[1,1,1,3,3,4,3,2,4,2]", expected: "true" },
   ],
+  translations: {
+    en: {
+      title: "Contains Duplicate",
+      description:
+        "Implement containsDuplicate(nums).\n\n" +
+        "Return true if any value in the array appears at least twice, otherwise false. " +
+        "The array can be empty and can contain negative numbers. An empty array and a " +
+        "single element have no duplicate.\n\n" +
+        "Comparing every element with every other one works and costs O(n²). The point of " +
+        "the task is the single pass: if you remember what you have already seen, you spot " +
+        "the repeat in the very moment it happens.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            'A duplicate is a value you have seen before. The question "have I seen this ' +
+            'value" is answered by a set in one step – no matter how many values are already ' +
+            "in it. That makes a single pass enough.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Create an empty set and walk through the array. If the current value is already " +
+            "in the set, return true right away. If it is not, add it and move on. If you " +
+            "reach the end without a hit, return false.\n\n" +
+            "It gets even shorter if you put the whole array into a set and compare the " +
+            "sizes: if the set is smaller than the array, something appears twice.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The false belongs after the loop, not inside it. Returning false at the first " +
+            "new value means never seeing the duplicate further on.\n\n" +
+            "For an empty array the loop never runs once – the result is still false, not an " +
+            "error and not undefined.\n\n" +
+            "If you sort instead and compare neighbors, do not let i+1 run past the end. And " +
+            "-1 and 1 are different values, even when sorting puts them side by side.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "All different",
+        "3": "Empty",
+        "4": "Single element",
+        "5": "At both ends",
+        "6": "Negative numbers",
+        "7": "Opposite signs",
+        "8": "Many duplicates",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

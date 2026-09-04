@@ -168,7 +168,7 @@ function scalarKind(v: unknown): ScalarKind {
   if (typeof v === "boolean") return "bool";
   if (typeof v === "string") return "string";
   throw new Error(
-    `Typisierter Harness: Eingabewert vom Typ ${v === null ? "null" : typeof v} wird nicht unterstützt.`
+    `Typed harness: an input value of type ${v === null ? "null" : typeof v} is not supported.`
   );
 }
 
@@ -191,7 +191,7 @@ function classify(v: unknown): ArgShape {
   const numeric: ScalarKind[] = ["int", "long", "double"];
   const compatible = kinds.every((k) => k === elem || (numeric.includes(k) && numeric.includes(elem)));
   if (!compatible) {
-    throw new Error("Typisierter Harness: gemischte Array-Typen werden nicht unterstützt.");
+    throw new Error("Typed harness: mixed array types are not supported.");
   }
   return { kind: "array", elem, values: v as (number | boolean | string)[] };
 }
@@ -208,7 +208,7 @@ function inferArguments(input: string, language: string): { name: string; shape:
   try {
     parsed = JSON.parse(input);
   } catch {
-    throw new Error(`${language}-Harness: Testeingabe ist kein gültiges JSON: ${input.slice(0, 80)}`);
+    throw new Error(`${language} harness: test input is not valid JSON: ${input.slice(0, 80)}`);
   }
 
   if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
@@ -501,7 +501,7 @@ sys.stdout.write(json.dumps(_result))
 `;
     case "java": {
       if (input == null) {
-        throw new Error("Java-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+        throw new Error("Java harness: cannot build a program without a test input.");
       }
       const { decls, names } = buildJavaArguments(input);
       const indented = trimmed
@@ -520,7 +520,7 @@ ${decls.join("\n")}
     }
     case "go": {
       if (input == null) {
-        throw new Error("Go-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+        throw new Error("Go harness: cannot build a program without a test input.");
       }
       const { decls, names } = buildGoArguments(input);
       return `${GO_HEADER_LINES.join("\n")}
@@ -554,7 +554,7 @@ ${decls.join("\n")}
     }
     case "cpp": {
       if (input == null) {
-        throw new Error("C++-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+        throw new Error("C++ harness: cannot build a program without a test input.");
       }
       const { decls, names } = buildCppArguments(input);
       /*
@@ -595,7 +595,7 @@ ${decls.join("\n")}
     }
     case "csharp": {
       if (input == null) {
-        throw new Error("C#-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+        throw new Error("C# harness: cannot build a program without a test input.");
       }
       const { decls, names } = buildCsharpArguments(input);
       const indented = trimmed
@@ -649,7 +649,7 @@ ${decls.join("\n")}
     }
     case "rust": {
       if (input == null) {
-        throw new Error("Rust-Harness: ohne Testeingabe kann kein Programm gebaut werden.");
+        throw new Error("Rust harness: cannot build a program without a test input.");
       }
       const { decls, names } = buildRustArguments(input);
       /*

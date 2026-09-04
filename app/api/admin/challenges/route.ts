@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { adminCreateChallengeSchema } from "@/lib/admin/challenge-schema";
+import {
+  germanChallengeText,
+  writeChallengeTranslations,
+} from "@/lib/admin/challenge-translations";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/server/admin-session";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
@@ -83,25 +87,40 @@ export async function POST(request: NextRequest) {
     );
 
   try {
-    const created = await prisma.challenge.create({
-      data: {
-        id: data.id,
-        title: data.title,
-        description: data.description,
-        hints: data.hints,
-        difficulty: data.difficulty,
-        points: data.points,
-        categoryId: data.categoryId,
-        examples: data.examples as unknown as Prisma.InputJsonValue,
-        testCases: data.testCases as unknown as Prisma.InputJsonValue,
-        evaluationConfig:
-          data.evaluationConfig as unknown as Prisma.InputJsonValue,
-        starterCodes: data.starterCodes as unknown as Prisma.InputJsonValue,
-        starterCode: data.starterCodes.javascript,
-        supportedLanguages: [...supported],
-        isActive: data.isActive ?? false,
-        date,
-      },
+    /*
+      Challenge and translation rows in one transaction: the German prose lives in both the
+      columns and the `de` row, and a save that wrote only one of them would leave the
+      translation table describing a version that no longer exists.
+    */
+    const created = await prisma.$transaction(async (tx) => {
+      const row = await tx.challenge.create({
+        data: {
+          id: data.id,
+          title: data.title,
+          description: data.description,
+          hints: data.hints,
+          difficulty: data.difficulty,
+          points: data.points,
+          categoryId: data.categoryId,
+          examples: data.examples as unknown as Prisma.InputJsonValue,
+          testCases: data.testCases as unknown as Prisma.InputJsonValue,
+          evaluationConfig:
+            data.evaluationConfig as unknown as Prisma.InputJsonValue,
+          starterCodes: data.starterCodes as unknown as Prisma.InputJsonValue,
+          starterCode: data.starterCodes.javascript,
+          supportedLanguages: [...supported],
+          isActive: data.isActive ?? false,
+          date,
+        },
+      });
+
+      await writeChallengeTranslations(
+        tx,
+        row.id,
+        germanChallengeText(data),
+        data.translations,
+      );
+      return row;
     });
     return NextResponse.json({ id: created.id }, { status: 201 });
   } catch (e) {

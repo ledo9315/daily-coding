@@ -5,6 +5,12 @@ import { resolve } from "node:path";
 const OG_FILE = resolve(process.cwd(), "public", "og-image.jpg");
 const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
 
+/** The alt text as a crawler receives it - one message per language, not a literal. */
+const ogImageAlt = (locale: string): string =>
+  JSON.parse(
+    readFileSync(resolve(process.cwd(), "messages", locale, "dashboard.json"), "utf8")
+  ).meta.ogImageAlt;
+
 /**
  * The pixel size a JPEG really has, read from its first SOF marker.
  *
@@ -55,7 +61,16 @@ describe("Open Graph image", () => {
 
   it("describes what the image actually shows", () => {
     // A stale alt text is worse than none: it tells a screen reader about a different image.
-    expect(layout).toContain("DAILY CODING");
-    expect(layout).not.toContain("mit Rang, Punkten, Streak");
+    expect(layout).toContain('t("meta.ogImageAlt")');
+    for (const locale of ["de", "en"]) {
+      expect(ogImageAlt(locale)).toContain("DAILY CODING");
+      expect(ogImageAlt(locale)).not.toContain("mit Rang, Punkten, Streak");
+    }
+  });
+
+  it("announces the locale the page is served in, not a fixed one", () => {
+    // Title, description and alt text are per request; a hardcoded og:locale contradicts them.
+    expect(layout).not.toMatch(/locale:\s*"de_DE"/);
+    expect(layout).toMatch(/locale:\s*OG_LOCALES\[/);
   });
 });

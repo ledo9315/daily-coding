@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocale, useTranslations } from "next-intl";
 import { Header } from "@/components/header";
 import ChallengeLoading from "./loading";
 import { CodeEditor } from "@/components/code-editor";
@@ -50,6 +51,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatTimeOfDay } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /** Interval for the silent API check that picks up a new UTC day / new challenge. */
@@ -66,6 +68,8 @@ export default function ChallengePage() {
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
   const prevChallengeIdRef = useRef<string | null>(null);
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("challenge");
 
   const {
     data: challenge,
@@ -86,8 +90,8 @@ export default function ChallengePage() {
     const isNew = prevChallengeIdRef.current !== challenge.id;
     if (isNew) {
       if (prevChallengeIdRef.current !== null) {
-        toast.message("Neue Daily Challenge", {
-          description: "Der UTC-Tag hat gewechselt.",
+        toast.message(t("toasts.newChallenge.title"), {
+          description: t("toasts.newChallenge.description"),
         });
       }
       prevChallengeIdRef.current = challenge.id;
@@ -118,18 +122,13 @@ export default function ChallengePage() {
           : status === "failed" ? "failed"
           : "pending"
         );
-        setSubmittedAtLabel(
-          new Date(submittedAt).toLocaleTimeString("de-DE", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        );
+        setSubmittedAtLabel(formatTimeOfDay(new Date(submittedAt), locale));
       } else {
         setSubmitOutcome("none");
         setSubmittedAtLabel(undefined);
       }
     }
-  }, [challenge]);
+  }, [challenge, locale, t]);
 
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -156,18 +155,18 @@ export default function ChallengePage() {
       setTestCases(result.testCases as TestCase[]);
       setCompileError(result.compileError ?? null);
       if (result.compileError) {
-        toast.error("Kompilieren fehlgeschlagen", {
-          description: "Der Code wurde nicht ausgeführt.",
+        toast.error(t("toasts.compileFailed.title"), {
+          description: t("toasts.compileFailed.description"),
         });
       } else if (result.runtimeOk === false) {
-        toast.message("Tests ausgeführt", {
-          description: "Mindestens ein Test ist fehlgeschlagen.",
+        toast.message(t("toasts.testsRun.title"), {
+          description: t("toasts.testsRun.description"),
         });
       }
     },
     onError: (e) => {
-      toast.error("Testlauf fehlgeschlagen", {
-        description: e instanceof Error ? e.message : "Unbekannter Fehler",
+      toast.error(t("toasts.runFailed.title"), {
+        description: e instanceof Error ? e.message : t("errors.unknown"),
       });
     },
   });
@@ -178,9 +177,7 @@ export default function ChallengePage() {
     onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
       setCompileError(result.compileError ?? null);
-      setSubmittedAtLabel(
-        new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
-      );
+      setSubmittedAtLabel(formatTimeOfDay(new Date(), locale));
       setSubmitOutcome(result.status === "completed" ? "success" : "failed");
 
       if (result.success) {
@@ -194,24 +191,23 @@ export default function ChallengePage() {
         } else {
           // Staying put on a repeat submission: navigating away would throw the user
           // out of the editor every time they improve an already passing solution.
-          toast.success("Lösung aktualisiert", {
-            description: "Deine Abgabe für heute wurde ersetzt.",
+          toast.success(t("toasts.solutionUpdated.title"), {
+            description: t("toasts.solutionUpdated.description"),
             action: {
-              label: "Zum Ergebnis",
+              label: t("actions.toResult"),
               onClick: () => router.push(challengeResultPath(challenge!.id)),
             },
           });
         }
       } else {
-        toast.error("Abgabe nicht bestanden", {
-          description:
-            "Mindestens ein Test ist fehlgeschlagen oder die Ausführung war fehlerhaft.",
+        toast.error(t("toasts.submissionFailed.title"), {
+          description: t("toasts.submissionFailed.description"),
         });
       }
     },
     onError: (e) => {
-      toast.error("Einreichen fehlgeschlagen", {
-        description: e instanceof Error ? e.message : "Unbekannter Fehler",
+      toast.error(t("toasts.submitFailed.title"), {
+        description: e instanceof Error ? e.message : t("errors.unknown"),
       });
     },
   });
@@ -231,10 +227,10 @@ export default function ChallengePage() {
       {compileError ? (
         <div className="border-2 border-destructive/60 bg-destructive/10 p-4">
           <p className="font-sans text-sm uppercase tracking-wide text-destructive">
-            Kompilieren fehlgeschlagen
+            {t("compileError.title")}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Der Code wurde nicht ausgeführt, es gibt daher kein Testergebnis.
+            {t("compileError.body")}
           </p>
           <pre className="mt-3 max-h-60 overflow-auto whitespace-pre-wrap font-code text-xs text-destructive">
             {compileError}
@@ -266,15 +262,15 @@ export default function ChallengePage() {
         <main className="mx-auto max-w-lg px-4 py-16 space-y-4">
           <Alert variant="destructive" className="rounded-none">
             <AlertIcon className="h-4 w-4" fill="currentColor" />
-            <AlertTitle>Keine Challenge</AlertTitle>
+            <AlertTitle>{t("loadError.title")}</AlertTitle>
             <AlertDescription>
               {loadError instanceof Error
                 ? loadError.message
-                : "Es ist keine aktive Aufgabe verfügbar. Bitte Datenbank prüfen (migrate + seed) oder später erneut versuchen."}
+                : t("loadError.description")}
             </AlertDescription>
           </Alert>
           <Button variant="outline" className="rounded-none" onClick={() => refetch()}>
-            Erneut laden
+            {t("loadError.retry")}
           </Button>
         </main>
       </div>
@@ -317,7 +313,7 @@ export default function ChallengePage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" fill="currentColor" />
-                  <CardTitle className="text-lg">Aufgabenbeschreibung</CardTitle>
+                  <CardTitle className="text-lg">{t("description.title")}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -327,15 +323,19 @@ export default function ChallengePage() {
                 </CardDescription>
 
                 <div className="space-y-3 rounded-lg bg-secondary/50 p-4">
-                  <h4 className="font-semibold">Beispiele:</h4>
+                  <h4 className="font-semibold">{t("description.examples")}</h4>
                   {challenge.examples.map((ex, i) => (
                     <div key={i} className="space-y-2 text-xs font-code">
                       <div>
-                        <span className="text-muted-foreground">Input: </span>
+                        <span className="text-muted-foreground">
+                          {t("description.inputLabel")}{" "}
+                        </span>
                         <span className="text-primary">{ex.input}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Output: </span>
+                        <span className="text-muted-foreground">
+                          {t("description.outputLabel")}{" "}
+                        </span>
                         <span className="text-emerald-500">{ex.output}</span>
                       </div>
                     </div>
@@ -354,7 +354,7 @@ export default function ChallengePage() {
               )}
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-lg font-semibold">Code Editor</h2>
+                <h2 className="text-lg font-semibold">{t("editor.title")}</h2>
                 <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                   {language && challenge.supportedLanguages.length > 1 ? (
                     <Select
@@ -362,7 +362,7 @@ export default function ChallengePage() {
                       onValueChange={(v) => setLanguage(v as CodeLanguageId)}
                     >
                       <SelectTrigger size="sm" className="w-full rounded-none font-sans sm:w-[180px]">
-                        <SelectValue placeholder="Sprache" />
+                        <SelectValue placeholder={t("editor.languagePlaceholder")} />
                       </SelectTrigger>
                       {/*
                         Above the maximize overlay. The list is portalled to the body, and
@@ -382,11 +382,11 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || !language}
-                    title="Test ausführen, im Editor auch mit ⌘S / Strg+S"
+                    title={t("editor.runTestsTitle")}
                     className="gap-2 rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Play className="h-4 w-4" fill="currentColor" />
-                    {isRunning ? "Läuft..." : "Test ausführen"}
+                    {isRunning ? t("editor.running") : t("editor.runTests")}
                   </Button>
                   <Button
                     variant="outline"
@@ -394,9 +394,9 @@ export default function ChallengePage() {
                     onClick={() => setIsMaximized((v) => !v)}
                     aria-pressed={isMaximized}
                     aria-label={
-                      isMaximized ? "Editor verkleinern" : "Editor maximieren"
+                      isMaximized ? t("editor.minimize") : t("editor.maximize")
                     }
-                    title={isMaximized ? "Editor verkleinern" : "Editor maximieren"}
+                    title={isMaximized ? t("editor.minimize") : t("editor.maximize")}
                     className="rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                   >
                     {isMaximized ? (
@@ -465,10 +465,10 @@ export default function ChallengePage() {
               >
                 <ArrowRight className="h-4 w-4" fill="currentColor" />
                 {isSubmitting
-                  ? "Wird gesendet…"
+                  ? t("submit.sending")
                   : submitOutcome === "none"
-                    ? "Final abgeben"
-                    : "Erneut abgeben"}
+                    ? t("submit.final")
+                    : t("submit.again")}
               </Button>
 
               {/* Only after a passing submission: the result page needs one, and a repeat
@@ -486,7 +486,9 @@ export default function ChallengePage() {
                 >
                   {/* No icon: the arrow of the button above it is the one that means
                       „weiter", and twice in a row it read as a list rather than as a choice. */}
-                  <Link href={challengeResultPath(challenge.id)}>Zum Ergebnis</Link>
+                  <Link href={challengeResultPath(challenge.id)}>
+                    {t("actions.toResult")}
+                  </Link>
                 </Button>
               ) : null}
             </div>

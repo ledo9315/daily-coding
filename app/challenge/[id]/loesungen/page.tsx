@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { CodeBlock } from "@/components/code-block";
 import { Header } from "@/components/header";
@@ -20,12 +21,17 @@ import { prisma } from "@/lib/prisma";
 import { getOwnChallengeResult } from "@/lib/server/challenge-result";
 
 // Overrides the "Aufgabe" title of app/challenge/layout.tsx.
-export const metadata: Metadata = { title: "Lösungen" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("challenge");
+  return { title: t("meta.solutions") };
+}
 
 type PageProps = { params: Promise<{ id: string }> };
 
 export default async function ChallengeResultPage({ params }: PageProps) {
   const { id } = await params;
+  const t = await getTranslations("challenge");
+  const locale = await getLocale();
   const session = await auth();
   if (!session?.user?.id) {
     redirect(`/login?callbackUrl=${encodeURIComponent(challengeResultPath(id))}`);
@@ -86,13 +92,15 @@ export default async function ChallengeResultPage({ params }: PageProps) {
           <span aria-hidden className="text-border">
             |
           </span>
-          <span>gelöst am {formatDate(submission.createdAt)}</span>
+          <span>
+            {t("result.solvedOn", { date: formatDate(submission.createdAt, locale) })}
+          </span>
           {revised && (
             <>
               <span aria-hidden className="text-border">
                 |
               </span>
-              <span>später überarbeitet</span>
+              <span>{t("result.laterRevised")}</span>
             </>
           )}
         </p>
@@ -102,7 +110,7 @@ export default async function ChallengeResultPage({ params }: PageProps) {
         <section className="mt-10">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-pixel text-sm uppercase tracking-wide sm:text-base">
-              Dein Code
+              {t("result.yourCode")}
             </h2>
             {isTodaysChallenge && (
               /* Not the shadcn ghost button: its hover is `accent`, which in this palette is
@@ -111,7 +119,7 @@ export default async function ChallengeResultPage({ params }: PageProps) {
                 href="/challenge"
                 className="border-2 border-primary/40 bg-primary/10 px-3 py-1.5 text-base uppercase tracking-wider text-primary transition-colors hover:border-primary hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                Lösung verbessern
+                {t("result.improveSolution")}
               </Link>
             )}
           </div>

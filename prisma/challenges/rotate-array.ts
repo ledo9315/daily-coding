@@ -87,4 +87,57 @@ export const challenge: ChallengeContent = {
   ],
   starterCodes: starter,
   starterCode: starter.javascript,
+  translations: {
+    en: {
+      title: "Rotate Array",
+      description:
+        "Implement rotate(data) with data = { nums, k }.\n\n" +
+        "Rotate the array k steps to the right and return the result: every element moves on by " +
+        "k positions, and whatever falls off the back comes in again at the front. " +
+        "[1,2,3,4,5,6,7] with k = 3 becomes [5,6,7,1,2,3,4].\n\n" +
+        "k is not negative and may be larger than the length of the array. The array has at " +
+        "least one element.\n\n" +
+        "With a copy the task is one line. It gets interesting once you want to manage without " +
+        "extra memory – there is a trick with three reversals that does exactly that.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "The element at position i ends up at position (i + k) % n. Read the other way " +
+            "round: the last k elements move to the front, the first n - k move to the back. " +
+            "Rotating by k is the same as rotating by k % n – after n steps everything is back " +
+            "in its place.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "The direct way: reduce k to k % n and return the last k elements followed by the " +
+            "first n - k – with slice or slicing those are two pieces that you join together. " +
+            "Alternatively, create a new array of the same length and write nums[i] to position " +
+            "(i + k) % n.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "k larger than the length. Without k % n you reach past the array for [1,2,3] and " +
+            "k = 5, or you rotate wrongly – expected is [2,3,1]. And k = n has to leave the " +
+            "array unchanged.\n\n" +
+            "The direction: to the right means the last element comes to the front. If you push " +
+            "the first k elements to the end, you are rotating to the left.\n\n" +
+            "If you try it without extra memory: reverse three times – first the whole array, " +
+            "then the first k elements, then the rest from position k. That gives exactly the " +
+            "right rotation with O(1) extra memory, and the order of the three steps is not " +
+            "arbitrary.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Negatives",
+        "3": "k is zero",
+        "4": "k equals the length",
+        "5": "k larger than the length",
+        "6": "One element",
+      },
+    },
+  },
 };

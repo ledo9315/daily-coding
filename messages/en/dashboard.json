@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "title": "Daily Coding – a coding challenge every day",
+    "description": "Solve a new coding challenge every day in the language of your choice and climb the ranking.",
+    "ogImageAlt": "The DAILY CODING landing page: the words \"One challenge every day\" in pixel lettering, two buttons below it and the top edge of the dashboard"
+  },
+  "nav": {
+    "login": "LOGIN",
+    "join": "JOIN NOW"
+  },
+  "hero": {
+    "todaysChallenge": "Today's challenge: {title}",
+    "headlineLine1": "ONE CHALLENGE",
+    "headlineLine2": "EVERY DAY",
+    "subline": "Not a library of thousands of exercises where you never know where to start. One task a day: the one that counts for everyone today.",
+    "startChallenge": "START THE CHALLENGE",
+    "howADayWorks": "HOW A DAY WORKS",
+    "screenshotAlt": "The Daily Coding dashboard with rank, points, streak and today's challenge",
+    "pillars": {
+      "tasks": {
+        "title": "DAILY TASKS",
+        "detail": "Easy, medium, hard in rotation"
+      },
+      "points": {
+        "title": "POINTS AND LEVELS",
+        "detail": "Streaks, badges, rankings"
+      },
+      "skills": {
+        "title": "SKILL GROWTH",
+        "detail": "Algorithms and data structures"
+      }
+    }
+  },
+  "day": {
+    "eyebrow": "From midnight to midnight",
+    "heading": "A DAY ON",
+    "steps": {
+      "newTask": {
+        "when": "00:00 UTC",
+        "what": "New task",
+        "detail": "The same one for everybody. It follows from the calendar day, not from your profile."
+      },
+      "test": {
+        "when": "after that",
+        "what": "Test",
+        "detail": "In the browser, in your language. As often as you like."
+      },
+      "submit": {
+        "when": "once",
+        "what": "Submit",
+        "detail": "One attempt. Pass or fail, that settles the day."
+      },
+      "streak": {
+        "when": "23:59 UTC",
+        "what": "Streak",
+        "detail": "A solved day extends it. A skipped one puts it back to zero."
+      }
+    }
+  },
+  "routine": {
+    "heading": "DAYS TURN INTO SKILL",
+    "intro": "A single exercise is forgotten by tomorrow. This sticks around and shows you how far you have come.",
+    "levelUp": {
+      "title": "Level up",
+      "detail": "Points for every task you solve, levels for the points you collect. From beginner to legend, and every tier sits twice as far out as the one before."
+    },
+    "compete": {
+      "title": "Measure up",
+      "detail": "Weekly and monthly standings by tasks solved. Points break the tie."
+    },
+    "feed": {
+      "title": "Look around",
+      "detail": "Who solved today, who levelled up, who picked up a badge. Same task, plenty of people."
+    },
+    "calendar": {
+      "title": "Look back",
+      "detail": "A calendar of the days you solved. You can see at a glance where you kept it up."
+    }
+  },
+  "codeDemo": {
+    "headlineLine1": "SEE RIGHT AWAY",
+    "headlineLine2": "IF IT FITS",
+    "claim": "The same test cases that grade your submission later run in the browser first. As often as you like, in your language.",
+    "tests": {
+      "middle": "Value in the middle",
+      "first": "First element",
+      "last": "Last element",
+      "missing": "Not present",
+      "empty": "Empty array"
+    },
+    "summary": "{passed}/{total} passed · called as {entry}()",
+    "reward": "+{points} points, streak +1 🔥"
+  },
+  "cta": {
+    "eyebrow": "00:00 UTC, for everyone at once",
+    "heading": "BE THERE TOMORROW",
+    "body": "Or start with today's. It is still running.",
+    "action": "TAKE THE CHALLENGE",
+    "artworkAlt": "Pixel-art night scene: a desk with books, a steaming mug, an old CRT monitor whose green glow washes the wall, a keyboard and a switched-off lamp, and on the right a window with a full moon"
+  },
+  "todaysChallenge": {
+    "eyebrow": "TODAY'S CHALLENGE",
+    "timeRemaining": "Time remaining",
+    "start": "START THE CHALLENGE",
+    "viewSolution": "VIEW SOLUTION",
+    "viewSubmission": "VIEW SUBMISSION"
+  },
+  "home": {
+    "welcome": "WELCOME BACK!",
+    "prompt": "Ready for today's challenge?",
+    "rank": {
+      "title": "YOUR RANK",
+      "of": "of {count, plural, one {# user} other {# users}}",
+      "trend": "places since last week"
+    },
+    "points": {
+      "title": "POINTS",
+      "trend": "this month"
+    },
+    "streak": {
+      "title": "STREAK",
+      "record": "Record: {count, plural, one {# day} other {# days}}"
+    },
+    "weekRanking": "WEEKLY RANKING",
+    "communityFeed": "COMMUNITY FEED"
+  },
+  "monthlyActivity": {
+    "currentMonth": "Current month",
+    "weekdays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "cell": {
+      "day": "Day {day}",
+      "completed": "challenge solved",
+      "notCompleted": "not completed",
+      "inStreak": "part of the current streak"
+    },
+    "daysWithCompletion": "<big>{count}</big> of <num>{days}</num> days completed",
+    "monthLabel": "Month:"
+  }
+}

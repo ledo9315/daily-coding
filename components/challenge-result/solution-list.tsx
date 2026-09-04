@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { SolutionCard } from "@/components/challenge-result/solution-card";
@@ -14,11 +15,11 @@ import {
 
 const PAGE_SIZE = 10;
 
-const SORT_LABELS: Record<SolutionSort, string> = {
-  newest: "Neueste zuerst",
-  oldest: "Älteste zuerst",
-  best_practices: "Best Practices",
-  clever: "Clever",
+const SORT_LABEL_KEYS: Record<SolutionSort, string> = {
+  newest: "solutionList.sortNewest",
+  oldest: "solutionList.sortOldest",
+  best_practices: "solutionList.sortBestPractices",
+  clever: "solutionList.sortClever",
 };
 
 export function SolutionList({
@@ -31,6 +32,7 @@ export function SolutionList({
   ownCode: string;
   ownLanguage: CodeLanguageId;
 }) {
+  const t = useTranslations("community");
   /**
    * Set by a notification link. The list starts on „Meine" then: the wanted solution is one
    * of the user's own and there are few of those, so it is on the first page - without the
@@ -74,11 +76,7 @@ export function SolutionList({
         await loadPage(null);
       } catch (e) {
         if (!cancelled) {
-          setError(
-            e instanceof Error
-              ? e.message
-              : "Lösungen konnten nicht geladen werden.",
-          );
+          setError(e instanceof Error ? e.message : t("solutionList.loadError"));
         }
       } finally {
         if (!cancelled) setInitialLoading(false);
@@ -87,7 +85,7 @@ export function SolutionList({
     return () => {
       cancelled = true;
     };
-  }, [loadPage]);
+  }, [loadPage, t]);
 
   const onLoadMore = useCallback(async () => {
     if (nextCursor == null || loadingMore || initialLoading) return;
@@ -96,15 +94,11 @@ export function SolutionList({
     try {
       await loadPage(nextCursor);
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "Weitere Lösungen konnten nicht geladen werden.",
-      );
+      setError(e instanceof Error ? e.message : t("solutionList.loadMoreError"));
     } finally {
       setLoadingMore(false);
     }
-  }, [nextCursor, loadingMore, initialLoading, loadPage]);
+  }, [nextCursor, loadingMore, initialLoading, loadPage, t]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -134,14 +128,14 @@ export function SolutionList({
     <section className="mt-12">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border pb-4">
         <h2 className="font-pixel text-sm uppercase tracking-wide sm:text-base">
-          Lösungen der Community
+          {t("solutionList.heading")}
         </h2>
 
         <div className="flex flex-wrap items-center gap-3">
           <div
             className="flex border-2 border-border"
             role="group"
-            aria-label="Lösungen filtern"
+            aria-label={t("solutionList.filterLabel")}
           >
             {(["all", "mine"] as const).map((value) => (
               <button
@@ -155,13 +149,15 @@ export function SolutionList({
                     : "bg-secondary text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {value === "all" ? "Alle" : "Meine"}
+                {value === "all"
+                  ? t("solutionList.filterAll")
+                  : t("solutionList.filterMine")}
               </button>
             ))}
           </div>
 
           <label className="sr-only" htmlFor="solution-sort">
-            Lösungen sortieren
+            {t("solutionList.sortLabel")}
           </label>
           <select
             id="solution-sort"
@@ -169,9 +165,9 @@ export function SolutionList({
             onChange={(e) => setSort(e.target.value as SolutionSort)}
             className="border-2 border-border bg-secondary px-3 py-1.5 text-base uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {Object.entries(SORT_LABELS).map(([value, label]) => (
+            {Object.entries(SORT_LABEL_KEYS).map(([value, labelKey]) => (
               <option key={value} value={value}>
-                {label}
+                {t(labelKey)}
               </option>
             ))}
           </select>
@@ -181,7 +177,7 @@ export function SolutionList({
       {initialLoading ? (
         <div className="flex justify-center py-12 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
-          <span className="sr-only">Lösungen werden geladen</span>
+          <span className="sr-only">{t("solutionList.loading")}</span>
         </div>
       ) : error && groups.length === 0 ? (
         <p className="mt-6 border-2 border-destructive/40 bg-destructive/10 px-4 py-3 text-lg text-destructive">
@@ -191,8 +187,8 @@ export function SolutionList({
         <div className="mt-6 border-2 border-dashed border-border px-4 py-10 text-center">
           <p className="text-lg text-muted-foreground">
             {filter === "mine"
-              ? "Von dir steht hier noch keine Lösung."
-              : "Diese Challenge hat noch niemand gelöst. Schau später wieder vorbei."}
+              ? t("solutionList.emptyMine")
+              : t("solutionList.emptyAll")}
           </p>
         </div>
       ) : (
@@ -219,7 +215,7 @@ export function SolutionList({
           {loadingMore ? (
             <div className="flex justify-center py-4 text-muted-foreground">
               <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
-              <span className="sr-only">Weitere Lösungen werden geladen</span>
+              <span className="sr-only">{t("solutionList.loadingMore")}</span>
             </div>
           ) : null}
         </>

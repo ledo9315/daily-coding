@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "title": "Daily Coding – täglich eine Coding-Challenge",
+    "description": "Löse jeden Tag eine neue Coding-Challenge in deiner Programmiersprache und steige im Ranking auf.",
+    "ogImageAlt": "Die Startseite von DAILY CODING: der Schriftzug „Eine Challenge jeden Tag“ im Pixel-Stil, darunter zwei Schaltflächen und der obere Rand der Übersichtsseite"
+  },
+  "nav": {
+    "login": "LOGIN",
+    "join": "JETZT BEITRETEN"
+  },
+  "hero": {
+    "todaysChallenge": "Heutige Challenge: {title}",
+    "headlineLine1": "EINE CHALLENGE",
+    "headlineLine2": "JEDEN TAG",
+    "subline": "Keine Sammlung mit Tausenden Aufgaben, in der du nicht weißt, wo du anfangen sollst. Eine Aufgabe am Tag: die, die heute für alle gilt.",
+    "startChallenge": "CHALLENGE STARTEN",
+    "howADayWorks": "SO LÄUFT EIN TAG",
+    "screenshotAlt": "Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge",
+    "pillars": {
+      "tasks": {
+        "title": "TÄGLICHE AUFGABEN",
+        "detail": "Leicht, mittel, schwer im Wechsel"
+      },
+      "points": {
+        "title": "PUNKTE UND LEVEL",
+        "detail": "Streaks, Abzeichen, Wertungen"
+      },
+      "skills": {
+        "title": "SKILL-WACHSTUM",
+        "detail": "Algorithmen und Datenstrukturen"
+      }
+    }
+  },
+  "day": {
+    "eyebrow": "Von Mitternacht zu Mitternacht",
+    "heading": "EIN TAG AUF",
+    "steps": {
+      "newTask": {
+        "when": "00:00 UTC",
+        "what": "Neue Aufgabe",
+        "detail": "Für alle dieselbe. Sie ergibt sich aus dem Kalendertag, nicht aus deinem Profil."
+      },
+      "test": {
+        "when": "danach",
+        "what": "Testen",
+        "detail": "Im Browser, in deiner Sprache. So oft du willst."
+      },
+      "submit": {
+        "when": "einmal",
+        "what": "Abgeben",
+        "detail": "Ein Versuch. Bestanden oder nicht, damit ist der Tag erledigt."
+      },
+      "streak": {
+        "when": "23:59 UTC",
+        "what": "Streak",
+        "detail": "Ein gelöster Tag verlängert ihn. Ein übersprungener setzt ihn auf null."
+      }
+    }
+  },
+  "routine": {
+    "heading": "AUS TAGEN WIRD KÖNNEN",
+    "intro": "Eine einzelne Aufgabe ist morgen vergessen. Das hier bleibt und zeigt dir, wie weit du gekommen bist.",
+    "levelUp": {
+      "title": "Steig auf",
+      "detail": "Punkte für jede gelöste Aufgabe, Level für gesammelte Punkte. Von Einsteiger bis Legende, und jede Stufe liegt doppelt so weit wie die vorige."
+    },
+    "compete": {
+      "title": "Miss dich",
+      "detail": "Wochen- und Monatswertung nach gelösten Aufgaben. Bei Gleichstand entscheiden die Punkte."
+    },
+    "feed": {
+      "title": "Schau rein",
+      "detail": "Wer heute gelöst hat, wer aufgestiegen ist, wer ein Abzeichen geholt hat. Dieselbe Aufgabe, viele Leute."
+    },
+    "calendar": {
+      "title": "Sieh zurück",
+      "detail": "Ein Kalender deiner gelösten Tage. Du siehst sofort, wo du dran geblieben bist."
+    }
+  },
+  "codeDemo": {
+    "headlineLine1": "SOFORT SEHEN,",
+    "headlineLine2": "OB ES PASST",
+    "claim": "Dieselben Testfälle, die später deine Abgabe bewerten, laufen vorher im Browser. So oft du willst, in deiner Sprache.",
+    "tests": {
+      "middle": "Wert in der Mitte",
+      "first": "Erstes Element",
+      "last": "Letztes Element",
+      "missing": "Nicht vorhanden",
+      "empty": "Leeres Array"
+    },
+    "summary": "{passed}/{total} bestanden · aufgerufen als {entry}()",
+    "reward": "+{points} Punkte, Streak +1 🔥"
+  },
+  "cta": {
+    "eyebrow": "00:00 UTC, für alle gleichzeitig",
+    "heading": "SEI MORGEN DABEI",
+    "body": "Oder fang mit der von heute an. Sie läuft noch.",
+    "action": "CHALLENGE ANNEHMEN",
+    "artworkAlt": "Nachtszene als Pixelgrafik: ein Schreibtisch mit Büchern, dampfender Tasse, einem alten Röhrenmonitor, dessen grünes Leuchten die Wand anstrahlt, Tastatur und ausgeschalteter Lampe, rechts ein Fenster mit Vollmond"
+  },
+  "todaysChallenge": {
+    "eyebrow": "TAGES-CHALLENGE",
+    "timeRemaining": "Zeit verbleibend",
+    "start": "CHALLENGE STARTEN",
+    "viewSolution": "LÖSUNG ANSEHEN",
+    "viewSubmission": "ABGABE ANSEHEN"
+  },
+  "home": {
+    "welcome": "WILLKOMMEN ZURÜCK!",
+    "prompt": "Bereit für die heutige Challenge?",
+    "rank": {
+      "title": "DEIN RANG",
+      "of": "von {count, plural, one {# Nutzer} other {# Nutzern}}",
+      "trend": "Plätze seit letzter Woche"
+    },
+    "points": {
+      "title": "PUNKTE",
+      "trend": "diesen Monat"
+    },
+    "streak": {
+      "title": "STREAK",
+      "record": "Rekord: {count, plural, one {# Tag} other {# Tage}}"
+    },
+    "weekRanking": "WOCHEN-RANKING",
+    "communityFeed": "COMMUNITY-FEED"
+  },
+  "monthlyActivity": {
+    "currentMonth": "Aktueller Monat",
+    "weekdays": {
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa",
+      "sun": "So"
+    },
+    "cell": {
+      "day": "Tag {day}",
+      "completed": "Challenge gelöst",
+      "notCompleted": "kein Abschluss",
+      "inStreak": "Teil der aktuellen Serie"
+    },
+    "daysWithCompletion": "<big>{count}</big> von <num>{days}</num> Tagen mit Abschluss",
+    "monthLabel": "Monat:"
+  }
+}

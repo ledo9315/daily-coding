@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "HOME",
+    "challenge": "CHALLENGE",
+    "ranking": "RANKING",
+    "profile": "PROFILE"
+  },
+  "header": {
+    "streakLoading": "Loading streak",
+    "streakLabel": "STREAK",
+    "levelBadge": "LVL {level}",
+    "sessionChecking": "Checking your session",
+    "profile": "PROFILE",
+    "adminChallenges": "ADMIN: CHALLENGES",
+    "settings": "SETTINGS",
+    "signOut": "SIGN OUT",
+    "login": "Login",
+    "register": "Sign up"
+  },
+  "mobileNav": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "admin": "Admin",
+    "settings": "Settings"
+  },
+  "footer": {
+    "tagline": "Solve a new coding challenge every day in the language of your choice and climb the ranking.",
+    "project": "Project",
+    "githubLabel": "Open the GitHub repository in a new tab",
+    "bugReport": "Report a bug",
+    "bugReportLabel": "Report a bug on GitHub in a new tab",
+    "support": "Support",
+    "legal": "Legal",
+    "imprint": "Imprint",
+    "privacy": "Privacy",
+    "copyright": "© {year} Daily Coding"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "labelUnread": "Notifications, {count} unread",
+    "empty": "Nothing yet. As soon as someone comments on or rates your solution, it shows up here."
+  },
+  "feed": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "loading": "Loading the community feed",
+    "loadError": "Could not load the feed.",
+    "loadMoreError": "Could not load more entries.",
+    "loadingMore": "Loading more entries",
+    "empty": "No solved challenges yet. The feed fills up as soon as the community gets to work.",
+    "end": "End of the feed",
+    "solvedTitle": "Challenge solved",
+    "solvedDescription": "solved the challenge \"{challenge}\" (+{points} points)",
+    "levelUpTitle": "Challenge solved & level up",
+    "levelUpDescription": "solved the challenge \"{challenge}\" (+{points} points) and went from level {previousLevel} to level {newLevel}"
+  },
+  "feedItem": {
+    "tier": "Level {level}",
+    "badges": {
+      "levelUp": "Level up",
+      "milestone": "Milestone",
+      "badgeEarned": "Badge",
+      "challengeSolved": "Challenge"
+    }
+  },
+  "comments": {
+    "placeholder": "Write a comment on this solution",
+    "inputLabel": "Write a comment",
+    "remaining": "{count, plural, one {# character left} other {# characters left}}",
+    "sending": "Sending …",
+    "submit": "Post comment",
+    "loading": "Loading comments",
+    "loadError": "Could not load the comments.",
+    "loadMoreError": "Could not load more comments.",
+    "saveError": "Could not save your comment.",
+    "deleteError": "Could not delete the comment.",
+    "empty": "No comments yet. Be the first.",
+    "authorLevel": "Level {level}",
+    "delete": "Delete",
+    "loadingMore": "Loading …",
+    "loadMore": "Load more"
+  },
+  "solutionList": {
+    "heading": "Solutions from the community",
+    "filterLabel": "Filter solutions",
+    "filterAll": "All",
+    "filterMine": "Mine",
+    "sortLabel": "Sort solutions",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortBestPractices": "Best Practices",
+    "sortClever": "Clever",
+    "loading": "Loading solutions",
+    "loadError": "Could not load the solutions.",
+    "loadMoreError": "Could not load more solutions.",
+    "loadingMore": "Loading more solutions",
+    "emptyMine": "You have not posted a solution here yet.",
+    "emptyAll": "Nobody has solved this challenge yet. Come back later."
+  },
+  "solutionCard": {
+    "authorLevel": "(Level {level})",
+    "moreAuthors": "and {count} more",
+    "revised": "revised",
+    "ownSolution": "Your solution",
+    "identicalSubmissions": "{count} identical submissions",
+    "comments": "Comments",
+    "compare": "Compare with your solution"
+  },
+  "solutionVotes": {
+    "bestPractices": "Best Practices",
+    "clever": "Clever",
+    "castLabel": "Award {label}",
+    "ownDisabled": "You cannot rate your own solution.",
+    "saveError": "Could not save your rating."
+  },
+  "solutionDiff": {
+    "differentLanguage": "This solution is written in {theirs}, yours in {mine}. A line-by-line comparison would not tell you anything useful.",
+    "identical": "That is your own solution, line for line. There is nothing to compare.",
+    "legendOnlyMine": "only yours",
+    "legendOnlyTheirs": "only here",
+    "columnMine": "Your solution",
+    "columnTheirs": "This solution"
+  }
+}

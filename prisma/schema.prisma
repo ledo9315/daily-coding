@@ -42,6 +42,12 @@ enum UserRole {
   admin
 }
 
+/// Interface language of a user. Values match the message directories under `messages/`.
+enum Locale {
+  de
+  en
+}
+
 /// Programming languages available for daily challenges (extend as runners are added).
 /// The two ways a solution can be praised (#225).
 enum SolutionVoteKind {
@@ -89,6 +95,12 @@ model User {
   /// Opt-out for activity mails; the in-app bell is not affected by it (#257).
   notifyByEmail Boolean     @default(true)
 
+  /// Interface and mail language. `de` for every existing row: the app has always been
+  /// German, and a default of `en` would take the language away from them overnight (E7).
+  /// A mail is sent without a request, so there is no cookie to read - this column is the
+  /// only place the language of a mail can come from.
+  locale        Locale      @default(de)
+
   streak       Int          @default(0)
   streakRecord Int          @default(0)
   submissions    Submission[]
@@ -109,7 +121,23 @@ model AchievementDef {
   iconKey      String
   rarity       AchievementRarity @default(common)
   userProgress UserAchievement[]
+  translations AchievementTranslation[]
   createdAt    DateTime          @default(now())
+}
+
+/// Title and description of one achievement in one language.
+///
+/// The `AchievementDef` columns keep the German original and stay the fallback: a locale
+/// without a row here is answered with them, so a half-translated catalogue shows German
+/// rather than a gap (E8).
+model AchievementTranslation {
+  achievementId String
+  locale        Locale
+  title         String
+  description   String
+  achievement   AchievementDef @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@id([achievementId, locale])
 }
 
 model UserAchievement {
@@ -124,10 +152,24 @@ model UserAchievement {
 }
 
 model Category {
-  id         String      @id @default(cuid())
-  name       String      @unique
-  challenges Challenge[]
-  createdAt  DateTime    @default(now())
+  id           String      @id @default(cuid())
+  name         String      @unique
+  challenges   Challenge[]
+  translations CategoryTranslation[]
+  createdAt    DateTime    @default(now())
+}
+
+/// The name of one category in one language.
+///
+/// A table of its own rather than a second name column: `Category.name` is `@unique`, so a
+/// translation written into it would collide with the German name it translates.
+model CategoryTranslation {
+  categoryId String
+  locale     Locale
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, locale])
 }
 
 model Challenge {
@@ -160,8 +202,29 @@ model Challenge {
   submissions Submission[]
   solutionVotes SolutionVote[]
   notifications Notification[]
+  translations ChallengeTranslation[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+}
+
+/// The prose of one challenge in one language: everything a solver reads, nothing the
+/// grader needs. Test inputs, expected values, points and starter code have no language.
+///
+/// The `Challenge` columns keep the German original and stay the fallback: a locale without
+/// a row here is answered with them, so an untranslated challenge shows German text instead
+/// of an empty page (E8).
+model ChallengeTranslation {
+  challengeId   String
+  locale        Locale
+  title         String
+  description   String
+  hints         Json
+  /// Test-case names, keyed by `testCases[].id` - not by position, so reordering the test
+  /// cases does not shift the names onto the wrong cases.
+  testCaseNames Json
+  challenge     Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@id([challengeId, locale])
 }
 
 /// Where the daily ring currently stands. Exactly one row, id "current".

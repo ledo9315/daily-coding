@@ -78,6 +78,7 @@
     "motion": "^12.29.2",
     "next": "16.2.12",
     "next-auth": "5.0.0-beta.32",
+    "next-intl": "^4.14.2",
     "next-themes": "^0.4.6",
     "pg": "^8.20.0",
     "prisma": "^7.9.1",

@@ -1,6 +1,8 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { progressPercentage } from "@/lib/progress-percentage";
+import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export { progressPercentage as progressBarPercentage } from "@/lib/progress-percentage";
@@ -24,6 +26,7 @@ export function ProgressBar({
   variant = "default",
   className,
 }: ProgressBarProps) {
+  const locale = useLocale();
   const percentage = progressPercentage(value, max);
 
   const sizeClasses = {
@@ -45,7 +48,7 @@ export function ProgressBar({
           {label && <span className="font-medium">{label}</span>}
           {showPercentage && (
             <span className="text-muted-foreground">
-              {value.toLocaleString("de-DE")} / {max.toLocaleString("de-DE")} (
+              {formatNumber(value, locale)} / {formatNumber(max, locale)} (
               {percentage}%)
             </span>
           )}

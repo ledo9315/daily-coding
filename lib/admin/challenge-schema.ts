@@ -4,6 +4,27 @@ import { HINT_TITLE_MAX } from "@/lib/challenge-hints";
 
 const codeLanguageZ = z.enum(CODE_LANGUAGES);
 
+/**
+ * The prose of a challenge in one language: everything a solver reads. Test inputs, expected
+ * values, points and starter code have no language and are therefore not in here.
+ *
+ * `testCaseNames` is keyed by `testCases[].id`, not by position - reordering the test cases
+ * must not shift the names onto the wrong cases. A missing key keeps the German name.
+ */
+const challengeTextSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(50000),
+  hints: z.array(
+    z.object({
+      title: z.string().min(1).max(HINT_TITLE_MAX),
+      body: z.string().min(1).max(10000),
+    }),
+  ),
+  testCaseNames: z.record(z.string(), z.string().min(1)),
+});
+
+export type AdminChallengeText = z.infer<typeof challengeTextSchema>;
+
 /** Payload sent by the admin form / API to create a challenge. */
 export const adminCreateChallengeSchema = z.object({
   id: z
@@ -59,6 +80,16 @@ export const adminCreateChallengeSchema = z.object({
   isActive: z.boolean().optional(),
   /** Start of the UTC day as an ISO string, or empty for no daily date */
   dateIso: z.string().optional().nullable(),
+  /*
+    German is not in here. It stays in `title`, `description`, `hints` and the `name` of each
+    test case above - those columns are the fallback for a locale without a translation row,
+    so an untranslated challenge shows German text instead of an empty page.
+
+    A further language is optional: a challenge has to be saveable before anyone has typed
+    its English version. Omitting `translations` entirely leaves existing rows untouched;
+    sending it without `en` removes the English version.
+  */
+  translations: z.object({ en: challengeTextSchema.optional() }).optional(),
 });
 
 export type AdminCreateChallengeInput = z.infer<typeof adminCreateChallengeSchema>;

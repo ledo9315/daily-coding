@@ -1,31 +1,52 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Notification, Lock, Trash } from "@nsmr/pixelart-react";
+import { Notification, Lock, Trash, Chat, Check } from "@nsmr/pixelart-react";
 import { cn } from "@/lib/utils";
-import { getEmailNotificationSetting, setEmailNotificationSetting } from "@/lib/api";
+import type { AppLocale } from "@/lib/locale";
+import {
+  getEmailNotificationSetting,
+  setEmailNotificationSetting,
+  setLocaleSetting,
+} from "@/lib/api";
 
-/** Sidebar entries; the id doubles as the key of the panel shown next to it. */
+/** Sidebar entries; the id doubles as the key of the panel shown next to it and as its label key. */
 const SECTIONS = [
-  { id: "notifications", label: "Benachrichtigungen", icon: Notification },
-  { id: "security", label: "Sicherheit", icon: Lock },
-  { id: "account", label: "Konto", icon: Trash },
+  { id: "notifications", icon: Notification },
+  { id: "language", icon: Chat },
+  { id: "security", icon: Lock },
+  { id: "account", icon: Trash },
 ] as const;
+
+/** Endonyms - a language names itself the same way in every UI language. */
+const LOCALE_OPTIONS: { id: AppLocale; label: string }[] = [
+  { id: "de", label: "Deutsch" },
+  { id: "en", label: "English" },
+];
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
-const CONFIRM_PHRASE = "KONTO LÖSCHEN";
-
 export function SettingsPanel() {
-  // Client state, not a route per section: the panels are three forms, and a URL per form
-  // would mean three pages that all render the same shell.
+  const t = useTranslations("profile");
+  /**
+   * Shown, typed and compared in the language of the panel. `DELETE /api/user/account`
+   * accepts the phrase of either language, so a switch mid-dialog stays recoverable.
+   */
+  const confirmPhrase = t("settings.account.confirmPhrase");
+  const router = useRouter();
+  const { data: session, update } = useSession();
+
+  // Client state, not a route per section: the panels are four forms, and a URL per form
+  // would mean four pages that all render the same shell.
   const [section, setSection] = useState<SectionId>("notifications");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -35,6 +56,14 @@ export function SettingsPanel() {
   // null until loaded: rendering the switch as "off" first would tell the user their mails
   // are disabled for a moment, which is the opposite of the default.
   const [notifyByEmail, setNotifyByEmail] = useState<boolean | null>(null);
+
+  /**
+   * Only set while the session has not caught up yet - `update()` below writes the new
+   * locale into the JWT, and from then on the session is the single source.
+   */
+  const [pendingLocale, setPendingLocale] = useState<AppLocale | null>(null);
+  const [savingLocale, setSavingLocale] = useState(false);
+  const activeLocale = pendingLocale ?? session?.user?.locale ?? null;
 
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
@@ -54,8 +83,29 @@ export function SettingsPanel() {
     } catch (error) {
       setNotifyByEmail(previous);
       toast.error(
-        error instanceof Error ? error.message : "Einstellung konnte nicht gespeichert werden."
+        error instanceof Error ? error.message : t("settings.notifications.saveFailed")
       );
+    }
+  }
+
+  async function onSelectLocale(next: AppLocale) {
+    if (next === activeLocale || savingLocale) return;
+
+    setSavingLocale(true);
+    setPendingLocale(next);
+    try {
+      await setLocaleSetting(next);
+      // Without the token update the JWT keeps the old language for up to 30 days; without
+      // the refresh the already rendered server components keep showing it.
+      await update({ user: { locale: next } });
+      router.refresh();
+    } catch (error) {
+      setPendingLocale(null);
+      toast.error(
+        error instanceof Error ? error.message : t("settings.language.saveFailed")
+      );
+    } finally {
+      setSavingLocale(false);
     }
   }
 
@@ -63,11 +113,11 @@ export function SettingsPanel() {
     e.preventDefault();
 
     if (newPassword.length < 8) {
-      toast.error("Neues Passwort ist zu kurz.");
+      toast.error(t("settings.security.tooShort"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("Passwort-Wiederholung stimmt nicht überein.");
+      toast.error(t("settings.security.mismatch"));
       return;
     }
 
@@ -83,16 +133,16 @@ export function SettingsPanel() {
         throw new Error(
           typeof data.error === "string"
             ? data.error
-            : "Passwort konnte nicht aktualisiert werden."
+            : t("settings.security.updateFailed")
         );
       }
 
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      toast.success("Passwort wurde erfolgreich aktualisiert.");
+      toast.success(t("settings.security.updated"));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Passwort-Änderung fehlgeschlagen.");
+      toast.error(error instanceof Error ? error.message : t("settings.security.changeFailed"));
     } finally {
       setChangingPassword(false);
     }
@@ -101,8 +151,9 @@ export function SettingsPanel() {
   async function onDeleteAccount(e: React.FormEvent) {
     e.preventDefault();
 
-    if (deleteConfirmText !== CONFIRM_PHRASE) {
-      toast.error("Bitte gib exakt KONTO LÖSCHEN ein.");
+    const typedPhrase = deleteConfirmText.trim();
+    if (typedPhrase !== confirmPhrase) {
+      toast.error(t("settings.account.confirmMismatch", { phrase: confirmPhrase }));
       return;
     }
 
@@ -112,7 +163,7 @@ export function SettingsPanel() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          confirmText: deleteConfirmText,
+          confirmText: typedPhrase,
           currentPassword: deletePassword,
         }),
       });
@@ -120,13 +171,13 @@ export function SettingsPanel() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(
-          typeof data.error === "string" ? data.error : "Konto konnte nicht gelöscht werden."
+          typeof data.error === "string" ? data.error : t("settings.account.deleteFailed")
         );
       }
 
       await signOut({ callbackUrl: "/register?accountDeleted=1" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Konto-Löschung fehlgeschlagen.");
+      toast.error(error instanceof Error ? error.message : t("settings.account.failed"));
       setDeletingAccount(false);
     }
   }
@@ -135,7 +186,7 @@ export function SettingsPanel() {
     <div className="grid items-start gap-6 lg:grid-cols-[15rem_1fr]">
       {/* Stacked above the panel on small screens, beside it from `lg` on. A scrolling row
           was the alternative and pushed the active entry out of sight on a phone. */}
-      <nav aria-label="Bereiche" className="flex flex-col gap-2">
+      <nav aria-label={t("settings.sectionsLabel")} className="flex flex-col gap-2">
         {SECTIONS.map((entry) => {
           const active = section === entry.id;
           return (
@@ -145,7 +196,7 @@ export function SettingsPanel() {
               aria-current={active ? "page" : undefined}
               onClick={() => setSection(entry.id)}
               className={cn(
-                "flex w-full items-center gap-2 border-2 px-4 py-2.5 text-left text-lg uppercase tracking-wider transition-colors",
+                "flex w-full items-center gap-2 border-2 px-4 py-2.5 text-left text-lg uppercase transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 active
                   ? "border-primary bg-primary/15 text-primary"
@@ -153,7 +204,7 @@ export function SettingsPanel() {
               )}
             >
               <entry.icon className="h-5 w-5 shrink-0" />
-              {entry.label}
+              {t(`settings.sections.${entry.id}`)}
             </button>
           );
         })}
@@ -162,18 +213,17 @@ export function SettingsPanel() {
       {section === "notifications" && (
         <Card className="pixel-box bg-card">
           <CardHeader>
-            <CardTitle className="font-sans uppercase tracking-wide">
-              Benachrichtigungen
+            <CardTitle className="font-sans uppercase">
+              {t("settings.notifications.title")}
             </CardTitle>
             <CardDescription className="text-base leading-relaxed">
-              Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in
-              der Glocke im Kopfbereich. Zusätzlich per E-Mail:
+              {t("settings.notifications.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-4 border-2 border-border bg-background px-4 py-3">
               <Label htmlFor="notifyByEmail" className="text-lg">
-                Benachrichtigungen per E-Mail
+                {t("settings.notifications.emailLabel")}
               </Label>
               <Switch
                 id="notifyByEmail"
@@ -186,19 +236,65 @@ export function SettingsPanel() {
         </Card>
       )}
 
+      {section === "language" && (
+        <Card className="pixel-box bg-card">
+          <CardHeader>
+            <CardTitle className="font-sans uppercase">
+              {t("settings.language.title")}
+            </CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              {t("settings.language.description")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div
+              role="radiogroup"
+              aria-label={t("settings.language.groupLabel")}
+              className="flex max-w-md flex-col gap-2"
+            >
+              {LOCALE_OPTIONS.map((option) => {
+                const selected = activeLocale === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    disabled={savingLocale || activeLocale === null}
+                    onClick={() => onSelectLocale(option.id)}
+                    className={cn(
+                      "flex w-full items-center justify-between gap-4 border-2 px-4 py-3 text-left text-lg uppercase transition-colors",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "disabled:cursor-not-allowed disabled:opacity-60",
+                      selected
+                        ? "border-primary bg-primary/15 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    )}
+                  >
+                    {option.label}
+                    {selected && <Check className="h-5 w-5 shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {section === "security" && (
         <Card className="pixel-box bg-card">
           <CardHeader>
-            <CardTitle className="font-sans uppercase tracking-wide">Passwort ändern</CardTitle>
+            <CardTitle className="font-sans uppercase">
+              {t("settings.security.title")}
+            </CardTitle>
             <CardDescription className="text-base leading-relaxed">
-              Wenn dein Konto bereits ein Passwort hat, gib zuerst dein aktuelles Passwort ein.
-              Mindestens 8 Zeichen.
+              {t("settings.security.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form className="max-w-md space-y-5" onSubmit={onChangePassword}>
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
+                <Label htmlFor="currentPassword">{t("settings.security.currentPassword")}</Label>
                 <Input
                   id="currentPassword"
                   type="password"
@@ -208,7 +304,7 @@ export function SettingsPanel() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="newPassword">Neues Passwort</Label>
+                <Label htmlFor="newPassword">{t("settings.security.newPassword")}</Label>
                 <Input
                   id="newPassword"
                   type="password"
@@ -218,7 +314,9 @@ export function SettingsPanel() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Neues Passwort wiederholen</Label>
+                <Label htmlFor="confirmPassword">
+                  {t("settings.security.confirmPassword")}
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -228,7 +326,9 @@ export function SettingsPanel() {
                 />
               </div>
               <Button type="submit" disabled={changingPassword}>
-                {changingPassword ? "Speichert..." : "Passwort speichern"}
+                {changingPassword
+                  ? t("settings.security.submitting")
+                  : t("settings.security.submit")}
               </Button>
             </form>
           </CardContent>
@@ -238,20 +338,23 @@ export function SettingsPanel() {
       {section === "account" && (
         <Card className="pixel-box border-destructive/40 bg-card">
           <CardHeader>
-            <CardTitle className="font-sans uppercase tracking-wide text-destructive">
-              Konto löschen
+            <CardTitle className="font-sans uppercase text-destructive">
+              {t("settings.account.title")}
             </CardTitle>
             <CardDescription className="text-base leading-relaxed">
-              Dieser Schritt ist endgültig: Abgaben, Achievements, Platzierungen und deine
-              Serie werden gelöscht und lassen sich nicht wiederherstellen.
+              {t("settings.account.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form className="max-w-md space-y-5" onSubmit={onDeleteAccount}>
               <div className="space-y-2">
                 <Label htmlFor="deleteConfirmText">
-                  Tippe <span className="font-code text-destructive">{CONFIRM_PHRASE}</span> zur
-                  Bestätigung
+                  {t.rich("settings.account.confirmLabel", {
+                    phrase: confirmPhrase,
+                    highlight: (chunks) => (
+                      <span className="font-code text-destructive">{chunks}</span>
+                    ),
+                  })}
                 </Label>
                 {/* No placeholder repeating the phrase: it would turn the gate into something
                     to copy rather than something to mean. */}
@@ -264,7 +367,7 @@ export function SettingsPanel() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="deletePassword">Aktuelles Passwort</Label>
+                <Label htmlFor="deletePassword">{t("settings.account.passwordLabel")}</Label>
                 <Input
                   id="deletePassword"
                   type="password"
@@ -275,15 +378,17 @@ export function SettingsPanel() {
                 />
                 {/* Was a placeholder, where it vanished with the first keystroke. */}
                 <p id="deletePasswordHint" className="text-sm text-muted-foreground">
-                  Bei einem Konto über GitHub oder Google ohne Passwort leer lassen.
+                  {t("settings.account.passwordHint")}
                 </p>
               </div>
               <Button
                 type="submit"
                 variant="destructive"
-                disabled={deletingAccount || deleteConfirmText !== CONFIRM_PHRASE}
+                disabled={deletingAccount || deleteConfirmText.trim() !== confirmPhrase}
               >
-                {deletingAccount ? "Löscht..." : "Konto endgültig löschen"}
+                {deletingAccount
+                  ? t("settings.account.submitting")
+                  : t("settings.account.submit")}
               </Button>
             </form>
           </CardContent>

@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Mail, ArrowRight } from "@nsmr/pixelart-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -30,14 +32,16 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       });
       if (res.status === 429) {
-        toast.error("Zu viele Anfragen", {
-          description: "Bitte warte 15 Minuten und versuche es erneut.",
+        toast.error(t("forgotPassword.rateLimitTitle"), {
+          description: t("forgotPassword.rateLimitDescription"),
         });
         return;
       }
       setSent(true);
     } catch {
-      toast.error("Fehler", { description: "Netzwerkfehler. Bitte versuche es erneut." });
+      toast.error(t("forgotPassword.errorTitle"), {
+        description: t("forgotPassword.networkError"),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -56,46 +60,48 @@ export default function ForgotPasswordPage() {
             <span className="text-xl text-primary">{">_"}</span>
             {/* Stacked and left-aligned, the same shape as the header on every
                 signed-in page - one logo, not two. */}
+            {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <span className="text-left">
               DAILY
               <br />
               CODING
             </span>
+            {/* eslint-enable no-restricted-syntax */}
           </h1>
         </div>
 
         <Card className="pixel-box bg-card">
           <CardHeader>
             <CardTitle className="text-xl font-sans uppercase tracking-wide">
-              Passwort vergessen
+              {t("forgotPassword.title")}
             </CardTitle>
             <CardDescription>
               {sent
-                ? "Falls ein Konto existiert, haben wir dir einen Reset-Link gesendet."
-                : "Gib deine E-Mail ein. Wir senden dir einen Reset-Link."}
+                ? t("forgotPassword.descriptionSent")
+                : t("forgotPassword.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {sent ? (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Prüfe deinen Posteingang (und Spam-Ordner).
+                  {t("forgotPassword.checkInbox")}
                 </p>
                 <Link href="/login">
                   <Button variant="outline" className="w-full">
-                    Zurück zum Login
+                    {t("forgotPassword.backToLogin")}
                   </Button>
                 </Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">E-Mail Adresse</Label>
+                  <Label htmlFor="email">{t("forgotPassword.emailLabel")}</Label>
                   <div className="relative">
                     <Input
                       id="email"
                       type="email"
-                      placeholder="deine@email.de"
+                      placeholder={t("forgotPassword.emailPlaceholder")}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -109,12 +115,12 @@ export default function ForgotPasswordPage() {
                   className="pixel-btn w-full gap-2 mt-2 cursor-pointer"
                   disabled={isLoading}
                 >
-                  {isLoading ? "WIRD GESENDET..." : "RESET-LINK SENDEN"}
+                  {isLoading ? t("forgotPassword.submitting") : t("forgotPassword.submit")}
                   {!isLoading && <ArrowRight className="h-4 w-4" />}
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
                   <Link href="/login" className="text-primary hover:underline">
-                    Zurück zum Login
+                    {t("forgotPassword.backToLogin")}
                   </Link>
                 </p>
               </form>

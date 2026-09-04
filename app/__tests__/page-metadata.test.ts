@@ -19,9 +19,32 @@ function findPages(dir: string, found: string[] = []): string[] {
 const routeOf = (pagePath: string) =>
   "/" + relative(APP, pagePath).split(sep).slice(0, -1).join("/");
 
+/** The namespace a file translates against, or null. */
+function namespaceOf(source: string): string | null {
+  const match = /getTranslations\(\s*["']([^"']+)["']/.exec(source);
+  return match ? match[1] : null;
+}
+
+/**
+ * The German text behind a message key. A title read from the catalogue is still a title,
+ * so the assertions below stay about what a search result shows rather than about syntax.
+ */
+function messageFor(namespace: string, key: string): string | null {
+  const file = resolve(process.cwd(), "messages", "de", `${namespace}.json`);
+  if (!existsSync(file)) return null;
+  const value = key.split(".").reduce<unknown>(
+    (node, part) =>
+      node && typeof node === "object"
+        ? (node as Record<string, unknown>)[part]
+        : undefined,
+    JSON.parse(readFileSync(file, "utf8"))
+  );
+  return typeof value === "string" ? value : null;
+}
+
 /**
  * The title a file declares, or null. `title: { default, template }` in the root layout
- * resolves to its `default`.
+ * resolves to its `default`, and a `t("...")` call resolves to the German message.
  */
 function declaredTitle(filePath: string): string | null {
   if (!existsSync(filePath)) return null;
@@ -32,7 +55,14 @@ function declaredTitle(filePath: string): string | null {
   const nested = /title:\s*\{[\s\S]*?default:\s*"([^"]+)"/.exec(source);
   if (nested) return nested[1];
   const plain = /title:\s*"([^"]+)"/.exec(source);
-  return plain ? plain[1] : null;
+  if (plain) return plain[1];
+
+  const namespace = namespaceOf(source);
+  if (!namespace) return null;
+  const nestedKey = /title:\s*\{[\s\S]*?default:\s*t\(\s*["']([^"']+)["']/.exec(source);
+  const plainKey = /title:\s*t\(\s*["']([^"']+)["']/.exec(source);
+  const key = nestedKey?.[1] ?? plainKey?.[1];
+  return key ? messageFor(namespace, key) : null;
 }
 
 /**

@@ -1,19 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AchievementBadge } from "@/components/achievement-badge";
+import { renderWithIntl } from "./intl-render";
 
 function Icon() {
   return <svg />;
 }
 
-function render(props: Partial<Parameters<typeof AchievementBadge>[0]> = {}) {
-  return renderToStaticMarkup(
+function render(
+  props: Partial<Parameters<typeof AchievementBadge>[0]> = {},
+  locale = "de"
+) {
+  return renderWithIntl(
     <AchievementBadge
       title="Code-Meister"
       description="10 schwere Challenges gelöst"
       icon={Icon}
       {...props}
-    />
+    />,
+    locale
   );
 }
 
@@ -28,9 +32,19 @@ describe("AchievementBadge", () => {
   it("prefixes the label when the value is a record, not a current run", () => {
     const html = render({
       unlocked: false,
-      progress: { current: 5, target: 7, label: "Rekord" },
+      progress: { current: 5, target: 7, label: "record" },
     });
     expect(html).toContain("Rekord: 5/7");
+  });
+
+  // The rules hand the label down as a message key, so it follows the reader's language.
+  it("translates the record label", () => {
+    const html = render(
+      { unlocked: false, progress: { current: 5, target: 7, label: "record" } },
+      "en"
+    );
+    expect(html).toContain("Record: 5/7");
+    expect(html).not.toContain("Rekord");
   });
 
   it("renders no bar without progress", () => {
@@ -41,11 +55,16 @@ describe("AchievementBadge", () => {
   it("renders no bar once unlocked, where the unlock date carries the information", () => {
     const html = render({
       unlocked: true,
-      unlockedAt: "29.07.2026",
+      unlockedAtIso: "2026-07-29T10:00:00.000Z",
       progress: { current: 10, target: 10 },
     });
     expect(html).toContain("Freigeschaltet am 29.07.2026");
     expect(html).not.toContain("10/10");
+  });
+
+  it("formats the unlock date for the reader's locale", () => {
+    const html = render({ unlocked: true, unlockedAtIso: "2026-07-29T10:00:00.000Z" }, "en");
+    expect(html).toContain("Unlocked on 07/29/2026");
   });
 });
 

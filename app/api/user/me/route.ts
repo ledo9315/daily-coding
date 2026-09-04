@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { getUserRoleFromDb } from "@/lib/server/user-role";
 
@@ -9,7 +10,8 @@ import { getUserRoleFromDb } from "@/lib/server/user-role";
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Nicht angemeldet." }, { status: 401 });
+    const t = await getTranslations("api");
+    return NextResponse.json({ error: t("user.notSignedIn") }, { status: 401 });
   }
   const role = await getUserRoleFromDb(session.user.id);
   return NextResponse.json({

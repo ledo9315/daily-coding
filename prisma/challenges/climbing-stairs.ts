@@ -58,6 +58,57 @@ export const challenge: ChallengeContent = {
         "Integer – größere n sind nicht gefragt.",
     },
   ],
+  translations: {
+    en: {
+      title: "Climbing Stairs",
+      description:
+        "Implement climbStairs(n).\n\n" +
+        "A staircase has n steps (1 ≤ n ≤ 45). With every stride you take one or two steps. " +
+        "Return how many different ways there are to reach the top. Order matters: 1+2 and 2+1 " +
+        "are two ways.\n\n" +
+        "Listing every path one by one runs out of time at n = 40 already. This task aims at the " +
+        "realisation that the count for n follows from the counts for n-1 and n-2 alone – and " +
+        "that you only have to carry two numbers along for it.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "The last stride onto step n comes either from step n-1 or from step n-2. So the " +
+            "number of ways to n is the sum of the ways to n-1 and to n-2. For one step there is " +
+            "one way, for two steps there are two. That is the Fibonacci sequence, just shifted " +
+            "by one position.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Keep two variables: the count for the second-to-last step and the one for the last " +
+            "step, 1 and 2 to begin with. Run from 3 up to and including n and compute the sum of " +
+            "the two in every step; the older one drops out, the sum moves up. For n = 1 you " +
+            "return 1 directly. At the end the result sits in the variable for the last step.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The naive recursion climbStairs(n-1) + climbStairs(n-2) without a cache computes the " +
+            "same partial results billions of times over: for n = 45 that is more than three " +
+            "billion calls, and the test runs into the timeout. Either you remember every result " +
+            "in a map (memoization) or you compute from the bottom up.\n\n" +
+            "The starting values are 1 and 2, for n = 1 and n = 2. Beginning with 0 and 1 puts " +
+            "you one step off unless the loop is built to match.\n\n" +
+            "The result for n = 45 is 1836311903 and just fits into a 32-bit integer – larger n " +
+            "are not asked for.",
+        },
+      ],
+      testCaseNames: {
+        "1": "One step",
+        "2": "Example",
+        "3": "Three steps",
+        "4": "Five steps",
+        "5": "Ten steps",
+        "6": "Maximum",
+      },
+    },
+  },
   examples: [
     { input: "2", output: "2" },
     { input: "3", output: "3" },

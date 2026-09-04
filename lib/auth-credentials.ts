@@ -5,6 +5,7 @@ import { verifyEmailToken } from "@/lib/server/auth-service";
 import { emailAddressValidationError, normaliseEmailAddress } from "@/lib/email-address";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { requestClientIdentity } from "@/lib/server/request-security";
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
 
 export const EMAIL_NOT_VERIFIED_CODE = "email_not_verified";
 
@@ -22,6 +23,7 @@ type SessionUser = {
   email: string | null;
   image: string | null;
   role: "user" | "admin";
+  locale: AppLocale;
   rememberMe: boolean;
 };
 
@@ -32,6 +34,7 @@ function mapUserToSessionUser(
     email: string | null;
     avatar: string | null;
     role: "user" | "admin" | string;
+    locale?: string;
   },
   rememberMe: boolean
 ): SessionUser {
@@ -43,6 +46,7 @@ function mapUserToSessionUser(
     email: user.email,
     image: user.avatar,
     role,
+    locale: isAppLocale(user.locale) ? user.locale : DEFAULT_LOCALE,
     rememberMe,
   };
 }

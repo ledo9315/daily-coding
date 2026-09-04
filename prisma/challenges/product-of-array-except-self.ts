@@ -85,4 +85,57 @@ export const challenge: ChallengeContent = {
   ],
   starterCodes: starter,
   starterCode: starter.javascript,
+  translations: {
+    en: {
+      title: "Product of Array Except Self",
+      description:
+        "Implement productExceptSelf(nums).\n\n" +
+        "Return an array of the same length in which position i holds the product of all the " +
+        "numbers except nums[i]. Division is not allowed – not even the detour via the total " +
+        "product. nums has between 2 and 20 elements, and every partial product fits into a " +
+        "32-bit integer.\n\n" +
+        "Multiplying all the others together for every position works and costs O(n²). The task " +
+        "is after two passes: what stands to the left of a position and what stands to the right " +
+        "of it can each be collected as you go – and the answer needs nothing more.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "The product of all the other numbers splits into two parts: everything to the left " +
+            "of i and everything to the right of i. Both parts grow step by step – the prefix " +
+            "product from left to right, the suffix product from right to left. At every " +
+            "position the answer is the product of the two.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Create the result array and fill it in a first pass with the prefix products: " +
+            "result[i] is the product of nums[0] up to nums[i-1], so 1 for i = 0. Then walk from " +
+            "right to left with a variable that holds the product of all the right-hand elements " +
+            "you have seen so far. Multiply result[i] by it and only update the variable with " +
+            "nums[i] afterwards.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "Zeros. If you build the total product and divide, a single zero makes you divide by " +
+            "zero, and with two zeros there is no way back at all – which is exactly why " +
+            "division is forbidden. With prefix and suffix, zeros simply pass through: " +
+            "[-1,1,0,-3,3] gives [0,0,9,0,0].\n\n" +
+            "The starting values: prefix and suffix start at 1, not at 0 – otherwise the whole " +
+            "result is zeros.\n\n" +
+            "The order on the way back: first multiply result[i] by the suffix, then extend the " +
+            "suffix by nums[i]. The other way round, nums[i] ends up in its own result.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "One zero",
+        "3": "Two elements",
+        "4": "Two zeros",
+        "5": "Negatives",
+        "6": "Primes",
+      },
+    },
+  },
 };

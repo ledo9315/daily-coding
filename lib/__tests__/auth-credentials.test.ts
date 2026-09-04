@@ -127,6 +127,7 @@ describe("authorizeCredentials", () => {
       avatar: "/avatar.png",
       passwordHash: "hashed",
       role: "user",
+      locale: "en",
     });
     mockCompare.mockResolvedValueOnce(true);
     const result = await authorizeCredentials({
@@ -139,6 +140,7 @@ describe("authorizeCredentials", () => {
       email: "max@example.com",
       image: "/avatar.png",
       role: "user",
+      locale: "en",
       rememberMe: false,
     });
   });
@@ -207,7 +209,7 @@ describe("authorizeCredentials", () => {
   });
 
   it("returns null for invalid verification token", async () => {
-    mockVerifyEmailToken.mockResolvedValueOnce({ error: "Token ungültig." });
+    mockVerifyEmailToken.mockResolvedValueOnce({ error: "invalid" });
 
     const result = await authorizeCredentials({ verificationToken: "bad" });
 
@@ -236,6 +238,8 @@ describe("authorizeCredentials", () => {
       email: "a@b.de",
       image: "",
       role: "user",
+      // No `locale` on the fixture, so the default fills in.
+      locale: "de",
       rememberMe: true,
     });
     expect(mockCompare).not.toHaveBeenCalled();

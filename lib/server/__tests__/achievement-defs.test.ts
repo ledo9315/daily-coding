@@ -2,8 +2,15 @@ import { describe, expect, it, vi } from "vitest";
 import {
   ACHIEVEMENT_DEFS,
   seedAchievementDefs,
+  seedAchievementTranslations,
 } from "@/lib/server/achievement-defs";
 import { resolveAchievementIcon } from "@/components/achievement-badge";
+
+type AchievementTranslationUpsertArgs = {
+  where: { achievementId_locale: { achievementId: string; locale: string } };
+  update: { title: string; description: string };
+  create: { achievementId: string; locale: string; title: string; description: string };
+};
 
 describe("seedAchievementDefs", () => {
   it("writes the definition on update, not just on create", async () => {
@@ -37,6 +44,19 @@ describe("seedAchievementDefs", () => {
     expect(args.map((a) => a.create.id)).toEqual(
       ACHIEVEMENT_DEFS.map((d) => d.id)
     );
+  });
+
+  it("keeps the language blocks out of the row", async () => {
+    const upsert = vi.fn().mockResolvedValue(undefined);
+
+    await seedAchievementDefs({ achievementDef: { upsert } });
+
+    for (const call of upsert.mock.calls) {
+      const args = call[0] as { update: object; create: object };
+      // `AchievementDef` has no `translations` column; the rows go into their own table.
+      expect(args.update).not.toHaveProperty("translations");
+      expect(args.create).not.toHaveProperty("translations");
+    }
   });
 
   it("describes ach-3 as Polyglott", () => {
@@ -82,5 +102,64 @@ describe("ACHIEVEMENT_DEFS", () => {
     expect(ACHIEVEMENT_DEFS).toHaveLength(23);
     expect(ACHIEVEMENT_DEFS[6]).toMatchObject({ id: "ach-7", title: "Dranbleiber" });
     expect(ACHIEVEMENT_DEFS[22]).toMatchObject({ id: "ach-23", title: "Minimalist" });
+  });
+});
+
+describe("seedAchievementTranslations", () => {
+  it("writes one English row per definition, keyed by id and locale", async () => {
+    const upsert = vi.fn().mockResolvedValue(undefined);
+
+    await seedAchievementTranslations({ achievementTranslation: { upsert } });
+
+    const args = upsert.mock.calls.map((c) => c[0] as AchievementTranslationUpsertArgs);
+    expect(args).toHaveLength(ACHIEVEMENT_DEFS.length);
+    expect(args.map((a) => a.where.achievementId_locale)).toEqual(
+      ACHIEVEMENT_DEFS.map((d) => ({ achievementId: d.id, locale: "en" }))
+    );
+    // Same reason as `update: def` above: a renamed achievement must reach an existing row.
+    expect(args.map((a) => a.update)).toEqual(
+      ACHIEVEMENT_DEFS.map((d) => d.translations.en)
+    );
+  });
+
+  it("writes no German row - the seed mirrors that from the columns", async () => {
+    const upsert = vi.fn().mockResolvedValue(undefined);
+
+    await seedAchievementTranslations({ achievementTranslation: { upsert } });
+
+    const locales = upsert.mock.calls.map(
+      (c) => (c[0] as AchievementTranslationUpsertArgs).where.achievementId_locale.locale
+    );
+    expect(new Set(locales)).toEqual(new Set(["en"]));
+  });
+});
+
+describe("English achievement text", () => {
+  it("gives every definition a non-empty English title and description", () => {
+    for (const def of ACHIEVEMENT_DEFS) {
+      expect(def.translations.en.title.trim(), def.id).not.toBe("");
+      expect(def.translations.en.description.trim(), def.id).not.toBe("");
+    }
+  });
+
+  it("keeps the titles short enough to read as names", () => {
+    // „Ohne Stützräder" is „No Training Wheels", not a sentence explaining the unlock:
+    // a badge shows the title on one line.
+    for (const def of ACHIEVEMENT_DEFS) {
+      expect(def.translations.en.title.length, def.id).toBeLessThanOrEqual(24);
+      expect(def.translations.en.title, def.id).not.toContain(".");
+    }
+  });
+
+  it("translates every description instead of repeating the German one", () => {
+    for (const def of ACHIEVEMENT_DEFS) {
+      expect(def.translations.en.description, def.id).not.toBe(def.description);
+    }
+  });
+
+  it("names ach-14 after Rust in both languages", () => {
+    const rustproof = ACHIEVEMENT_DEFS.find((d) => d.id === "ach-14");
+    expect(rustproof?.title).toBe("Rostfrei");
+    expect(rustproof?.translations.en.title).toBe("Rustproof");
   });
 });

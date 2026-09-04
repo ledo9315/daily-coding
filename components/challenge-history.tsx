@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
@@ -16,34 +17,36 @@ interface ChallengeHistoryProps {
 const statusConfig = {
   pending: {
     icon: Clock,
-    label: "Ausstehend",
+    labelKey: "history.status.pending",
     className: "text-amber-500",
   },
   completed: {
     icon: Check,
-    label: "Abgeschlossen",
+    labelKey: "history.status.completed",
     className: "text-emerald-500",
   },
   failed: {
     icon: Close,
-    label: "Nicht bestanden",
+    labelKey: "history.status.failed",
     className: "text-rose-500",
   },
   skipped: {
     icon: Clock,
-    label: "Übersprungen",
+    labelKey: "history.status.skipped",
     className: "text-muted-foreground",
   },
-};
+} as const;
 
 export function ChallengeHistory({
   entries,
   className,
 }: ChallengeHistoryProps) {
+  const t = useTranslations("challenge");
+
   return (
     <Card className={className}>
       <CardHeader className="mb-2">
-        <CardTitle>Letzte Challenges</CardTitle>
+        <CardTitle>{t("history.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -60,7 +63,10 @@ export function ChallengeHistory({
                 )}
               >
                 <div className={cn("shrink-0", config.className)}>
-                  <StatusIcon className="h-5 w-5" />
+                  <StatusIcon className="h-5 w-5" aria-hidden />
+                  {/* The icon was the only carrier of the status, and a shape says
+                      nothing to a screen reader. */}
+                  <span className="sr-only">{t(config.labelKey)}</span>
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -77,7 +83,7 @@ export function ChallengeHistory({
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground">
                     <span>{entry.date}</span>
-                    {entry.rank && <span>Rang #{entry.rank}</span>}
+                    {entry.rank && <span>{t("history.rank", { rank: entry.rank })}</span>}
                   </div>
                 </div>
 

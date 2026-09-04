@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +31,8 @@ export function CommentThread({
   /** Keeps the count on the card's toggle in step with what the thread does. */
   onCountChange?: (count: number) => void;
 }) {
+  const t = useTranslations("community");
+  const locale = useLocale();
   const [comments, setComments] = useState<SubmissionComment[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,9 +52,7 @@ export function CommentThread({
         setNextCursor(page.nextCursor);
       } catch (e) {
         if (!cancelled) {
-          setError(
-            e instanceof Error ? e.message : "Kommentare konnten nicht geladen werden."
-          );
+          setError(e instanceof Error ? e.message : t("comments.loadError"));
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -60,7 +61,7 @@ export function CommentThread({
     return () => {
       cancelled = true;
     };
-  }, [submissionId]);
+  }, [submissionId, t]);
 
   async function onLoadMore() {
     if (!nextCursor || loadingMore) return;
@@ -74,9 +75,7 @@ export function CommentThread({
       setComments((prev) => [...prev, ...page.comments]);
       setNextCursor(page.nextCursor);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Weitere Kommentare konnten nicht geladen werden."
-      );
+      setError(e instanceof Error ? e.message : t("comments.loadMoreError"));
     } finally {
       setLoadingMore(false);
     }
@@ -94,9 +93,7 @@ export function CommentThread({
       });
       setBody("");
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Kommentar konnte nicht gespeichert werden."
-      );
+      toast.error(e instanceof Error ? e.message : t("comments.saveError"));
     } finally {
       setSending(false);
     }
@@ -112,9 +109,7 @@ export function CommentThread({
         return next;
       });
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Kommentar konnte nicht gelöscht werden."
-      );
+      toast.error(e instanceof Error ? e.message : t("comments.deleteError"));
     } finally {
       setDeletingId(null);
     }
@@ -135,22 +130,24 @@ export function CommentThread({
           onChange={(e) => setBody(e.target.value)}
           disabled={sending}
           rows={3}
-          placeholder="Schreib einen Kommentar zu dieser Lösung"
-          aria-label="Kommentar schreiben"
+          placeholder={t("comments.placeholder")}
+          aria-label={t("comments.inputLabel")}
           className="rounded-none border-2 border-border bg-input text-lg focus-visible:border-primary focus-visible:ring-0 md:text-lg"
         />
         <div className="flex items-center justify-between gap-3">
           <span
             className={`text-base ${remaining < 0 ? "text-destructive" : "text-muted-foreground"}`}
           >
-            {remaining <= COUNTER_THRESHOLD ? `${remaining} Zeichen übrig` : ""}
+            {remaining <= COUNTER_THRESHOLD
+              ? t("comments.remaining", { count: remaining })
+              : ""}
           </span>
           <Button
             type="submit"
             disabled={sending || !submittable}
             className="rounded-none border-2 border-primary/40 text-base uppercase tracking-wider"
           >
-            {sending ? "Wird gesendet …" : "Kommentar senden"}
+            {sending ? t("comments.sending") : t("comments.submit")}
           </Button>
         </div>
       </form>
@@ -158,16 +155,14 @@ export function CommentThread({
       {loading ? (
         <div className="flex justify-center py-6 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-          <span className="sr-only">Kommentare werden geladen</span>
+          <span className="sr-only">{t("comments.loading")}</span>
         </div>
       ) : error && comments.length === 0 ? (
         <p className="mt-4 border-2 border-destructive/40 bg-destructive/10 px-3 py-2 text-lg text-destructive">
           {error}
         </p>
       ) : comments.length === 0 ? (
-        <p className="mt-4 text-lg text-muted-foreground">
-          Noch keine Kommentare. Schreib den ersten.
-        </p>
+        <p className="mt-4 text-lg text-muted-foreground">{t("comments.empty")}</p>
       ) : (
         <ul className="mt-5 space-y-5">
           {comments.map((comment) => (
@@ -189,10 +184,10 @@ export function CommentThread({
                     {comment.author.name}
                   </Link>
                   <span className="text-base text-muted-foreground">
-                    Level {comment.author.level}
+                    {t("comments.authorLevel", { level: comment.author.level })}
                   </span>
                   <span className="font-code text-xs text-muted-foreground">
-                    {formatDate(new Date(comment.createdAt))}
+                    {formatDate(new Date(comment.createdAt), locale)}
                   </span>
                   {comment.own && (
                     <button
@@ -202,7 +197,7 @@ export function CommentThread({
                       className="ml-auto inline-flex items-center gap-1 text-base uppercase tracking-wider text-muted-foreground hover:text-destructive disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Trash2 className="h-3.5 w-3.5" aria-hidden />
-                      Löschen
+                      {t("comments.delete")}
                     </button>
                   )}
                 </div>
@@ -227,7 +222,7 @@ export function CommentThread({
           disabled={loadingMore}
           className="mt-4 rounded-none border-2 text-base uppercase tracking-wider"
         >
-          {loadingMore ? "Wird geladen …" : "Mehr laden"}
+          {loadingMore ? t("comments.loadingMore") : t("comments.loadMore")}
         </Button>
       ) : null}
     </section>

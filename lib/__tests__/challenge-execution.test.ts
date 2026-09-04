@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+/** The slots this module names itself are translated; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 vi.mock("@/lib/server/code-execution-flag", () => ({
   isCodeExecutionEnabled: () => true,
 }));
@@ -152,9 +157,39 @@ describe("runChallengeTests (smoke, no IO)", () => {
     expect(testCases.every((t) => t.status !== "passed")).toBe(true);
     expect(testCases[0]?.actual).toContain("keine automatische Bewertung");
   });
+
+  it("names the fallback slots from the catalogue rather than from the source", async () => {
+    mockExecute.mockResolvedValueOnce(pistonOk(""));
+
+    const { testCases } = await runChallengeTests(
+      { testCases: [] },
+      "console.log(1)",
+      "javascript",
+      "run"
+    );
+
+    expect(testCases[0]?.name).toContain("Laufzeit / Kompilierung");
+  });
 });
 
-describe("Kompilierfehler", () => {
+describe("runChallengeTests (execution failure)", () => {
+  it("translates the frame and appends the cause unchanged", async () => {
+    mockExecute.mockRejectedValueOnce(new Error("fetch failed"));
+
+    const { runtimeOk, testCases } = await runChallengeTests(
+      { testCases: [{ id: 1, name: "T" }] },
+      "console.log(1)",
+      "javascript",
+      "run"
+    );
+
+    expect(runtimeOk).toBe(false);
+    expect(testCases[0]?.name).toBe("Laufzeit (javascript)");
+    expect(testCases[0]?.actual).toBe("Ausführung fehlgeschlagen: fetch failed");
+  });
+});
+
+describe("compile errors", () => {
   const ioChallenge = {
     evaluationConfig: { callableByLanguage: { typescript: "solve" } },
     testCases: [

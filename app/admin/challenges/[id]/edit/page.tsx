@@ -16,7 +16,15 @@ export default async function AdminEditChallengePage({ params }: PageProps) {
   await requireAdminPage(`/admin/challenges/${id}/edit`);
 
   const [ch, categories] = await Promise.all([
-    prisma.challenge.findUnique({ where: { id } }),
+    prisma.challenge.findUnique({
+      where: { id },
+      include: {
+        translations: {
+          where: { locale: "en" },
+          select: { title: true, description: true, hints: true, testCaseNames: true },
+        },
+      },
+    }),
     prisma.category.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true },
@@ -25,7 +33,7 @@ export default async function AdminEditChallengePage({ params }: PageProps) {
 
   if (!ch) notFound();
 
-  const initial = challengeToFormInitial(ch);
+  const initial = challengeToFormInitial(ch, ch.translations[0]);
 
   return (
     <div className="min-h-screen bg-background">

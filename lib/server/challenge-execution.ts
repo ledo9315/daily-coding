@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { ChallengeTestCase } from "@/lib/api";
 import { LANGUAGES, languageFileName, type CodeLanguageId } from "@/lib/challenge-languages";
 import type { Prisma } from "@/lib/generated/prisma/client";
@@ -21,6 +22,19 @@ export type ParsedIoTestCase = {
   name: string;
   input?: string;
   expected?: string;
+};
+
+/**
+ * The strings this module puts into the result panel itself, resolved once per request.
+ *
+ * Only the slots the module invents: a name that came from `Challenge.testCases` is already
+ * in the reader's language by the time it gets here - `localizeChallenge` translated it.
+ */
+type ExecutionLabels = {
+  runtimeSlot: string;
+  configSlot: string;
+  missingCallable: string;
+  noAutoGrading: string;
 };
 
 export type EvaluationConfigShape = {
@@ -60,9 +74,9 @@ export function parseTestCasesIo(raw: Prisma.JsonValue): ParsedIoTestCase[] {
     .slice(0, 20);
 }
 
-function defaultSlots(): ParsedIoTestCase[] {
+function defaultSlots(labels: ExecutionLabels): ParsedIoTestCase[] {
   return [
-    { id: 1, name: "Laufzeit / Kompilierung" },
+    { id: 1, name: labels.runtimeSlot },
     { id: 2, name: "Test 2" },
     { id: 3, name: "Test 3" },
     { id: 4, name: "Test 4" },
@@ -128,7 +142,8 @@ export function withEditorFileName(message: string, language: CodeLanguageId): s
 async function runPistonIoCases(
   challenge: ChallengeLike,
   code: string,
-  language: CodeLanguageId
+  language: CodeLanguageId,
+  labels: ExecutionLabels
 ): Promise<ChallengeRunResult> {
   const cfg = parseEvaluationConfig(challenge.evaluationConfig);
   const callable = cfg?.callableByLanguage?.[language];
@@ -137,10 +152,10 @@ async function runPistonIoCases(
       testCases: [
         {
           id: 1,
-          name: "Konfiguration",
+          name: labels.configSlot,
           status: "failed",
           time: "0ms",
-          actual: "Keine callableByLanguage für diese Sprache in evaluationConfig.",
+          actual: labels.missingCallable,
         },
       ],
       runtimeOk: false,
@@ -148,7 +163,7 @@ async function runPistonIoCases(
   }
 
   let list = parseTestCasesIo(challenge.testCases);
-  if (list.length === 0) list = defaultSlots();
+  if (list.length === 0) list = defaultSlots(labels);
 
   const results: ChallengeTestCase[] = [];
   let allPassed = true;
@@ -241,11 +256,12 @@ async function runPistonSmoke(
   challenge: ChallengeLike,
   code: string,
   language: CodeLanguageId,
-  mode: ChallengeExecutionMode
+  mode: ChallengeExecutionMode,
+  labels: ExecutionLabels
 ): Promise<ChallengeRunResult> {
   const piston = await executeWithPiston(language, code, "");
   const list = parseTestCasesIo(challenge.testCases);
-  const slots = list.length > 0 ? list : defaultSlots();
+  const slots = list.length > 0 ? list : defaultSlots(labels);
 
   if (piston.compileFailed) {
     return {
@@ -263,8 +279,6 @@ async function runPistonSmoke(
     // correctness. No auto-pass - that would award full points for code that
     // merely compiles. Affects misconfigured challenges: seed demos without a
     // config, or admin-created challenges without test cases.
-    const note =
-      "Diese Challenge hat keine automatische Bewertung (Test-Cases mit Input/Expected) konfiguriert. Die Einreichung kann nicht gewertet werden.";
     return {
       testCases: slots.map((s, i) => ({
         id: s.id,
@@ -274,7 +288,7 @@ async function runPistonSmoke(
         actual:
           i === 0
             ? piston.ok
-              ? note
+              ? labels.noAutoGrading
               : (piston.stderr || piston.stdout || `Exit ${piston.exitCode}`).slice(0, 2000)
             : undefined,
       })),
@@ -282,7 +296,7 @@ async function runPistonSmoke(
     };
   }
 
-  const firstName = slots[0]?.name ?? "Laufzeit / Kompilierung";
+  const firstName = slots[0]?.name ?? labels.runtimeSlot;
   const first: ChallengeTestCase = {
     id: slots[0]?.id ?? 1,
     name: `${firstName} (${language})`,
@@ -327,21 +341,31 @@ export async function runChallengeTests(
     };
   }
 
+  const t = await getTranslations("challenge");
+  const labels: ExecutionLabels = {
+    runtimeSlot: t("execution.slots.runtimeCompile"),
+    configSlot: t("execution.slots.configuration"),
+    missingCallable: t("execution.missingCallable"),
+    noAutoGrading: t("execution.noAutoGrading"),
+  };
+
   try {
     if (usesIoEvaluation(challenge, language)) {
-      return await runPistonIoCases(challenge, code, language);
+      return await runPistonIoCases(challenge, code, language, labels);
     }
-    return await runPistonSmoke(challenge, code, language, mode);
+    return await runPistonSmoke(challenge, code, language, mode, labels);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return {
       testCases: [
         {
           id: 1,
-          name: `Laufzeit (${language})`,
+          name: t("execution.slots.runtime", { language }),
           status: "failed",
           time: "0ms",
-          actual: `Ausführung fehlgeschlagen: ${msg}`,
+          // Only the frame is ours: the cause is a Piston message or a harness refusal and is
+          // appended unchanged, the way a compiler's own wording reaches the panel.
+          actual: t("execution.failed", { cause: msg }),
         },
       ],
       runtimeOk: false,

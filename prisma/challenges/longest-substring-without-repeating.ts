@@ -89,6 +89,59 @@ export const challenge: ChallengeContent = {
     { id: 6, name: "Fenster am Ende", input: '"dvdf"', expected: "3" },
     { id: 7, name: "Zeiger zurück", input: '"abba"', expected: "2" },
   ],
+  translations: {
+    en: {
+      title: "Longest Substring Without Repeating Characters",
+      description:
+        "Implement lengthOfLongestSubstring(s).\n\n" +
+        "Return the length of the longest contiguous substring of s in which no character " +
+        'appears twice. In "abcabcbb" that is "abc" with length 3, in "bbbbb" it is "b" with ' +
+        "length 1. The empty string gives 0.\n\n" +
+        "What is asked for is a substring, not a subsequence: the characters have to follow one " +
+        'another directly. In "pwwkew" the answer is 3 ("wke"), not 4 ("pwke").\n\n' +
+        "Checking every substring costs O(n²) or more. The task aims at the sliding window: two " +
+        "pointers that only ever move forward, and a memory of where each character last stood.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Keep a window [left, right] with no repeated characters. When right moves on by one " +
+            "and the new character is already in the window, left jumps past that character's " +
+            "last occurrence – nothing before it can yield a longer valid window anyway. The " +
+            "largest window width along the way is the answer.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Set up a map from a character to the index of its last occurrence, plus left = 0 " +
+            "and best = 0. Walk right over the string: if s[right] is in the map with an index " +
+            ">= left, set left to that index + 1. Then store s[right] with right and update best " +
+            "with right - left + 1.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            'The left pointer must never move back. In "abba", at the last a the first a sits in ' +
+            "the map with index 0 – but left is already at 2. Set left blindly to 0 + 1 and you " +
+            'pull the window open again and count "bba" as valid; expected is 2. Hence the ' +
+            "condition: only jump when the stored occurrence lies inside the current window – or " +
+            "left = max(left, index + 1).\n\n" +
+            "The empty string gives 0; a single space is a valid character and gives 1.\n\n" +
+            'Measure the window after every step, not only on a hit: in "dvdf" the longest ' +
+            'window "vdf" appears right at the end, with no further duplicate behind it.',
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "One character only",
+        "3": "Substring, not a subsequence",
+        "4": "Empty",
+        "5": "Space",
+        "6": "Window at the end",
+        "7": "Pointer moving back",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

@@ -28,6 +28,25 @@ Multi-agent: see **`AGENTS-QA.md`** for the QA role (supplementary tests, review
 - `lib/` → `api.ts` (fetch layer), `prisma.ts` (DB client)
 - `prisma/` → `schema.prisma`, migrations, `seed.ts`
 
+## Language convention
+
+**Developer text is English. User-visible text is bilingual and lives in
+`messages/<locale>/<area>.json`, never in the JSX.**
+
+- Comments, JSDoc, `describe`/`it`, identifiers and commit messages: English.
+- A string a user reads goes into a namespace and is rendered with
+  `useTranslations("<area>")` (client) or `await getTranslations("<area>")`
+  (server, route handlers). The German value is copied verbatim; the English one carries
+  the same keys.
+- The admin area stays German. Impressum and Datenschutz are bilingual with the German
+  version authoritative.
+- `eslint.config.mjs` carries a ratchet that flags a JSX literal where a key belongs. It
+  misses `aria-label`, `placeholder`, `alt` and template strings, so read the file rather
+  than trusting the lint.
+
+The full rules - the nine namespaces, what stays German, and how a locale is resolved -
+are in **`CLAUDE.md` → Language convention**. Read it before touching UI text.
+
 ## Database
 
 - **Local:** PostgreSQL in Docker (`docker compose up -d db`). URL: `postgresql://daily_dev:daily_dev_secret@localhost:5433/daily_dev` (see `.env.example`).

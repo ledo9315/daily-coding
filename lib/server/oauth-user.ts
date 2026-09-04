@@ -7,6 +7,7 @@ import {
   uniqueDisplayName,
 } from "@/lib/display-name";
 import { emailAddressValidationError, normaliseEmailAddress } from "@/lib/email-address";
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
 
 /**
  * No `image` field on purpose. The provider sends a picture URL, but storing it would
@@ -29,6 +30,7 @@ interface DbUser {
   id: string;
   role: "user" | "admin";
   avatar: string;
+  locale: AppLocale;
 }
 
 export async function findOAuthUserByAccount(
@@ -50,12 +52,21 @@ export async function findOAuthUserByAccount(
     id: existingAccount.user.id,
     role: existingAccount.user.role as "user" | "admin",
     avatar: existingAccount.user.avatar,
+    locale: isAppLocale(existingAccount.user.locale)
+      ? existingAccount.user.locale
+      : DEFAULT_LOCALE,
   };
 }
 
 export async function findOrCreateOAuthUser(
   profile: OAuthProfile,
-  account: OAuthAccount
+  account: OAuthAccount,
+  /**
+   * Only reaches the `user.create` below, and only for an account that does not exist
+   * yet. Omitted means the column default (`de`) applies, which is what the two paths
+   * above an existing row want anyway.
+   */
+  newUserLocale?: AppLocale
 ): Promise<DbUser> {
   if (emailAddressValidationError(profile.email)) {
     throw new Error("OAuth provider returned an invalid email address");
@@ -88,6 +99,7 @@ export async function findOrCreateOAuthUser(
       id: existingUser.id,
       role: existingUser.role as "user" | "admin",
       avatar: existingUser.avatar,
+      locale: isAppLocale(existingUser.locale) ? existingUser.locale : DEFAULT_LOCALE,
     };
   }
 
@@ -119,6 +131,7 @@ export async function findOrCreateOAuthUser(
       nameKey: nameKeyOf(name),
       initials,
       avatar: starterAvatarPath(name),
+      locale: newUserLocale,
       emailVerified: true, // OAuth providers pre-verify emails
       accounts: {
         create: {
@@ -129,5 +142,10 @@ export async function findOrCreateOAuthUser(
     },
   });
 
-  return { id: newUser.id, role: "user", avatar: newUser.avatar };
+  return {
+    id: newUser.id,
+    role: "user",
+    avatar: newUser.avatar,
+    locale: isAppLocale(newUser.locale) ? newUser.locale : DEFAULT_LOCALE,
+  };
 }

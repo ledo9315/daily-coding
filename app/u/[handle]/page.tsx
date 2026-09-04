@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import {
   ArrowBarUp,
@@ -17,19 +18,30 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageAmbience } from "@/components/page-ambience";
 import { avatarImageSrc } from "@/lib/avatar-src";
+import { formatDate, formatMonthYearShort, formatNumber } from "@/lib/format";
 import { getPublicProfile } from "@/lib/server/public-profile";
 
 type PageProps = { params: Promise<{ handle: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { handle } = await params;
-  const profile = await getPublicProfile(handle);
+  const [t, profile] = await Promise.all([
+    getTranslations("profile"),
+    getPublicProfile(handle),
+  ]);
   if (!profile) {
-    return { title: "Profil nicht gefunden", robots: { index: false, follow: true } };
+    return {
+      title: t("metadata.publicProfileNotFound"),
+      robots: { index: false, follow: true },
+    };
   }
   return {
-    title: `${profile.name} – Öffentliches Profil`,
-    description: `Level ${profile.level}, ${profile.totalSolved} gelöste Challenges und eine Streak von ${profile.streak} Tagen.`,
+    title: t("metadata.publicProfile", { name: profile.name }),
+    description: t("metadata.publicProfileDescription", {
+      level: profile.level,
+      solved: profile.totalSolved,
+      streak: profile.streak,
+    }),
     /**
      * Not an SEO detail: section 4 of the Datenschutzerklärung promises that this page
      * stays out of the search engines. Changing this makes that passage false.
@@ -40,7 +52,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicProfilePage({ params }: PageProps) {
   const { handle } = await params;
-  const profile = await getPublicProfile(handle);
+  const [locale, t, profile] = await Promise.all([
+    getLocale(),
+    getTranslations("profile"),
+    getPublicProfile(handle),
+  ]);
   if (!profile) notFound();
 
   return (
@@ -64,31 +80,45 @@ export default async function PublicProfilePage({ params }: PageProps) {
               {profile.name}
             </h1>
             <p className="text-muted-foreground uppercase tracking-wider text-sm">
-              Level {profile.level}
+              {t("publicProfile.level", { level: profile.level })}
             </p>
             <p className="mt-1 text-xs text-muted-foreground/80">
-              Dabei seit {profile.memberSince}
+              {t("publicProfile.memberSince", {
+                date: formatMonthYearShort(profile.memberSince, locale),
+              })}
               {profile.lastSolvedAt
-                ? ` · Zuletzt gelöst am ${profile.lastSolvedAt}`
+                ? ` · ${t("publicProfile.lastSolved", {
+                    date: formatDate(profile.lastSolvedAt, locale),
+                  })}`
                 : ""}
             </p>
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <StatsCard title="LEVEL" value={profile.level} icon={ArrowBarUp} />
           <StatsCard
-            title="PUNKTE"
-            value={profile.points.toLocaleString("de-DE")}
+            title={t("publicProfile.statsLevel")}
+            value={profile.level}
+            icon={ArrowBarUp}
+          />
+          <StatsCard
+            title={t("publicProfile.statsPoints")}
+            value={formatNumber(profile.points, locale)}
             icon={PixelStar}
           />
           <StatsCard
-            title="STREAK"
+            title={t("publicProfile.statsStreak")}
             value={profile.streak}
-            description={`Rekord: ${profile.streakRecord}`}
+            description={t("publicProfile.statsStreakDescription", {
+              record: profile.streakRecord,
+            })}
             icon={Zap}
           />
-          <StatsCard title="GELÖST" value={profile.totalSolved} icon={Bullseye} />
+          <StatsCard
+            title={t("publicProfile.statsSolved")}
+            value={profile.totalSolved}
+            icon={Bullseye}
+          />
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -107,7 +137,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
             <CardHeader className="mb-2">
               <CardTitle className="flex items-center gap-2">
                 <CalendarToday className="h-5 w-5 text-primary" />
-                Aktivität
+                {t("publicProfile.activityTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

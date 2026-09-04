@@ -123,14 +123,18 @@ describe("getPublicProfile", () => {
     });
   });
 
+  /**
+   * Both come back as `Date`, not as a formatted string: the page picks the format for the
+   * reader's locale, and a query function has no locale to pick it with.
+   */
   it("reports when the account joined and when it last solved something", async () => {
     mockUserFindUnique.mockResolvedValue(makeUserRow());
 
     const result = await getPublicProfile("anna schmidt");
 
-    expect(result!.memberSince).toMatch(/2026/);
+    expect(result!.memberSince).toEqual(new Date("2026-03-15T10:00:00Z"));
     // The newest submission, not the first row returned.
-    expect(result!.lastSolvedAt).toBe("14.08.2026");
+    expect(result!.lastSolvedAt).toEqual(new Date("2026-08-14T09:00:00Z"));
   });
 
   it("leaves the last solve empty for an account that never finished one", async () => {

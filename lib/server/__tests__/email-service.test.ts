@@ -6,6 +6,7 @@ process.env.APP_URL = "https://app.example.com";
 process.env.EMAIL_FROM = "noreply@example.com";
 
 const mockSend = vi.fn();
+const mockFindUnique = vi.fn();
 
 vi.mock("resend", () => ({
   Resend: class {
@@ -15,6 +16,20 @@ vi.mock("resend", () => ({
   },
 }));
 
+vi.mock("@/lib/prisma", () => ({
+  prisma: { user: { findUnique: (...a: unknown[]) => mockFindUnique(...a) } },
+}));
+
+/**
+ * The real one reads `cookies()`, which throws outside a request. The double keeps the one
+ * rule that matters here: the account row wins, and without it the mail is German.
+ */
+vi.mock("@/lib/server/request-locale", () => ({
+  localeFromRequestScope: async (user?: string | null) => (user === "en" ? "en" : "de"),
+}));
+
+import de from "@/messages/de/email.json";
+import en from "@/messages/en/email.json";
 import {
   sendVerificationEmail,
   sendPasswordResetEmail,
@@ -23,7 +38,10 @@ import {
   sendSolutionActivityEmail,
 } from "@/lib/server/email-service";
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockFindUnique.mockResolvedValue({ locale: "de" });
+});
 
 describe("sendVerificationEmail", () => {
   it("calls resend.emails.send with correct to, subject, and verification link", async () => {
@@ -32,7 +50,7 @@ describe("sendVerificationEmail", () => {
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "user@test.com",
-        subject: expect.stringContaining("bestätigen"),
+        subject: de.verification.subject,
         html: expect.stringContaining("https://app.example.com/auth/verify-email?token=abc123"),
       })
     );
@@ -46,7 +64,7 @@ describe("sendPasswordResetEmail", () => {
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "user@test.com",
-        subject: expect.stringContaining("Passwort"),
+        subject: de.passwordReset.subject,
         html: expect.stringContaining("https://app.example.com/auth/reset-password?token=xyz789"),
       })
     );
@@ -106,7 +124,7 @@ describe("every mail", () => {
     await sendAccountDeletionEmail("user@test.com", "<b>Max</b>");
     const sent = mockSend.mock.calls[0][0] as { html: string; subject: string };
     expect(sent.html).not.toContain("<b>Max</b>");
-    expect(sent.subject).toContain("gelöscht");
+    expect(sent.subject).toBe(de.accountDeletion.subject);
   });
 });
 
@@ -128,5 +146,53 @@ describe("sendSolutionActivityEmail", () => {
       })
     );
     expect(mockSend.mock.calls[0][0].text).toContain("Watson");
+  });
+
+  it("names actor, kind and challenge in the recipient's language", async () => {
+    mockFindUnique.mockResolvedValue({ locale: "en" });
+    mockSend.mockResolvedValueOnce({ data: { id: "e8" }, error: null });
+    await sendSolutionActivityEmail("author@test.com", {
+      actorName: "Watson",
+      kind: "best_practices",
+      challengeTitle: "Two Sum",
+      path: "/challenge/chal-1/loesungen?loesung=abc",
+    });
+    const sent = mockSend.mock.calls[0][0] as { text: string };
+    expect(sent.text).toContain('Watson thinks your solution to "Two Sum" is exemplary.');
+  });
+});
+
+/**
+ * The mail leaves without a request of its own, so nothing but the account row says which
+ * language it should be written in.
+ */
+describe("recipient locale", () => {
+  it("writes the mail in the language of the recipient's account", async () => {
+    mockFindUnique.mockResolvedValue({ locale: "en" });
+    mockSend.mockResolvedValueOnce({ data: { id: "e9" }, error: null });
+    await sendVerificationEmail("user@test.com", "tok");
+    const sent = mockSend.mock.calls[0][0] as { subject: string; html: string; text: string };
+    expect(sent.subject).toBe(en.verification.subject);
+    expect(sent.html).toContain('lang="en"');
+    expect(sent.text).toContain(en.verification.line);
+    expect(sent.text).not.toContain(de.verification.line);
+  });
+
+  it("looks the account up by the address it is sending to", async () => {
+    mockSend.mockResolvedValueOnce({ data: { id: "e10" }, error: null });
+    await sendVerificationEmail("user@test.com", "tok");
+    expect(mockFindUnique).toHaveBeenCalledWith({
+      where: { email: "user@test.com" },
+      select: { locale: true },
+    });
+  });
+
+  /** The deletion mail is sent after the row is gone, and it may not throw there. */
+  it("falls back to German when there is no account row left", async () => {
+    mockFindUnique.mockResolvedValue(null);
+    mockSend.mockResolvedValueOnce({ data: { id: "e11" }, error: null });
+    await sendAccountDeletionEmail("user@test.com", "Max");
+    const sent = mockSend.mock.calls[0][0] as { subject: string };
+    expect(sent.subject).toBe(de.accountDeletion.subject);
   });
 });

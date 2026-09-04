@@ -1,18 +1,26 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { FeedItem } from "@/components/feed-item";
 import { motion } from "framer-motion";
 import { getCommunityFeed } from "@/lib/api";
 import type { CommunityFeedItem } from "@/lib/api";
 import { communityFeedItemToFeedItem } from "@/lib/community-feed-map";
+import { formatWeekdayDate } from "@/lib/format";
 import { Loader2 } from "lucide-react";
 
 const PAGE_SIZE = 15;
 
 type DayBucket = { label: string; items: CommunityFeedItem[] };
 
-function groupItemsByDay(items: CommunityFeedItem[], now: Date): DayBucket[] {
+function groupItemsByDay(
+  items: CommunityFeedItem[],
+  now: Date,
+  locale: string,
+  /** The two headings that are words rather than a date. */
+  labels: { today: string; yesterday: string }
+): DayBucket[] {
   const startToday = new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -28,8 +36,8 @@ function groupItemsByDay(items: CommunityFeedItem[], now: Date): DayBucket[] {
     const start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
     const diffDays = Math.round((startToday - start) / dayMs);
     let key: string;
-    if (diffDays === 0) key = "heute";
-    else if (diffDays === 1) key = "gestern";
+    if (diffDays === 0) key = "today";
+    else if (diffDays === 1) key = "yesterday";
     else key = `day-${start}`;
 
     if (!bucketMap.has(key)) {
@@ -43,20 +51,18 @@ function groupItemsByDay(items: CommunityFeedItem[], now: Date): DayBucket[] {
     const arr = bucketMap.get(key)!;
     const first = new Date(arr[0].createdAt);
     let label: string;
-    if (key === "heute") label = "Heute";
-    else if (key === "gestern") label = "Gestern";
+    if (key === "today") label = labels.today;
+    else if (key === "yesterday") label = labels.yesterday;
     else {
-      label = first.toLocaleDateString("de-DE", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-      });
+      label = formatWeekdayDate(first, locale);
     }
     return { label, items: arr };
   });
 }
 
 export function CommunityFeed() {
+  const t = useTranslations("community");
+  const locale = useLocale();
   const [now] = useState(() => new Date());
   const [items, setItems] = useState<CommunityFeedItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -83,7 +89,7 @@ export function CommunityFeed() {
         await loadPage(null);
       } catch (e) {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Feed konnte nicht geladen werden.");
+          setError(e instanceof Error ? e.message : t("feed.loadError"));
         }
       } finally {
         if (!cancelled) setInitialLoading(false);
@@ -92,7 +98,7 @@ export function CommunityFeed() {
     return () => {
       cancelled = true;
     };
-  }, [loadPage]);
+  }, [loadPage, t]);
 
   const onLoadMore = useCallback(async () => {
     if (nextCursor == null || loadingMore || initialLoading) return;
@@ -101,11 +107,11 @@ export function CommunityFeed() {
     try {
       await loadPage(nextCursor);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Weitere Einträge konnten nicht geladen werden.");
+      setError(e instanceof Error ? e.message : t("feed.loadMoreError"));
     } finally {
       setLoadingMore(false);
     }
-  }, [nextCursor, loadingMore, initialLoading, loadPage]);
+  }, [nextCursor, loadingMore, initialLoading, loadPage, t]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -122,15 +128,19 @@ export function CommunityFeed() {
   }, [onLoadMore]);
 
   const buckets = useMemo(
-    () => groupItemsByDay(items, now),
-    [items, now],
+    () =>
+      groupItemsByDay(items, now, locale, {
+        today: t("feed.today"),
+        yesterday: t("feed.yesterday"),
+      }),
+    [items, now, locale, t],
   );
 
   if (initialLoading) {
     return (
       <div className="flex justify-center py-12 text-muted-foreground">
         <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
-        <span className="sr-only">Community-Feed wird geladen</span>
+        <span className="sr-only">{t("feed.loading")}</span>
       </div>
     );
   }
@@ -145,10 +155,7 @@ export function CommunityFeed() {
 
   if (items.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground px-1">
-        Noch keine abgeschlossenen Challenges. Der Feed füllt sich, sobald die Community
-        Aufgaben löst.
-      </p>
+      <p className="text-sm text-muted-foreground px-1">{t("feed.empty")}</p>
     );
   }
 
@@ -171,7 +178,7 @@ export function CommunityFeed() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(i * 0.04, 0.4) }}
                 >
-                  <FeedItem {...communityFeedItemToFeedItem(item)} />
+                  <FeedItem {...communityFeedItemToFeedItem(item, t)} />
                 </motion.div>
               );
             })}
@@ -188,13 +195,13 @@ export function CommunityFeed() {
       {loadingMore ? (
         <div className="flex justify-center py-4 text-muted-foreground">
           <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
-          <span className="sr-only">Weitere Einträge werden geladen</span>
+          <span className="sr-only">{t("feed.loadingMore")}</span>
         </div>
       ) : null}
 
       {!loadingMore && nextCursor == null && items.length > 0 ? (
         <p className="text-center text-xs text-muted-foreground pb-2">
-          Ende des Feeds
+          {t("feed.end")}
         </p>
       ) : null}
     </div>

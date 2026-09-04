@@ -138,14 +138,17 @@ them - Ruby covers both, since `data` there is just a value.
 ### Authentication
 
 - `auth.ts` configures NextAuth with credentials provider
-- `middleware.ts` protects `/challenge`, `/profile`, `/ranking`, `/admin` paths via JWT token check
-- Admin role is checked **in route handlers** via `lib/server/require-admin-page.ts` / `lib/server/admin-session.ts` (not in middleware, to avoid stale JWT role data)
+- `proxy.ts` (Next 16's name for `middleware.ts`) protects `/challenge`, `/profile`, `/ranking`, `/settings` and `/admin` paths via JWT token check, and writes the locale cookie on every response
+- Admin role is checked **in route handlers** via `lib/server/require-admin-page.ts` / `lib/server/admin-session.ts` (not in the proxy, to avoid stale JWT role data)
 
 ### Challenge content
 
-The first fifteen challenges live inline in `prisma/seed.ts`; every later one is a module under
-`prisma/challenges/<slug>.ts` exporting `challenge: ChallengeContent`, listed in
-`prisma/challenges/index.ts` and upserted by the seed in one loop. `prisma/__tests__/challenge-catalog.test.ts`
+Every challenge is a module under `prisma/challenges/<slug>.ts` exporting
+`challenge: ChallengeContent`, listed in `prisma/challenges/index.ts` as `ALL_CHALLENGES`
+and upserted by the seed in one loop - the first fifteen used to sit inline in
+`prisma/seed.ts` and no longer do. The German text is the column value; the English one
+lives in `translations.en` of the same module and is written to `ChallengeTranslation` by
+`prisma/translation-upsert.ts`. `prisma/__tests__/challenge-catalog.test.ts`
 checks each module structurally (ids, hint titles, points, JSON validity, a callable and a starter
 per language, typed-harness compatibility of every test input). Before seeding a new challenge run
 `scripts/verify-challenge.ts` with reference solutions kept outside the repo - it executes them
@@ -184,27 +187,120 @@ an admin adds them to the ring.
 
 ## Language convention
 
-**Developer-facing text is English, user-facing text is German.**
+**Developer text is English. User-visible text is bilingual and lives in
+`messages/<locale>/<area>.json`, not in the JSX.**
 
-English: code comments, JSDoc, `describe`/`it` descriptions, identifiers.
+English, everywhere and without exception: code comments, JSDoc, `describe`/`it`
+descriptions, identifiers, commit messages. The convention covers config files too, not
+just `app/`, `lib/`, `components/`: check `vitest.config.ts`, `prisma.config.ts`,
+`proxy.ts`, `docker-compose.yml`, `pnpm-workspace.yaml`, `.github/workflows/`,
+`.env.example`. Scoping the sweep to the source directories is what let German comments
+survive in all of them. When translating an old comment, keep the *why*: a comment that
+only restates what the code does is worth deleting rather than translating.
 
-German - do not translate these:
+### Where a string goes
 
-- UI strings in JSX, API error messages, email bodies, toasts, button labels
-- Challenge content in `prisma/seed.ts` (titles, descriptions, test-case names)
-- Starter-code templates such as `defaultCode` in `components/code-editor.tsx`,
-  which the user reads inside the editor
-- Achievement titles quoted inside comments (`„Blitzschnell“`), because they name
-  a user-visible string
+`next-intl` 4, **without** i18n routing - no `/de` or `/en` prefix, one URL per page. The
+locale comes from the cookie `NEXT_LOCALE`, which `proxy.ts` writes on every response.
 
-The convention covers config files too, not just `app/`, `lib/`, `components/`: check
-`vitest.config.ts`, `prisma.config.ts`, `middleware.ts`, `docker-compose.yml`,
-`pnpm-workspace.yaml`, `.github/workflows/`, `.env.example`. Scoping the sweep to the
-source directories is what let German comments survive in all of them.
+- Client components (`"use client"`): `const t = useTranslations("<area>")`
+- Server components and route handlers: `const t = await getTranslations("<area>")`
+- Mails: `emailTranslator(locale)` from `lib/server/email-template.ts` - `getTranslations`
+  would read the *request's* locale, and an activity mail goes to a third party
 
-There is no lint rule for this - umlaut heuristics trip over proper nouns and over
-the German UI strings that are supposed to stay. A keyword list is not enough either:
-lines like `// Gleiche Tagesgrenze wie …` and `# Nach Start: …` contain neither an
-umlaut nor a common stop word. Read the candidate files rather than trusting a grep. When translating an old comment,
-keep the *why*: a comment that only restates what the code does is worth deleting
-rather than translating.
+The German value is the source of truth and is copied **verbatim** - umlauts, typographic
+quotes (`„…“`), trailing spaces and all. The English one carries the same key set and is
+written as English, not word for word; `„…“` becomes `"…"` there. Keys are English
+camelCase, nested by component or section (`{ "loginForm": { "title": … } }`). Plurals go
+through ICU (`"{count, plural, one {# Punkt} other {# Punkte}}"`), interpolation through
+`t("greeting", { name })`.
+
+Nine namespaces, one file per language each:
+
+| Namespace | Covers |
+|---|---|
+| `api` | route-handler error messages under `app/api/**` |
+| `auth` | login, register, forgot/reset password, verify e-mail |
+| `challenge` | challenge page, editor, hints, test results, submission status, solutions page |
+| `changelog` | `/changelog` page chrome and the footer link |
+| `community` | header, nav, footer, notifications, community feed, comments, solution cards and votes |
+| `dashboard` | landing page and the signed-in dashboard, including today's card and the activity calendar |
+| `email` | every outgoing mail, plus the three notification sentences the bell shares with it |
+| `legal` | Impressum and Datenschutz |
+| `profile` | profile, settings, ranking, public profile, achievements |
+
+The list in `i18n/request.ts` is authoritative; `__tests__/messages.test.ts` checks that it
+matches the files on disk, that both languages carry the same keys, that no value is empty
+and that a placeholder present in one language is present in the other.
+
+### What stays German
+
+- **Admin area** (`app/admin/**`, `components/admin/**`, `lib/server/admin-session.ts`,
+  `ringLabel`): one audience, and it speaks German (decision E4)
+- **Content columns in the database.** `Challenge`, `Category` and `AchievementDef` hold
+  the German text; `ChallengeTranslation`, `CategoryTranslation` and
+  `AchievementTranslation` hold the other languages, and a missing row falls back to the
+  column, so a half-translated catalogue shows German rather than an empty page (E8). Read
+  them through `lib/server/content-translations.ts`, never `findMany` directly.
+- **Changelog entries** (`lib/changelog.ts`): bilingual, but as prose in the module rather
+  than in `messages/` - a release is a numbered block of sentences, not a keyed list
+- **Protocol strings that both sides compare**, above all `KONTO LÖSCHEN`: the settings
+  panel types it and `DELETE /api/user/account` checks it. Only the sentence around it is
+  translated, and a test keeps the phrase out of the catalogues.
+- **Shared validation messages** in `lib/display-name.ts`, `lib/password-policy.ts`,
+  `lib/comment-policy.ts`, `lib/email-address.ts` and `lib/server/auth-service.ts`. They
+  are shared between a route handler and the client, so they hand back a rendered German
+  sentence; the form maps the known outcomes back to keys (see `translateNameError` in
+  `components/register-form.tsx`).
+- **Brands and names**: `DAILY CODING`, `GitHub`, `Google`, `Vercel`, `Neon`, and every
+  programming-language label in `lib/challenge-languages.ts`
+
+### Impressum and Datenschutz
+
+Both are bilingual, and the German version is the **authoritative** one. The English
+translation is a courtesy for the reader and has had no legal review; treat the German text
+as the one that binds, and do not change the German wording to match a translation
+(decision E5).
+
+### The switch and how a locale is decided
+
+`User.locale` (Prisma `enum Locale { de en }`, default `de`) holds the account setting; the
+switch sits in Settings → Sprache and writes it through `PATCH /api/user/locale`, which
+also sets the cookie so server components see the change on the next render.
+
+`resolveLocale` in `lib/locale.ts` is the whole decision, in this order:
+
+1. `User.locale` of the signed-in account
+2. the `NEXT_LOCALE` cookie
+3. `Accept-Language`
+4. `x-vercel-ip-country` (German for DE/AT/CH)
+5. `DEFAULT_LOCALE`, currently `de`
+
+The account beats the cookie, not the other way round: the cookie is a cache of a decision,
+the account row is the record of it. Two entry points wrap it - `localeFromRequest(request)`
+for code holding a `NextRequest` (`proxy.ts`), and `localeFromRequestScope(user?)` for code
+that has none (the request config, NextAuth callbacks, mails). Outside a request scope the
+latter degrades to the default instead of throwing.
+
+### The ESLint ratchet
+
+`eslint.config.mjs` exports `uiStringRatchet` and applies it per area to `app/**`,
+`components/**` and `lib/**`. It flags a JSX text literal and a bare literal inside a
+`toast.*` call - a *literal where a key belongs*, which is decidable from the syntax tree
+and says nothing about which language the literal is in.
+
+It is a floor, not a proof. It does **not** see `aria-label`, `placeholder`, `alt`, `title`,
+a template string, an object literal like `{ label: "Mittel" }`, or a string handed to a
+component as a prop. Every one of those hid a German string that survived the first sweep.
+So: read the candidate file, do not trust a grep, and never trust a green lint as evidence
+that a directory is converted.
+
+Exempt, with reason: `app/admin/**` and `components/admin/**` (German by decision),
+`components/ui/**` (vendored shadcn primitives, kept as the CLI writes them - the one label
+a reader can reach, the dialog's close button, takes it from the caller), `app/map/**` and
+`components/level-map.tsx` (the level path, not yet converted), plus `__tests__`, `prisma`
+and `scripts`. A hit that is genuinely not copy gets an `eslint-disable-next-line` with a
+short reason - not a file-wide exemption. Note the mechanics: a JSX text node starts on the
+line of the tag *before* it, so `disable-next-line` cannot reach text that follows a
+`</svg>` or a `<br />`; use an `eslint-disable` / `eslint-enable` pair around the element
+there.

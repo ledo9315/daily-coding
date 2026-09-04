@@ -90,6 +90,58 @@ export const challenge: ChallengeContent = {
       expected: "[[1,10]]",
     },
   ],
+  translations: {
+    en: {
+      title: "Merge Intervals",
+      description:
+        "Implement merge(intervals).\n\n" +
+        "intervals is a list of pairs [start, end]. Return a list in which all overlapping " +
+        "intervals are merged into one, sorted ascending by start. " +
+        "[[1,3],[2,6],[8,10],[15,18]] becomes [[1,6],[8,10],[15,18]].\n\n" +
+        "Two intervals that only touch overlap as well: [1,4] and [4,5] give [1,5]. The input " +
+        "is not sorted, and one interval can swallow several others at once.\n\n" +
+        "Compare every pair with every other one and you land at O(n²) and still have to tidy " +
+        "up afterwards. The task is: sort once, then a single pass – after that an interval can " +
+        "only merge with the last result you built.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Once the intervals are sorted by start, an interval can only overlap with its " +
+            "predecessor in the result – everything before that ended earlier or is already " +
+            "part of that predecessor. Which leaves exactly one question per interval: does it " +
+            "begin before the last result ends?",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Sort intervals by their first element. Start with an empty result and walk " +
+            "through the sorted intervals. If the result is empty, or the current interval " +
+            "begins after the end of the last result, append it. Otherwise set the end of the " +
+            "last result to the maximum of both ends.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The new end is the maximum of both ends, not the end of the current interval. " +
+            "For [[1,10],[2,3]] the result ends at 10 – overwrite it blindly and you turn it " +
+            "into [1,3].\n\n" +
+            "Touching counts as overlapping: the condition is start <= last end, not <. " +
+            "Otherwise [1,4] and [4,5] stay apart.\n\n" +
+            "There is no way around sorting. [[4,7],[1,4]] has to become [[1,7]], and for that " +
+            "[1,4] has to come first.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Touching",
+        "3": "Unsorted",
+        "4": "One interval",
+        "5": "No overlap",
+        "6": "One swallows all",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

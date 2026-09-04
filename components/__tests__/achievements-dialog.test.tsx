@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import {
   AchievementsDialog,
   AchievementsDialogBody,
 } from "@/components/achievements-dialog";
 import { Dialog } from "@/components/ui/dialog";
+import { renderWithIntl as renderToStaticMarkup } from "./intl-render";
 import type { Achievement } from "@/lib/api";
+import de from "@/messages/de/profile.json";
 
 function makeAchievements(count: number, unlocked: number): Achievement[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -15,7 +16,6 @@ function makeAchievements(count: number, unlocked: number): Achievement[] {
     iconKey: "Check",
     unlocked: i < unlocked,
     rarity: "rare" as const,
-    unlockedAt: i < unlocked ? "01.09.2026" : undefined,
     unlockedAtIso: i < unlocked ? "2026-09-01T10:00:00.000Z" : undefined,
     progress: i < unlocked ? undefined : { current: 1, target: 10 },
   }));
@@ -47,7 +47,7 @@ describe("AchievementsDialogBody", () => {
     const html = renderBody(makeAchievements(23, 4));
     expect(badgeCount(html)).toBe(23);
     expect(html).toContain("Achievements 4/23");
-    expect(html).toContain("Alle Achievements im Überblick");
+    expect(html).toContain(de.achievements.dialogDescription);
   });
 
   it("offers no filters", () => {

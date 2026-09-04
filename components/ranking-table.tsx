@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import {
@@ -78,6 +79,8 @@ export function RankingTable({
   entries,
   showPoints = true,
 }: RankingTableProps) {
+  const t = useTranslations("profile");
+
   return (
     <div className="overflow-hidden rounded-none border border-border">
       <div className="overflow-x-auto">
@@ -85,14 +88,14 @@ export function RankingTable({
           <thead>
             <tr className="border-b border-border bg-secondary/50">
               <th className="w-16 px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Rang
+                {t("rankingTable.rank")}
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground min-w-0">
-                Nutzer
+                {t("rankingTable.user")}
               </th>
               {showPoints && (
                 <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground whitespace-nowrap">
-                  Punkte
+                  {t("rankingTable.points")}
                 </th>
               )}
             </tr>
@@ -170,14 +173,13 @@ export function RankingTable({
                               reads as broken, so it keeps its size and the name wraps.
                             */
                             <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
-                              Lvl {entry.level}
+                              {t("rankingTable.level", { level: entry.level })}
                             </span>
                           )}
                         </div>
                         {entry.challengesSolved !== undefined && (
                           <p className="text-sm text-muted-foreground">
-                            {entry.challengesSolved}{" "}
-                            {entry.challengesSolved === 1 ? "Challenge" : "Challenges"} gelöst
+                            {t("rankingTable.solved", { count: entry.challengesSolved })}
                           </p>
                         )}
                       </div>

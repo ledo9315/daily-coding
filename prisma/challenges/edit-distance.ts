@@ -91,6 +91,59 @@ export const challenge: ChallengeContent = {
     { id: 5, name: "Identisch", input: '{"word1":"same","word2":"same"}', expected: "0" },
     { id: 6, name: "Klassiker", input: '{"word1":"kitten","word2":"sitting"}', expected: "3" },
   ],
+  translations: {
+    en: {
+      title: "Edit Distance",
+      description:
+        "Implement minDistance(data) with data = { word1, word2 }.\n\n" +
+        "Return the smallest number of operations that turns word1 into word2. Three " +
+        "operations are allowed, each one costs 1: insert a character, delete a character, " +
+        "replace a character. horse becomes ros in 3 steps: horse → rorse → rose → ros.\n\n" +
+        "Both words can be empty; the distance to an empty word is the length of the other " +
+        "one. Identical words have distance 0.\n\n" +
+        "Trying out every path explodes exponentially. The task is dynamic programming in a " +
+        "table: the distance of two prefixes depends only on three neighbors that are " +
+        "already computed.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Let dp[i][j] be the distance between the first i characters of word1 and the " +
+            "first j characters of word2. If the last characters of both prefixes are equal, " +
+            "the step costs nothing: dp[i][j] = dp[i-1][j-1]. Otherwise you take the " +
+            "cheapest of three things and pay 1: delete (dp[i-1][j]), insert (dp[i][j-1]) or " +
+            "replace (dp[i-1][j-1]).",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Create a table of (m+1) × (n+1) cells. The first row and the first column are " +
+            "the base cases: dp[i][0] = i and dp[0][j] = j, because against an empty word " +
+            "all that helps is deleting, or inserting. Then fill it row by row with the rule " +
+            "from the first hint. The result sits in dp[m][n].",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The table is one larger than the words, because row 0 and column 0 stand for " +
+            "the empty prefixes. That is why dp[i][j] compares word1[i-1] with word2[j-1] – " +
+            "taking word1[i] reads one character too far.\n\n" +
+            "The first row and column really have to be filled with 0, 1, 2, …, not with " +
+            "zeros. Otherwise the distance to an empty word comes out as 0.\n\n" +
+            "All three transitions belong in the minimum. Forgetting the replace turns " +
+            "kitten → sitting into 5 instead of 3.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Longer words",
+        "3": "First word empty",
+        "4": "Second word empty",
+        "5": "Identical",
+        "6": "The classic",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

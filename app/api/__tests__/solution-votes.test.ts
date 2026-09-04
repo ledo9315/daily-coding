@@ -1,4 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import api from "@/messages/de/api.json";
+
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 import { NextResponse } from "next/server";
 import { POST as voteHandler } from "../challenge/[id]/votes/route";
 
@@ -135,7 +142,7 @@ describe("POST /api/challenge/[id]/votes", () => {
     submissionAnswers({ own: { id: "sub-mine" } });
     const res = await call();
     expect(res.status).toBe(403);
-    expect((await res.json()).error).toContain("eigene Lösung");
+    expect((await res.json()).error).toBe(api.votes.ownSolution);
     expect(mockVoteDeleteMany).not.toHaveBeenCalled();
   });
 

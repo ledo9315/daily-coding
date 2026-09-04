@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { calculateLevel } from "@/lib/level";
 import { computeLevelUpBySubmissionId } from "@/lib/server/community-feed-level";
+import { localizeChallengeTitles } from "@/lib/server/content-translations";
 
 const DEFAULT_LIMIT = 15;
 const MAX_LIMIT = 50;
@@ -14,6 +16,7 @@ function parseLimit(rawLimit: string | null): number {
 }
 
 export async function GET(request: Request) {
+  const t = await getTranslations("api");
   const { searchParams } = new URL(request.url);
   const cursor = searchParams.get("cursor")?.trim() || undefined;
   const limit = parseLimit(searchParams.get("limit"));
@@ -33,6 +36,7 @@ export async function GET(request: Request) {
     select: {
       id: true,
       userId: true,
+      challengeId: true,
       createdAt: true,
       user: { select: { name: true, initials: true, avatar: true } },
       challenge: { select: { title: true, points: true } },
@@ -75,15 +79,19 @@ export async function GET(request: Request) {
     orderedSubmissions,
   );
 
+  // One query for the page rather than one per row; German needs none at all.
+  const challengeTitles = await localizeChallengeTitles(
+    page.map((submission) => submission.challengeId),
+  );
+
   const now = new Date();
   const formatRelativeTime = (date: Date) => {
     const elapsedMs = now.getTime() - date.getTime();
     const elapsedMinutes = Math.floor(elapsedMs / 60000);
-    if (elapsedMinutes < 60) return `vor ${elapsedMinutes} Minuten`;
+    if (elapsedMinutes < 60) return t("feed.minutesAgo", { count: elapsedMinutes });
     const elapsedHours = Math.floor(elapsedMinutes / 60);
-    if (elapsedHours < 24)
-      return `vor ${elapsedHours} Stunde${elapsedHours > 1 ? "n" : ""}`;
-    return `vor ${Math.floor(elapsedHours / 24)} Tagen`;
+    if (elapsedHours < 24) return t("feed.hoursAgo", { count: elapsedHours });
+    return t("feed.daysAgo", { count: Math.floor(elapsedHours / 24) });
   };
 
   const items = page.map((submission) => {
@@ -98,8 +106,8 @@ export async function GET(request: Request) {
         level: calculateLevel(lifetimePoints.get(submission.userId) ?? 0),
       },
       username: `@${submission.user.name}`,
-      action: "hat die Challenge gelöst",
-      challenge: submission.challenge.title,
+      action: t("feed.solvedChallenge"),
+      challenge: challengeTitles.get(submission.challengeId) ?? submission.challenge.title,
       points: submission.challenge.points,
       time: formatRelativeTime(submission.createdAt),
       createdAt: submission.createdAt.toISOString(),

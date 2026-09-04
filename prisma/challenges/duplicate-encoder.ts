@@ -86,6 +86,59 @@ export const challenge: ChallengeContent = {
     { id: 5, name: "Nur Groß/Klein", input: '"aA"', expected: '"))"' },
     { id: 6, name: "Kurz", input: '"abc"', expected: '"((("' },
   ],
+  translations: {
+    en: {
+      title: "Duplicate Encoder",
+      description:
+        "Implement duplicateEncode(word).\n\n" +
+        'Turn the string into a new string of the same length: every character becomes "(" ' +
+        'if it appears only once in the word, and ")" if it appears more than once. Case ' +
+        'does not matter here – "a" and "A" are the same character. Spaces, parentheses and ' +
+        "special characters are treated like letters.\n\n" +
+        "The reflex is to search the whole string for every character – O(n²). The task aims " +
+        "at two passes: count first, then translate.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            'The question "does this character appear more than once" answers itself for ' +
+            "every character at once if you count through the string one time. After that, " +
+            'translating is a lookup: a count of 1 means "(", anything above it means ")". ' +
+            "Two passes, O(n).",
+        },
+        {
+          title: "The implementation",
+          body:
+            "First convert word to lowercase as a whole. Walk over it once and count in a " +
+            "map how often each character appears. Walk over it a second time and append " +
+            '"(" or ")" per character to the result, depending on whether the count is 1 or ' +
+            "greater. Return the assembled string.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            'Upper and lower case. In "Success" the capital S and the lowercase s are the ' +
+            'same character, so both become ")". Without normalizing you get "(())())" ' +
+            'instead of ")())())". The easiest way is to convert once at the very start and ' +
+            "work only with the lowercase version from then on.\n\n" +
+            'Spaces and symbols count like letters. In "(( @" the space appears once and ' +
+            'becomes "(", the parentheses appear twice and become ")" – so the result is ' +
+            "itself made of parentheses that have nothing to do with the parentheses in the " +
+            "input – and that is exactly right.\n\n" +
+            "Comparing indexOf and lastIndexOf for every character does give the right " +
+            "result, but in O(n²). It is good enough here, yet it is not the idea.",
+        },
+      ],
+      testCaseNames: {
+        "1": "All unique",
+        "2": "Mixed",
+        "3": "Upper and lower case",
+        "4": "Symbols and spaces",
+        "5": "Case only",
+        "6": "Short",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

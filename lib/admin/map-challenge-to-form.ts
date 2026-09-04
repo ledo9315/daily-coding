@@ -1,6 +1,6 @@
-import type { Challenge } from "@/lib/generated/prisma/client";
+import type { Challenge, ChallengeTranslation } from "@/lib/generated/prisma/client";
 import { parseEvaluationConfig } from "@/lib/server/challenge-execution";
-import { normalizeHints } from "@/lib/challenge-hints";
+import { normalizeHints, type ChallengeHint } from "@/lib/challenge-hints";
 import { perLanguage, type CodeLanguageId } from "@/lib/challenge-languages";
 
 function jsonPretty(value: unknown): string {
@@ -31,9 +31,48 @@ export type ChallengeFormInitial = {
   starters: Record<CodeLanguageId, string>;
   isActive: boolean;
   dateUtcDay: string;
+  /**
+   * The English version, or null when none was written yet. Only the translatable prose -
+   * points, difficulty, test inputs and starter code belong to the challenge, not to a
+   * language, and exist once.
+   */
+  english: ChallengeTextInitial | null;
 };
 
-export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
+export type ChallengeTextInitial = {
+  title: string;
+  description: string;
+  hints: ChallengeHint[];
+  /** Keyed by `testCases[].id`, the same key the read side looks the name up under. */
+  testCaseNames: Record<string, string>;
+};
+
+/** Just the columns of `ChallengeTranslation` the form fills its English tab from. */
+type TranslationRow = Pick<
+  ChallengeTranslation,
+  "title" | "description" | "hints" | "testCaseNames"
+>;
+
+function toTextInitial(row: TranslationRow | null | undefined): ChallengeTextInitial | null {
+  if (!row) return null;
+  const names =
+    typeof row.testCaseNames === "object" &&
+    row.testCaseNames !== null &&
+    !Array.isArray(row.testCaseNames)
+      ? (row.testCaseNames as Record<string, string>)
+      : {};
+  return {
+    title: row.title,
+    description: row.description,
+    hints: normalizeHints(row.hints, "Hinweis"),
+    testCaseNames: names,
+  };
+}
+
+export function challengeToFormInitial(
+  ch: Challenge,
+  english?: TranslationRow | null,
+): ChallengeFormInitial {
   const examples = ch.examples;
   const testCases = ch.testCases;
   const evalCfg = parseEvaluationConfig(ch.evaluationConfig);
@@ -50,7 +89,7 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     id: ch.id,
     title: ch.title,
     description: ch.description,
-    hintsJson: jsonPretty(normalizeHints(ch.hints)),
+    hintsJson: jsonPretty(normalizeHints(ch.hints, "Hinweis")),
     difficulty: ch.difficulty,
     points: ch.points,
     categoryId: ch.categoryId,
@@ -64,5 +103,6 @@ export function challengeToFormInitial(ch: Challenge): ChallengeFormInitial {
     starters: perLanguage((spec) => starters[spec.id] ?? ""),
     isActive: ch.isActive,
     dateUtcDay: ch.date ? formatUtcDay(new Date(ch.date)) : "",
+    english: toTextInitial(english),
   };
 }

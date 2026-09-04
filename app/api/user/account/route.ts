@@ -1,10 +1,28 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getSessionUserId } from "@/lib/auth-session";
+import { DEFAULT_LOCALE, LOCALES, isAppLocale, type AppLocale } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { sendAccountDeletionEmail } from "@/lib/server/email-service";
 
+/**
+ * The confirmation phrase of every language, keyed by locale. The settings panel shows the
+ * one of the language the user reads; the route accepts all of them, so switching the
+ * language with the confirmation already typed does not turn the form into a dead end.
+ */
+async function deleteConfirmPhrases(): Promise<Record<AppLocale, string>> {
+  const entries = await Promise.all(
+    LOCALES.map(async (locale) => {
+      const translate = await getTranslations({ locale, namespace: "profile" });
+      return [locale, translate("settings.account.confirmPhrase")] as const;
+    })
+  );
+  return Object.fromEntries(entries) as Record<AppLocale, string>;
+}
+
 export async function DELETE(request: Request) {
+  const t = await getTranslations("api");
   const result = await getSessionUserId();
   if (result.error) return result.error;
 
@@ -12,7 +30,7 @@ export async function DELETE(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Ungültiger JSON-Body." }, { status: 400 });
+    return NextResponse.json({ error: t("user.invalidJsonBody") }, { status: 400 });
   }
 
   const confirmText =
@@ -24,9 +42,14 @@ export async function DELETE(request: Request) {
       ? (body as { currentPassword: unknown }).currentPassword
       : "";
 
-  if (confirmText !== "KONTO LÖSCHEN") {
+  const requestLocale = await getLocale();
+  const phrases = await deleteConfirmPhrases();
+  const shownPhrase = phrases[isAppLocale(requestLocale) ? requestLocale : DEFAULT_LOCALE];
+  const typedPhrase = typeof confirmText === "string" ? confirmText.trim() : "";
+
+  if (!Object.values(phrases).includes(typedPhrase)) {
     return NextResponse.json(
-      { error: "Bitte bestätige mit KONTO LÖSCHEN." },
+      { error: t("user.deleteConfirmRequired", { phrase: shownPhrase }) },
       { status: 400 }
     );
   }
@@ -38,10 +61,7 @@ export async function DELETE(request: Request) {
 
   if (!user) {
     return NextResponse.json(
-      {
-        error:
-          "Benutzer nicht gefunden. Bitte abmelden und erneut anmelden (z. B. nach Datenbank-Reset).",
-      },
+      { error: t("user.notFound") },
       { status: 401 }
     );
   }
@@ -49,7 +69,7 @@ export async function DELETE(request: Request) {
   if (user.passwordHash) {
     if (typeof currentPassword !== "string" || currentPassword.length === 0) {
       return NextResponse.json(
-        { error: "Bitte gib dein aktuelles Passwort ein." },
+        { error: t("user.currentPasswordRequired") },
         { status: 400 }
       );
     }
@@ -57,7 +77,7 @@ export async function DELETE(request: Request) {
     const currentValid = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!currentValid) {
       return NextResponse.json(
-        { error: "Aktuelles Passwort ist falsch." },
+        { error: t("user.currentPasswordWrong") },
         { status: 400 }
       );
     }

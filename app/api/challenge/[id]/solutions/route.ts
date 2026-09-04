@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { calculateLevel } from "@/lib/level";
@@ -36,8 +37,9 @@ export async function GET(
   const { userId } = session;
 
   if (!(await hasSolvedChallenge(userId, challengeId))) {
+    const t = await getTranslations("api");
     return NextResponse.json(
-      { error: "Löse die Challenge zuerst selbst, um fremde Lösungen zu sehen." },
+      { error: t("solutions.solveFirstToSee") },
       { status: 403 }
     );
   }

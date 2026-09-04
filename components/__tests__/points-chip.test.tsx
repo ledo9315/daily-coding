@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderWithIntl } from "./intl-render";
 
 import { PointsChip } from "@/components/points-chip";
 
@@ -10,7 +10,7 @@ import { PointsChip } from "@/components/points-chip";
  * hence the hand-drawn inline SVG rather than a second icon library.
  */
 describe("PointsChip", () => {
-  const markup = renderToStaticMarkup(<PointsChip points={520} />);
+  const markup = renderWithIntl(<PointsChip points={520} />);
 
   it("draws its own pixel star instead of importing an icon", () => {
     expect(markup).toContain('viewBox="0 0 9 9"');
@@ -29,13 +29,13 @@ describe("PointsChip", () => {
   });
 
   it("keeps the German thousands separator", () => {
-    expect(renderToStaticMarkup(<PointsChip points={1234} />)).toContain("1.234");
+    expect(renderWithIntl(<PointsChip points={1234} />)).toContain("1.234");
   });
 
   it("renders every size with the star", () => {
     for (const size of ["sm", "md", "lg"] as const) {
       expect(
-        renderToStaticMarkup(<PointsChip points={7} size={size} />),
+        renderWithIntl(<PointsChip points={7} size={size} />),
       ).toContain('viewBox="0 0 9 9"');
     }
   });

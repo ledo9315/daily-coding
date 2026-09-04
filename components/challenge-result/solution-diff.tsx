@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { normalizeCode } from "@/lib/code-normalize";
 import { languageLabel, type CodeLanguageId } from "@/lib/challenge-languages";
 import { diffLines, type DiffLine } from "@/lib/line-diff";
@@ -65,13 +66,16 @@ export function SolutionDiff({
   theirs: string;
   theirsLanguage: CodeLanguageId;
 }) {
+  const t = useTranslations("community");
   const lines = useMemo(() => diffLines(mine, theirs), [mine, theirs]);
 
   if (mineLanguage !== theirsLanguage) {
     return (
       <p className="mt-4 border-2 border-border bg-secondary px-3 py-2 text-lg text-muted-foreground">
-        Diese Lösung ist in {languageLabel(theirsLanguage)} geschrieben, deine in{" "}
-        {languageLabel(mineLanguage)}. Ein zeilenweiser Vergleich sagt darüber nichts aus.
+        {t("solutionDiff.differentLanguage", {
+          theirs: languageLabel(theirsLanguage),
+          mine: languageLabel(mineLanguage),
+        })}
       </p>
     );
   }
@@ -79,7 +83,7 @@ export function SolutionDiff({
   if (normalizeCode(mine) === normalizeCode(theirs)) {
     return (
       <p className="mt-4 border-2 border-border bg-secondary px-3 py-2 text-lg text-muted-foreground">
-        Das ist deine eigene Lösung, Zeile für Zeile. Es gibt nichts zu vergleichen.
+        {t("solutionDiff.identical")}
       </p>
     );
   }
@@ -88,15 +92,16 @@ export function SolutionDiff({
     <div className="mt-4">
       <p className="mb-3 text-base text-muted-foreground">
         <span className="border border-border bg-secondary px-1.5 font-code text-xs">-</span>{" "}
-        nur bei dir{"  "}
+        {t("solutionDiff.legendOnlyMine")}
+        {"  "}
         <span className="ml-2 border border-border bg-secondary px-1.5 font-code text-xs">
           +
         </span>{" "}
-        nur hier
+        {t("solutionDiff.legendOnlyTheirs")}
       </p>
       <div className="flex flex-col gap-4 md:flex-row">
-        <DiffColumn title="Deine Lösung" lines={lines} hide="added" />
-        <DiffColumn title="Diese Lösung" lines={lines} hide="removed" />
+        <DiffColumn title={t("solutionDiff.columnMine")} lines={lines} hide="added" />
+        <DiffColumn title={t("solutionDiff.columnTheirs")} lines={lines} hide="removed" />
       </div>
     </div>
   );
