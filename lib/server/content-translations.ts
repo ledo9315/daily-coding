@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { DEFAULT_LOCALE, type AppLocale } from "@/lib/locale";
+import { CONTENT_SOURCE_LOCALE, type AppLocale } from "@/lib/locale";
 import { localeFromRequestScope } from "@/lib/server/request-locale";
 
 /**
@@ -10,6 +10,10 @@ import { localeFromRequestScope } from "@/lib/server/request-locale";
  * `*Translation` tables hold the other languages. Two consequences, both intended: German
  * costs no additional query, and a locale without a translation row falls back to the
  * columns, so a half-translated catalogue shows German text instead of an empty page (E8).
+ *
+ * The guard below is `CONTENT_SOURCE_LOCALE`, not `DEFAULT_LOCALE`. They were the same
+ * value until the domain moved, and mixing them up here means the default language skips
+ * the lookup and renders the German columns under an English URL.
  */
 
 async function contentLocale(locale?: AppLocale): Promise<AppLocale> {
@@ -58,7 +62,7 @@ export async function localizeChallenge<T extends LocalizableChallenge>(
   locale?: AppLocale
 ): Promise<T> {
   const target = await contentLocale(locale);
-  if (target === DEFAULT_LOCALE) return challenge;
+  if (target === CONTENT_SOURCE_LOCALE) return challenge;
 
   // One query for both: the category is reached through the challenge, so a caller that
   // selected `category.name` without `categoryId` needs no second lookup.
@@ -106,7 +110,7 @@ export async function localizeChallengeTitles(
   locale?: AppLocale
 ): Promise<Map<string, string>> {
   const target = await contentLocale(locale);
-  if (target === DEFAULT_LOCALE || challengeIds.length === 0) return new Map();
+  if (target === CONTENT_SOURCE_LOCALE || challengeIds.length === 0) return new Map();
 
   const rows = await prisma.challengeTranslation.findMany({
     where: { locale: target, challengeId: { in: [...new Set(challengeIds)] } },
@@ -136,7 +140,7 @@ export async function localizeAchievements<T extends LocalizableAchievement>(
   locale?: AppLocale
 ): Promise<T[]> {
   const target = await contentLocale(locale);
-  if (target === DEFAULT_LOCALE || defs.length === 0) return defs;
+  if (target === CONTENT_SOURCE_LOCALE || defs.length === 0) return defs;
 
   const rows = await prisma.achievementTranslation.findMany({
     where: { locale: target, achievementId: { in: defs.map((def) => def.id) } },

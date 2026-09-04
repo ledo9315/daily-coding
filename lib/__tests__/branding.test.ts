@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { renderEmail } from "@/lib/server/email-template";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * #109: the product is „Daily Coding" since the move to daily-coding.de. A leftover
@@ -48,7 +49,9 @@ describe("branding", () => {
    */
   it("declares the canonical site URL as metadataBase", () => {
     const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
-    expect(layout).toContain('metadataBase: new URL("https://daily-coding.de")');
+    // Read from `SITE_URL` rather than spelled out, so the domain lives in one place.
+    expect(layout).toContain("metadataBase: new URL(SITE_URL)");
+    expect(SITE_URL).toBe("https://daily-coding.dev");
   });
 
   /**

@@ -7,6 +7,7 @@ import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -51,11 +52,12 @@ export async function generateMetadata(): Promise<Metadata> {
      * metadata is useless - the readers are Slack, WhatsApp and search engines, all of them
      * outside the site. A shared link then has no preview card (#111).
      *
-     * Written out rather than read from `APP_URL`: this is the *canonical* address, which
-     * stays the production one even in a preview deployment. A shared link should not point
-     * at a throwaway preview host.
+     * `SITE_URL` is a written-out constant, not `APP_URL` from the environment: this is the
+     * *canonical* address and stays the production one even in a preview deployment, so a
+     * shared link never points at a throwaway host. It used to be spelled out here as well,
+     * which made the move to `.dev` a two-place change - one of the two places is enough.
      */
-    metadataBase: new URL("https://daily-coding.de"),
+    metadataBase: new URL(SITE_URL),
     /**
      * `template` composes every other page's title, so no page repeats the brand by hand.
      * Three different suffix styles had grown before that - `– Daily Coding`, `| Admin` and

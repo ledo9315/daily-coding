@@ -21,13 +21,19 @@ import {
   getUserStatsData,
 } from "@/lib/server/dashboard-data";
 import { formatNumber } from "@/lib/format";
+import { localizedAlternates } from "@/lib/server/metadata";
 
 /**
  * Title and description stay the site-wide default from the root layout: for anyone without
  * a session this route *is* the landing, and that is what a search result shows (#130).
  * Only the canonical URL was missing (#131).
+ *
+ * `generateMetadata` rather than a constant since the language moved into the path: `/` and
+ * `/de` are the same component, and each has to name itself as the canonical one.
  */
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { alternates: await localizedAlternates("/") };
+}
 
 export default async function DashboardPage() {
   const session = await auth();

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LandingNavbar } from "@/components/landing/navbar";
+import { localizedAlternates } from "@/lib/server/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("legal");
@@ -8,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("imprint.meta.title"),
     description: t("imprint.meta.description"),
-    alternates: { canonical: "/impressum" },
+    alternates: await localizedAlternates("/impressum"),
   };
 }
 

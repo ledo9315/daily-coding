@@ -9,6 +9,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import { localeFromRequestScope } from "@/lib/server/request-locale";
+import { DEFAULT_LOCALE } from "@/lib/locale";
 
 const cookieStore = (value?: string) => ({
   get: (name: string) => (name === "NEXT_LOCALE" && value ? { value } : undefined),
@@ -64,7 +65,7 @@ describe("localeFromRequestScope", () => {
       throw new Error("`headers` was called outside a request scope.");
     });
 
-    await expect(localeFromRequestScope()).resolves.toBe("de");
-    await expect(localeFromRequestScope("en")).resolves.toBe("en");
+    await expect(localeFromRequestScope()).resolves.toBe(DEFAULT_LOCALE);
+    await expect(localeFromRequestScope("de")).resolves.toBe("de");
   });
 });

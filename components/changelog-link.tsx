@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   hasUnseenChangelog,
@@ -9,6 +9,7 @@ import {
   markChangelogSeen,
   readChangelogSeen,
 } from "@/lib/changelog-seen";
+import { localizedPath } from "@/lib/site";
 
 /**
  * The footer's changelog link, with a „NEU" marker after a release the reader has not opened.
@@ -19,6 +20,7 @@ import {
  */
 export function ChangelogLink({ className }: { className?: string }) {
   const t = useTranslations("changelog");
+  const locale = useLocale();
   // Starts false and is decided after mount: reading storage during render would make the
   // server output and the first client render disagree.
   const [isNew, setIsNew] = useState(false);
@@ -36,7 +38,7 @@ export function ChangelogLink({ className }: { className?: string }) {
 
   return (
     <Link
-      href="/changelog"
+      href={localizedPath("/changelog", locale)}
       className={className}
       onClick={() => {
         markChangelogSeen();

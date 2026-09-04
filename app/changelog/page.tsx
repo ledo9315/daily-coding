@@ -6,6 +6,7 @@ import { MarkChangelogSeen } from "@/components/changelog-link";
 import { CHANGELOG } from "@/lib/changelog";
 import { formatLongDate } from "@/lib/format";
 import { DEFAULT_LOCALE, isAppLocale } from "@/lib/locale";
+import { localizedAlternates } from "@/lib/server/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("changelog");
@@ -13,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("meta.title"),
     description: t("meta.description"),
-    alternates: { canonical: "/changelog" },
+    alternates: await localizedAlternates("/changelog"),
   };
 }
 

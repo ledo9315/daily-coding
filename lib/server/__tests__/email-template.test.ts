@@ -100,10 +100,10 @@ describe("renderEmail", () => {
     expect(english.html).not.toContain("täglich");
   });
 
-  it("stays German without a locale", () => {
-    expect(mail.html).toContain('lang="de"');
-    expect(mail.html).toContain("Oder diese Adresse in den Browser kopieren:");
-    expect(mail.text).toContain("Daily Coding, täglich eine Coding-Challenge.");
+  it("renders the default locale without one", () => {
+    expect(mail.html).toContain('lang="en"');
+    expect(mail.html).toContain("Or copy this address into your browser:");
+    expect(mail.text).toContain("Daily Coding, one coding challenge a day.");
   });
 
   it("omits the button block when there is no action", () => {

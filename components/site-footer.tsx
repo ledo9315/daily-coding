@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ChangelogLink } from "@/components/changelog-link";
+import { localizedPath } from "@/lib/site";
 
 const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
 const BUG_REPORT_URL = `${REPOSITORY_URL}/issues/new?template=bug_report.yml`;
@@ -16,7 +17,12 @@ const footerLinkClass = "transition-colors hover:text-primary focus-visible:text
  * the groups below carry only links that exist, which is what the placeholders never did.
  */
 export async function SiteFooter() {
-  const t = await getTranslations("community");
+  const [t, locale] = await Promise.all([getTranslations("community"), getLocale()]);
+  /**
+   * The public pages carry the language in the path, so a link to a fixed address would
+   * hand a German reader the English Impressum - the one page where that matters most.
+   */
+  const path = (pathname: string) => localizedPath(pathname, locale);
 
   return (
     // `mt-16` because the footer now follows arbitrary page content: on the challenge page
@@ -25,7 +31,7 @@ export async function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-3">
+            <Link href={path("/")} className="flex items-center gap-3">
               <span className="font-pixel text-xl tracking-tighter text-primary">
                 {">_"}
               </span>
@@ -85,12 +91,12 @@ export async function SiteFooter() {
             </h2>
             <ul className="mt-4 space-y-3 font-code text-sm text-muted-foreground">
               <li>
-                <Link href="/impressum" className={footerLinkClass}>
+                <Link href={path("/impressum")} className={footerLinkClass}>
                   {t("footer.imprint")}
                 </Link>
               </li>
               <li>
-                <Link href="/datenschutz" className={footerLinkClass}>
+                <Link href={path("/datenschutz")} className={footerLinkClass}>
                   {t("footer.privacy")}
                 </Link>
               </li>
