@@ -24,6 +24,10 @@ pnpm infra:up               # Start PostgreSQL + Piston in Docker
 pnpm db:reset               # Reset DB, apply migrations, then seed explicitly
 pnpm db:migrate             # Apply migrations (prisma migrate deploy)
 pnpm db:seed                # Seed the database (tsx prisma/seed.ts)
+
+# Content only - categories, achievements, challenges and their translations, no demo
+# users, no fixture submissions or rankings. The only sanctioned way to seed production:
+PROD_DATABASE_URL=<neon-url> SEED_CONTENT_ONLY=true pnpm db:seed
 pnpm prisma migrate dev     # Create + apply a new migration locally
 
 # Code execution runtime
@@ -154,6 +158,18 @@ per language, typed-harness compatibility of every test input). Before seeding a
 `scripts/verify-challenge.ts` with reference solutions kept outside the repo - it executes them
 through the real harness on the local Piston. New challenges are created with `isActive: false`;
 an admin adds them to the ring.
+
+**The translations have to be seeded, and production is not seeded by a deploy.** Without a
+`ChallengeTranslation`, `CategoryTranslation` or `AchievementTranslation` row the read side
+falls back to the German columns (E8) - which is the right behaviour for a half-translated
+catalogue and the wrong one for an empty table: every reader gets German prose under English
+headings, and nothing about it looks broken. Run the content-only seed above after adding or
+translating content; it is an upsert throughout, so a second run changes nothing.
+
+Two variables, both deliberate: `SEED_CONTENT_ONLY=true` skips the demo users, and
+`PROD_DATABASE_URL` is a name `.env.local` cannot overwrite - a `DATABASE_URL` passed on the
+command line is replaced by the local one and the seed then reports success against the wrong
+database. The seed refuses to run with `PROD_DATABASE_URL` and without the flag.
 
 ### Data model highlights
 
