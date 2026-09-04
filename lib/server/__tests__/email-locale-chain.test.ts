@@ -47,7 +47,7 @@ const ACTIVITY = {
   actorName: "Watson",
   kind: "clever" as const,
   challengeTitle: "Two Sum",
-  path: "/challenge/chal-1/loesungen?loesung=abc",
+  path: "/challenge/chal-1/solutions?solution=abc",
 };
 
 const send = {

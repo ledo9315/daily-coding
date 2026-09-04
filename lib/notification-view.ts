@@ -8,7 +8,7 @@ export type NotificationKindId = "comment" | "best_practices" | "clever";
  * card, and that card is what a comment or a vote belongs to.
  */
 export function solutionLink(challengeId: string, codeHash: string): string {
-  return `/challenge/${challengeId}/loesungen?loesung=${codeHash}`;
+  return `/challenge/${challengeId}/solutions?solution=${codeHash}`;
 }
 
 /**

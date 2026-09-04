@@ -8,7 +8,7 @@ const read = (...parts: string[]) =>
 const profilePage = read("app", "profile", "page.tsx");
 const dashboardPage = read("app", "page.tsx");
 const feedItem = read("components", "feed-item.tsx");
-const resultPage = read("app", "challenge", "[id]", "loesungen", "page.tsx");
+const resultPage = read("app", "challenge", "[id]", "solutions", "page.tsx");
 const rankingTable = read("components", "ranking-table.tsx");
 
 /**

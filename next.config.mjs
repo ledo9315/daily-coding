@@ -12,6 +12,17 @@ const nextConfig = {
       // The landing moved to `/` (#130). Kept because the URL is in the sitemap Google
       // has already fetched, and in whatever links were shared before the move.
       { source: "/landing", destination: "/", permanent: true },
+      /**
+       * The solutions page was the last German route name. Kept because activity mails
+       * carrying the old address are already sent - the path sits behind the login and in
+       * robots.txt, so no search engine ever had it, but a reader following a mail from
+       * last week has.
+       */
+      {
+        source: "/challenge/:id/loesungen",
+        destination: "/challenge/:id/solutions",
+        permanent: true,
+      },
     ];
   },
   async headers() {

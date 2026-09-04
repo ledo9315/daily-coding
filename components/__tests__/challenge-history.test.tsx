@@ -58,7 +58,7 @@ describe("ChallengeHistory announces the status", () => {
 describe("ChallengeHistory links to the result page", () => {
   it("links a solved entry", () => {
     const html = render([entry]);
-    expect(html).toContain('href="/challenge/chal-1/loesungen"');
+    expect(html).toContain('href="/challenge/chal-1/solutions"');
   });
 
   it("leaves an unsolved entry unlinked", () => {

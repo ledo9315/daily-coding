@@ -135,13 +135,13 @@ describe("sendSolutionActivityEmail", () => {
       actorName: "Watson",
       kind: "clever",
       challengeTitle: "Two Sum",
-      path: "/challenge/chal-1/loesungen?loesung=abc",
+      path: "/challenge/chal-1/solutions?solution=abc",
     });
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "author@test.com",
         html: expect.stringContaining(
-          "https://app.example.com/challenge/chal-1/loesungen?loesung=abc"
+          "https://app.example.com/challenge/chal-1/solutions?solution=abc"
         ),
       })
     );
@@ -155,7 +155,7 @@ describe("sendSolutionActivityEmail", () => {
       actorName: "Watson",
       kind: "best_practices",
       challengeTitle: "Two Sum",
-      path: "/challenge/chal-1/loesungen?loesung=abc",
+      path: "/challenge/chal-1/solutions?solution=abc",
     });
     const sent = mockSend.mock.calls[0][0] as { text: string };
     expect(sent.text).toContain('Watson thinks your solution to "Two Sum" is exemplary.');
