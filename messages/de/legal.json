@@ -43,7 +43,7 @@
       "title": "Datenschutzerklärung",
       "description": "Welche Daten Daily Coding verarbeitet, zu welchem Zweck, an welche Dienstleister sie gehen und welche Rechte du hast."
     },
-    "title": "Datenschutz\u00aderklärung",
+    "title": "Datenschutz­erklärung",
     "controller": {
       "title": "1. Verantwortlicher",
       "intro": "Verantwortlich für die Datenverarbeitung auf dieser Website ist:"
@@ -95,5 +95,9 @@
       "title": "12. Beschwerderecht",
       "p1": "Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist das Unabhängige Landeszentrum für Datenschutz Schleswig-Holstein (ULD), Holstenstraße 98, 24103 Kiel."
     }
+  },
+  "translationNotice": {
+    "text": "Diese Seite ist eine Übersetzung. Maßgeblich ist die deutsche Fassung:",
+    "link": "zur deutschen Fassung"
   }
 }

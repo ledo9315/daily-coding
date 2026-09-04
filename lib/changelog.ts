@@ -26,6 +26,26 @@ export type ChangelogEntry = {
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "v0.4.0",
+    date: "2026-09-04",
+    changes: {
+      de: [
+        "Die App gibt es jetzt auf Deutsch und Englisch. Umstellen kannst du in den Einstellungen unter „Sprache“; beim ersten Besuch richtet sie sich nach deinem Browser. Die Wahl gilt auch für die E-Mails, die du bekommst.",
+        "Alle 40 Aufgaben und alle 23 Achievements sind übersetzt — Titel, Beschreibung, Hinweise und die Namen der Testfälle.",
+        "Die Seite ist auf daily-coding.dev umgezogen. Alte Links auf daily-coding.de funktionieren weiter und leiten auf die deutsche Fassung.",
+        "Impressum und Datenschutzerklärung gibt es ebenfalls auf Englisch. Maßgeblich bleibt die deutsche Fassung; die englische Seite sagt das jetzt auch.",
+        "Datums- und Zahlenangaben folgen der eingestellten Sprache — der 4.9.2026 ist im Englischen 9/4/2026, und 1.500 Punkte werden zu 1,500.",
+      ],
+      en: [
+        "The app now speaks German and English. Switch in the settings under \"Language\"; on a first visit it follows your browser. Your choice applies to the emails you get, too.",
+        "All 40 challenges and all 23 achievements are translated - title, description, hints and the names of the test cases.",
+        "The site moved to daily-coding.dev. Old links to daily-coding.de keep working and lead to the German version.",
+        "The legal notice and the privacy policy are available in English as well. The German version remains the authoritative one, and the English page now says so.",
+        "Dates and numbers follow the language you picked - 4.9.2026 becomes 9/4/2026, and 1.500 points become 1,500.",
+      ],
+    },
+  },
+  {
     version: "v0.3.0",
     date: "2026-09-03",
     changes: {

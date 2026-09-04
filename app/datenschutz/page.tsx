@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LandingNavbar } from "@/components/landing/navbar";
 import { localizedAlternates } from "@/lib/server/metadata";
+import { TranslationNotice } from "@/components/translation-notice";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("legal");
@@ -23,6 +24,8 @@ export default async function DatenschutzPage() {
         <h1 className="font-pixel text-2xl mb-8 uppercase tracking-wide">
           {t("privacy.title")}
         </h1>
+
+        <TranslationNotice path="/datenschutz" />
 
         <div className="space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
