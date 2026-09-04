@@ -28,7 +28,13 @@ export function isLegacyHost(host: string | null | undefined): boolean {
  * and answering it put `/login` and `/register` in the sitemap, which recommends a sign-in
  * form for indexing (#132). Both stay crawlable; they are simply not recommended.
  */
-export const SITEMAP_PATHS = ["/", "/changelog", "/impressum", "/datenschutz"] as const;
+export const SITEMAP_PATHS = [
+  "/",
+  "/challenge",
+  "/changelog",
+  "/impressum",
+  "/datenschutz",
+] as const;
 
 /**
  * The paths whose language the URL decides instead of the cookie. Everything else is
@@ -41,16 +47,22 @@ export const SITEMAP_PATHS = ["/", "/changelog", "/impressum", "/datenschutz"] a
  * nothing there and cost the cookie its say, so a German reader following a profile link
  * out of the feed would land on the English rendering.
  */
-export const LOCALIZED_PATHS = ["/", "/changelog", "/impressum", "/datenschutz"] as const;
+export const LOCALIZED_PATHS = [
+  "/",
+  "/challenge",
+  "/changelog",
+  "/impressum",
+  "/datenschutz",
+] as const;
 
 /**
- * True for a path that gets a language pair - the exact prefixes above, plus anything
- * below them. `/uber-uns` must not count as `/u`, hence the segment check.
+ * True for a path that gets a language pair. Exact matches, not prefixes: `/challenge` is
+ * the first entry with children and they are the private ones. Fixing the language of
+ * `/challenge/<id>/solutions` by its URL would take the cookie its say on a page that sits
+ * behind the login, so a German reader would suddenly read it in English.
  */
 export function isLocalizedPath(pathname: string): boolean {
-  return LOCALIZED_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(path === "/" ? "//" : path + "/")
-  );
+  return (LOCALIZED_PATHS as readonly string[]).includes(pathname);
 }
 
 /**
@@ -80,11 +92,15 @@ export function languageAlternates(pathname: string): Record<string, string> {
 /**
  * Behind the login. Kept in step with `PROTECTED_PATHS` in `proxy.ts` plus the API
  * and the admin area; a crawler following these only ever reaches the login form.
+ *
+ * `/challenge/` carries the slash on purpose. The daily task itself is public (#287) and
+ * is the page worth indexing; what sits below it is the solutions of others, which is
+ * both behind the login and the spoiler.
  */
 export const PRIVATE_PATHS = [
   "/api/",
   "/admin",
-  "/challenge",
+  "/challenge/",
   "/profile",
   "/settings",
   "/ranking",

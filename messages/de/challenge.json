@@ -1,7 +1,8 @@
 {
   "meta": {
     "task": "Aufgabe",
-    "solutions": "Lösungen"
+    "solutions": "Lösungen",
+    "description": "Jeden Tag eine neue Coding-Aufgabe. Lesen und ausprobieren ohne Konto."
   },
   "loadError": {
     "title": "Keine Challenge",
@@ -82,6 +83,12 @@
     "sending": "Wird gesendet…",
     "final": "Final abgeben",
     "again": "Erneut abgeben"
+  },
+  "guest": {
+    "action": "Konto erstellen und abgeben",
+    "hint": "Lesen und Tests ausführen geht ohne Konto. Gespeichert werden Abgabe, Serie und Punkte erst mit einem.",
+    "haveAccount": "Schon ein Konto?",
+    "login": "Anmelden"
   },
   "actions": {
     "toResult": "Zum Ergebnis"

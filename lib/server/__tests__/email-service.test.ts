@@ -116,7 +116,7 @@ describe("every mail", () => {
     expect(sent.html).not.toContain('href="http://phish.example"');
     expect(sent.html).toContain("&lt;a href=");
     const hrefs = [...sent.html.matchAll(/href="([^"]*)"/g)].map((m) => m[1]);
-    expect(new Set(hrefs)).toEqual(new Set(["https://app.example.com/challenge"]));
+    expect(new Set(hrefs)).toEqual(new Set(["https://app.example.com/de/challenge"]));
   });
 
   it("escapes the name in the deletion mail too", async () => {

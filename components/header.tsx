@@ -152,12 +152,15 @@ export function Header() {
 
           <nav className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
+              // `/challenge` and `/` carry a language prefix, so both the link and the
+              // active check have to speak of the localized address.
+              const href = localizedPath(item.href, locale);
+              const isActive = pathname === href;
               const labelKey = NAV_LABEL_KEYS[item.href];
               return (
                 <Link
                   key={item.name}
-                  href={item.href}
+                  href={href}
                   className={cn(
                     "flex items-center gap-2 border-2 px-4 py-2 text-lg font-sans uppercase tracking-wider transition-all",
                     isActive

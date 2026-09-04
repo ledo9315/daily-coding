@@ -12,8 +12,15 @@ import {
 } from "@/lib/locale";
 import { localeFromRequest } from "@/lib/request-locale";
 
-const PROTECTED_PATHS = ["/profile", "/challenge", "/ranking", "/settings"];
+const PROTECTED_PATHS = ["/profile", "/ranking", "/settings"];
 const ADMIN_PREFIX = "/admin";
+
+/**
+ * `/challenge` itself is public since #287 - it is the page the whole site is about, and
+ * behind a login it could be neither linked nor indexed. Everything below it stays shut:
+ * `/challenge/<id>/solutions` shows other people's answers.
+ */
+const CHALLENGE_CHILD_PREFIX = "/challenge/";
 
 const PREFIX = `/${PREFIXED_LOCALE}`;
 
@@ -128,13 +135,21 @@ export async function proxy(request: NextRequest) {
     return NextResponse.rewrite(rewritten, forwarded);
   };
 
+  /**
+   * The guard reads the path the router will see, not the one in the address bar: `forward`
+   * rewrites `/de/x` to `/x` whether or not `/x` has a language pair, so checking the
+   * prefixed form would let `/de/profile` render the profile without a token.
+   */
+  const guarded = unprefixed ?? pathname;
+
   const isAdminPath =
-    pathname === ADMIN_PREFIX || pathname.startsWith(ADMIN_PREFIX + "/");
+    guarded === ADMIN_PREFIX || guarded.startsWith(ADMIN_PREFIX + "/");
 
   const isProtected =
     isAdminPath ||
+    guarded.startsWith(CHALLENGE_CHILD_PREFIX) ||
     PROTECTED_PATHS.some(
-      (path) => pathname === path || pathname.startsWith(path + "/")
+      (path) => guarded === path || guarded.startsWith(path + "/")
     );
 
   if (!isProtected) return withResponseDefaults(forward());

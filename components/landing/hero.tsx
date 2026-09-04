@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Code, TrendingUp, Zap } from "@nsmr/pixelart-react";
 import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AnimatedFlickeringGrid } from "../ui/animated-flickering-grid";
 import { Meteors } from "../ui/meteors";
 import { BorderBeam } from "../ui/border-beam";
+import { localizedPath } from "@/lib/site";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -38,6 +39,7 @@ export function LandingHero({
   todaysChallengeTitle: string | null;
 }) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
   const badge = todaysChallengeTitle
     ? t("hero.todaysChallenge", { title: todaysChallengeTitle })
     : null;
@@ -97,8 +99,11 @@ export function LandingHero({
           variants={itemVariants}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
+          {/* The button says "start the challenge", so it starts the challenge. Since #287
+              that needs no account - the sign-up sits in the navbar, for whoever wants one
+              before writing anything. */}
           <Link
-            href="/join?token=12312"
+            href={localizedPath("/challenge", locale)}
             className="pixel-btn bg-primary text-primary-foreground min-w-50 text-center"
           >
             {t("hero.startChallenge")}

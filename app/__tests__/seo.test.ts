@@ -23,7 +23,14 @@ describe("robots.txt", () => {
     expect(list).not.toContain(path);
   });
 
-  it.each(["/api/", "/admin", "/challenge", "/profile", "/settings", "/ranking"])(
+  it("lets a crawler fetch the task itself, which is the page worth indexing (#287)", () => {
+    const rule = Array.isArray(rules.rules) ? rules.rules[0] : rules.rules;
+    const disallow = rule?.disallow;
+    const list = Array.isArray(disallow) ? disallow : [disallow];
+    expect(list).not.toContain("/challenge");
+  });
+
+  it.each(["/api/", "/admin", "/challenge/", "/profile", "/settings", "/ranking"])(
     "excludes %s, which sits behind the login",
     (path) => {
       const rule = Array.isArray(rules.rules) ? rules.rules[0] : rules.rules;
@@ -45,6 +52,8 @@ describe("sitemap.xml", () => {
       // The landing lives on the apex URL since #130 - `/landing` only redirects there.
         `${SITE}/`,
         `${SITE}/de`,
+        `${SITE}/challenge`,
+        `${SITE}/de/challenge`,
         `${SITE}/changelog`,
         `${SITE}/de/changelog`,
         `${SITE}/impressum`,
@@ -83,9 +92,11 @@ describe("sitemap.xml", () => {
     for (const url of urls) expect(url.startsWith(SITE)).toBe(true);
   });
 
+  /** `/challenge` is the exception since #287: readable without an account. */
   it("lists no page that requires a login", () => {
     for (const url of urls) {
-      expect(url).not.toMatch(/\/(challenge|profile|settings|admin|ranking)/);
+      expect(url).not.toMatch(/\/(profile|settings|admin|ranking)/);
+      expect(url).not.toMatch(/\/challenge\//);
     }
   });
 });

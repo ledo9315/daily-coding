@@ -1,7 +1,8 @@
 {
   "meta": {
     "task": "Task",
-    "solutions": "Solutions"
+    "solutions": "Solutions",
+    "description": "A new coding challenge every day. Read it and try it without an account."
   },
   "loadError": {
     "title": "No challenge",
@@ -82,6 +83,12 @@
     "sending": "Sending…",
     "final": "Submit final",
     "again": "Submit again"
+  },
+  "guest": {
+    "action": "Create an account to submit",
+    "hint": "Reading the task and running the tests needs no account. Keeping your submission, streak and points does.",
+    "haveAccount": "Already have an account?",
+    "login": "Sign in"
   },
   "actions": {
     "toResult": "To the result"

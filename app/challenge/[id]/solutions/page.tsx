@@ -17,13 +17,18 @@ import { PageAmbience } from "@/components/page-ambience";
 import { languageLabel, type CodeLanguageId } from "@/lib/challenge-languages";
 import { formatDate } from "@/lib/format";
 import { challengeResultPath } from "@/lib/navigation";
+import { localizedPath } from "@/lib/site";
 import { prisma } from "@/lib/prisma";
 import { getOwnChallengeResult } from "@/lib/server/challenge-result";
 
-// Overrides the "Aufgabe" title of app/challenge/layout.tsx.
+// Overrides the title of app/challenge/layout.tsx - and its alternates, which name the
+// public task page and would otherwise be inherited as this page's canonical.
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("challenge");
-  return { title: t("meta.solutions") };
+  return {
+    title: t("meta.solutions"),
+    alternates: { canonical: null, languages: {} },
+  };
 }
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -116,7 +121,7 @@ export default async function ChallengeResultPage({ params }: PageProps) {
               /* Not the shadcn ghost button: its hover is `accent`, which in this palette is
                  amber, and amber behind green text is unreadable. */
               <Link
-                href="/challenge"
+                href={localizedPath("/challenge", locale)}
                 className="border-2 border-primary/40 bg-primary/10 px-3 py-1.5 text-base uppercase tracking-wider text-primary transition-colors hover:border-primary hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {t("result.improveSolution")}

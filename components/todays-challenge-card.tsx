@@ -5,8 +5,9 @@ import { DifficultyBadge } from "@/components/difficulty-badge";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PointsChip } from "@/components/points-chip";
 import { ArrowRight, Tournament, Zap, CheckDouble } from "@nsmr/pixelart-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
+import { localizedPath } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 interface TodaysChallengeCardProps {
@@ -33,6 +34,7 @@ export function TodaysChallengeCard({
   className,
 }: TodaysChallengeCardProps) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
   const submittedToday = todayStatus != null;
   // Say "solved" only when it actually passed. A failed attempt locks the page just
   // the same, but would be labelled wrongly.
@@ -82,7 +84,7 @@ export function TodaysChallengeCard({
         </div>
 
         <Link
-          href="/challenge"
+          href={localizedPath("/challenge", locale)}
           className={cn(
             "pixel-btn inline-flex items-center gap-2 group",
             submittedToday

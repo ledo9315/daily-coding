@@ -124,8 +124,8 @@ describe("proxy locale cookie", () => {
 /**
  * The domain move. Two rules that look like one: the legacy host redirects, and it inserts
  * the language prefix only where a language pair exists. Everything else maps one to one -
- * `/de/challenge` is not a page, so sending `/challenge` there would turn a working URL
- * into a 404 in the name of preserving content.
+ * sending a path without a German counterpart to `/de/…` would turn a working URL into a
+ * 404 in the name of preserving content.
  */
 describe("legacy domain", () => {
   it.each([
@@ -133,6 +133,8 @@ describe("legacy domain", () => {
     ["/changelog", "https://daily-coding.dev/de/changelog"],
     ["/impressum", "https://daily-coding.dev/de/impressum"],
     ["/datenschutz", "https://daily-coding.dev/de/datenschutz"],
+    // Everything on the old domain was German, and since #287 the task has a German URL.
+    ["/challenge", "https://daily-coding.dev/de/challenge"],
   ])("sends the public path %s to its German counterpart", async (path, target) => {
     const response = await proxy(request(path, { host: "daily-coding.de" }));
 
@@ -141,7 +143,8 @@ describe("legacy domain", () => {
   });
 
   it.each([
-    ["/challenge", "https://daily-coding.dev/challenge"],
+    // A child of the public task, but private itself - no pair, so no prefix.
+    ["/challenge/abc/solutions", "https://daily-coding.dev/challenge/abc/solutions"],
     ["/profile", "https://daily-coding.dev/profile"],
     ["/login", "https://daily-coding.dev/login"],
     ["/api/user/me", "https://daily-coding.dev/api/user/me"],

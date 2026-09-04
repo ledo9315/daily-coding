@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { Header } from "@/components/header";
@@ -68,8 +69,16 @@ export default function ChallengePage() {
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
   const prevChallengeIdRef = useRef<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("challenge");
+  const { status: sessionStatus } = useSession();
+  /**
+   * The page is readable without an account since #287. Only the submission needs one, so
+   * that is the single control that changes - the description, the editor and the test run
+   * stay exactly as they are for a signed-in reader.
+   */
+  const isGuest = sessionStatus === "unauthenticated";
 
   const {
     data: challenge,
@@ -457,19 +466,54 @@ export default function ChallengePage() {
 
             {/* The two together, tighter than the column's rhythm: they are one decision. */}
             <div className="space-y-3">
-              <Button
-                size="lg"
-                className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                onClick={handleSubmit}
-                disabled={!language || isSubmitting}
-              >
-                <ArrowRight className="h-4 w-4" fill="currentColor" />
-                {isSubmitting
-                  ? t("submit.sending")
-                  : submitOutcome === "none"
-                    ? t("submit.final")
-                    : t("submit.again")}
-              </Button>
+              {isGuest ? (
+                <>
+                  <Button
+                    asChild
+                    size="lg"
+                    className="w-full gap-2 rounded-none cursor-pointer"
+                  >
+                    {/* No `callbackUrl`: registering ends at the verification mail and then
+                        at /login, so the parameter would promise a return it cannot keep. */}
+                    <Link href="/register">
+                      <ArrowRight className="h-4 w-4" fill="currentColor" />
+                      {t("guest.action")}
+                    </Link>
+                  </Button>
+
+                  {/* Not `text-xs`: at that size the pixel face turns to mush, and this is
+                      the sentence that explains why the button above says what it says. */}
+                  <div className="space-y-2 text-base leading-relaxed text-muted-foreground">
+                    <p>{t("guest.hint")}</p>
+                    <p>
+                      {t("guest.haveAccount")}{" "}
+                      <Link
+                        href={`/login?callbackUrl=${encodeURIComponent(pathname)}`}
+                        className="text-primary underline-offset-4 hover:underline"
+                      >
+                        {t("guest.login")}
+                      </Link>
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <Button
+                  size="lg"
+                  className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={handleSubmit}
+                  // Disabled while the session is still loading: it is not yet known whether
+                  // this submits or asks for an account, and a wrong label says more than a
+                  // button that waits a moment.
+                  disabled={!language || isSubmitting || sessionStatus === "loading"}
+                >
+                  <ArrowRight className="h-4 w-4" fill="currentColor" />
+                  {isSubmitting
+                    ? t("submit.sending")
+                    : submitOutcome === "none"
+                      ? t("submit.final")
+                      : t("submit.again")}
+                </Button>
+              )}
 
               {/* Only after a passing submission: the result page needs one, and a repeat
                   submission keeps the user in the editor (see the toast above), so without

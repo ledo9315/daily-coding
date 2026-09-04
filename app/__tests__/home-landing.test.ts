@@ -7,6 +7,8 @@ const read = (...parts: string[]) =>
 
 const homePage = read("app", "page.tsx");
 const nextConfig = read("next.config.mjs");
+const hero = read("components", "landing", "hero.tsx");
+const closingCta = read("components", "landing", "cta.tsx");
 
 /**
  * #130: `/` answered 307 to `/login?callbackUrl=/` for anyone without a session, so the
@@ -40,5 +42,22 @@ describe("the old landing URL", () => {
     expect(nextConfig).toMatch(
       /source:\s*["'`]\/landing["'`],\s*destination:\s*["'`]\/["'`],\s*permanent:\s*true/
     );
+  });
+});
+
+/**
+ * #287: the task is readable without an account, so a button labelled "start the challenge"
+ * has to start it. Both of these opened the registration form, which left the landing
+ * promising something a visitor could not reach without signing up first.
+ *
+ * The navbar's "join now" is deliberately not in here - that one says what it does.
+ */
+describe("the landing's calls to action", () => {
+  it.each([
+    ["hero", hero],
+    ["closing section", closingCta],
+  ])("sends the %s button to the challenge, not to the form", (_where, source) => {
+    expect(source).toContain('localizedPath("/challenge", locale)');
+    expect(source).not.toContain("/join?token");
   });
 });
