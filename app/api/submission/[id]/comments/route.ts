@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
-import { normalizeCommentBody } from "@/lib/comment-policy";
+import { normalizeCommentBody, type CommentError } from "@/lib/comment-policy";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { hasSolvedChallenge } from "@/lib/server/solution-access";
 import { getLifetimePointsByUserIds } from "@/lib/server/user-points";
@@ -68,6 +69,7 @@ async function authorize(submissionId: string): Promise<
   | { error: NextResponse; userId?: never; challengeId?: never; codeHash?: never }
   | { error?: never; userId: string; challengeId: string; codeHash: string | null }
 > {
+  const t = await getTranslations("api");
   const session = await getSessionUserId();
   if (session.error) return { error: session.error };
   const { userId } = session;
@@ -80,7 +82,7 @@ async function authorize(submissionId: string): Promise<
   if (!submission || submission.status !== "completed") {
     return {
       error: NextResponse.json(
-        { error: "Einreichung nicht gefunden." },
+        { error: t("comments.submissionNotFound") },
         { status: 404 }
       ),
     };
@@ -89,7 +91,7 @@ async function authorize(submissionId: string): Promise<
   if (!(await hasSolvedChallenge(userId, submission.challengeId))) {
     return {
       error: NextResponse.json(
-        { error: "Löse die Challenge zuerst selbst, um die Diskussion zu sehen." },
+        { error: t("comments.solveFirstToDiscuss") },
         { status: 403 }
       ),
     };
@@ -147,8 +149,9 @@ export async function POST(
   const { userId, challengeId, codeHash } = access;
 
   if (!(await checkRateLimit(`comment-create:${userId}`, 10, 60_000))) {
+    const t = await getTranslations("api");
     return NextResponse.json(
-      { error: "Zu viele Kommentare. Bitte warte einen Moment." },
+      { error: t("comments.tooManyComments") },
       { status: 429 }
     );
   }
@@ -158,7 +161,19 @@ export async function POST(
     (payload as { body?: unknown } | null)?.body
   );
   if ("error" in normalized) {
-    return NextResponse.json({ error: normalized.error }, { status: 400 });
+    const t = await getTranslations("api");
+    const commentErrorText = (error: CommentError): string => {
+      switch (error.code) {
+        case "empty":
+          return t("validation.commentEmpty");
+        case "tooLong":
+          return t("validation.commentTooLong", { max: error.max });
+      }
+    };
+    return NextResponse.json(
+      { error: commentErrorText(normalized.error) },
+      { status: 400 }
+    );
   }
 
   const created = await prisma.comment.create({

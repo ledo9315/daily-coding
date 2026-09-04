@@ -82,6 +82,58 @@ export const challenge: ChallengeContent = {
     { id: 5, name: "Null am Start", input: "[0,1]", expected: "false" },
     { id: 6, name: "Über Nullen hinweg", input: "[2,0,0]", expected: "true" },
   ],
+  translations: {
+    en: {
+      title: "Jump Game",
+      description:
+        "Implement canJump(nums).\n\n" +
+        "You start on index 0 of an array; nums[i] is the maximum jump distance from position i " +
+        "– jumping shorter is always allowed. Return true if you can reach the last index, false " +
+        "otherwise. All values are non-negative, and an array with a single element counts as " +
+        "reached.\n\n" +
+        "Playing through every possible path of jumps explodes fast. The task aims at a single " +
+        "pass with a single number: how far can you get so far – and is that enough to move on " +
+        "at all?",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Which path you take does not matter; all that counts is how far you can get so " +
+            "far. That reach grows as you walk the array: from every position inside the reach " +
+            "you get as far as i + nums[i]. Once the reach hits the last index, the answer is " +
+            "yes. If you stand on a position beyond the reach, it is no – you will never get " +
+            "there.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "One variable reach = 0. For every index i from 0 to the end: if i > reach, stop and " +
+            "return false. Otherwise set reach = max(reach, i + nums[i]). As soon as reach meets " +
+            "or passes the last index you can return true – and if the loop runs through, true " +
+            "as well.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The comparison is i > reach, not i >= reach: the position right at the edge of " +
+            "the reach is still one you are standing on.\n\n" +
+            "A zero only blocks you when nothing before it carries past it. [2,0,0] works, " +
+            "[3,2,1,0,4] does not – there every jump lands exactly on the zero.\n\n" +
+            "A single element is always reachable, [0] included: you are already at the goal. " +
+            "Start the loop at index 1, or write off nums[0] = 0 as a dead end, and you return " +
+            "false here.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Blocked",
+        "3": "One element",
+        "4": "Two elements",
+        "5": "Zero at the start",
+        "6": "Across zeros",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

@@ -4,6 +4,7 @@ import type { CodeLanguageId, StarterCodesMap } from "@/lib/challenge-languages"
 import type { MonthlyActivity } from "@/lib/monthly-activity";
 import type { ChallengeHint } from "@/lib/challenge-hints";
 import type { NotificationKindId } from "@/lib/notification-view";
+import type { AppLocale } from "@/lib/locale";
 
 export type { CodeLanguageId, StarterCodesMap };
 export type { ChallengeHint };
@@ -38,7 +39,8 @@ export interface TodayChallenge {
 
 export interface UserStats {
   rank: string;
-  points: string;
+  /** Raw lifetime points - the UI formats them for its own locale. */
+  points: number;
   /** Rank change against last week, in percent (positive = better). */
   rankTrendPercent: number;
   /** Rank change against last week, in places (positive = better). */
@@ -60,6 +62,9 @@ export interface UserStats {
   monthlyChallengeGoal: number;
 }
 
+/** Key under `profile.achievements.progressLabels`, not display text. */
+export type ProgressLabel = "record";
+
 export interface Achievement {
   id: string;
   title: string;
@@ -67,15 +72,15 @@ export interface Achievement {
   iconKey: string;
   unlocked: boolean;
   rarity: "common" | "rare" | "epic" | "legendary";
-  unlockedAt?: string;
-  /** The same instant as `unlockedAt`, unformatted, so the UI can sort by recency. */
+  /** ISO instant, not a formatted date: the badge formats it in the reader's locale. */
   unlockedAtIso?: string;
   /**
    * How far along a locked achievement is. Absent once unlocked, and absent for targets
-   * of one, where a bar would say nothing (#96). `label` prefixes the numbers when the
-   * value is not a plain count - the streak achievements measure a record.
+   * of one, where a bar would say nothing (#96). `label` names a message key that prefixes
+   * the numbers when the value is not a plain count - the streak achievements measure a
+   * record.
    */
-  progress?: { current: number; target: number; label?: string };
+  progress?: { current: number; target: number; label?: ProgressLabel };
 }
 
 export interface ChallengeHistoryEntry {
@@ -486,5 +491,14 @@ export function setEmailNotificationSetting(
   return apiFetch("/api/user/notifications", {
     method: "PATCH",
     body: JSON.stringify({ notifyByEmail }),
+  });
+}
+
+// ─── Language ─────────────────────────────────────────────────────────────────
+
+export function setLocaleSetting(locale: AppLocale): Promise<{ locale: AppLocale }> {
+  return apiFetch("/api/user/locale", {
+    method: "PATCH",
+    body: JSON.stringify({ locale }),
   });
 }

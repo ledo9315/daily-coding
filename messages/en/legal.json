@@ -1,0 +1,99 @@
+{
+  "provider": {
+    "name": "Leonid Domahalskyy",
+    "street": "Rude 13",
+    "city": "24941 Flensburg",
+    "country": "Germany",
+    "email": "leonid.domagalsky@gmail.com",
+    "phone": "015205892880",
+    "emailLabel": "Email:",
+    "phoneLabel": "Phone:"
+  },
+  "imprint": {
+    "meta": {
+      "title": "Impressum (Legal Notice)",
+      "description": "Provider identification and contact details for daily-coding.de."
+    },
+    "title": "Impressum (Legal Notice)",
+    "provider": {
+      "title": "Information pursuant to § 5 DDG (German Digital Services Act)"
+    },
+    "contact": {
+      "title": "Contact"
+    },
+    "responsible": {
+      "title": "Responsible for the content pursuant to § 18 (2) MStV (German Interstate Media Treaty)"
+    },
+    "dispute": {
+      "title": "Dispute resolution",
+      "platform": "The European Commission provides a platform for online dispute resolution (ODR):",
+      "notice": "We are neither willing nor obliged to take part in dispute resolution proceedings before a consumer arbitration board."
+    },
+    "contentLiability": {
+      "title": "Liability for content",
+      "body": "As a service provider we are responsible for our own content on these pages under the general laws, pursuant to § 7 (1) DDG. Under §§ 8 to 10 DDG, however, we are not obliged as a service provider to monitor third-party information that we transmit or store, or to investigate circumstances that point to unlawful activity."
+    },
+    "linkLiability": {
+      "title": "Liability for links",
+      "body": "Our site contains links to external third-party websites whose content is beyond our control. We can therefore accept no responsibility for that third-party content. The respective provider or operator of the linked pages is always responsible for their content."
+    }
+  },
+  "privacy": {
+    "meta": {
+      "title": "Privacy Policy",
+      "description": "Which data Daily Coding processes, for what purpose, which service providers receive it and what rights you have."
+    },
+    "title": "Privacy Policy",
+    "controller": {
+      "title": "1. Controller",
+      "intro": "Responsible for the data processing on this website is:"
+    },
+    "registration": {
+      "title": "2. Processing for registration and your account",
+      "p1": "To use Daily Coding you create a user account. In doing so we process your name, your email address and your password. The password is stored solely as a cryptographic hash (bcrypt) – at no point is it available to us in plain text. To verify your email address and to reset your password we generate tokens with a limited lifetime.",
+      "p2": "The legal basis is the performance of the terms of use pursuant to Art. 6 (1) (b) GDPR."
+    },
+    "oauth": {
+      "title": "3. Sign-in via third-party providers (OAuth)",
+      "p1": "If you sign in via GitHub or Google, we receive your email address, your name and, where applicable, your profile picture from that provider in order to create or link your account. No passwords held by the third-party providers are transmitted to us. The legal basis is your consent given by choosing the sign-in service (Art. 6 (1) (a) GDPR) as well as the performance of the contract (Art. 6 (1) (b) GDPR)."
+    },
+    "usageData": {
+      "title": "4. Usage data (challenges, ranking, streaks)",
+      "p1": "When you work on coding challenges, we store the source code you submit, the programming language you chose, the solution status and the points, leaderboard and streak data derived from them. This data is required for the core function of the platform (evaluation, leaderboard, progress). The legal basis is Art. 6 (1) (b) GDPR as well as our legitimate interest in a platform that works (Art. 6 (1) (f) GDPR).",
+      "p2": "What others can see is your name, the avatar you chose, your level, your current streak together with your streak record, and the number of challenges you have solved. That applies in the leaderboard, in the community feed and on your public profile page.",
+      "p3": "That profile page can be opened without signing in, so by people without an account with us as well. It is excluded from search engine indexing by a meta tag and is not listed in our sitemap. Your email address and the source code you submit remain invisible to other users."
+    },
+    "codeExecution": {
+      "title": "5. Execution of source code",
+      "p1": "To evaluate your solutions, the code you submit is run in an isolated, self-hosted execution environment (sandbox). It runs on a server of Hetzner Online GmbH in Nuremberg, which to that extent acts as a processor (Art. 28 GDPR) on our behalf. The code is processed solely for the purpose of evaluation and is not passed on to uninvolved third parties."
+    },
+    "emailDelivery": {
+      "title": "6. Email delivery",
+      "p1": "To send system emails (email verification, password reset, welcome and account deletion confirmations) we use the service provider Resend (Resend, Inc.) as a processor. Your email address is transmitted to that provider in the process; delivery runs over its infrastructure in Ireland. The legal basis is Art. 6 (1) (b) and (f) GDPR."
+    },
+    "hosting": {
+      "title": "7. Hosting and database",
+      "p1": "This website is operated at Vercel Inc.; the database is hosted at Neon in a data center in Frankfurt am Main. Both process the data named above on our behalf as processors (Art. 28 GDPR). When the website is opened, technically necessary access data (e.g. IP address, time, requested resource) is processed on the server side in order to keep operation secure and stable (Art. 6 (1) (f) GDPR). Vercel Inc. and Resend, Inc. are US companies; insofar as data is processed outside the EU/EEA, this takes place on the basis of appropriate safeguards (e.g. EU standard contractual clauses). The database and the execution environment for source code are located within the EU."
+    },
+    "analytics": {
+      "title": "8. Audience measurement",
+      "p1": "To evaluate how the site is used we use Vercel Web Analytics from Vercel Inc. What is collected is the pages requested, the referrer, device type and country. The service works without cookies and without storing your IP address; no cross-device profiles are built. The legal basis is our legitimate interest in a statistical evaluation of usage (Art. 6 (1) (f) GDPR)."
+    },
+    "cookies": {
+      "title": "9. Cookies",
+      "p1": "We use one technically necessary cookie to keep you signed in (session). This cookie is required to operate the login area; the legal basis is § 25 (2) TDDDG (German Telecommunications Digital Services Data Protection Act) as well as Art. 6 (1) (f) GDPR. We do not use tracking or marketing cookies."
+    },
+    "retention": {
+      "title": "10. Storage period",
+      "p1": "We store your data for as long as your account exists. You can delete your account yourself at any time in the settings; your personal data as well as the associated submissions, leaderboard and token data are deleted in the process, unless statutory retention obligations stand in the way."
+    },
+    "rights": {
+      "title": "11. Your rights",
+      "p1": "Within the statutory framework you have the following rights: access (Art. 15 GDPR), rectification (Art. 16 GDPR), erasure (Art. 17 GDPR), restriction of processing (Art. 18 GDPR), data portability (Art. 20 GDPR) as well as objection to the processing (Art. 21 GDPR). You can withdraw a consent you have given at any time with effect for the future. A message to the contact details named above is enough to exercise these rights."
+    },
+    "complaints": {
+      "title": "12. Right to lodge a complaint",
+      "p1": "You have the right to lodge a complaint with a data protection supervisory authority. The authority responsible for us is the Unabhängiges Landeszentrum für Datenschutz Schleswig-Holstein (ULD, the data protection authority of Schleswig-Holstein), Holstenstraße 98, 24103 Kiel."
+    }
+  }
+}

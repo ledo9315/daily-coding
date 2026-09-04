@@ -1,4 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 import { NextResponse } from "next/server";
 import { PATCH } from "../user/password/route";
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Lightbulb } from "@nsmr/pixelart-react";
 import {
   Accordion,
@@ -19,15 +20,19 @@ import type { ChallengeHint } from "@/lib/challenge-hints";
  * `type="multiple"`: the steps build on each other, so reading step 2 must not close step 1.
  */
 export function ChallengeHints({ hints }: { hints: ChallengeHint[] }) {
+  const t = useTranslations("challenge");
+
   if (hints.length === 0) return null;
 
   return (
     <div className="border-2 border-amber-500/25 bg-amber-500/[0.04] shadow-[4px_4px_0_0_rgba(245,158,11,0.12)]">
       <div className="flex items-center gap-2 border-b-2 border-amber-500/20 bg-amber-500/[0.06] px-4 py-2">
         <Lightbulb className="h-4 w-4 shrink-0 text-accent" fill="currentColor" />
-        <span className="font-sans text-sm uppercase tracking-wider text-accent">Hinweise</span>
+        <span className="font-sans text-sm uppercase tracking-wider text-accent">
+          {t("hints.title")}
+        </span>
         <span className="ml-auto font-mono text-xs text-accent/50">
-          {hints.length} {hints.length === 1 ? "Stufe" : "Stufen"}
+          {t("hints.levels", { count: hints.length })}
         </span>
       </div>
 

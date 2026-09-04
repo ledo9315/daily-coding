@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "START",
+    "challenge": "AUFGABE",
+    "ranking": "RANGLISTE",
+    "profile": "PROFIL"
+  },
+  "header": {
+    "streakLoading": "Streak wird geladen",
+    "streakLabel": "STREAK",
+    "levelBadge": "LVL {level}",
+    "sessionChecking": "Anmeldung wird geprüft",
+    "profile": "PROFIL",
+    "adminChallenges": "ADMIN: CHALLENGES",
+    "settings": "EINSTELLUNGEN",
+    "signOut": "ABMELDEN",
+    "login": "Login",
+    "register": "Registrieren"
+  },
+  "mobileNav": {
+    "open": "Menü öffnen",
+    "close": "Menü schließen",
+    "admin": "Admin",
+    "settings": "Einstellungen"
+  },
+  "footer": {
+    "tagline": "Löse jeden Tag eine neue Coding-Challenge in deiner Programmiersprache und steige im Ranking auf.",
+    "project": "Projekt",
+    "githubLabel": "GitHub-Repository in neuem Tab öffnen",
+    "bugReport": "Fehler melden",
+    "bugReportLabel": "Fehler auf GitHub in neuem Tab melden",
+    "support": "Support",
+    "legal": "Rechtliches",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "copyright": "© {year} Daily Coding"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "labelUnread": "Benachrichtigungen, {count} ungelesen",
+    "empty": "Noch nichts passiert. Sobald jemand deine Lösung kommentiert oder bewertet, steht es hier."
+  },
+  "feed": {
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "loading": "Community-Feed wird geladen",
+    "loadError": "Feed konnte nicht geladen werden.",
+    "loadMoreError": "Weitere Einträge konnten nicht geladen werden.",
+    "loadingMore": "Weitere Einträge werden geladen",
+    "empty": "Noch keine abgeschlossenen Challenges. Der Feed füllt sich, sobald die Community Aufgaben löst.",
+    "end": "Ende des Feeds",
+    "solvedTitle": "Challenge gelöst",
+    "solvedDescription": "hat die Challenge „{challenge}“ gelöst (+{points} Punkte)",
+    "levelUpTitle": "Challenge gelöst & Level-Aufstieg",
+    "levelUpDescription": "hat die Challenge „{challenge}“ gelöst (+{points} Punkte) und ist von Stufe {previousLevel} auf Stufe {newLevel} gestiegen"
+  },
+  "feedItem": {
+    "tier": "Stufe {level}",
+    "badges": {
+      "levelUp": "Level-Aufstieg",
+      "milestone": "Meilenstein",
+      "badgeEarned": "Abzeichen",
+      "challengeSolved": "Challenge"
+    }
+  },
+  "comments": {
+    "placeholder": "Schreib einen Kommentar zu dieser Lösung",
+    "inputLabel": "Kommentar schreiben",
+    "remaining": "{count} Zeichen übrig",
+    "sending": "Wird gesendet …",
+    "submit": "Kommentar senden",
+    "loading": "Kommentare werden geladen",
+    "loadError": "Kommentare konnten nicht geladen werden.",
+    "loadMoreError": "Weitere Kommentare konnten nicht geladen werden.",
+    "saveError": "Kommentar konnte nicht gespeichert werden.",
+    "deleteError": "Kommentar konnte nicht gelöscht werden.",
+    "empty": "Noch keine Kommentare. Schreib den ersten.",
+    "authorLevel": "Level {level}",
+    "delete": "Löschen",
+    "loadingMore": "Wird geladen …",
+    "loadMore": "Mehr laden"
+  },
+  "solutionList": {
+    "heading": "Lösungen der Community",
+    "filterLabel": "Lösungen filtern",
+    "filterAll": "Alle",
+    "filterMine": "Meine",
+    "sortLabel": "Lösungen sortieren",
+    "sortNewest": "Neueste zuerst",
+    "sortOldest": "Älteste zuerst",
+    "sortBestPractices": "Best Practices",
+    "sortClever": "Clever",
+    "loading": "Lösungen werden geladen",
+    "loadError": "Lösungen konnten nicht geladen werden.",
+    "loadMoreError": "Weitere Lösungen konnten nicht geladen werden.",
+    "loadingMore": "Weitere Lösungen werden geladen",
+    "emptyMine": "Von dir steht hier noch keine Lösung.",
+    "emptyAll": "Diese Challenge hat noch niemand gelöst. Schau später wieder vorbei."
+  },
+  "solutionCard": {
+    "authorLevel": "(Level {level})",
+    "moreAuthors": "und {count} weitere",
+    "revised": "überarbeitet",
+    "ownSolution": "Deine Lösung",
+    "identicalSubmissions": "{count} identische Abgaben",
+    "comments": "Kommentare",
+    "compare": "Mit deiner Lösung vergleichen"
+  },
+  "solutionVotes": {
+    "bestPractices": "Best Practices",
+    "clever": "Clever",
+    "castLabel": "{label} vergeben",
+    "ownDisabled": "Die eigene Lösung kannst du nicht bewerten.",
+    "saveError": "Bewertung konnte nicht gespeichert werden."
+  },
+  "solutionDiff": {
+    "differentLanguage": "Diese Lösung ist in {theirs} geschrieben, deine in {mine}. Ein zeilenweiser Vergleich sagt darüber nichts aus.",
+    "identical": "Das ist deine eigene Lösung, Zeile für Zeile. Es gibt nichts zu vergleichen.",
+    "legendOnlyMine": "nur bei dir",
+    "legendOnlyTheirs": "nur hier",
+    "columnMine": "Deine Lösung",
+    "columnTheirs": "Diese Lösung"
+  }
+}

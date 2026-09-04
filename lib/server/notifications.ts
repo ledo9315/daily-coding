@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { NotificationKind } from "@/lib/generated/prisma/client";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { sendSolutionActivityEmail } from "@/lib/server/email-service";
+import { localizeChallengeTitle } from "@/lib/server/content-translations";
 import { solutionLink } from "@/lib/notification-view";
 
 /**
@@ -32,7 +33,13 @@ async function recipientsOf({ challengeId, codeHash, actorId }: Activity) {
     distinct: ["userId"],
     select: {
       user: {
-        select: { id: true, email: true, notifyByEmail: true, emailVerified: true },
+        select: {
+          id: true,
+          email: true,
+          notifyByEmail: true,
+          emailVerified: true,
+          locale: true,
+        },
       },
     },
   });
@@ -74,6 +81,16 @@ export async function notifySolutionActivity(activity: Activity): Promise<void> 
   ]);
   if (!actor || !challenge) return;
 
+  // The mail is written in the recipient's language (E6), so the title is looked up per
+  // locale rather than per recipient - two mailable languages, at most two lookups.
+  const titleByLocale = new Map<string, string>();
+  for (const locale of new Set(mailable.map((recipient) => recipient.locale))) {
+    titleByLocale.set(
+      locale,
+      await localizeChallengeTitle(challengeId, challenge.title, locale)
+    );
+  }
+
   for (const recipient of mailable) {
     if (!(await checkRateLimit(`notify-email:${recipient.id}`, EMAILS_PER_HOUR, 3_600_000))) {
       continue;
@@ -81,7 +98,7 @@ export async function notifySolutionActivity(activity: Activity): Promise<void> 
     await sendSolutionActivityEmail(recipient.email, {
       actorName: actor.name,
       kind,
-      challengeTitle: challenge.title,
+      challengeTitle: titleByLocale.get(recipient.locale) ?? challenge.title,
       path: solutionLink(challengeId, codeHash),
     });
   }

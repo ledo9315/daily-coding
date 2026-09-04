@@ -11,8 +11,10 @@ const CONTROL_OR_FORMAT = /[\p{Cc}\p{Cf}]/gu;
 /** Anything that actually shows up: not whitespace, not a control, not a combining mark. */
 const VISIBLE = /[^\s\p{Cc}\p{Cf}\p{M}]/u;
 
+export type CommentError = { code: "empty" } | { code: "tooLong"; max: number };
+
 /**
- * Returns either the cleaned body or a message, so a route can never store the raw value.
+ * Returns either the cleaned body or a reason, so a route can never store the raw value.
  *
  * Measured in characters, not UTF-8 bytes: nothing downstream truncates - unlike bcrypt,
  * Postgres `text` has no hard ceiling - so the limit only serves readability, and a comment
@@ -20,17 +22,17 @@ const VISIBLE = /[^\s\p{Cc}\p{Cf}\p{M}]/u;
  */
 export function normalizeCommentBody(
   raw: unknown
-): { body: string } | { error: string } {
-  if (typeof raw !== "string") return { error: "Kommentar darf nicht leer sein." };
+): { body: string } | { error: CommentError } {
+  if (typeof raw !== "string") return { error: { code: "empty" } };
 
   // Newline and tab survive the sweep; they are the only layout the thread renders.
   const body = raw
     .replace(CONTROL_OR_FORMAT, (char) => (char === "\n" || char === "\t" ? char : ""))
     .trim();
 
-  if (!VISIBLE.test(body)) return { error: "Kommentar darf nicht leer sein." };
+  if (!VISIBLE.test(body)) return { error: { code: "empty" } };
   if ([...body].length > COMMENT_MAX_LENGTH) {
-    return { error: `Kommentar darf höchstens ${COMMENT_MAX_LENGTH} Zeichen lang sein.` };
+    return { error: { code: "tooLong", max: COMMENT_MAX_LENGTH } };
   }
   return { body };
 }

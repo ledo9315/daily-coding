@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslations, type TranslationValues } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
   CODE_LANGUAGES,
@@ -216,19 +218,17 @@ const SOLUTIONS: Record<
 };
 
 /**
- * The five test cases of the Binary Search challenge, verbatim from `prisma/seed.ts:357`, padded
- * to a fixed width so the timings line up - the output renders with `whitespace-pre`.
+ * The five test cases of the Binary Search challenge, in the order the harness runs them. The
+ * German names are `prisma/challenges/binary-search.ts` verbatim; both languages live in
+ * `dashboard.codeDemo.tests`.
  */
-const TESTS = [
-  "Wert in der Mitte",
-  "Erstes Element",
-  "Letztes Element",
-  "Nicht vorhanden",
-  "Leeres Array",
-];
+const TEST_IDS = ["middle", "first", "last", "missing", "empty"] as const;
 
-/** What the challenge is worth in the seed (`prisma/seed.ts:389`) - not a made-up number. */
+/** What the challenge is worth in `prisma/challenges/binary-search.ts` - not a made-up number. */
 const POINTS = 120;
+
+/** Only what this module calls on the translator, so the builder stays testable. */
+type Translate = (key: string, values?: TranslationValues) => string;
 
 /**
  * Derived from CODE_LANGUAGES, so the landing cannot claim a smaller set than the app accepts.
@@ -237,34 +237,52 @@ const POINTS = 120;
  * labels and the command reaches the server-rendered markup. The content is data, and that is
  * where it can be checked.
  */
-export const terminalTabs: TabContent[] = CODE_LANGUAGES.map((lang) => ({
+export function buildTerminalTabs(t: Translate): TabContent[] {
+  const tests = TEST_IDS.map((id) => t(`codeDemo.tests.${id}`));
   /*
-    The registry label, not the id: `cpp` and `csharp` are what the database calls them, and
-    reading an internal identifier off a landing page is a small broken promise.
+    The output renders with `whitespace-pre`, so the timings only line up if every name is
+    padded to the same width. Measured rather than hardcoded: the English names are longer
+    than the German ones, and a fixed 19 would have run the columns into each other.
   */
-  label: languageLabel(lang),
-  command: `daily test --lang=${lang}`,
-  lines: [
-    { text: "", delay: 60 },
-    { text: `  ${languageFileName(lang)}`, color: DIM, delay: 240 },
-    ...SOLUTIONS[lang].code.map((text) => ({ text: `  ${text}`, color: CODE, delay: 85 })),
-    { text: "", delay: 60 },
-    ...TESTS.map((name, i) => ({
-      text: `  ✔ ${name.padEnd(19)}(${SOLUTIONS[lang].ms[i]} ms)`,
-      color: PASS,
-      delay: 130,
-    })),
-    { text: "", delay: 60 },
-    {
-      text: `  ${TESTS.length}/${TESTS.length} bestanden · aufgerufen als ${SOLUTIONS[lang].entry}()`,
-      color: RESULT,
-      delay: 280,
-    },
-    { text: `  +${POINTS} Punkte, Streak +1 🔥`, color: RESULT, delay: 220 },
-  ],
-}));
+  const nameWidth = Math.max(...tests.map((name) => name.length)) + 2;
+
+  return CODE_LANGUAGES.map((lang) => ({
+    /*
+      The registry label, not the id: `cpp` and `csharp` are what the database calls them, and
+      reading an internal identifier off a landing page is a small broken promise.
+    */
+    label: languageLabel(lang),
+    command: `daily test --lang=${lang}`,
+    lines: [
+      { text: "", delay: 60 },
+      { text: `  ${languageFileName(lang)}`, color: DIM, delay: 240 },
+      ...SOLUTIONS[lang].code.map((text) => ({ text: `  ${text}`, color: CODE, delay: 85 })),
+      { text: "", delay: 60 },
+      ...tests.map((name, i) => ({
+        text: `  ✔ ${name.padEnd(nameWidth)}(${SOLUTIONS[lang].ms[i]} ms)`,
+        color: PASS,
+        delay: 130,
+      })),
+      { text: "", delay: 60 },
+      {
+        text: `  ${t("codeDemo.summary", {
+          passed: tests.length,
+          total: tests.length,
+          entry: SOLUTIONS[lang].entry,
+        })}`,
+        color: RESULT,
+        delay: 280,
+      },
+      { text: `  ${t("codeDemo.reward", { points: POINTS })}`, color: RESULT, delay: 220 },
+    ],
+  }));
+}
 
 export function LandingCodeDemo() {
+  const t = useTranslations("dashboard");
+  // Memoised because `TerminalAnimationRoot` keys its animation state off the array it is given.
+  const terminalTabs = useMemo(() => buildTerminalTabs(t), [t]);
+
   return (
     <div className="overflow-hidden py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -284,12 +302,13 @@ export function LandingCodeDemo() {
               beforehand, as often as you like.
             */}
             <h2 className="font-heading text-3xl sm:text-4xl">
-              SOFORT SEHEN, <br />
-              <span className="text-chart-5 retro-glow">OB ES PASST</span>
+              {t("codeDemo.headlineLine1")} <br />
+              <span className="text-chart-5 retro-glow">
+                {t("codeDemo.headlineLine2")}
+              </span>
             </h2>
             <p className="text-xl text-muted-foreground">
-              Dieselben Testfälle, die später deine Abgabe bewerten, laufen
-              vorher im Browser. So oft du willst, in deiner Sprache.
+              {t("codeDemo.claim")}
             </p>
           </motion.div>
 

@@ -1,6 +1,16 @@
 import { Resend } from "resend";
-import { renderEmail, type EmailContent } from "@/lib/server/email-template";
-import { notificationText, type NotificationKindId } from "@/lib/notification-view";
+import { prisma } from "@/lib/prisma";
+import {
+  emailTranslator,
+  renderEmail,
+  type EmailContent,
+} from "@/lib/server/email-template";
+import { localeFromRequestScope } from "@/lib/server/request-locale";
+import type { AppLocale } from "@/lib/locale";
+import {
+  NOTIFICATION_MESSAGE_KEYS,
+  type NotificationKindId,
+} from "@/lib/notification-view";
 
 function getResend(): Resend {
   const apiKey = process.env.RESEND_API_KEY;
@@ -19,58 +29,82 @@ function getAppUrl(): string {
 }
 
 /**
+ * The language a mail is written in belongs to its recipient, not to the request that
+ * triggered it: an activity mail is sent while a third party clicks, and the recipient
+ * may not even be online. `User.locale` is therefore the first source (E6).
+ *
+ * The request scope is the fallback, and it is the right one twice over - the deletion
+ * mail goes out after the row is gone, and a mail to an address without an account has
+ * no row to read. Outside a request it degrades to the default locale on its own.
+ */
+async function localeOf(recipient: string): Promise<AppLocale> {
+  const user = await prisma.user
+    .findUnique({ where: { email: recipient }, select: { locale: true } })
+    .catch(() => null);
+  return localeFromRequestScope(user?.locale);
+}
+
+/**
  * `renderEmail` escapes every piece of content, so names from the registration form are
  * safe to pass through here. They used to be interpolated into the HTML raw (#105).
  */
-async function send(to: string, subject: string, content: EmailContent): Promise<void> {
-  const { html, text } = renderEmail(content);
+async function send(
+  to: string,
+  locale: AppLocale,
+  subject: string,
+  content: EmailContent
+): Promise<void> {
+  const { html, text } = renderEmail(content, locale);
   await getResend().emails.send({ from: getFrom(), to, subject, html, text });
 }
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
+  const locale = await localeOf(to);
+  const t = emailTranslator(locale);
   const url = `${getAppUrl()}/auth/verify-email?token=${token}`;
-  await send(to, "E-Mail Adresse bestätigen – Daily Coding", {
-    heading: "E-Mail bestätigen",
-    lines: [
-      "Fast fertig. Bestätige deine Adresse, dann kannst du mit der ersten Challenge anfangen.",
-    ],
-    action: { label: "Adresse bestätigen", url },
-    footer: "Dieser Link ist 24 Stunden gültig.",
+  await send(to, locale, t("verification.subject"), {
+    heading: t("verification.heading"),
+    lines: [t("verification.line")],
+    action: { label: t("verification.action"), url },
+    footer: t("verification.footer"),
   });
 }
 
 export async function sendPasswordResetEmail(to: string, token: string): Promise<void> {
+  const locale = await localeOf(to);
+  const t = emailTranslator(locale);
   const url = `${getAppUrl()}/auth/reset-password?token=${token}`;
-  await send(to, "Passwort zurücksetzen – Daily Coding", {
-    heading: "Passwort zurücksetzen",
-    lines: ["Du kannst hier ein neues Passwort für dein Konto setzen."],
-    action: { label: "Neues Passwort setzen", url },
-    footer:
-      "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail. Dein Passwort bleibt unverändert.",
+  await send(to, locale, t("passwordReset.subject"), {
+    heading: t("passwordReset.heading"),
+    lines: [t("passwordReset.line")],
+    action: { label: t("passwordReset.action"), url },
+    footer: t("passwordReset.footer"),
   });
 }
 
 export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
-  await send(to, "Willkommen bei Daily Coding!", {
-    heading: `Willkommen, ${name}`,
-    lines: [
-      "Jeden Tag wartet eine neue Coding-Challenge auf dich, in deiner Sprache.",
-      "Löse sie, sammle Punkte und halte deine Serie am Leben.",
-    ],
-    action: { label: "Zur heutigen Challenge", url: `${getAppUrl()}/challenge` },
-    footer: "Viel Erfolg.",
+  const locale = await localeOf(to);
+  const t = emailTranslator(locale);
+  await send(to, locale, t("welcome.subject"), {
+    heading: t("welcome.heading", { name }),
+    lines: [t("welcome.lineOne"), t("welcome.lineTwo")],
+    action: { label: t("welcome.action"), url: `${getAppUrl()}/challenge` },
+    footer: t("welcome.footer"),
   });
 }
 
 export async function sendAccountDeletionEmail(to: string, name: string): Promise<void> {
-  await send(to, "Konto gelöscht – Daily Coding", {
-    heading: "Konto gelöscht",
+  const locale = await localeOf(to);
+  const t = emailTranslator(locale);
+  await send(to, locale, t("accountDeletion.subject"), {
+    heading: t("accountDeletion.heading"),
     lines: [
-      `Hallo ${name || "und tschüss"}, dein Daily-Coding-Konto wurde gelöscht.`,
-      "Deine Abgaben und dein Punktestand sind damit entfernt.",
+      t("accountDeletion.lineOne", {
+        name: name || t("accountDeletion.namelessGreeting"),
+      }),
+      t("accountDeletion.lineTwo"),
     ],
-    footer:
-      "Wenn du das nicht selbst veranlasst hast, melde dich bitte sofort bei uns. Diese Adresse kann jederzeit für ein neues Konto verwendet werden.",
+    footer: t("accountDeletion.footer"),
   });
 }
 
@@ -84,13 +118,17 @@ export async function sendSolutionActivityEmail(
     path: string;
   }
 ): Promise<void> {
-  await send(to, "Neue Aktivität an deiner Lösung – Daily Coding", {
-    heading: "Aktivität an deiner Lösung",
+  const locale = await localeOf(to);
+  const t = emailTranslator(locale);
+  await send(to, locale, t("solutionActivity.subject"), {
+    heading: t("solutionActivity.heading"),
     lines: [
-      notificationText(activity.kind, activity.actorName, activity.challengeTitle),
+      t(NOTIFICATION_MESSAGE_KEYS[activity.kind], {
+        actor: activity.actorName,
+        challenge: activity.challengeTitle,
+      }),
     ],
-    action: { label: "Zur Lösung", url: `${getAppUrl()}${activity.path}` },
-    footer:
-      "Diese Benachrichtigungen kannst du in deinen Einstellungen jederzeit abschalten.",
+    action: { label: t("solutionActivity.action"), url: `${getAppUrl()}${activity.path}` },
+    footer: t("solutionActivity.footer"),
   });
 }

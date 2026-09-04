@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CheckDouble, Lightbulb } from "@nsmr/pixelart-react";
 import { toast } from "sonner";
 import {
@@ -15,9 +16,9 @@ import {
  * The icons of `@nsmr/pixelart-react` are filled shapes, not outlines: without
  * `fill="currentColor"` they render as nothing at all.
  */
-const KINDS: { kind: SolutionVoteKind; label: string; icon: typeof Lightbulb }[] = [
-  { kind: "best_practices", label: "Best Practices", icon: CheckDouble },
-  { kind: "clever", label: "Clever", icon: Lightbulb },
+const KINDS: { kind: SolutionVoteKind; labelKey: string; icon: typeof Lightbulb }[] = [
+  { kind: "best_practices", labelKey: "solutionVotes.bestPractices", icon: CheckDouble },
+  { kind: "clever", labelKey: "solutionVotes.clever", icon: Lightbulb },
 ];
 
 export function SolutionVotes({
@@ -27,6 +28,7 @@ export function SolutionVotes({
   challengeId: string;
   group: ChallengeSolutionGroup;
 }) {
+  const t = useTranslations("community");
   const [votes, setVotes] = useState<SolutionVoteCounts>(group.votes);
   const [mine, setMine] = useState<SolutionVoteState>(group.myVotes);
   const [pending, setPending] = useState<SolutionVoteKind | null>(null);
@@ -46,9 +48,7 @@ export function SolutionVotes({
     } catch (e) {
       setVotes(before.votes);
       setMine(before.mine);
-      toast.error(
-        e instanceof Error ? e.message : "Bewertung konnte nicht gespeichert werden."
-      );
+      toast.error(e instanceof Error ? e.message : t("solutionVotes.saveError"));
     } finally {
       setPending(null);
     }
@@ -57,35 +57,40 @@ export function SolutionVotes({
   // A fragment, not a row of its own: the card lines the votes up with the other actions.
   return (
     <>
-      {KINDS.map(({ kind, label, icon: Icon }) => (
-        <button
-          key={kind}
-          type="button"
-          onClick={() => onVote(kind)}
-          disabled={group.own || pending !== null}
-          aria-pressed={mine[kind]}
-          title={
-            group.own ? "Die eigene Lösung kannst du nicht bewerten." : `${label} vergeben`
-          }
-          className={`inline-flex items-center gap-2 border-2 px-3 py-1.5 text-base uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-            mine[kind]
-              ? "border-primary bg-primary/15 text-primary"
-              : "border-border bg-secondary text-foreground hover:border-primary/60 hover:text-primary"
-          }`}
-        >
-          <Icon className="h-4 w-4 shrink-0" aria-hidden fill="currentColor" />
-          {label}
-          <span
-            className={`min-w-6 border px-1.5 text-center font-code text-xs ${
+      {KINDS.map(({ kind, labelKey, icon: Icon }) => {
+        const label = t(labelKey);
+        return (
+          <button
+            key={kind}
+            type="button"
+            onClick={() => onVote(kind)}
+            disabled={group.own || pending !== null}
+            aria-pressed={mine[kind]}
+            title={
+              group.own
+                ? t("solutionVotes.ownDisabled")
+                : t("solutionVotes.castLabel", { label })
+            }
+            className={`inline-flex items-center gap-2 border-2 px-3 py-1.5 text-base uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               mine[kind]
-                ? "border-primary/40 bg-primary/10"
-                : "border-border bg-background text-muted-foreground"
+                ? "border-primary bg-primary/15 text-primary"
+                : "border-border bg-secondary text-foreground hover:border-primary/60 hover:text-primary"
             }`}
           >
-            {votes[kind]}
-          </span>
-        </button>
-      ))}
+            <Icon className="h-4 w-4 shrink-0" aria-hidden fill="currentColor" />
+            {label}
+            <span
+              className={`min-w-6 border px-1.5 text-center font-code text-xs ${
+                mine[kind]
+                  ? "border-primary/40 bg-primary/10"
+                  : "border-border bg-background text-muted-foreground"
+              }`}
+            >
+              {votes[kind]}
+            </span>
+          </button>
+        );
+      })}
     </>
   );
 }

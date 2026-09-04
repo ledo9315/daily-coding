@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import { ArrowRight, Lock, Mail, User } from "@nsmr/pixelart-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import {
   DISPLAY_NAME_MAX_LENGTH,
   displayNameValidationError,
+  type DisplayNameError,
 } from "@/lib/display-name";
 
 interface RegisterFormProps {
@@ -28,6 +30,7 @@ export function RegisterForm({
   githubEnabled = false,
   googleEnabled = false,
 }: RegisterFormProps) {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -35,15 +38,30 @@ export function RegisterForm({
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  /**
+   * `displayNameValidationError` is shared with the register API route and the OAuth path,
+   * so it reports a code and the wording is picked here.
+   */
+  const nameErrorText = (error: DisplayNameError): string => {
+    switch (error.code) {
+      case "empty":
+        return t("registerForm.nameErrorEmpty");
+      case "tooLong":
+        return t("registerForm.nameErrorTooLong", { max: error.max });
+      case "tooFewAlphanumerics":
+        return t("registerForm.nameErrorTooFewLetters");
+    }
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("accountDeleted") !== "1") return;
 
-    toast.success("Account erfolgreich gelöscht", {
-      description: "Du kannst jederzeit ein neues Konto erstellen.",
+    toast.success(t("registerForm.accountDeletedTitle"), {
+      description: t("registerForm.accountDeletedDescription"),
     });
     router.replace("/register");
-  }, [router]);
+  }, [router, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +69,7 @@ export function RegisterForm({
 
     const nameError = displayNameValidationError(name);
     if (nameError) {
-      setFormError(nameError);
+      setFormError(nameErrorText(nameError));
       return;
     }
 
@@ -64,7 +82,7 @@ export function RegisterForm({
         body: JSON.stringify({ name, email, password }),
       });
 
-      let message = "Unbekannter Fehler.";
+      let message = t("registerForm.unknownError");
       let verificationEmailSent = true;
       try {
         const data = (await res.json()) as {
@@ -81,27 +99,25 @@ export function RegisterForm({
 
       if (!res.ok) {
         setFormError(message);
-        toast.error("Registrierung fehlgeschlagen", { description: message });
+        toast.error(t("registerForm.errorTitle"), { description: message });
         return;
       }
 
       if (verificationEmailSent) {
-        toast.success("Konto erstellt!", {
-          description:
-            "Bitte bestätige deine E-Mail-Adresse. Wir haben dir eine Verifizierungs-E-Mail gesendet.",
+        toast.success(t("registerForm.createdTitle"), {
+          description: t("registerForm.createdDescription"),
         });
       } else {
-        toast.warning("Konto erstellt, aber keine E-Mail gesendet", {
-          description:
-            "Der Versand der Verifizierungs-E-Mail ist fehlgeschlagen. Bitte kontaktiere den Support oder versuche es erneut.",
+        toast.warning(t("registerForm.createdWithoutEmailTitle"), {
+          description: t("registerForm.createdWithoutEmailDescription"),
         });
       }
       router.push("/login?pending=1");
     } catch (err) {
       const desc =
-        err instanceof Error ? err.message : "Netzwerk- oder Serverfehler.";
+        err instanceof Error ? err.message : t("registerForm.networkError");
       setFormError(desc);
-      toast.error("Registrierung fehlgeschlagen", {
+      toast.error(t("registerForm.errorTitle"), {
         description: desc,
       });
     } finally {
@@ -113,12 +129,12 @@ export function RegisterForm({
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{t("registerForm.nameLabel")}</Label>
         <div className="relative">
           <Input
             id="name"
             type="text"
-            placeholder="Max Mustermann"
+            placeholder={t("registerForm.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -130,16 +146,16 @@ export function RegisterForm({
           <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
         <p id="name-requirements" className="text-xs text-muted-foreground">
-          Mindestens zwei Buchstaben oder Zahlen, maximal {DISPLAY_NAME_MAX_LENGTH} Zeichen.
+          {t("registerForm.nameRequirements", { max: DISPLAY_NAME_MAX_LENGTH })}
         </p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">E-Mail Adresse</Label>
+        <Label htmlFor="email">{t("registerForm.emailLabel")}</Label>
         <div className="relative">
           <Input
             id="email"
             type="email"
-            placeholder="deine@email.de"
+            placeholder={t("registerForm.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             
@@ -149,12 +165,12 @@ export function RegisterForm({
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Passwort</Label>
+        <Label htmlFor="password">{t("registerForm.passwordLabel")}</Label>
         <div className="relative">
           <Input
             id="password"
             type="password"
-            placeholder="Mindestens 8 Zeichen"
+            placeholder={t("registerForm.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
@@ -178,14 +194,14 @@ export function RegisterForm({
         className="pixel-btn w-full gap-2 mt-6 cursor-pointer"
         disabled={isLoading}
       >
-        {isLoading ? "WIRD REGISTRIERT..." : "REGISTRIEREN"}
+        {isLoading ? t("registerForm.submitting") : t("registerForm.submit")}
         {!isLoading && <ArrowRight className="h-4 w-4" />}
       </Button>
 
         <p className="text-center text-sm text-muted-foreground">
-          Bereits ein Konto?{" "}
+          {t("registerForm.haveAccount")}{" "}
           <Link href="/login" className="text-primary hover:underline">
-            Einloggen
+            {t("registerForm.loginLink")}
           </Link>
         </p>
       </form>

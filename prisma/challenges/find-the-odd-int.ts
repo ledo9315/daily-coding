@@ -91,6 +91,58 @@ export const challenge: ChallengeContent = {
       expected: "5",
     },
   ],
+  translations: {
+    en: {
+      title: "Find the Odd Int",
+      description:
+        "Implement findOdd(arr).\n\n" +
+        "Exactly one number in arr appears an odd number of times – once, three times, five " +
+        "times. All other numbers appear an even number of times. Return the number with the " +
+        "odd count. The array is never empty, the values can be negative, and the " +
+        "occurrences of a number are not necessarily next to each other.\n\n" +
+        "The task is counting with a map – and then asking the counts the right question: " +
+        'not "equal to 1" but "odd". If you know Single Number, you will sense that it works ' +
+        "without a map as well; that is the encore here, not the task.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Count in a map how often each number appears. The answer is the key whose count " +
+            "is odd – and odd means 1, 3, 5, …, not just 1. Two passes, O(n).",
+        },
+        {
+          title: "The implementation",
+          body:
+            "One pass over arr in which you raise the count of every number by one. A second " +
+            "pass over the map in which you return the entry with count % 2 === 1. It also " +
+            "works without a map: combine all numbers with ^ – pairs cancel each other out, " +
+            "of three equal ones one is left standing. The same idea as in Single Number, " +
+            'except that here "odd" is enough instead of "exactly once".',
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            'Looking for the number 0 with a "falsy" check misses it: in [0,1,0,1,0] the ' +
+            "result is 0, and if (result) fails although result is correct. Check the count, " +
+            "not the value.\n\n" +
+            'Odd does not mean "once". In [0,1,0,1,0] the 0 appears three times and is still ' +
+            "the answer – searching only for count === 1 will not find it. What is asked for " +
+            "is count % 2 === 1. The other way round, in [1,2,2,3,3,3,4,3,3,3,2,2,1] the 3 " +
+            "appears six times, so an even number of times, and drops out.\n\n" +
+            "An array with a single element already is the answer, even if that element is " +
+            "0. Negative numbers are ordinary keys and ordinary XOR operands.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Single element",
+        "2": "Zero on its own",
+        "3": "Example",
+        "4": "Zero three times",
+        "5": "Scattered occurrences",
+        "6": "Negative numbers",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

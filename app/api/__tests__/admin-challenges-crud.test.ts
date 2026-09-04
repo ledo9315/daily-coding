@@ -8,27 +8,41 @@ const mockFindUniqueChallenge = vi.fn();
 const mockChallengeUpdate = vi.fn();
 const mockChallengeDelete = vi.fn();
 const mockCategoryFindUnique = vi.fn();
+const mockTranslationUpsert = vi.fn();
+const mockTranslationDeleteMany = vi.fn();
 
 vi.mock("@/auth", () => ({
   auth: () => mockAuth(),
 }));
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    user: {
-      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+// The update and the translation rows share one transaction, so the update goes through the
+// transaction client. Both clients point at the same mocks here.
+vi.mock("@/lib/prisma", () => {
+  const challenge = {
+    findMany: (...args: unknown[]) => mockFindMany(...args),
+    findUnique: (...args: unknown[]) => mockFindUniqueChallenge(...args),
+    update: (...args: unknown[]) => mockChallengeUpdate(...args),
+    delete: (...args: unknown[]) => mockChallengeDelete(...args),
+  };
+  const challengeTranslation = {
+    upsert: (...args: unknown[]) => mockTranslationUpsert(...args),
+    deleteMany: (...args: unknown[]) => mockTranslationDeleteMany(...args),
+  };
+  const tx = { challenge, challengeTranslation };
+  return {
+    prisma: {
+      user: {
+        findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+      },
+      challenge,
+      challengeTranslation,
+      category: {
+        findUnique: (...args: unknown[]) => mockCategoryFindUnique(...args),
+      },
+      $transaction: (run: (client: typeof tx) => unknown) => run(tx),
     },
-    challenge: {
-      findMany: (...args: unknown[]) => mockFindMany(...args),
-      findUnique: (...args: unknown[]) => mockFindUniqueChallenge(...args),
-      update: (...args: unknown[]) => mockChallengeUpdate(...args),
-      delete: (...args: unknown[]) => mockChallengeDelete(...args),
-    },
-    category: {
-      findUnique: (...args: unknown[]) => mockCategoryFindUnique(...args),
-    },
-  },
-}));
+  };
+});
 
 import { GET as getList } from "../admin/challenges/route";
 import {
@@ -45,7 +59,7 @@ const patchBody = {
   categoryId: "cat-1",
   examples: [],
   hints: [],
-  testCases: [{ name: "t", input: "1", expected: "1" }],
+  testCases: [{ id: 1, name: "t", input: "1", expected: "1" }],
   evaluationConfig: {
     callableByLanguage: {
       javascript: "f",
@@ -172,5 +186,70 @@ describe("/api/admin/challenges/[id]", () => {
     );
     expect(res.status).toBe(409);
     expect(mockChallengeDelete).not.toHaveBeenCalled();
+  });
+});
+
+describe("PATCH /api/admin/challenges/[id] translations", () => {
+  function adminPatch(body: unknown) {
+    mockAuth.mockResolvedValueOnce({ user: { id: "a1" } });
+    mockUserFindUnique.mockResolvedValueOnce({ role: "admin" });
+    mockFindUniqueChallenge.mockResolvedValueOnce({ id: "c1" });
+    mockCategoryFindUnique.mockResolvedValueOnce({ id: "cat-1" });
+    mockChallengeUpdate.mockResolvedValueOnce({});
+    return patchOne(
+      new NextRequest("http://localhost/api/admin/challenges/c1", {
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      }),
+      { params: Promise.resolve({ id: "c1" }) },
+    );
+  }
+
+  function upsertFor(locale: string) {
+    return mockTranslationUpsert.mock.calls
+      .map((call) => call[0] as { create: { locale: string } })
+      .find((arg) => arg.create.locale === locale);
+  }
+
+  it("saves when only the German version is filled in", async () => {
+    const res = await adminPatch({ ...patchBody, translations: {} });
+    expect(res.status).toBe(200);
+    expect(upsertFor("de")).toBeDefined();
+    expect(upsertFor("en")).toBeUndefined();
+  });
+
+  // An empty `translations` object is how the form says the English tab was cleared.
+  it("removes the English row when the payload carries none", async () => {
+    await adminPatch({ ...patchBody, translations: {} });
+    expect(mockTranslationDeleteMany).toHaveBeenCalledWith({
+      where: { challengeId: "c1", locale: "en" },
+    });
+  });
+
+  it("leaves the English row alone when translations are not mentioned", async () => {
+    await adminPatch(patchBody);
+    expect(mockTranslationDeleteMany).not.toHaveBeenCalled();
+  });
+
+  it("writes the English version and keeps the German columns unchanged", async () => {
+    const res = await adminPatch({
+      ...patchBody,
+      translations: {
+        en: {
+          title: "Title",
+          description: "Desc",
+          hints: [],
+          testCaseNames: { "1": "case" },
+        },
+      },
+    });
+    expect(res.status).toBe(200);
+    expect(upsertFor("en")?.create).toMatchObject({
+      challengeId: "c1",
+      title: "Title",
+      testCaseNames: { "1": "case" },
+    });
+    expect(mockChallengeUpdate.mock.calls[0][0].data.title).toBe("T");
   });
 });

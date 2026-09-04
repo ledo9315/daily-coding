@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AchievementsCard } from "@/components/achievements-card";
+import { renderWithIntl as renderToStaticMarkup } from "./intl-render";
 import type { Achievement } from "@/lib/api";
 
 function makeAchievements(count: number, unlocked = 1): Achievement[] {
@@ -11,7 +11,6 @@ function makeAchievements(count: number, unlocked = 1): Achievement[] {
     iconKey: "Check",
     unlocked: i < unlocked,
     rarity: "common" as const,
-    unlockedAt: i < unlocked ? "01.09.2026" : undefined,
     unlockedAtIso: i < unlocked ? "2026-09-01T10:00:00.000Z" : undefined,
     progress: i < unlocked ? undefined : { current: i, target: 30 },
   }));

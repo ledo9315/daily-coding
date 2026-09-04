@@ -5,6 +5,11 @@ import type { UserProfile } from "@/lib/api";
 import { getAllTimeRankNumber } from "@/lib/server/user-points";
 import { loadAchievementFacts } from "@/lib/server/achievement-facts";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
+import {
+  findLocalizedAchievementDefs,
+  localizeChallengeTitles,
+} from "@/lib/server/content-translations";
+import { localeFromRequestScope } from "@/lib/server/request-locale";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
 import { utcDayKey } from "@/lib/streak-days";
@@ -30,7 +35,7 @@ export async function getUserProfileData(
     await Promise.all([
       getAllTimeRankNumber(resolvedUserId),
       loadAchievementFacts(prisma, resolvedUserId),
-      prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
+      findLocalizedAchievementDefs(),
       prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
       prisma.user.count(),
     ]);
@@ -48,6 +53,11 @@ export async function getUserProfileData(
   }
   const monthlyActivity = buildMonthlyActivityGrid(now, allCompletedDayKeys);
 
+  const [historyTitles, locale] = await Promise.all([
+    localizeChallengeTitles(user.submissions.map((s) => s.challengeId)),
+    localeFromRequestScope(),
+  ]);
+
   const { achievements, unlockedCount: unlockedBadges } = buildUserAchievementsView(
     achievementDefs,
     userAchievements,
@@ -62,7 +72,7 @@ export async function getUserProfileData(
     role: "",
     stats: {
       rank: `#${allTimeRank}`,
-      points: points.toLocaleString("de-DE"),
+      points,
       rankTrendPercent: 0,
       rankTrendPlaces: 0,
       pointsTrendPercent: 0,
@@ -81,8 +91,8 @@ export async function getUserProfileData(
     challengeHistory: user.submissions.map((s) => ({
       id: s.id,
       challengeId: s.challengeId,
-      title: s.challenge.title,
-      date: formatDate(s.createdAt),
+      title: historyTitles.get(s.challengeId) ?? s.challenge.title,
+      date: formatDate(s.createdAt, locale),
       difficulty: s.challenge.difficulty,
       status:
         s.status === "completed" || s.status === "failed" || s.status === "skipped"

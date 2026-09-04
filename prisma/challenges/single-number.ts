@@ -88,4 +88,56 @@ export const challenge: ChallengeContent = {
   ],
   starterCodes: starter,
   starterCode: starter.javascript,
+  translations: {
+    en: {
+      title: "Single Number",
+      description:
+        "Implement singleNumber(nums).\n\n" +
+        "Every number in nums appears exactly twice – except one, which appears only once. " +
+        "Return that number. The array is never empty, the values can be negative, and the order " +
+        "is arbitrary: the single number can sit at the front, at the back or somewhere in the " +
+        "middle.\n\n" +
+        "Counting with a map works and costs O(n) time, but also O(n) memory. The task is after " +
+        "the solution with constant memory: one pass, one variable, and the pairs cancel each " +
+        "other out.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "There is an operation where a number combined with itself gives 0, and 0 combined " +
+            "with anything gives that anything: bitwise XOR. a ^ a is 0, a ^ 0 is a. Combine all " +
+            "the elements and the pairs cancel each other out – no matter how far apart they " +
+            "are, because XOR is commutative and associative. What is left is the number without " +
+            "a partner.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Start with result = 0. Walk through nums once and set result = result ^ nums[i] in " +
+            "every step. After the pass, result holds the number you are looking for. No sorting, " +
+            "no map, no second pass.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "XOR is ^ – in every language in this task, from JavaScript to Rust. If you read " +
+            "^ as \"to the power of\", you are thinking in math notation: powers are ** or pow, " +
+            "and nothing cancels out with those.\n\n" +
+            "Negative numbers do not bother XOR: two's complement is wiped out bit by bit just " +
+            "like positive values. If you sort instead and compare neighbors, you have to treat " +
+            "the first and the last element separately, or you read past the edge.\n\n" +
+            "An array with a single element is already the answer. If your loop advances in steps " +
+            "of two, it misses exactly that case.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Middle",
+        "3": "One element",
+        "4": "Negatives",
+        "5": "At the front",
+        "6": "Negative on its own",
+      },
+    },
+  },
 };

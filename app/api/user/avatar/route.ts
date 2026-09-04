@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { getSessionUserId } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import { isAllowedUserAvatarPath } from "@/lib/user-avatars";
 
 export async function PATCH(request: Request) {
+  const t = await getTranslations("api");
   const result = await getSessionUserId();
   if (result.error) return result.error;
 
@@ -11,7 +13,7 @@ export async function PATCH(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Ungültiger JSON-Body." }, { status: 400 });
+    return NextResponse.json({ error: t("user.invalidJsonBody") }, { status: 400 });
   }
 
   const avatar =
@@ -21,7 +23,7 @@ export async function PATCH(request: Request) {
 
   if (typeof avatar !== "string" || !isAllowedUserAvatarPath(avatar)) {
     return NextResponse.json(
-      { error: "Ungültiger Avatar. Bitte ein Bild aus der Liste wählen." },
+      { error: t("user.invalidAvatar") },
       { status: 400 }
     );
   }
@@ -33,10 +35,7 @@ export async function PATCH(request: Request) {
 
   if (!user) {
     return NextResponse.json(
-      {
-        error:
-          "Benutzer nicht gefunden. Bitte abmelden und erneut anmelden (z. B. nach Datenbank-Reset).",
-      },
+      { error: t("user.notFound") },
       { status: 401 }
     );
   }

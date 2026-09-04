@@ -1,4 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 import { GET as getCommunityFeedHandler } from "../community/feed/route";
 
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
@@ -141,6 +147,17 @@ describe("GET /api/community/feed", () => {
     expect(json.items[0].time).toBe("vor 10 Minuten");
   });
 
+  it("uses singular 'Minute' for exactly 1 minute ago", async () => {
+    withLifetimePoints(
+      makeSubmission({ createdAt: new Date(Date.now() - 1 * 60 * 1000) }),
+    );
+    const res = await getCommunityFeedHandler(
+      new Request("http://localhost/api/community/feed"),
+    );
+    const json = await res.json();
+    expect(json.items[0].time).toBe("vor 1 Minute");
+  });
+
   it("formats time as 'vor N Stunden' for hours-old submissions", async () => {
     withLifetimePoints(
       makeSubmission({ createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000) }),
@@ -174,6 +191,17 @@ describe("GET /api/community/feed", () => {
     );
     const json = await res.json();
     expect(json.items[0].time).toBe("vor 2 Tagen");
+  });
+
+  it("uses singular 'Tag' for exactly 1 day ago", async () => {
+    withLifetimePoints(
+      makeSubmission({ createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000) }),
+    );
+    const res = await getCommunityFeedHandler(
+      new Request("http://localhost/api/community/feed"),
+    );
+    const json = await res.json();
+    expect(json.items[0].time).toBe("vor 1 Tag");
   });
 
   it("returns empty items when no completed submissions exist", async () => {

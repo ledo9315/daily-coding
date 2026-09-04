@@ -1,0 +1,132 @@
+{
+  "closeDialog": "Close",
+  "metadata": {
+    "profile": "Profile",
+    "ranking": "Ranking",
+    "settings": "Settings",
+    "publicProfileNotFound": "Profile not found",
+    "publicProfile": "{name} – Public profile",
+    "publicProfileDescription": "Level {level}, {solved} challenges solved and a streak of {streak} days."
+  },
+  "profilePage": {
+    "statsLevel": "LEVEL",
+    "statsSolved": "SOLVED",
+    "statsRecord": "RECORD",
+    "statsRank": "RANK",
+    "statsRankDescription": "of {total}",
+    "progressTitle": "Progress",
+    "progressLevelLabel": "Level {level}",
+    "progressStreakLabel": "Streak to record",
+    "activityTitle": "Activity",
+    "streakBadge": "{count} day streak"
+  },
+  "avatarPicker": {
+    "ariaLabel": "Choose avatar",
+    "trigger": "Choose",
+    "dialogTitle": "Choose avatar",
+    "close": "Close",
+    "updated": "Avatar updated",
+    "saveFailed": "Saving failed",
+    "updateFailed": "Could not save the avatar."
+  },
+  "publicProfile": {
+    "level": "Level {level}",
+    "memberSince": "Member since {date}",
+    "lastSolved": "Last solved on {date}",
+    "statsLevel": "LEVEL",
+    "statsPoints": "POINTS",
+    "statsStreak": "STREAK",
+    "statsStreakDescription": "Record: {record}",
+    "statsSolved": "SOLVED",
+    "activityTitle": "Activity"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "subtitle": "See how you stack up against everyone else",
+    "tabWeek": "Week",
+    "tabMonth": "Month",
+    "tabAll": "All time",
+    "podiumWeek": "Top 3 this week",
+    "podiumMonth": "Top 3 this month",
+    "podiumAll": "Top 3 all time",
+    "podiumLevel": "Level {level}"
+  },
+  "rankingTable": {
+    "rank": "Rank",
+    "user": "User",
+    "points": "Points",
+    "level": "Lvl {level}",
+    "solved": "{count, plural, one {# Challenge solved} other {# Challenges solved}}"
+  },
+  "rankingPreview": {
+    "all": "ALL",
+    "level": "Lvl {level}"
+  },
+  "achievements": {
+    "title": "Achievements {unlocked}/{total}",
+    "showAll": "Show all {total}",
+    "dialogDescription": "Every achievement at a glance",
+    "unlockedAt": "Unlocked on {date}",
+    "progress": "{current}/{target}",
+    "progressWithLabel": "{label}: {current}/{target}",
+    "progressLabels": {
+      "record": "Record"
+    },
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Notifications, password and account",
+    "sectionsLabel": "Sections",
+    "sections": {
+      "notifications": "Notifications",
+      "language": "Language",
+      "security": "Security",
+      "account": "Account"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Whenever someone comments on or rates your solution, you always see it in the bell in the header. Also by email:",
+      "emailLabel": "Notifications by email",
+      "saveFailed": "Could not save the setting."
+    },
+    "language": {
+      "title": "Language",
+      "description": "Applies to the whole site and to emails, on every device you are signed in on.",
+      "groupLabel": "Language",
+      "saveFailed": "Could not save the language."
+    },
+    "security": {
+      "title": "Change password",
+      "description": "If your account already has a password, enter your current one first. At least 8 characters.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Repeat new password",
+      "submit": "Save password",
+      "updated": "Password updated successfully.",
+      "submitting": "Saving...",
+      "tooShort": "New password is too short.",
+      "mismatch": "The repeated password does not match.",
+      "updateFailed": "Could not update the password.",
+      "changeFailed": "Password change failed."
+    },
+    "account": {
+      "title": "Delete account",
+      "description": "This step is final: submissions, achievements, rankings and your streak are deleted and cannot be restored.",
+      "confirmPhrase": "DELETE ACCOUNT",
+      "confirmLabel": "Type <highlight>{phrase}</highlight> to confirm",
+      "confirmMismatch": "Please type exactly {phrase}.",
+      "passwordLabel": "Current password",
+      "passwordHint": "Leave empty for an account via GitHub or Google without a password.",
+      "submit": "Delete account for good",
+      "submitting": "Deleting...",
+      "deleteFailed": "Could not delete the account.",
+      "failed": "Account deletion failed."
+    }
+  }
+}

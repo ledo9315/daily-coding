@@ -1,3 +1,5 @@
+import { useLocale } from "next-intl";
+import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 interface PointsChipProps {
@@ -51,6 +53,8 @@ export function PointsChip({
   variant = "default",
   className,
 }: PointsChipProps) {
+  const locale = useLocale();
+
   const sizeClasses = {
     sm: "px-2 h-6 text-xs border-2",
     md: "px-3 h-9 text-sm border-2",
@@ -81,7 +85,7 @@ export function PointsChip({
     >
       <PixelStar className={cn(iconSizes[size], "shrink-0")} />
       <span className="translate-y-px font-sans">
-        {points.toLocaleString("de-DE")}
+        {formatNumber(points, locale)}
       </span>
     </div>
   );

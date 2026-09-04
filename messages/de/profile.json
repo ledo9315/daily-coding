@@ -1,0 +1,132 @@
+{
+  "closeDialog": "Schließen",
+  "metadata": {
+    "profile": "Profil",
+    "ranking": "Rangliste",
+    "settings": "Einstellungen",
+    "publicProfileNotFound": "Profil nicht gefunden",
+    "publicProfile": "{name} – Öffentliches Profil",
+    "publicProfileDescription": "Level {level}, {solved} gelöste Challenges und eine Streak von {streak} Tagen."
+  },
+  "profilePage": {
+    "statsLevel": "LEVEL",
+    "statsSolved": "GELÖST",
+    "statsRecord": "REKORD",
+    "statsRank": "PLATZIERUNG",
+    "statsRankDescription": "von {total}",
+    "progressTitle": "Fortschritt",
+    "progressLevelLabel": "Level {level}",
+    "progressStreakLabel": "Streak zum Rekord",
+    "activityTitle": "Aktivität",
+    "streakBadge": "{count, plural, one {# Tag Streak} other {# Tage Streak}}"
+  },
+  "avatarPicker": {
+    "ariaLabel": "Avatar auswählen",
+    "trigger": "Wählen",
+    "dialogTitle": "Avatar wählen",
+    "close": "Schließen",
+    "updated": "Avatar aktualisiert",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "updateFailed": "Avatar konnte nicht gespeichert werden."
+  },
+  "publicProfile": {
+    "level": "Level {level}",
+    "memberSince": "Dabei seit {date}",
+    "lastSolved": "Zuletzt gelöst am {date}",
+    "statsLevel": "LEVEL",
+    "statsPoints": "PUNKTE",
+    "statsStreak": "STREAK",
+    "statsStreakDescription": "Rekord: {record}",
+    "statsSolved": "GELÖST",
+    "activityTitle": "Aktivität"
+  },
+  "ranking": {
+    "title": "Rangliste",
+    "subtitle": "Vergleiche dich mit anderen Nutzern",
+    "tabWeek": "Woche",
+    "tabMonth": "Monat",
+    "tabAll": "Gesamt",
+    "podiumWeek": "Top 3 der Woche",
+    "podiumMonth": "Top 3 des Monats",
+    "podiumAll": "Top 3 insgesamt",
+    "podiumLevel": "Level {level}"
+  },
+  "rankingTable": {
+    "rank": "Rang",
+    "user": "Nutzer",
+    "points": "Punkte",
+    "level": "Lvl {level}",
+    "solved": "{count, plural, one {# Challenge gelöst} other {# Challenges gelöst}}"
+  },
+  "rankingPreview": {
+    "all": "ALLE",
+    "level": "Lvl {level}"
+  },
+  "achievements": {
+    "title": "Achievements {unlocked}/{total}",
+    "showAll": "Alle {total} anzeigen",
+    "dialogDescription": "Alle Achievements im Überblick",
+    "unlockedAt": "Freigeschaltet am {date}",
+    "progress": "{current}/{target}",
+    "progressWithLabel": "{label}: {current}/{target}",
+    "progressLabels": {
+      "record": "Rekord"
+    },
+    "rarity": {
+      "common": "Gewöhnlich",
+      "rare": "Selten",
+      "epic": "Episch",
+      "legendary": "Legendär"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Benachrichtigungen, Passwort und Konto",
+    "sectionsLabel": "Bereiche",
+    "sections": {
+      "notifications": "Benachrichtigungen",
+      "language": "Sprache",
+      "security": "Sicherheit",
+      "account": "Konto"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Wenn jemand deine Lösung kommentiert oder bewertet, siehst du das immer in der Glocke im Kopfbereich. Zusätzlich per E-Mail:",
+      "emailLabel": "Benachrichtigungen per E-Mail",
+      "saveFailed": "Einstellung konnte nicht gespeichert werden."
+    },
+    "language": {
+      "title": "Sprache",
+      "description": "Gilt für die gesamte Seite und für E-Mails, auf jedem Gerät, auf dem du angemeldet bist.",
+      "groupLabel": "Sprache",
+      "saveFailed": "Sprache konnte nicht gespeichert werden."
+    },
+    "security": {
+      "title": "Passwort ändern",
+      "description": "Wenn dein Konto bereits ein Passwort hat, gib zuerst dein aktuelles Passwort ein. Mindestens 8 Zeichen.",
+      "currentPassword": "Aktuelles Passwort",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Neues Passwort wiederholen",
+      "submit": "Passwort speichern",
+      "updated": "Passwort wurde erfolgreich aktualisiert.",
+      "submitting": "Speichert...",
+      "tooShort": "Neues Passwort ist zu kurz.",
+      "mismatch": "Passwort-Wiederholung stimmt nicht überein.",
+      "updateFailed": "Passwort konnte nicht aktualisiert werden.",
+      "changeFailed": "Passwort-Änderung fehlgeschlagen."
+    },
+    "account": {
+      "title": "Konto löschen",
+      "description": "Dieser Schritt ist endgültig: Abgaben, Achievements, Platzierungen und deine Serie werden gelöscht und lassen sich nicht wiederherstellen.",
+      "confirmPhrase": "KONTO LÖSCHEN",
+      "confirmLabel": "Tippe <highlight>{phrase}</highlight> zur Bestätigung",
+      "confirmMismatch": "Bitte gib exakt {phrase} ein.",
+      "passwordLabel": "Aktuelles Passwort",
+      "passwordHint": "Bei einem Konto über GitHub oder Google ohne Passwort leer lassen.",
+      "submit": "Konto endgültig löschen",
+      "submitting": "Löscht...",
+      "deleteFailed": "Konto konnte nicht gelöscht werden.",
+      "failed": "Konto-Löschung fehlgeschlagen."
+    }
+  }
+}

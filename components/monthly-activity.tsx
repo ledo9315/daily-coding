@@ -1,14 +1,20 @@
+import type { ReactNode } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import type { MonthlyActivity } from "@/lib/api";
+import { formatMonthYearLong } from "@/lib/format";
 import { progressPercentage } from "@/lib/progress-percentage";
 import { cn } from "@/lib/utils";
 import { Check } from "@nsmr/pixelart-react";
 
-const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] as const;
+/** Monday first, like the grid `lib/monthly-activity.ts` builds. */
+const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
 export function MonthlyActivityView({ activity }: { activity: MonthlyActivity }) {
-  const monthTitle = new Date(Date.UTC(activity.year, activity.month - 1, 1)).toLocaleDateString(
-    "de-DE",
-    { month: "long", year: "numeric", timeZone: "UTC" }
+  const locale = useLocale();
+  const t = useTranslations("dashboard");
+  const monthTitle = formatMonthYearLong(
+    new Date(Date.UTC(activity.year, activity.month - 1, 1)),
+    locale
   );
 
   const monthPct = progressPercentage(
@@ -19,23 +25,23 @@ export function MonthlyActivityView({ activity }: { activity: MonthlyActivity })
   return (
     <div className="space-y-5 font-sans">
       <div className="space-y-1">
-        <p className="text-sm uppercase tracking-wider text-muted-foreground">Aktueller Monat</p>
+        <p className="text-sm uppercase tracking-wider text-muted-foreground">
+          {t("monthlyActivity.currentMonth")}
+        </p>
         <p className="text-2xl font-bold capitalize leading-none tracking-tight text-foreground">
           {monthTitle}
         </p>
       </div>
 
       <div className="border border-border bg-secondary/40 p-2 sm:p-3">
-        {/*
-          gap-px + bg-border: klare Linien ohne doppelte Rahmen (kein border-2 zwischen Zellen).
-        */}
+        {/* gap-px + bg-border: clean lines without a double frame between two cells. */}
         <div className="grid grid-cols-7 gap-px bg-border">
           {WEEKDAYS.map((w) => (
             <div
               key={w}
               className="flex h-8 items-center justify-center bg-secondary/90 text-xs font-bold uppercase tracking-wider text-muted-foreground sm:h-9 sm:text-sm"
             >
-              {w}
+              {t(`monthlyActivity.weekdays.${w}`)}
             </div>
           ))}
           {activity.cells.map((cell, i) => (
@@ -56,9 +62,11 @@ export function MonthlyActivityView({ activity }: { activity: MonthlyActivity })
                 cell.day === null
                   ? undefined
                   : [
-                      `Tag ${cell.day}`,
-                      cell.completed ? "Challenge gelöst" : "kein Abschluss",
-                      cell.inStreak ? "Teil der aktuellen Serie" : "",
+                      t("monthlyActivity.cell.day", { day: cell.day }),
+                      cell.completed
+                        ? t("monthlyActivity.cell.completed")
+                        : t("monthlyActivity.cell.notCompleted"),
+                      cell.inStreak ? t("monthlyActivity.cell.inStreak") : "",
                     ]
                       .filter(Boolean)
                       .join(" · ")
@@ -77,15 +85,20 @@ export function MonthlyActivityView({ activity }: { activity: MonthlyActivity })
       <div className="space-y-2">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-md text-muted-foreground">
-            <span className="text-3xl font-bold tabular-nums text-primary">
-              {activity.completedDaysInMonthCount}
-            </span>
-            <span> von </span>
-            <span className="tabular-nums text-foreground">{activity.daysInMonth}</span>
-            <span> Tagen mit Abschluss</span>
+            {t.rich("monthlyActivity.daysWithCompletion", {
+              count: activity.completedDaysInMonthCount,
+              days: activity.daysInMonth,
+              big: (chunks: ReactNode) => (
+                <span className="text-3xl font-bold tabular-nums text-primary">{chunks}</span>
+              ),
+              num: (chunks: ReactNode) => (
+                <span className="tabular-nums text-foreground">{chunks}</span>
+              ),
+            })}
           </p>
           <p className="text-sm uppercase tracking-wider text-muted-foreground">
-            Monat: <span className="font-sans text-xl font-bold text-primary tabular-nums">{monthPct}%</span>
+            {t("monthlyActivity.monthLabel")}{" "}
+            <span className="font-sans text-xl font-bold text-primary tabular-nums">{monthPct}%</span>
           </p>
         </div>
         <div className="h-2.5 overflow-hidden bg-secondary">

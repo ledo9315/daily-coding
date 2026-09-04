@@ -83,6 +83,55 @@ export const challenge: ChallengeContent = {
     { id: 5, name: "Fast ein Tag", input: "86399", expected: '"23:59:59"' },
     { id: 6, name: "Maximum", input: "359999", expected: '"99:59:59"' },
   ],
+  translations: {
+    en: {
+      title: "Human Readable Time",
+      description:
+        "Implement humanReadable(seconds).\n\n" +
+        "Turn a number of seconds into a string in HH:MM:SS format. Every part has exactly two " +
+        'digits, padded with a leading zero where needed: 5 seconds become "00:00:05", 3661 ' +
+        'seconds become "01:01:01".\n\n' +
+        "seconds is between 0 and 359999. The hours do not wrap at 24, they simply keep " +
+        'counting – the largest value gives "99:59:59".\n\n' +
+        "The math is integer division with a remainder, three times. The task checks whether " +
+        "you pull the parts out in the right order and do not leave the formatting to chance.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "An hour has 3600 seconds, a minute 60. The hours are seconds divided by 3600 with " +
+            "the fraction dropped; what is left over (seconds % 3600) you divide by 60 for the " +
+            "minutes, and the remainder of that is the seconds. Three numbers, each below 100.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Compute h, m and s as described in the idea. Format each number to two digits – " +
+            'padStart(2, "0") in JavaScript, f"{h:02d}" in Python, String.format("%02d") in ' +
+            'Java – and join them with colons. If you would rather do it by hand: prefixing a "0" ' +
+            "for values below ten works just as well.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "Cutting the hours off at 24. These are durations, not clock times – 86400 seconds " +
+            'are "24:00:00", not "00:00:00".\n\n' +
+            "The division has to drop the fraction. In JavaScript 3661 / 3600 gives a decimal, " +
+            "you need Math.floor; in Python it is // instead of /.\n\n" +
+            'Forgetting the leading zero: "1:1:1" is wrong, "01:01:01" is what is asked for. And ' +
+            '0 comes out as "00:00:00", not as an empty string.',
+        },
+      ],
+      testCaseNames: {
+        "1": "Zero",
+        "2": "Seconds only",
+        "3": "One minute",
+        "4": "Example",
+        "5": "Almost a day",
+        "6": "Maximum",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

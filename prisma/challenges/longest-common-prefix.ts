@@ -91,6 +91,62 @@ export const challenge: ChallengeContent = {
     { id: 6, name: "Teilstring, kein Präfix", input: '["flow","low","slow"]', expected: '""' },
     { id: 7, name: "Leeres Wort", input: '["abc","","abd"]', expected: '""' },
   ],
+  translations: {
+    en: {
+      title: "Longest Common Prefix",
+      description:
+        "Implement longestCommonPrefix(strs).\n\n" +
+        "Return the longest string that every word in the array starts with. If they share no " +
+        'beginning, return the empty string "". The array holds at least one word; a single word ' +
+        "is its own prefix.\n\n" +
+        "The prefix can never be longer than the shortest word, and it can only shrink: every " +
+        "further word cuts it at most, none can extend it. Use that and you never have to " +
+        "compare two words against each other, only ever one against the current candidate.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Take the first word as the candidate for the prefix. Every further word can only " +
+            "cut the candidate down – to the part the two have in common. If the candidate is " +
+            "still not empty after all the words, it is the prefix you are looking for.\n\n" +
+            "Alternatively you go position by position: as long as every word has the same " +
+            "character at position i, that character belongs to the prefix. The first difference " +
+            "ends it.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Set prefix to strs[0]. Walk over all the words and cut the last character off " +
+            "prefix as long as the word does not start with prefix. If prefix runs empty on the " +
+            "way, you can return the empty string right away. If something is left after the " +
+            "last word, return it.\n\n" +
+            "Almost every language has a function like startsWith – that saves you comparing " +
+            "characters by hand.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            'Reading past the end of a shorter word: "flow" has no fifth character. If you ' +
+            "compare character by character, check the length first and the character second.\n\n" +
+            'What is asked for is a prefix, not a common substring. "flow" and "slow" share ' +
+            '"low", but no prefix – the result is "".\n\n' +
+            "With a single word there is nothing to compare; the word itself is the " +
+            'answer. And for "nothing in common" return the empty string, not null or ' +
+            "undefined. An empty word in the array makes the prefix empty at once – the " +
+            "candidate gets cut down to nothing.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "No prefix",
+        "3": "One word",
+        "4": "Word is the prefix",
+        "5": "Identical",
+        "6": "Substring, not a prefix",
+        "7": "Empty word",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

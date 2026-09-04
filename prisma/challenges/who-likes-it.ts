@@ -95,4 +95,57 @@ export const challenge: ChallengeContent = {
   ],
   starterCodes: starter,
   starterCode: starter.javascript,
+  translations: {
+    en: {
+      title: "Who likes it?",
+      description:
+        "Implement likes(names).\n\n" +
+        "You know the line under every post on social networks: who marked this one with " +
+        '"Like". Return exactly that text, depending on how many names are in the array:\n\n' +
+        '[] → "no one likes this"\n' +
+        '["Peter"] → "Peter likes this"\n' +
+        '["Jacob", "Alex"] → "Jacob and Alex like this"\n' +
+        '["Max", "John", "Mark"] → "Max, John and Mark like this"\n' +
+        '["Alex", "Jacob", "Mark", "Max"] → "Alex, Jacob and 2 others like this"\n\n' +
+        "From four names on, the first two are named and the rest are counted. The output is " +
+        "compared character by character, so every space and every comma has to match.\n\n" +
+        "There is almost nothing to compute. The task checks whether you keep the cases apart " +
+        "cleanly and do not overlook some small thing while putting the strings together.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "There are exactly five cases, and they depend only on the length of the array: 0, " +
+            "1, 2, 3 and everything from 4 on. The first four are templates with zero to three " +
+            "names; the last one names two of them and counts the rest, so names.length - 2.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Branch on the length – switch, a chain of ifs or a map of templates, that is a " +
+            "matter of taste. In each branch, put the string together from the matching names " +
+            "and return it. The case from four names on is the default branch, the one where " +
+            "you work out how many are left over.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            'Singular and plural: one name gets "likes", from two names on it is "like". The ' +
+            "difference is a single letter, and the comparison is exact.\n\n" +
+            'The separators: a comma after the first name, "and" before the last one. With ' +
+            'three names there is no comma before the "and", and nowhere a double space.\n\n' +
+            "From four names on, the number counts the ones left over, not all the names: with " +
+            'four names it is "2 others", not "4 others".',
+        },
+      ],
+      testCaseNames: {
+        "1": "No one",
+        "2": "One name",
+        "3": "Two names",
+        "4": "Three names",
+        "5": "Four names",
+        "6": "Five names",
+      },
+    },
+  },
 };

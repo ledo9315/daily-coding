@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import bcrypt from "bcryptjs";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -9,16 +10,40 @@ import {
   displayNameValidationError,
   nameKeyOf,
   normaliseDisplayName,
+  type DisplayNameError,
 } from "@/lib/display-name";
 import {
   emailAddressValidationError,
   normaliseEmailAddress,
 } from "@/lib/email-address";
-import { passwordValidationError } from "@/lib/password-policy";
+import { passwordValidationError, type PasswordError } from "@/lib/password-policy";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
 import { requestClientIdentity } from "@/lib/server/request-security";
+import { localeFromRequest } from "@/lib/request-locale";
 
 export async function POST(request: NextRequest) {
+  const t = await getTranslations("api");
+
+  const passwordErrorText = (error: PasswordError): string => {
+    switch (error.code) {
+      case "tooShort":
+        return t("validation.passwordTooShort", { min: error.min });
+      case "tooLong":
+        return t("validation.passwordTooLong", { maxBytes: error.maxBytes });
+    }
+  };
+
+  const displayNameErrorText = (error: DisplayNameError): string => {
+    switch (error.code) {
+      case "empty":
+        return t("validation.nameEmpty");
+      case "tooLong":
+        return t("validation.nameTooLong", { max: error.max });
+      case "tooFewAlphanumerics":
+        return t("validation.nameTooFewAlphanumerics");
+    }
+  };
+
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const { email, password, name } = body;
 
@@ -31,20 +56,26 @@ export async function POST(request: NextRequest) {
     !name
   ) {
     return NextResponse.json(
-      { error: "E-Mail, Passwort und Name sind erforderlich." },
+      { error: t("auth.registerFieldsRequired") },
       { status: 400 }
     );
   }
 
-  const emailError = emailAddressValidationError(email);
-  if (emailError) return NextResponse.json({ error: emailError }, { status: 400 });
+  if (emailAddressValidationError(email)) {
+    return NextResponse.json({ error: t("validation.emailInvalid") }, { status: 400 });
+  }
 
   const passwordError = passwordValidationError(password);
-  if (passwordError) return NextResponse.json({ error: passwordError }, { status: 400 });
+  if (passwordError) {
+    return NextResponse.json({ error: passwordErrorText(passwordError) }, { status: 400 });
+  }
 
   const displayNameError = displayNameValidationError(name);
   if (displayNameError) {
-    return NextResponse.json({ error: displayNameError }, { status: 400 });
+    return NextResponse.json(
+      { error: displayNameErrorText(displayNameError) },
+      { status: 400 }
+    );
   }
 
   const displayName = normaliseDisplayName(name);
@@ -57,7 +88,7 @@ export async function POST(request: NextRequest) {
     (await checkRateLimit(`register-email:${canonicalEmail}`, 3, 60 * 60 * 1000));
   if (!emailAllowed) {
     return NextResponse.json(
-      { error: "Zu viele Registrierungsversuche. Bitte später erneut versuchen." },
+      { error: t("auth.tooManyRegistrations") },
       { status: 429 }
     );
   }
@@ -65,7 +96,7 @@ export async function POST(request: NextRequest) {
   const existing = await prisma.user.findUnique({ where: { email: canonicalEmail } });
   if (existing) {
     return NextResponse.json(
-      { error: "Diese E-Mail-Adresse wird bereits verwendet." },
+      { error: t("auth.emailTaken") },
       { status: 409 }
     );
   }
@@ -78,7 +109,7 @@ export async function POST(request: NextRequest) {
   const nameTaken = await prisma.user.findUnique({ where: { nameKey } });
   if (nameTaken) {
     return NextResponse.json(
-      { error: "Dieser Name ist schon vergeben." },
+      { error: t("auth.nameTaken") },
       { status: 409 }
     );
   }
@@ -101,12 +132,15 @@ export async function POST(request: NextRequest) {
         nameKey,
         initials,
         avatar: starterAvatarPath(displayName),
+        // The language this visitor is reading the form in, so the verification mail
+        // arrives in it. Existing accounts keep `de` via the column default (E7).
+        locale: localeFromRequest(request),
       },
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(
-        { error: "E-Mail-Adresse oder Name ist bereits vergeben." },
+        { error: t("auth.emailOrNameTaken") },
         { status: 409 }
       );
     }

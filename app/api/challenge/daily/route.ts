@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import {
   findDailyChallengeForApp,
@@ -16,7 +17,8 @@ export async function GET() {
   const challenge = await findDailyChallengeForApp();
 
   if (!challenge) {
-    return NextResponse.json({ error: "No active challenge" }, { status: 404 });
+    const t = await getTranslations("api");
+    return NextResponse.json({ error: t("challenge.noneActive") }, { status: 404 });
   }
 
   const supportedLanguages = normalizeSupportedLanguages(
@@ -56,6 +58,8 @@ export async function GET() {
     }
   }
 
+  const tc = await getTranslations("challenge");
+
   return NextResponse.json({
     id: challenge.id,
     title: challenge.title,
@@ -63,7 +67,7 @@ export async function GET() {
     difficulty: challenge.difficulty,
     points: challenge.points,
     category: challenge.category.name,
-    hints: normalizeHints(challenge.hints),
+    hints: normalizeHints(challenge.hints, tc("hints.fallbackTitle")),
     examples: challenge.examples,
     testCases: stripTestCaseSecretsForClient(challenge.testCases),
     supportedLanguages,

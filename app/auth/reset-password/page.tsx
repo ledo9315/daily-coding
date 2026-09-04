@@ -14,9 +14,11 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Lock, ArrowRight } from "@nsmr/pixelart-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 function ResetPasswordForm() {
+  const t = useTranslations("auth");
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token") ?? "";
@@ -26,16 +28,14 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <p className="text-sm text-destructive">
-        Ungültiger Link. Bitte fordere einen neuen Reset-Link an.
-      </p>
+      <p className="text-sm text-destructive">{t("resetPassword.invalidLink")}</p>
     );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
-      toast.error("Passwörter stimmen nicht überein.");
+      toast.error(t("resetPassword.mismatch"));
       return;
     }
     setIsLoading(true);
@@ -47,17 +47,17 @@ function ResetPasswordForm() {
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
-        toast.error("Fehler", {
-          description: data.error ?? "Reset fehlgeschlagen.",
+        toast.error(t("resetPassword.errorTitle"), {
+          description: data.error ?? t("resetPassword.errorFallback"),
         });
         return;
       }
-      toast.success("Passwort geändert!", {
-        description: "Du kannst dich jetzt mit deinem neuen Passwort einloggen.",
+      toast.success(t("resetPassword.successTitle"), {
+        description: t("resetPassword.successDescription"),
       });
       router.push("/login");
     } catch {
-      toast.error("Netzwerkfehler");
+      toast.error(t("resetPassword.networkError"));
     } finally {
       setIsLoading(false);
     }
@@ -66,12 +66,12 @@ function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="password">Neues Passwort</Label>
+        <Label htmlFor="password">{t("resetPassword.passwordLabel")}</Label>
         <div className="relative">
           <Input
             id="password"
             type="password"
-            placeholder="Mindestens 8 Zeichen"
+            placeholder={t("resetPassword.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
@@ -82,12 +82,12 @@ function ResetPasswordForm() {
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirm">Passwort bestätigen</Label>
+        <Label htmlFor="confirm">{t("resetPassword.confirmLabel")}</Label>
         <div className="relative">
           <Input
             id="confirm"
             type="password"
-            placeholder="Passwort wiederholen"
+            placeholder={t("resetPassword.confirmPlaceholder")}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             required
@@ -101,12 +101,12 @@ function ResetPasswordForm() {
         className="pixel-btn w-full gap-2 mt-2 cursor-pointer"
         disabled={isLoading}
       >
-        {isLoading ? "WIRD GESPEICHERT..." : "PASSWORT ÄNDERN"}
+        {isLoading ? t("resetPassword.submitting") : t("resetPassword.submit")}
         {!isLoading && <ArrowRight className="h-4 w-4" />}
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         <Link href="/login" className="text-primary hover:underline">
-          Zurück zum Login
+          {t("resetPassword.backToLogin")}
         </Link>
       </p>
     </form>
@@ -114,6 +114,8 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
+  const t = useTranslations("auth");
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       <div className="fixed inset-0 pointer-events-none">
@@ -127,23 +129,31 @@ export default function ResetPasswordPage() {
             <span className="text-xl text-primary">{">_"}</span>
             {/* Stacked and left-aligned, the same shape as the header on every
                 signed-in page - one logo, not two. */}
+            {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <span className="text-left">
               DAILY
               <br />
               CODING
             </span>
+            {/* eslint-enable no-restricted-syntax */}
           </h1>
         </div>
 
         <Card className="pixel-box bg-card">
           <CardHeader>
             <CardTitle className="text-xl font-sans uppercase tracking-wide">
-              Neues Passwort
+              {t("resetPassword.title")}
             </CardTitle>
-            <CardDescription>Gib dein neues Passwort ein.</CardDescription>
+            <CardDescription>{t("resetPassword.description")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<p className="text-sm text-muted-foreground">Laden...</p>}>
+            <Suspense
+              fallback={
+                <p className="text-sm text-muted-foreground">
+                  {t("resetPassword.loading")}
+                </p>
+              }
+            >
               <ResetPasswordForm />
             </Suspense>
           </CardContent>

@@ -87,4 +87,59 @@ export const challenge: ChallengeContent = {
   ],
   starterCodes: starter,
   starterCode: starter.javascript,
+  translations: {
+    en: {
+      title: "Trapping Rain Water",
+      description:
+        "Implement trap(height).\n\n" +
+        "height is an elevation profile: height[i] is the height of the bar at position i, and " +
+        "every bar is 1 wide. Return how many units of water are left standing between the bars " +
+        "after it rains. For [0,1,0,2,1,0,1,3,2,1,2,1] it is 6.\n\n" +
+        "A profile that is empty or rises all the way holds no water. Water only stands where " +
+        "there is a higher wall to the left and to the right – the question is how high it rises " +
+        "at each position.\n\n" +
+        "Looking for both maxima at every position works and costs O(n²). The task is after a " +
+        "single pass with two pointers running inwards from the outside – or after two helper " +
+        "arrays, if you want to make it easier on yourself first.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "For a position i only one thing counts: the tallest bar somewhere to the left " +
+            "(maxLeft) and the tallest one somewhere to the right (maxRight). The water level " +
+            "above i is min(maxLeft, maxRight) - height[i]; if that is negative, nothing stands " +
+            "there. Everything else is bookkeeping about how to get those two maxima cheaply.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Two pointers, left at the beginning and right at the end, plus maxLeft and " +
+            "maxRight, both 0. As long as left < right: if height[left] is smaller than " +
+            "height[right], the left side is the limiting one – update maxLeft with " +
+            "height[left], add maxLeft - height[left] to the water and move left to the right. " +
+            "Otherwise the same thing mirrored with right. At the end the sum is the result.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "The trick with the two pointers is that you move the side whose bar is lower. Only " +
+            "then is it certain that its maximum limits the water level, even though you do not " +
+            "yet know the maximum of the other side in full. If you always move the same side, " +
+            "you are computing with the wrong water level.\n\n" +
+            "Update the maximum first, then add the water – otherwise the contribution turns " +
+            "negative at a new tallest bar.\n\n" +
+            "An empty array gives 0. In languages with unsigned lengths, len - 1 is then not -1 " +
+            "but a huge number – catch that case beforehand.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Deep basin",
+        "3": "Empty",
+        "4": "Monotonically increasing",
+        "5": "One basin",
+        "6": "Right wall lower",
+      },
+    },
+  },
 };

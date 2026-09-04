@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
 import { runChallengeTests } from "@/lib/server/challenge-execution";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
@@ -14,15 +15,16 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const t = await getTranslations("api");
   const { id: challengeId } = await params;
   if (requestBodyExceedsLimit(request, MAX_CHALLENGE_REQUEST_BYTES)) {
-    return NextResponse.json({ error: "Code ist zu lang." }, { status: 413 });
+    return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
   }
 
   const client = requestClientIdentity(request);
   if (!(await checkRateLimit(`challenge-run:${client}`, 20, 60_000))) {
     return NextResponse.json(
-      { error: "Zu viele Testläufe. Bitte kurz warten." },
+      { error: t("challenge.tooManyRuns") },
       { status: 429 }
     );
   }
@@ -30,12 +32,12 @@ export async function POST(
   const body = await request.json().catch(() => ({}));
   const code: string = typeof body.code === "string" ? body.code : "";
   if (codeExceedsLimit(code)) {
-    return NextResponse.json({ error: "Code ist zu lang." }, { status: 413 });
+    return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
   }
 
   const challenge = await findDailyChallengeForApp();
   if (!challenge || challenge.id !== challengeId) {
-    return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
+    return NextResponse.json({ error: t("challenge.notFound") }, { status: 404 });
   }
 
   const allowed = normalizeSupportedLanguages(
@@ -44,7 +46,7 @@ export async function POST(
   const language = parseCodeLanguage(body.language, allowed);
   if (!language) {
     return NextResponse.json(
-      { error: "Ungültige oder nicht unterstützte Sprache für diese Challenge." },
+      { error: t("challenge.unsupportedLanguage") },
       { status: 400 }
     );
   }

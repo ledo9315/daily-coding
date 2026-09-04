@@ -80,6 +80,32 @@ describe("renderEmail", () => {
     );
   });
 
+  /**
+   * The chrome around the content - the fallback hint and the tagline - is the layout's
+   * own text, so the layout translates it rather than the caller.
+   */
+  it("renders its own chrome and the lang attribute in the given locale", () => {
+    const english = renderEmail(
+      {
+        heading: "Confirm your email",
+        lines: ["Almost done."],
+        action: { label: "Confirm address", url: "https://app.example.com/verify?token=abc" },
+        footer: "This link is valid for 24 hours.",
+      },
+      "en"
+    );
+    expect(english.html).toContain('lang="en"');
+    expect(english.html).toContain("Or copy this address into your browser:");
+    expect(english.text).toContain("Daily Coding, one coding challenge a day.");
+    expect(english.html).not.toContain("täglich");
+  });
+
+  it("stays German without a locale", () => {
+    expect(mail.html).toContain('lang="de"');
+    expect(mail.html).toContain("Oder diese Adresse in den Browser kopieren:");
+    expect(mail.text).toContain("Daily Coding, täglich eine Coding-Challenge.");
+  });
+
   it("omits the button block when there is no action", () => {
     const plain = renderEmail({ heading: "Konto gelöscht", lines: ["Fertig."], footer: "" });
     expect(plain.html).not.toContain("<a ");

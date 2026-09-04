@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderWithIntl } from "./intl-render";
 import { FeedItem } from "@/components/feed-item";
 
 describe("FeedItem", () => {
   it("derives the profile link from the name, not from the @-prefixed handle", () => {
-    const html = renderToStaticMarkup(
+    const html = renderWithIntl(
       <FeedItem
         user={{
           name: "Lisa Müller",

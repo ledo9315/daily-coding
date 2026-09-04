@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { LandingPage } from "@/components/landing/landing-page";
@@ -19,6 +20,7 @@ import {
   getTodayChallengeSummary,
   getUserStatsData,
 } from "@/lib/server/dashboard-data";
+import { formatNumber } from "@/lib/format";
 
 /**
  * Title and description stay the site-wide default from the root layout: for anyone without
@@ -42,7 +44,9 @@ export default async function DashboardPage() {
   }
   const userId = session.user.id;
 
-  const [rankingPreview, todayChallenge, userStats] = await Promise.all([
+  const [locale, t, rankingPreview, todayChallenge, userStats] = await Promise.all([
+    getLocale(),
+    getTranslations("dashboard"),
     getDashboardRankingPreviewData(),
     getTodayChallengeSummary(userId),
     getUserStatsData(userId),
@@ -60,11 +64,9 @@ export default async function DashboardPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
         <div className="mb-8">
-          <h1 className="font-pixel text-xl mb-2">
-            WILLKOMMEN ZURÜCK!
-          </h1>
+          <h1 className="font-pixel text-xl mb-2">{t("home.welcome")}</h1>
           <EncryptedText
-            text="Bereit für die heutige Challenge?"
+            text={t("home.prompt")}
             revealDelayMs={30}
             className="text-xl text-muted-foreground uppercase tracking-wide"
           />
@@ -72,31 +74,34 @@ export default async function DashboardPage() {
 
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
-            title="DEIN RANG"
+            title={t("home.rank.title")}
             value={userStats.rank}
-            description={`von ${userStats.totalUsers.toLocaleString("de-DE")} Nutzern`}
+            description={t("home.rank.of", { count: userStats.totalUsers })}
             icon={Trophy}
             trend={{
               value: userStats.rankTrendPlaces,
-              label: "Plätze seit letzter Woche",
+              label: t("home.rank.trend"),
               unit: "number",
             }}
           />
           <StatsCard
-            title="PUNKTE"
-            value={userStats.points}
+            title={t("home.points.title")}
+            value={formatNumber(userStats.points, locale)}
             icon={Bullseye}
             // A loss reads as a reproach on the dashboard; the number is on the profile.
             trend={
               userStats.pointsTrendPercent > 0
-                ? { value: userStats.pointsTrendPercent, label: "diesen Monat" }
+                ? {
+                    value: userStats.pointsTrendPercent,
+                    label: t("home.points.trend"),
+                  }
                 : undefined
             }
           />
           <StatsCard
-            title="STREAK"
+            title={t("home.streak.title")}
             value={String(userStats.streak)}
-            footer={`Rekord: ${userStats.streakRecord} ${userStats.streakRecord === 1 ? "Tag" : "Tage"}`}
+            footer={t("home.streak.record", { count: userStats.streakRecord })}
             icon={Zap}
           />
         </div>
@@ -122,14 +127,14 @@ export default async function DashboardPage() {
 
         <div className="mb-12">
           <RankingPreviewCard
-            title="WOCHEN-RANKING"
+            title={t("home.weekRanking")}
             users={rankingPreview.week}
             href="/ranking"
           />
         </div>
 
         <div className="mb-6">
-          <h2 className="font-pixel text-lg mb-4">COMMUNITY-FEED</h2>
+          <h2 className="font-pixel text-lg mb-4">{t("home.communityFeed")}</h2>
         </div>
         <CommunityFeed />
       </main>

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { CodeLanguage } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-languages";
 import { runChallengeTests } from "@/lib/server/challenge-execution";
+import { localizeAchievements } from "@/lib/server/content-translations";
 import {
   findDailyChallengeForApp,
   findTodaySubmission,
@@ -23,6 +25,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const t = await getTranslations("api");
   const result = await getSessionUserId();
   if (result.error) return result.error;
   const { userId } = result;
@@ -33,32 +36,32 @@ export async function POST(
   });
   if (!dbUser) {
     return NextResponse.json(
-      {
-        error:
-          "Dein Login passt nicht zur Datenbank (z. B. nach migrate/seed). Bitte abmelden und erneut anmelden.",
-      },
+      { error: t("challenge.sessionOutOfSync") },
       { status: 401 }
     );
   }
 
   const { id: challengeId } = await params;
   if (requestBodyExceedsLimit(request, MAX_CHALLENGE_REQUEST_BYTES)) {
-    return NextResponse.json({ error: "Code ist zu lang." }, { status: 413 });
+    return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
   }
 
   if (!(await checkRateLimit(`challenge-submit:${userId}`, 5, 60_000))) {
-    return NextResponse.json({ error: "Zu viele Abgaben. Bitte kurz warten." }, { status: 429 });
+    return NextResponse.json(
+      { error: t("challenge.tooManySubmissions") },
+      { status: 429 }
+    );
   }
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const code: string = typeof body.code === "string" ? body.code : "";
   if (codeExceedsLimit(code)) {
-    return NextResponse.json({ error: "Code ist zu lang." }, { status: 413 });
+    return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
   }
 
   const challenge = await findDailyChallengeForApp();
   if (!challenge || challenge.id !== challengeId) {
-    return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
+    return NextResponse.json({ error: t("challenge.notFound") }, { status: 404 });
   }
 
   const allowed = normalizeSupportedLanguages(
@@ -67,7 +70,7 @@ export async function POST(
   const language = parseCodeLanguage(body.language, allowed);
   if (!language) {
     return NextResponse.json(
-      { error: "Ungültige oder nicht unterstützte Sprache für diese Challenge." },
+      { error: t("challenge.unsupportedLanguage") },
       { status: 400 }
     );
   }
@@ -137,10 +140,12 @@ export async function POST(
     // has been reached so a later re-submission cannot recompute it away (#205).
     const unlockedIds = await persistAchievementUnlocks(prisma, userId);
     if (unlockedIds.length > 0) {
-      unlockedAchievements = await prisma.achievementDef.findMany({
-        where: { id: { in: unlockedIds } },
-        select: { id: true, title: true, description: true },
-      });
+      unlockedAchievements = await localizeAchievements(
+        await prisma.achievementDef.findMany({
+          where: { id: { in: unlockedIds } },
+          select: { id: true, title: true, description: true },
+        })
+      );
     }
   }
 

@@ -9,8 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { EncryptedText } from "@/components/ui/encrypted-text";
+import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
+  const t = useTranslations("auth");
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       {/* Ambient Background */}
@@ -25,14 +28,16 @@ export default function RegisterPage() {
             <span className="text-4xl text-primary">{">_"}</span>
             {/* Stacked and left-aligned, the same shape as the header on every
                 signed-in page - one logo, not two. */}
+            {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <span className="text-left">
               DAILY
               <br />
               CODING
             </span>
+            {/* eslint-enable no-restricted-syntax */}
           </h1>
           <EncryptedText
-            text="Erstelle deinen Account"
+            text={t("registerPage.tagline")}
             className="text-lg text-muted-foreground uppercase tracking-wide"
           />
         </div>
@@ -40,9 +45,9 @@ export default function RegisterPage() {
         <Card className="pixel-box bg-card">
           <CardHeader>
             <CardTitle className="text-xl font-sans uppercase tracking-wide">
-              Konto erstellen
+              {t("registerPage.cardTitle")}
             </CardTitle>
-            <CardDescription>Tritt der Daily Coding Community bei.</CardDescription>
+            <CardDescription>{t("registerPage.cardDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
             <RegisterForm

@@ -20,6 +20,30 @@
  * the mark and the button.
  */
 
+import { createTranslator } from "next-intl";
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
+import deMessages from "@/messages/de/email.json";
+import enMessages from "@/messages/en/email.json";
+
+/**
+ * The mail namespace, read straight from the message files instead of through
+ * `getTranslations` from `next-intl/server`.
+ *
+ * That helper resolves the locale from the request config, and for a mail the request is
+ * the wrong source: the activity mail goes to a third party, so it would arrive in the
+ * language of whoever clicked - and a mail sent outside a request has no locale at all.
+ * The recipient's `User.locale` decides here (E6), and it is passed in.
+ */
+const MESSAGES: Record<AppLocale, typeof deMessages> = {
+  de: deMessages,
+  en: enMessages,
+};
+
+export function emailTranslator(locale: string) {
+  const appLocale: AppLocale = isAppLocale(locale) ? locale : DEFAULT_LOCALE;
+  return createTranslator({ locale: appLocale, messages: MESSAGES[appLocale] });
+}
+
 const BG = "#0d1117";
 const TEXT = "#f0f6fc";
 /** Body copy sits below the headline, otherwise long paragraphs glare on the dark ground. */
@@ -31,10 +55,11 @@ const ACCENT = "#c4fe4d";
 const ON_ACCENT = "#0d1117";
 
 /**
- * Prose in monospace is a costume. German sentences in a fixed pitch read slowly and
- * the hyphens grow to the width of a letter, which is what made „E-Mail bestätigen"
- * look wrong. The system sans is what the client already uses for every other letter
- * in the inbox, so the mail reads as a message rather than as terminal output.
+ * Prose in monospace is a costume. Sentences in a fixed pitch read slowly in either
+ * language, and the hyphens grow to the width of a letter, which is what made
+ * „E-Mail bestätigen" and "Confirm your email address" look equally wrong. The system
+ * sans is what the client already uses for every other letter in the inbox, so the mail
+ * reads as a message rather than as terminal output.
  */
 const SANS =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
@@ -69,7 +94,13 @@ export interface RenderedEmail {
  * Both versions come from the same content. Resend accepts `text` alongside `html`, and
  * an HTML-only mail is markedly more likely to be filtered as spam.
  */
-export function renderEmail(content: EmailContent): RenderedEmail {
+export function renderEmail(
+  content: EmailContent,
+  /** The recipient's locale; the default marks a call site that renders German on purpose. */
+  locale: string = DEFAULT_LOCALE
+): RenderedEmail {
+  const t = emailTranslator(locale);
+  const lang: AppLocale = isAppLocale(locale) ? locale : DEFAULT_LOCALE;
   const heading = escapeHtml(content.heading);
   const lines = content.lines.map(escapeHtml);
   const footer = escapeHtml(content.footer);
@@ -103,7 +134,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
         </tr>
         <tr>
           <td style="padding-top:30px;font-family:${SANS};font-size:13px;line-height:20px;color:${FAINT};">
-            Oder diese Adresse in den Browser kopieren:<br>
+            ${escapeHtml(t("layout.fallbackHint"))}<br>
             <a href="${content.action.url}" style="font-family:${MONO};font-size:12px;line-height:20px;color:${MUTED};text-decoration:none;word-break:break-all;"><span style="color:${MUTED};text-decoration:none;">${content.action.url}</span></a>
           </td>
         </tr>`
@@ -113,7 +144,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
   const preheader = lines[0] ?? footer;
 
   const html = `<!doctype html>
-<html lang="de">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -152,7 +183,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
           <td style="padding-top:20px;font-family:${SANS};font-size:13px;line-height:21px;color:${MUTED};">${footer}</td>
         </tr>
         <tr>
-          <td style="padding-top:8px;font-family:${SANS};font-size:13px;line-height:21px;color:${FAINT};">Daily Coding, täglich eine Coding-Challenge.</td>
+          <td style="padding-top:8px;font-family:${SANS};font-size:13px;line-height:21px;color:${FAINT};">${escapeHtml(t("layout.tagline"))}</td>
         </tr>
       </table>
     </td>
@@ -173,7 +204,7 @@ export function renderEmail(content: EmailContent): RenderedEmail {
     "",
     content.footer,
     "",
-    "Daily Coding, täglich eine Coding-Challenge.",
+    t("layout.tagline"),
   ].join("\n");
 
   return { html, text };

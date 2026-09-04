@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { SolutionVotes } from "@/components/challenge-result/solution-votes";
 import type { ChallengeSolutionGroup } from "@/lib/api";
+import { renderWithIntl } from "@/components/__tests__/intl-render";
+import de from "@/messages/de/community.json";
+
+function render(group: ChallengeSolutionGroup) {
+  return renderWithIntl(<SolutionVotes challengeId="ch-1" group={group} />);
+}
 
 function makeGroup(overrides: Partial<ChallengeSolutionGroup> = {}): ChallengeSolutionGroup {
   return {
@@ -23,11 +28,9 @@ function makeGroup(overrides: Partial<ChallengeSolutionGroup> = {}): ChallengeSo
 
 describe("SolutionVotes", () => {
   it("shows both counts and which vote the user has already cast", () => {
-    const html = renderToStaticMarkup(
-      <SolutionVotes challengeId="ch-1" group={makeGroup()} />
-    );
-    expect(html).toContain("Best Practices");
-    expect(html).toContain("Clever");
+    const html = render(makeGroup());
+    expect(html).toContain(de.solutionVotes.bestPractices);
+    expect(html).toContain(de.solutionVotes.clever);
     expect(html).toContain(">2<");
     expect(html).toContain(">7<");
     expect(html.match(/aria-pressed="true"/g)).toHaveLength(1);
@@ -35,10 +38,8 @@ describe("SolutionVotes", () => {
   });
 
   it("disables both buttons on the own solution and names the reason", () => {
-    const html = renderToStaticMarkup(
-      <SolutionVotes challengeId="ch-1" group={makeGroup({ own: true })} />
-    );
+    const html = render(makeGroup({ own: true }));
     expect(html.match(/disabled=""/g)).toHaveLength(2);
-    expect(html).toContain("Die eigene Lösung kannst du nicht bewerten.");
+    expect(html).toContain(de.solutionVotes.ownDisabled);
   });
 });

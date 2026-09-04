@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { SolutionCard } from "@/components/challenge-result/solution-card";
 import type { ChallengeSolutionGroup } from "@/lib/api";
+import { renderWithIntl } from "@/components/__tests__/intl-render";
+import de from "@/messages/de/community.json";
 
 function makeGroup(
   overrides: Partial<ChallengeSolutionGroup> = {}
@@ -24,7 +25,7 @@ function makeGroup(
 }
 
 function render(group: ChallengeSolutionGroup, focused = false) {
-  return renderToStaticMarkup(
+  return renderWithIntl(
     <SolutionCard
       challengeId="ch-1"
       group={group}
@@ -50,11 +51,11 @@ describe("SolutionCard", () => {
 
   it("offers the comments behind a toggle that carries the count", () => {
     const html = render(makeGroup({ commentCount: 6 }));
-    expect(html).toContain("Kommentare");
+    expect(html).toContain(de.solutionCard.comments);
     expect(html).toContain(">6<");
     // Two collapsed toggles: the comments and the comparison.
     expect(html.match(/aria-expanded="false"/g)).toHaveLength(2);
-    expect(html).not.toContain("Schreib einen Kommentar");
+    expect(html).not.toContain(de.comments.placeholder);
   });
 
   it("names the level of every author", () => {
@@ -85,6 +86,7 @@ describe("SolutionCard", () => {
     expect(html).toContain("Bob Bauer");
     expect(html).toContain("und 38 weitere");
     expect(html).toContain("40 identische Abgaben");
+    expect(html).toContain("Level 4");
   });
 
   it("leaves out the rest count and the tally when the group is a single solution", () => {
@@ -96,20 +98,20 @@ describe("SolutionCard", () => {
   it("marks a revised single solution and leaves an unrevised one unmarked", () => {
     const revised = render(makeGroup({ revised: true }));
     const plain = render(makeGroup());
-    expect(revised).toContain("überarbeitet");
-    expect(plain).not.toContain("überarbeitet");
+    expect(revised).toContain(de.solutionCard.revised);
+    expect(plain).not.toContain(de.solutionCard.revised);
   });
 
   it("does not claim a group of many was revised", () => {
     const html = render(makeGroup({ revised: true, submissionCount: 7 }));
-    expect(html).not.toContain("überarbeitet");
+    expect(html).not.toContain(de.solutionCard.revised);
   });
 
   it("marks the group the own solution belongs to", () => {
     const own = render(makeGroup({ own: true }));
     const other = render(makeGroup());
-    expect(own).toContain("Deine Lösung");
-    expect(other).not.toContain("Deine Lösung");
+    expect(own).toContain(de.solutionCard.ownSolution);
+    expect(other).not.toContain(de.solutionCard.ownSolution);
   });
 
   it("escapes code that looks like markup", () => {

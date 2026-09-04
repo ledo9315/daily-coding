@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/auth-session";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
@@ -12,6 +13,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const t = await getTranslations("api");
   const { id: challengeId } = await params;
 
   const session = await getSessionUserId();
@@ -20,7 +22,7 @@ export async function POST(
 
   if (!(await checkRateLimit(`solution-vote:${userId}`, 30, 60_000))) {
     return NextResponse.json(
-      { error: "Zu viele Bewertungen. Bitte kurz warten." },
+      { error: t("votes.tooManyVotes") },
       { status: 429 }
     );
   }
@@ -29,12 +31,12 @@ export async function POST(
   const codeHash = typeof body.codeHash === "string" ? body.codeHash : "";
   const kind = parseVoteKind(body.kind);
   if (!/^[0-9a-f]{64}$/.test(codeHash) || !kind) {
-    return NextResponse.json({ error: "Ungültige Bewertung." }, { status: 400 });
+    return NextResponse.json({ error: t("votes.invalidVote") }, { status: 400 });
   }
 
   if (!(await hasSolvedChallenge(userId, challengeId))) {
     return NextResponse.json(
-      { error: "Löse die Challenge zuerst selbst, um Lösungen zu bewerten." },
+      { error: t("votes.solveFirstToVote") },
       { status: 403 }
     );
   }
@@ -46,7 +48,7 @@ export async function POST(
   });
   if (ownRow) {
     return NextResponse.json(
-      { error: "Die eigene Lösung kannst du nicht bewerten." },
+      { error: t("votes.ownSolution") },
       { status: 403 }
     );
   }
@@ -56,7 +58,7 @@ export async function POST(
     select: { id: true },
   });
   if (!solution) {
-    return NextResponse.json({ error: "Lösung nicht gefunden." }, { status: 404 });
+    return NextResponse.json({ error: t("votes.solutionNotFound") }, { status: 404 });
   }
 
   // Delete first: a hit means the vote was there and is now taken back, a miss means it was

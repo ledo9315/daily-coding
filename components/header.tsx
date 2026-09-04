@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -27,9 +28,21 @@ import { MobileNav } from "@/components/mobile-nav";
 import { NotificationBell } from "@/components/notification-bell";
 import { useMenuFocusReturn } from "@/hooks/use-menu-focus-return";
 
+/**
+ * `NAV_ITEMS` stores German labels, so the namespace keys the labels by destination
+ * instead. An entry without a key falls back to the label in the list, which is still
+ * a word rather than a missing key path.
+ */
+const NAV_LABEL_KEYS: Record<string, string> = {
+  "/": "nav.home",
+  "/challenge": "nav.challenge",
+  "/ranking": "nav.ranking",
+  "/profile": "nav.profile",
+};
 
 export function Header() {
   const pathname = usePathname();
+  const t = useTranslations("community");
   const { data: session, status } = useSession();
   /**
    * Seeded from the module cache, not from null: this component remounts on every
@@ -126,16 +139,19 @@ export function Header() {
             <span className="text-xl font-pixel tracking-tighter text-primary">
               {">_"}
             </span>
+            {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <span className="font-pixel text-[10px] leading-tight tracking-tight text-foreground sm:text-xs">
               DAILY
               <br />
               CODING
             </span>
+            {/* eslint-enable no-restricted-syntax */}
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
+              const labelKey = NAV_LABEL_KEYS[item.href];
               return (
                 <Link
                   key={item.name}
@@ -148,7 +164,7 @@ export function Header() {
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  {item.name}
+                  {labelKey ? t(labelKey) : item.name}
                 </Link>
               );
             })}
@@ -164,7 +180,7 @@ export function Header() {
                   {streak === null ? (
                     <Spinner
                       className="inline size-[1em] align-[-0.125em]"
-                      aria-label="Streak wird geladen"
+                      aria-label={t("header.streakLoading")}
                     />
                   ) : (
                     streak
@@ -173,7 +189,7 @@ export function Header() {
                 {/* Dropped on phones: the number carries the meaning, the label only fits
                     once there is room for it. */}
                 <span className="hidden text-sm uppercase text-muted-foreground sm:inline">
-                  STREAK
+                  {t("header.streakLabel")}
                 </span>
               </div>
 
@@ -209,7 +225,7 @@ export function Header() {
                         <p className="font-sans text-lg">{displayName}</p>
                         {level != null && (
                           <span className="shrink-0 whitespace-nowrap border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
-                            LVL {level}
+                            {t("header.levelBadge", { level })}
                           </span>
                         )}
                       </div>
@@ -221,7 +237,7 @@ export function Header() {
                   <DropdownMenuItem asChild className="rounded-none text-lg">
                     <Link href="/profile" className="cursor-pointer">
                       <User className="mr-2 h-5 w-5" />
-                      PROFIL
+                      {t("header.profile")}
                     </Link>
                   </DropdownMenuItem>
                   {isAdminFromDb && (
@@ -231,14 +247,14 @@ export function Header() {
                         className="cursor-pointer text-primary"
                       >
                         <Tournament className="mr-2 h-5 w-5" />
-                        ADMIN: CHALLENGES
+                        {t("header.adminChallenges")}
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild className="rounded-none text-lg">
                     <Link href="/settings" className="cursor-pointer">
                       <Sliders className="mr-2 h-5 w-5" />
-                      EINSTELLUNGEN
+                      {t("header.settings")}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border" />
@@ -247,7 +263,7 @@ export function Header() {
                     onSelect={() => signOut({ callbackUrl: "/" })}
                   >
                     <Logout className="mr-2 h-5 w-5" />
-                    ABMELDEN
+                    {t("header.signOut")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -262,7 +278,7 @@ export function Header() {
               />
               <div className="h-12 w-12 animate-pulse border-2 border-border bg-muted/40" aria-hidden />
               <div className="h-12 w-12 animate-pulse border-2 border-border bg-muted/40" aria-hidden />
-              <span className="sr-only">Anmeldung wird geprüft</span>
+              <span className="sr-only">{t("header.sessionChecking")}</span>
             </>
           ) : (
             <div className="flex items-center gap-2">
@@ -271,10 +287,10 @@ export function Header() {
                 asChild
                 className="rounded-none border-2 px-3 font-sans uppercase sm:px-4"
               >
-                <Link href="/login">Login</Link>
+                <Link href="/login">{t("header.login")}</Link>
               </Button>
               <Button asChild className="pixel-btn rounded-none px-3 font-sans uppercase sm:px-4">
-                <Link href="/register">Registrieren</Link>
+                <Link href="/register">{t("header.register")}</Link>
               </Button>
             </div>
           )}

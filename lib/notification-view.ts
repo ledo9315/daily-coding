@@ -11,19 +11,16 @@ export function solutionLink(challengeId: string, codeHash: string): string {
   return `/challenge/${challengeId}/loesungen?loesung=${codeHash}`;
 }
 
-/** German sentence for one notification, built at read time from the actor's current name. */
-export function notificationText(
-  kind: NotificationKindId,
-  actorName: string,
-  challengeTitle: string
-): string {
-  const solution = `deine Lösung zu „${challengeTitle}“`;
-  switch (kind) {
-    case "comment":
-      return `${actorName} hat ${solution} kommentiert.`;
-    case "best_practices":
-      return `${actorName} findet ${solution} vorbildlich.`;
-    case "clever":
-      return `${actorName} findet ${solution} clever.`;
-  }
-}
+/**
+ * One message key per notification kind, in the `email` namespace.
+ *
+ * The bell and the activity mail say the same sentence, and one key set is what keeps the
+ * two from drifting - which is why the bell reads its text out of the mail namespace rather
+ * than keeping a second copy under `api`. Both resolve it with the locale of the person who
+ * receives it: the mail from `User.locale`, the bell from the request.
+ */
+export const NOTIFICATION_MESSAGE_KEYS = {
+  comment: "solutionActivity.comment",
+  best_practices: "solutionActivity.bestPractices",
+  clever: "solutionActivity.clever",
+} as const satisfies Record<NotificationKindId, string>;

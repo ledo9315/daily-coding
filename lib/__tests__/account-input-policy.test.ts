@@ -3,7 +3,11 @@ import {
   emailAddressValidationError,
   normaliseEmailAddress,
 } from "@/lib/email-address";
-import { passwordValidationError } from "@/lib/password-policy";
+import {
+  PASSWORD_MAX_BYTES,
+  PASSWORD_MIN_LENGTH,
+  passwordValidationError,
+} from "@/lib/password-policy";
 
 describe("email address policy", () => {
   it("normalises before storage and lookup", () => {
@@ -21,13 +25,23 @@ describe("email address policy", () => {
     "a@example..com",
   ])(
     "rejects invalid address %s",
-    (email) => expect(emailAddressValidationError(email)).not.toBeNull()
+    (email) => expect(emailAddressValidationError(email)).toBe("invalid")
   );
 });
 
 describe("password policy", () => {
+  it("rejects a password below the minimum length", () => {
+    expect(passwordValidationError("short")).toEqual({
+      code: "tooShort",
+      min: PASSWORD_MIN_LENGTH,
+    });
+  });
+
   it("rejects values bcrypt would truncate after 72 UTF-8 bytes", () => {
-    expect(passwordValidationError("ä".repeat(37))).toMatch(/72 UTF-8-Bytes/);
+    expect(passwordValidationError("ä".repeat(37))).toEqual({
+      code: "tooLong",
+      maxBytes: PASSWORD_MAX_BYTES,
+    });
   });
 
   it("accepts a password at the bcrypt boundary", () => {

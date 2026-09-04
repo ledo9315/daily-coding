@@ -1,0 +1,72 @@
+{
+  "auth": {
+    "notAuthenticated": "Nicht authentifiziert.",
+    "invalidEmail": "Ungültige E-Mail.",
+    "tooManyRequests": "Zu viele Anfragen. Bitte warte 15 Minuten.",
+    "registerFieldsRequired": "E-Mail, Passwort und Name sind erforderlich.",
+    "tooManyRegistrations": "Zu viele Registrierungsversuche. Bitte später erneut versuchen.",
+    "emailTaken": "Diese E-Mail-Adresse wird bereits verwendet.",
+    "nameTaken": "Dieser Name ist schon vergeben.",
+    "emailOrNameTaken": "E-Mail-Adresse oder Name ist bereits vergeben.",
+    "resetFieldsRequired": "Token und Passwort (min. 8 Zeichen) erforderlich.",
+    "tokenMissing": "Token fehlt."
+  },
+  "validation": {
+    "emailInvalid": "Ungültige E-Mail-Adresse.",
+    "passwordTooShort": "Passwort muss mindestens {min} Zeichen lang sein.",
+    "passwordTooLong": "Passwort darf höchstens {maxBytes} UTF-8-Bytes lang sein.",
+    "nameEmpty": "Name darf nicht leer sein.",
+    "nameTooLong": "Name darf höchstens {max} Zeichen lang sein.",
+    "nameTooFewAlphanumerics": "Name muss mindestens zwei Buchstaben oder Zahlen enthalten.",
+    "commentEmpty": "Kommentar darf nicht leer sein.",
+    "commentTooLong": "Kommentar darf höchstens {max} Zeichen lang sein.",
+    "tokenInvalid": "Token ungültig.",
+    "tokenExpired": "Token abgelaufen.",
+    "tokenAlreadyUsed": "Token wurde bereits verwendet."
+  },
+  "challenge": {
+    "notFound": "Challenge nicht gefunden.",
+    "noneActive": "Keine aktive Challenge.",
+    "codeTooLong": "Code ist zu lang.",
+    "tooManyRuns": "Zu viele Testläufe. Bitte kurz warten.",
+    "tooManySubmissions": "Zu viele Abgaben. Bitte kurz warten.",
+    "unsupportedLanguage": "Ungültige oder nicht unterstützte Sprache für diese Challenge.",
+    "sessionOutOfSync": "Dein Login passt nicht zur Datenbank (z. B. nach migrate/seed). Bitte abmelden und erneut anmelden."
+  },
+  "solutions": {
+    "solveFirstToSee": "Löse die Challenge zuerst selbst, um fremde Lösungen zu sehen."
+  },
+  "votes": {
+    "tooManyVotes": "Zu viele Bewertungen. Bitte kurz warten.",
+    "invalidVote": "Ungültige Bewertung.",
+    "solveFirstToVote": "Löse die Challenge zuerst selbst, um Lösungen zu bewerten.",
+    "ownSolution": "Die eigene Lösung kannst du nicht bewerten.",
+    "solutionNotFound": "Lösung nicht gefunden."
+  },
+  "comments": {
+    "submissionNotFound": "Einreichung nicht gefunden.",
+    "solveFirstToDiscuss": "Löse die Challenge zuerst selbst, um die Diskussion zu sehen.",
+    "tooManyComments": "Zu viele Kommentare. Bitte warte einen Moment.",
+    "commentNotFound": "Kommentar nicht gefunden.",
+    "onlyOwnComments": "Du kannst nur eigene Kommentare löschen."
+  },
+  "user": {
+    "invalidJsonBody": "Ungültiger JSON-Body.",
+    "notFound": "Benutzer nicht gefunden. Bitte abmelden und erneut anmelden (z. B. nach Datenbank-Reset).",
+    "notFoundShort": "Benutzer nicht gefunden.",
+    "notSignedIn": "Nicht angemeldet.",
+    "currentPasswordRequired": "Bitte gib dein aktuelles Passwort ein.",
+    "currentPasswordWrong": "Aktuelles Passwort ist falsch.",
+    "newPasswordMissing": "Neues Passwort fehlt.",
+    "deleteConfirmRequired": "Bitte bestätige mit {phrase}.",
+    "invalidAvatar": "Ungültiger Avatar. Bitte ein Bild aus der Liste wählen.",
+    "invalidLocale": "Ungültige Sprache.",
+    "invalidValue": "Ungültiger Wert."
+  },
+  "feed": {
+    "solvedChallenge": "hat die Challenge gelöst",
+    "minutesAgo": "{count, plural, one {vor # Minute} other {vor # Minuten}}",
+    "hoursAgo": "{count, plural, one {vor # Stunde} other {vor # Stunden}}",
+    "daysAgo": "{count, plural, one {vor # Tag} other {vor # Tagen}}"
+  }
+}

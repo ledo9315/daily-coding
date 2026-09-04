@@ -68,8 +68,8 @@ describe("challengeUpsertArgs", () => {
     // Structural, not per-challenge: a new challenge added with a hand-written `update`
     // clause would silently bring the stale-prose bug back.
     expect(seed).not.toMatch(/challenge\.upsert\(\s*\{/);
-    // Fifteen inline challenges plus the loop over prisma/challenges.
-    expect(seed.match(/challengeUpsertArgs\(/g)?.length).toBe(16);
-    expect(seed).toContain("for (const content of EXTRA_CHALLENGES)");
+    // Every challenge is a module now, so the loop over prisma/challenges is the only call.
+    expect(seed.match(/challengeUpsertArgs\(/g)?.length).toBe(1);
+    expect(seed).toContain("for (const content of ALL_CHALLENGES)");
   });
 });

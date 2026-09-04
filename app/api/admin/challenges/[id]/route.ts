@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { adminUpdateChallengeSchema } from "@/lib/admin/challenge-schema";
+import {
+  germanChallengeText,
+  writeChallengeTranslations,
+} from "@/lib/admin/challenge-translations";
 import { challengeToFormInitial } from "@/lib/admin/map-challenge-to-form";
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/server/admin-session";
@@ -15,7 +19,13 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const ch = await prisma.challenge.findUnique({
     where: { id },
-    include: { category: { select: { id: true, name: true } } },
+    include: {
+      category: { select: { id: true, name: true } },
+      translations: {
+        where: { locale: "en" },
+        select: { title: true, description: true, hints: true, testCaseNames: true },
+      },
+    },
   });
 
   if (!ch) {
@@ -23,7 +33,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   }
 
   return NextResponse.json({
-    ...challengeToFormInitial(ch),
+    ...challengeToFormInitial(ch, ch.translations[0]),
     categoryName: ch.category.name,
   });
 }
@@ -90,25 +100,31 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     );
 
   try {
-    await prisma.challenge.update({
-      where: { id },
-      data: {
-        title: data.title,
-        description: data.description,
-        hints: data.hints,
-        difficulty: data.difficulty,
-        points: data.points,
-        categoryId: data.categoryId,
-        examples: data.examples as unknown as Prisma.InputJsonValue,
-        testCases: data.testCases as unknown as Prisma.InputJsonValue,
-        evaluationConfig:
-          data.evaluationConfig as unknown as Prisma.InputJsonValue,
-        starterCodes: data.starterCodes as unknown as Prisma.InputJsonValue,
-        starterCode: data.starterCodes.javascript,
-        supportedLanguages: [...supported],
-        isActive: data.isActive ?? false,
-        date,
-      },
+    // One transaction, so the German mirror and the English row can never describe a version
+    // of the challenge that was not saved. See lib/admin/challenge-translations.ts.
+    await prisma.$transaction(async (tx) => {
+      await tx.challenge.update({
+        where: { id },
+        data: {
+          title: data.title,
+          description: data.description,
+          hints: data.hints,
+          difficulty: data.difficulty,
+          points: data.points,
+          categoryId: data.categoryId,
+          examples: data.examples as unknown as Prisma.InputJsonValue,
+          testCases: data.testCases as unknown as Prisma.InputJsonValue,
+          evaluationConfig:
+            data.evaluationConfig as unknown as Prisma.InputJsonValue,
+          starterCodes: data.starterCodes as unknown as Prisma.InputJsonValue,
+          starterCode: data.starterCodes.javascript,
+          supportedLanguages: [...supported],
+          isActive: data.isActive ?? false,
+          date,
+        },
+      });
+
+      await writeChallengeTranslations(tx, id, germanChallengeText(data), data.translations);
     });
     return NextResponse.json({ id }, { status: 200 });
   } catch (e) {

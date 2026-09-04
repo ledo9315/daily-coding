@@ -185,3 +185,62 @@ describe("findOrCreateOAuthUser and display names", () => {
     expect(mockUserCreate.mock.calls[0][0].data.name).toBe("User");
   });
 });
+
+/**
+ * A sign-in through Google or GitHub creates the account in a NextAuth callback that gets
+ * handed no request, so the language has to be passed in from `auth.ts`. Before that it
+ * was always the column default, and an English speaker signing in with Google got a
+ * German interface and German mails.
+ */
+describe("findOrCreateOAuthUser locale", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAccountFindUnique.mockResolvedValue(null);
+    mockUserFindUnique.mockResolvedValue(null);
+    mockUserCreate.mockResolvedValue({ id: "u-new", avatar: "", locale: "en" });
+  });
+
+  it("creates a new account in the detected language", async () => {
+    const user = await findOrCreateOAuthUser(
+      { email: "someone@gmail.com", name: "Some One" },
+      account,
+      "en"
+    );
+
+    expect(mockUserCreate.mock.calls[0][0].data.locale).toBe("en");
+    expect(user.locale).toBe("en");
+  });
+
+  it("leaves the column default in place when no language was detected", async () => {
+    mockUserCreate.mockResolvedValue({ id: "u-new", avatar: "", locale: "de" });
+
+    const user = await findOrCreateOAuthUser(
+      { email: "someone@gmail.com", name: "Some One" },
+      account
+    );
+
+    // `undefined` rather than `"de"`: Prisma omits the field and Postgres fills it in, so
+    // the default lives in exactly one place.
+    expect(mockUserCreate.mock.calls[0][0].data.locale).toBeUndefined();
+    expect(user.locale).toBe("de");
+  });
+
+  it("does not touch the language of an account that already exists", async () => {
+    mockUserFindUnique.mockResolvedValue({
+      id: "u-old",
+      role: "user",
+      avatar: "/avatars/a.png",
+      emailVerified: true,
+      locale: "de",
+    });
+
+    const user = await findOrCreateOAuthUser(
+      { email: "someone@gmail.com", name: "Some One" },
+      account,
+      "en"
+    );
+
+    expect(mockUserCreate).not.toHaveBeenCalled();
+    expect(user.locale).toBe("de");
+  });
+});

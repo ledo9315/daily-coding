@@ -3,6 +3,7 @@
 import { ArrowBarUp, Trophy, Script, Calendar } from "@nsmr/pixelart-react";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
 import { motion, type Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -44,6 +45,8 @@ const itemVariants: Variants = {
  * cut in half. The `features` anchor moved to that shared section.
  */
 export function LandingRoutine() {
+  const t = useTranslations("dashboard");
+
   return (
     <div className="py-24">
       <motion.div
@@ -55,11 +58,10 @@ export function LandingRoutine() {
       >
         <motion.div variants={itemVariants} className="text-center mb-16">
           <h2 className="font-heading text-3xl sm:text-4xl mb-4">
-            AUS TAGEN WIRD KÖNNEN
+            {t("routine.heading")}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Eine einzelne Aufgabe ist morgen vergessen. Das hier bleibt und
-            zeigt dir, wie weit du gekommen bist.
+            {t("routine.intro")}
           </p>
         </motion.div>
 
@@ -70,12 +72,10 @@ export function LandingRoutine() {
                 <ArrowBarUp className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Steig auf
+                {t("routine.levelUp.title")}
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Punkte für jede gelöste Aufgabe, Level für gesammelte Punkte.
-                Von Einsteiger bis Legende, und jede Stufe liegt doppelt so weit
-                wie die vorige.
+                {t("routine.levelUp.detail")}
               </p>
             </CardSpotlight>
           </motion.div>
@@ -86,11 +86,10 @@ export function LandingRoutine() {
                 <Trophy className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Miss dich
+                {t("routine.compete.title")}
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Wochen- und Monatswertung nach gelösten Aufgaben. Bei
-                Gleichstand entscheiden die Punkte.
+                {t("routine.compete.detail")}
               </p>
             </CardSpotlight>
           </motion.div>
@@ -101,11 +100,10 @@ export function LandingRoutine() {
                 <Script className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Schau rein
+                {t("routine.feed.title")}
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Wer heute gelöst hat, wer aufgestiegen ist, wer ein Abzeichen
-                geholt hat. Dieselbe Aufgabe, viele Leute.
+                {t("routine.feed.detail")}
               </p>
             </CardSpotlight>
           </motion.div>
@@ -116,11 +114,10 @@ export function LandingRoutine() {
                 <Calendar className="h-8 w-8" />
               </div>
               <h3 className="font-heading text-lg mb-2 relative z-10">
-                Sieh zurück
+                {t("routine.calendar.title")}
               </h3>
               <p className="text-sm text-muted-foreground relative z-10">
-                Ein Kalender deiner gelösten Tage. Du siehst sofort, wo du dran
-                geblieben bist.
+                {t("routine.calendar.detail")}
               </p>
             </CardSpotlight>
           </motion.div>

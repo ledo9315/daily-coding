@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Notification as Bell } from "@nsmr/pixelart-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ const SHOWN = 10;
 
 export function NotificationBell() {
   const pathname = usePathname();
+  const t = useTranslations("community");
+  const locale = useLocale();
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unread, setUnread] = useState(0);
   const { triggerProps, contentProps } = useMenuFocusReturn();
@@ -59,7 +62,9 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           aria-label={
-            unread > 0 ? `Benachrichtigungen, ${unread} ungelesen` : "Benachrichtigungen"
+            unread > 0
+              ? t("notifications.labelUnread", { count: unread })
+              : t("notifications.title")
           }
           {...triggerProps}
           /* Shaped like the streak chip next to it, and coloured like it once there is
@@ -92,12 +97,11 @@ export function NotificationBell() {
         {...contentProps}
       >
         <p className="border-b-2 border-border p-3 font-sans text-sm uppercase tracking-wider text-muted-foreground">
-          Benachrichtigungen
+          {t("notifications.title")}
         </p>
         {items.length === 0 ? (
           <p className="p-4 text-base text-muted-foreground">
-            Noch nichts passiert. Sobald jemand deine Lösung kommentiert oder bewertet,
-            steht es hier.
+            {t("notifications.empty")}
           </p>
         ) : (
           items.map((item) => (
@@ -122,7 +126,7 @@ export function NotificationBell() {
                     {item.text}
                   </span>
                   <span className="mt-1 block text-xs uppercase tracking-wider text-muted-foreground">
-                    {formatDate(new Date(item.createdAt))}
+                    {formatDate(new Date(item.createdAt), locale)}
                   </span>
                 </span>
               </Link>

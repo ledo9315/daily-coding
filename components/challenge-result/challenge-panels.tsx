@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { TestResults, type TestCase } from "@/components/test-results";
 import {
   Accordion,
@@ -24,6 +25,7 @@ export function ChallengePanels({
   description: string;
   testResults: TestCase[];
 }) {
+  const t = useTranslations("challenge");
   const passed = testResults.filter((testCase) => testCase.status === "passed").length;
   const allPassed = testResults.length > 0 && passed === testResults.length;
 
@@ -34,7 +36,7 @@ export function ChallengePanels({
         className={testResults.length === 0 ? "border-b-0" : ""}
       >
         <AccordionTrigger className="py-4 text-base uppercase tracking-wider hover:no-underline data-[state=open]:text-primary">
-          Aufgabenstellung
+          {t("panels.task")}
         </AccordionTrigger>
         {/* pre-wrap, so a description may use paragraphs. Nothing parses Markdown. */}
         <AccordionContent className="whitespace-pre-wrap pb-5 text-lg leading-relaxed text-foreground/80">
@@ -45,7 +47,7 @@ export function ChallengePanels({
       {testResults.length > 0 && (
         <AccordionItem value="test-results" className="border-b-0">
           <AccordionTrigger className="py-4 text-base uppercase tracking-wider hover:no-underline data-[state=open]:text-primary">
-            Testergebnisse
+            {t("panels.testResults")}
             <span
               className={`ml-auto mr-3 shrink-0 border px-2 py-0.5 font-code text-xs ${
                 allPassed
@@ -53,7 +55,7 @@ export function ChallengePanels({
                   : "border-border bg-secondary text-muted-foreground"
               }`}
             >
-              {passed}/{testResults.length} bestanden
+              {t("panels.passed", { passed, total: testResults.length })}
             </span>
           </AccordionTrigger>
           <AccordionContent className="pb-5">

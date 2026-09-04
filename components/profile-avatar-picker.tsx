@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ export function ProfileAvatarPicker({
   initials,
   name,
 }: ProfileAvatarPickerProps) {
+  const t = useTranslations("profile");
   const router = useRouter();
   const { update } = useSession();
   const [open, setOpen] = useState(false);
@@ -42,14 +44,16 @@ export function ProfileAvatarPicker({
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(typeof err.error === "string" ? err.error : "Speichern fehlgeschlagen");
+        throw new Error(
+          typeof err.error === "string" ? err.error : t("avatarPicker.saveFailed")
+        );
       }
       await update({ user: { image: path } });
-      toast.success("Avatar aktualisiert");
+      toast.success(t("avatarPicker.updated"));
       setOpen(false);
       router.refresh();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Avatar konnte nicht gespeichert werden.");
+      toast.error(e instanceof Error ? e.message : t("avatarPicker.updateFailed"));
     } finally {
       setPending(null);
     }
@@ -65,20 +69,25 @@ export function ProfileAvatarPicker({
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             "hover:border-primary/80"
           )}
-          aria-label="Avatar auswählen"
+          aria-label={t("avatarPicker.ariaLabel")}
         >
           <Avatar className="h-20 w-20 rounded-none">
             <AvatarImage src={currentAvatar || undefined} alt={name} />
             <AvatarFallback className="text-2xl rounded-none">{initials}</AvatarFallback>
           </Avatar>
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/70 text-xs font-bold uppercase tracking-wider text-primary opacity-0 transition-opacity group-hover:opacity-100">
-            Wählen
+            {t("avatarPicker.trigger")}
           </span>
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg border-border bg-card sm:max-w-xl">
+      <DialogContent
+        className="max-w-lg border-border bg-card sm:max-w-xl"
+        closeLabel={t("closeDialog")}
+      >
         <DialogHeader>
-          <DialogTitle className="font-sans uppercase tracking-wide">Avatar wählen</DialogTitle>
+          <DialogTitle className="font-sans uppercase tracking-wide">
+            {t("avatarPicker.dialogTitle")}
+          </DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
           {USER_AVATAR_PATHS.map((path) => {
@@ -113,7 +122,7 @@ export function ProfileAvatarPicker({
           className="w-full border-border text-foreground hover:bg-secondary hover:text-foreground"
           onClick={() => setOpen(false)}
         >
-          Schließen
+          {t("avatarPicker.close")}
         </Button>
       </DialogContent>
     </Dialog>

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useRef } from "react";
+import { useTranslations } from "next-intl";
 import type { editor } from "monaco-editor";
 import type { Monaco } from "@monaco-editor/react";
 import { monacoLanguageId, type CodeLanguageId } from "@/lib/challenge-languages";
@@ -11,15 +12,22 @@ import {
 } from "@/lib/monaco-catppuccin-frappe";
 import { cn } from "@/lib/utils";
 
+// Its own component, because `loading` is rendered outside the editor and a hook needs one.
+function EditorLoading() {
+  const t = useTranslations("challenge");
+
+  return (
+    <div className="flex h-full items-center justify-center bg-secondary/20 font-code text-sm text-muted-foreground">
+      {t("editor.loading")}
+    </div>
+  );
+}
+
 const Editor = dynamic(
   () => import("@monaco-editor/react").then((m) => m.default),
   {
     ssr: false,
-    loading: () => (
-      <div className="flex h-full items-center justify-center bg-secondary/20 font-code text-sm text-muted-foreground">
-        Editor wird geladen…
-      </div>
-    ),
+    loading: EditorLoading,
   }
 );
 
@@ -37,20 +45,23 @@ interface CodeEditorProps {
   readOnly?: boolean;
 }
 
-const defaultCode = `function transformArray(arr) {
-  // Implementiere deine Lösung hier
+/** The reader of this is the user, inside the editor - so its comments are translated. */
+function starterCode(todo: string, example: string): string {
+  return `function transformArray(arr) {
+  // ${todo}
   
   return arr;
 }
 
-// Beispiel:
+// ${example}
 // Input: [1, 2, 3, 4, 5]
 // Output: [1, 3, 6, 10, 15]
 `;
+}
 
 export function CodeEditor({
   value: controlledValue,
-  defaultValue = defaultCode,
+  defaultValue,
   fileName = "solution.js",
   language = "javascript",
   onChange,
@@ -58,8 +69,12 @@ export function CodeEditor({
   className,
   readOnly = false,
 }: CodeEditorProps) {
+  const t = useTranslations("challenge");
   const isControlled = controlledValue !== undefined;
-  const value = isControlled ? controlledValue : defaultValue;
+  const value = isControlled
+    ? controlledValue
+    : (defaultValue ??
+      starterCode(t("editor.starter.todo"), t("editor.starter.example")));
 
   // The command is registered once on mount; the ref keeps it calling the current handler
   // instead of the one that existed back then.

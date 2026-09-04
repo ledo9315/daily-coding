@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createPasswordResetToken } from "@/lib/server/auth-service";
@@ -10,10 +11,11 @@ import { requestClientIdentity } from "@/lib/server/request-security";
 const schema = z.object({ email: z.string().email() });
 
 export async function POST(request: NextRequest) {
+  const t = await getTranslations("api");
   const body = await request.json().catch(() => ({}));
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Ungültige E-Mail." }, { status: 400 });
+    return NextResponse.json({ error: t("auth.invalidEmail") }, { status: 400 });
   }
   const email = normaliseEmailAddress(parsed.data.email);
 
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     (await checkRateLimit(`forgot-email:${email}`, 3, 15 * 60 * 1000));
   if (!emailAllowed) {
     return NextResponse.json(
-      { error: "Zu viele Anfragen. Bitte warte 15 Minuten." },
+      { error: t("auth.tooManyRequests") },
       { status: 429 }
     );
   }

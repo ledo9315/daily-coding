@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
+import { NextIntlClientProvider } from "next-intl";
 import { RegisterForm } from "@/components/register-form";
+import auth from "@/messages/de/auth.json";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
@@ -11,7 +13,11 @@ vi.mock("next-auth/react", () => ({
 }));
 
 const render = (props: Parameters<typeof RegisterForm>[0]) =>
-  renderToStaticMarkup(<RegisterForm {...props} />);
+  renderToStaticMarkup(
+    <NextIntlClientProvider locale="de" messages={{ auth }}>
+      <RegisterForm {...props} />
+    </NextIntlClientProvider>
+  );
 
 /**
  * #137: the OAuth buttons only sat on `/login`, although `findOrCreateOAuthUser` creates an
@@ -34,7 +40,7 @@ describe("RegisterForm", () => {
   it("shows no separator when no provider is configured", () => {
     // Same as on the login page: an "or continue with" rule above nothing reads as broken.
     const html = render({ githubEnabled: false, googleEnabled: false });
-    expect(html).not.toContain("Oder weitermachen mit");
+    expect(html).not.toContain(auth.oauthButtons.separator);
   });
 
   it("keeps the e-mail and password fields either way", () => {
@@ -42,7 +48,7 @@ describe("RegisterForm", () => {
     for (const field of ['id="name"', 'id="email"', 'id="password"']) {
       expect(html).toContain(field);
     }
-    expect(html).toContain("REGISTRIEREN");
+    expect(html).toContain(auth.registerForm.submit);
   });
 
   it("communicates the display-name constraints before submission", () => {
@@ -51,6 +57,6 @@ describe("RegisterForm", () => {
     expect(html).toContain('id="name"');
     expect(html).toContain('minLength="2"');
     expect(html).toContain('maxLength="50"');
-    expect(html).toContain("Mindestens zwei Buchstaben oder Zahlen");
+    expect(html).toContain(auth.registerForm.nameRequirements.replace("{max}", "50"));
   });
 });

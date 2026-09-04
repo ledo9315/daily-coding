@@ -1,0 +1,45 @@
+{
+  "layout": {
+    "fallbackHint": "Or copy this address into your browser:",
+    "tagline": "Daily Coding, one coding challenge a day."
+  },
+  "verification": {
+    "subject": "Confirm your email address – Daily Coding",
+    "heading": "Confirm your email",
+    "line": "Almost done. Confirm your address and you can get started on your first challenge.",
+    "action": "Confirm address",
+    "footer": "This link is valid for 24 hours."
+  },
+  "passwordReset": {
+    "subject": "Reset your password – Daily Coding",
+    "heading": "Reset password",
+    "line": "You can set a new password for your account here.",
+    "action": "Set a new password",
+    "footer": "This link is valid for 1 hour. If you did not ask for a reset, just ignore this email. Your password stays as it is."
+  },
+  "welcome": {
+    "subject": "Welcome to Daily Coding!",
+    "heading": "Welcome, {name}",
+    "lineOne": "Every day a new coding challenge is waiting for you, in the programming language of your choice.",
+    "lineTwo": "Solve it, collect points and keep your streak alive.",
+    "action": "Go to today's challenge",
+    "footer": "Good luck."
+  },
+  "accountDeletion": {
+    "subject": "Account deleted – Daily Coding",
+    "heading": "Account deleted",
+    "lineOne": "Hello {name}, your Daily Coding account has been deleted.",
+    "namelessGreeting": "and goodbye",
+    "lineTwo": "Your submissions and your score are gone with it.",
+    "footer": "If this was not you, please get in touch with us right away. This address can be used for a new account at any time."
+  },
+  "solutionActivity": {
+    "subject": "New activity on your solution – Daily Coding",
+    "heading": "Activity on your solution",
+    "comment": "{actor} commented on your solution to \"{challenge}\".",
+    "bestPractices": "{actor} thinks your solution to \"{challenge}\" is exemplary.",
+    "clever": "{actor} thinks your solution to \"{challenge}\" is clever.",
+    "action": "Go to the solution",
+    "footer": "You can switch these notifications off in your settings at any time."
+  }
+}

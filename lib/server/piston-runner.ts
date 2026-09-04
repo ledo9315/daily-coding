@@ -193,7 +193,7 @@ export async function executeWithPiston(
       exitCode: -1,
       stdout: "",
       stderr:
-        "Piston meldet keine Laufzeiten. Nach Start des Containers: pnpm piston:install (javascript, typescript, python, php).",
+        "Piston reports no runtimes. After starting the container: pnpm piston:install (javascript, typescript, python, php).",
       compileStderr: "",
       compileFailed: false,
       compileOutput: "",

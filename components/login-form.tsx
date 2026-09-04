@@ -10,6 +10,7 @@ import { ArrowRight, Lock, Mail } from "@nsmr/pixelart-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
 
 interface LoginFormProps {
@@ -18,6 +19,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ githubEnabled = false, googleEnabled = false }: LoginFormProps) {
+  const t = useTranslations("auth");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -37,18 +39,18 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
     });
 
     if (result?.error) {
-      toast.error("Anmeldung fehlgeschlagen", {
+      toast.error(t("loginForm.errorTitle"), {
         description:
           result.code === "email_not_verified"
-            ? "Deine E-Mail-Adresse ist noch nicht bestätigt. Schau in dein Postfach (auch im Spam-Ordner)."
-            : "E-Mail oder Passwort ist falsch.",
+            ? t("loginForm.errorEmailNotVerified")
+            : t("loginForm.errorInvalidCredentials"),
       });
       setIsLoading(false);
       return;
     }
 
-    toast.success("Willkommen zurück!", {
-      description: "Du hast dich erfolgreich eingeloggt.",
+    toast.success(t("loginForm.successTitle"), {
+      description: t("loginForm.successDescription"),
     });
 
     const callbackUrl = searchParams.get("callbackUrl") ?? "/";
@@ -60,12 +62,12 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">E-Mail Adresse</Label>
+          <Label htmlFor="email">{t("loginForm.emailLabel")}</Label>
           <div className="relative">
             <Input
               id="email"
               type="email"
-              placeholder="deine@email.de"
+              placeholder={t("loginForm.emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-9"
@@ -75,12 +77,12 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Passwort</Label>
+            <Label htmlFor="password">{t("loginForm.passwordLabel")}</Label>
             <Link
               href="/auth/forgot-password"
               className="text-xs text-muted-foreground hover:text-primary transition-colors"
             >
-              Passwort vergessen?
+              {t("loginForm.forgotPassword")}
             </Link>
           </div>
           <div className="relative">
@@ -105,7 +107,7 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
             htmlFor="remember-me"
             className="text-sm text-muted-foreground cursor-pointer"
           >
-            Angemeldet bleiben
+            {t("loginForm.rememberMe")}
           </Label>
         </div>
 
@@ -114,14 +116,14 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
           className="pixel-btn w-full gap-2 mt-6 cursor-pointer"
           disabled={isLoading}
         >
-          {isLoading ? "WIRD ANGEMELDET..." : "LOGIN"}
+          {isLoading ? t("loginForm.submitting") : t("loginForm.submit")}
           {!isLoading && <ArrowRight className="h-4 w-4" />}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
-          Noch kein Konto?{" "}
+          {t("loginForm.noAccount")}{" "}
           <Link href="/register" className="text-primary hover:underline">
-            Registrieren
+            {t("loginForm.registerLink")}
           </Link>
         </p>
       </form>

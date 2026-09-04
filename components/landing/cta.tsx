@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 
@@ -21,6 +22,8 @@ import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid
  * defined surface instead of on the page background.
  */
 export function LandingCTA() {
+  const t = useTranslations("dashboard");
+
   return (
     <section className="landing-deferred relative overflow-hidden bg-[#020912]">
       {/*
@@ -46,23 +49,23 @@ export function LandingCTA() {
           transition={{ duration: 0.5 }}
         >
           <p className="font-code text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            00:00 UTC, für alle gleichzeitig
+            {t("cta.eyebrow")}
           </p>
 
           <CountdownTimer className="mt-8" variant="display" />
 
           <h2 className="mt-14 font-heading text-2xl leading-tight sm:text-3xl">
-            SEI MORGEN DABEI
+            {t("cta.heading")}
           </h2>
           <p className="mt-4 max-w-md text-lg text-muted-foreground">
-            Oder fang mit der von heute an. Sie läuft noch.
+            {t("cta.body")}
           </p>
 
           <Link
             href="/join?token=123124"
             className="pixel-btn mt-8 inline-block bg-primary px-8 py-4 text-xl text-primary-foreground transition-transform hover:scale-105"
           >
-            CHALLENGE ANNEHMEN
+            {t("cta.action")}
           </Link>
         </motion.div>
       </div>
@@ -77,7 +80,7 @@ export function LandingCTA() {
       */}
       <Image
         src="/pixel/banner3.webp"
-        alt="Nachtszene als Pixelgrafik: ein Schreibtisch mit Büchern, dampfender Tasse, einem alten Röhrenmonitor, dessen grünes Leuchten die Wand anstrahlt, Tastatur und ausgeschalteter Lampe, rechts ein Fenster mit Vollmond"
+        alt={t("cta.artworkAlt")}
         width={2172}
         height={724}
         sizes="100vw"

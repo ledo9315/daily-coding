@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { NextIntlClientProvider } from "next-intl";
+import challenge from "@/messages/de/challenge.json";
 import { ChallengeHints } from "@/components/challenge-hints";
 
 const HINTS = [
@@ -9,7 +11,12 @@ const HINTS = [
   { title: "Fallstricke", body: "mid in jedem Durchlauf neu berechnen." },
 ];
 
-const render = (hints: typeof HINTS) => renderToStaticMarkup(<ChallengeHints hints={hints} />);
+const render = (hints: typeof HINTS) =>
+  renderToStaticMarkup(
+    <NextIntlClientProvider locale="de" messages={{ challenge }}>
+      <ChallengeHints hints={hints} />
+    </NextIntlClientProvider>
+  );
 
 describe("ChallengeHints", () => {
   it("shows every step as a trigger", () => {
@@ -29,6 +36,12 @@ describe("ChallengeHints", () => {
   it("renders nothing at all without hints", () => {
     // An empty amber box used to be shown for every challenge that had no hint.
     expect(render([])).toBe("");
+  });
+
+  it("names the box and counts the steps", () => {
+    const html = render(HINTS);
+    expect(html).toContain(challenge.hints.title);
+    expect(html).toContain("2 Stufen");
   });
 
   it("renders one item per step", () => {

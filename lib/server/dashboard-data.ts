@@ -13,6 +13,7 @@ import {
 } from "@/lib/server/user-points";
 import { loadAchievementFacts } from "@/lib/server/achievement-facts";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
+import { findLocalizedAchievementDefs } from "@/lib/server/content-translations";
 import { countSubmissionsInUtcMonth, utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 
 function percentageDelta(current: number, previous: number): number {
@@ -87,7 +88,7 @@ export async function getUserStatsData(
     await Promise.all([
       getAllTimeRankNumber(resolvedUserId),
       loadAchievementFacts(prisma, resolvedUserId),
-      prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
+      findLocalizedAchievementDefs(),
       prisma.userAchievement.findMany({ where: { userId: resolvedUserId } }),
       prisma.user.count(),
     ]);
@@ -141,7 +142,7 @@ export async function getUserStatsData(
 
   return {
     rank: `#${allTimeRank}`,
-    points: points.toLocaleString("de-DE"),
+    points,
     rankTrendPercent,
     rankTrendPlaces,
     pointsTrendPercent,

@@ -1,3 +1,8 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
+// Points at ./i18n/request.ts, which resolves the locale and loads the message namespaces.
+const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
@@ -40,4 +45,4 @@ const nextConfig = {
   ],
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

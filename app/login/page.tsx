@@ -9,9 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { EncryptedText } from "@/components/ui/encrypted-text";
+import { useTranslations } from "next-intl";
 import { Suspense } from "react";
 
 function LoginPageContent() {
+  const t = useTranslations("auth");
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       {/* Ambient Background */}
@@ -26,14 +29,16 @@ function LoginPageContent() {
             <span className="text-4xl text-primary">{">_"}</span>
             {/* Stacked and left-aligned, the same shape as the header on every
                 signed-in page - one logo, not two. */}
+            {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <span className="text-left">
               DAILY
               <br />
               CODING
             </span>
+            {/* eslint-enable no-restricted-syntax */}
           </h1>
           <EncryptedText
-            text="Logge dich ein um fortzufahren"
+            text={t("loginPage.tagline")}
             className="text-lg text-muted-foreground uppercase tracking-wide"
           />
         </div>
@@ -41,9 +46,9 @@ function LoginPageContent() {
         <Card className="pixel-box bg-card">
           <CardHeader>
             <CardTitle className="text-xl font-sans uppercase tracking-wide">
-              Willkommen zurück
+              {t("loginPage.cardTitle")}
             </CardTitle>
-            <CardDescription>Gib deine Zugangsdaten ein.</CardDescription>
+            <CardDescription>{t("loginPage.cardDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm
@@ -58,11 +63,13 @@ function LoginPageContent() {
 }
 
 export default function LoginPage() {
+  const t = useTranslations("auth");
+
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-background flex items-center justify-center">
-          Laden...
+          {t("loginPage.loading")}
         </div>
       }
     >

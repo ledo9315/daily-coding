@@ -65,7 +65,7 @@ describe("verifyEmailToken", () => {
   it("returns error when token not found", async () => {
     mockFindUnique.mockResolvedValueOnce(null);
     const result = await verifyEmailToken("bad-token");
-    expect(result).toEqual({ error: "Token ungültig." });
+    expect(result).toEqual({ error: "invalid" });
   });
 
   it("returns error and deletes when token is expired", async () => {
@@ -76,7 +76,7 @@ describe("verifyEmailToken", () => {
     });
     mockDelete.mockResolvedValueOnce({});
     const result = await verifyEmailToken("t");
-    expect(result).toEqual({ error: "Token abgelaufen." });
+    expect(result).toEqual({ error: "expired" });
     expect(mockDelete).toHaveBeenCalledWith({ where: { token: "t" } });
   });
 
@@ -112,7 +112,7 @@ describe("createPasswordResetToken", () => {
 describe("consumePasswordResetToken", () => {
   it("returns error when token not found", async () => {
     mockFindUnique.mockResolvedValueOnce(null);
-    expect(await consumePasswordResetToken("x", "hash")).toEqual({ error: "Token ungültig." });
+    expect(await consumePasswordResetToken("x", "hash")).toEqual({ error: "invalid" });
   });
 
   it("returns error when token already used", async () => {
@@ -123,7 +123,7 @@ describe("consumePasswordResetToken", () => {
       expiresAt: new Date(Date.now() + 60_000),
     });
     expect(await consumePasswordResetToken("t", "hash")).toEqual({
-      error: "Token wurde bereits verwendet.",
+      error: "alreadyUsed",
     });
   });
 
@@ -134,7 +134,7 @@ describe("consumePasswordResetToken", () => {
       used: false,
       expiresAt: new Date(Date.now() - 1000),
     });
-    expect(await consumePasswordResetToken("t", "hash")).toEqual({ error: "Token abgelaufen." });
+    expect(await consumePasswordResetToken("t", "hash")).toEqual({ error: "expired" });
   });
 
   it("claims the token conditionally and updates the password in one transaction", async () => {
@@ -168,7 +168,7 @@ describe("consumePasswordResetToken", () => {
     mockUpdateMany.mockResolvedValueOnce({ count: 0 });
 
     expect(await consumePasswordResetToken("t", "hash")).toEqual({
-      error: "Token wurde bereits verwendet.",
+      error: "alreadyUsed",
     });
     expect(mockUpdate).not.toHaveBeenCalled();
   });

@@ -5,6 +5,7 @@ import { avatarImageSrc } from "@/lib/avatar-src";
 import { publicProfilePath } from "@/lib/display-name";
 import { cn } from "@/lib/utils";
 import { Trophy } from "@nsmr/pixelart-react";
+import { useTranslations } from "next-intl";
 
 interface TopUser {
   name: string;
@@ -48,6 +49,7 @@ export function TopThreePodium({
   third,
   className,
 }: TopThreePodiumProps) {
+  const t = useTranslations("profile");
   const fallbackBase =
     "font-sans font-semibold tracking-tight bg-gradient-to-b from-zinc-600 to-zinc-900 text-zinc-100 ring-1 ring-inset ring-white/15";
 
@@ -77,7 +79,7 @@ export function TopThreePodium({
             </Link>
             {second.level && (
               <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-                Level {second.level}
+                {t("ranking.podiumLevel", { level: second.level })}
               </span>
             )}
             <PodiumMetric user={second} />
@@ -114,7 +116,7 @@ export function TopThreePodium({
           </Link>
           {first.level && (
             <span className="text-xs uppercase font-bold text-primary tracking-wider">
-              Level {first.level}
+              {t("ranking.podiumLevel", { level: first.level })}
             </span>
           )}
           <PodiumMetric user={first} pointsHighlight />
@@ -149,7 +151,7 @@ export function TopThreePodium({
             </Link>
             {third.level && (
               <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">
-                Level {third.level}
+                {t("ranking.podiumLevel", { level: third.level })}
               </span>
             )}
             <PodiumMetric user={third} />

@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "title": "Changelog",
+    "description": "What has changed at Daily Coding lately, release by release."
+  },
+  "page": {
+    "title": "Changelog",
+    "intro": "What has changed lately, newest release first.",
+    "empty": "Nothing here yet. As soon as the first release is out, this is where you will find what changed."
+  },
+  "link": {
+    "label": "Changelog",
+    "new": "New"
+  }
+}

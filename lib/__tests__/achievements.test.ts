@@ -60,7 +60,7 @@ describe("buildUserAchievementsView", () => {
       facts({ completed: [sub({ createdAt: new Date("2026-04-06T12:00:00Z") })] })
     );
     expect(achievements[0].unlocked).toBe(true);
-    expect(achievements[0].unlockedAt).toBeDefined();
+    expect(achievements[0].unlockedAtIso).toBeDefined();
     expect(unlockedCount).toBe(1);
   });
 
@@ -108,7 +108,9 @@ describe("buildUserAchievementsView", () => {
       [],
       facts({ completed })
     );
-    expect(achievements.find((a) => a.id === "ach-3")?.unlockedAt).toBe("08.04.2026");
+    expect(achievements.find((a) => a.id === "ach-3")?.unlockedAtIso).toBe(
+      new Date("2026-04-08T12:00:00Z").toISOString()
+    );
   });
 
   it("unlocks ach-2 at a 7-day streak record and ach-5 only at 30", () => {
@@ -129,7 +131,7 @@ describe("buildUserAchievementsView", () => {
 
     const ten = buildUserAchievementsView([def("ach-4")], [], facts({ completed: hard(10) }));
     expect(ten.achievements[0].unlocked).toBe(true);
-    expect(ten.achievements[0].unlockedAt).toBeDefined();
+    expect(ten.achievements[0].unlockedAtIso).toBeDefined();
   });
 
   it("ignores non-hard challenges for ach-4", () => {
@@ -149,14 +151,14 @@ describe("buildUserAchievementsView", () => {
     ).toBe(true);
   });
 
-  it("keeps a persisted unlockedAt even when the inference rule is not met", () => {
+  it("keeps a persisted unlock date even when the inference rule is not met", () => {
     const { achievements } = buildUserAchievementsView(
       [def("ach-5")],
       [{ achievementId: "ach-5", unlockedAt: new Date("2026-02-01T00:00:00Z") }],
       facts({ streakRecord: 0 })
     );
     expect(achievements[0].unlocked).toBe(true);
-    expect(achievements[0].unlockedAt).toBeDefined();
+    expect(achievements[0].unlockedAtIso).toBeDefined();
   });
 
   describe("unlockedAtIso", () => {
@@ -168,7 +170,6 @@ describe("buildUserAchievementsView", () => {
         facts({ completed: [sub({ createdAt: at })] })
       );
       expect(achievements[0].unlockedAtIso).toBe(at.toISOString());
-      expect(achievements[0].unlockedAt).toBe("06.04.2026");
     });
 
     it("carries the frozen instant of a UserAchievement row", () => {
@@ -254,12 +255,12 @@ describe("buildUserAchievementsView", () => {
       expect(achievements[0].progress).toEqual({
         current: 5,
         target: 7,
-        label: "Rekord",
+        label: "record",
       });
       expect(achievements[1].progress).toEqual({
         current: 5,
         target: 30,
-        label: "Rekord",
+        label: "record",
       });
     });
 
@@ -313,7 +314,7 @@ describe("deriveAchievementRules", () => {
         at: null,
         current: 3,
         target: 3,
-        label: "Rekord",
+        label: "record",
       });
     });
 
@@ -322,7 +323,7 @@ describe("deriveAchievementRules", () => {
         unlocked: false,
         current: 2,
         target: 3,
-        label: "Rekord",
+        label: "record",
       });
     });
   });
@@ -418,7 +419,7 @@ describe("deriveAchievementRules", () => {
         at: null,
         current: 100,
         target: 100,
-        label: "Rekord",
+        label: "record",
       });
     });
 
@@ -427,7 +428,7 @@ describe("deriveAchievementRules", () => {
         unlocked: false,
         current: 99,
         target: 100,
-        label: "Rekord",
+        label: "record",
       });
     });
   });

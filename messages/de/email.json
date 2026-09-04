@@ -1,0 +1,45 @@
+{
+  "layout": {
+    "fallbackHint": "Oder diese Adresse in den Browser kopieren:",
+    "tagline": "Daily Coding, täglich eine Coding-Challenge."
+  },
+  "verification": {
+    "subject": "E-Mail Adresse bestätigen – Daily Coding",
+    "heading": "E-Mail bestätigen",
+    "line": "Fast fertig. Bestätige deine Adresse, dann kannst du mit der ersten Challenge anfangen.",
+    "action": "Adresse bestätigen",
+    "footer": "Dieser Link ist 24 Stunden gültig."
+  },
+  "passwordReset": {
+    "subject": "Passwort zurücksetzen – Daily Coding",
+    "heading": "Passwort zurücksetzen",
+    "line": "Du kannst hier ein neues Passwort für dein Konto setzen.",
+    "action": "Neues Passwort setzen",
+    "footer": "Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail. Dein Passwort bleibt unverändert."
+  },
+  "welcome": {
+    "subject": "Willkommen bei Daily Coding!",
+    "heading": "Willkommen, {name}",
+    "lineOne": "Jeden Tag wartet eine neue Coding-Challenge auf dich, in deiner Sprache.",
+    "lineTwo": "Löse sie, sammle Punkte und halte deine Serie am Leben.",
+    "action": "Zur heutigen Challenge",
+    "footer": "Viel Erfolg."
+  },
+  "accountDeletion": {
+    "subject": "Konto gelöscht – Daily Coding",
+    "heading": "Konto gelöscht",
+    "lineOne": "Hallo {name}, dein Daily-Coding-Konto wurde gelöscht.",
+    "namelessGreeting": "und tschüss",
+    "lineTwo": "Deine Abgaben und dein Punktestand sind damit entfernt.",
+    "footer": "Wenn du das nicht selbst veranlasst hast, melde dich bitte sofort bei uns. Diese Adresse kann jederzeit für ein neues Konto verwendet werden."
+  },
+  "solutionActivity": {
+    "subject": "Neue Aktivität an deiner Lösung – Daily Coding",
+    "heading": "Aktivität an deiner Lösung",
+    "comment": "{actor} hat deine Lösung zu „{challenge}“ kommentiert.",
+    "bestPractices": "{actor} findet deine Lösung zu „{challenge}“ vorbildlich.",
+    "clever": "{actor} findet deine Lösung zu „{challenge}“ clever.",
+    "action": "Zur Lösung",
+    "footer": "Diese Benachrichtigungen kannst du in deinen Einstellungen jederzeit abschalten."
+  }
+}

@@ -1,4 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 import { codeHash } from "@/lib/server/code-hash";
 import { NextRequest } from "next/server";
 import { GET as getDailyHandler } from "../challenge/daily/route";

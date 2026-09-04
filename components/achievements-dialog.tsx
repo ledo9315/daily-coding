@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Bookmark } from "@nsmr/pixelart-react";
 import { AchievementBadge, resolveAchievementIcon } from "@/components/achievement-badge";
 import {
@@ -35,6 +36,7 @@ export function AchievementsDialogBody({
   total,
   showProgress = true,
 }: AchievementsDialogBodyProps) {
+  const t = useTranslations("profile");
   const sorted = sortAchievementsByRarity(achievements);
 
   return (
@@ -42,9 +44,11 @@ export function AchievementsDialogBody({
       <DialogHeader className="p-6 pb-0 pr-12">
         <DialogTitle className="flex items-center gap-2">
           <Bookmark className="h-5 w-5 text-amber-500" />
-          Achievements {unlockedCount}/{total}
+          {t("achievements.title", { unlocked: unlockedCount, total })}
         </DialogTitle>
-        <DialogDescription className="sr-only">Alle Achievements im Überblick</DialogDescription>
+        <DialogDescription className="sr-only">
+          {t("achievements.dialogDescription")}
+        </DialogDescription>
       </DialogHeader>
       <div className="h-[70vh] overflow-y-auto p-6 pt-4">
         <div className="grid gap-3 sm:grid-cols-2">
@@ -56,7 +60,7 @@ export function AchievementsDialogBody({
               icon={resolveAchievementIcon(achievement.iconKey)}
               unlocked={achievement.unlocked}
               rarity={achievement.rarity}
-              unlockedAt={achievement.unlockedAt}
+              unlockedAtIso={achievement.unlockedAtIso}
               progress={showProgress ? achievement.progress : undefined}
             />
           ))}
@@ -83,9 +87,13 @@ export function AchievementsDialog({
   onOpenChange,
   showProgress = true,
 }: AchievementsDialogProps) {
+  const t = useTranslations("profile");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl p-0 gap-0">
+      <DialogContent
+        className="sm:max-w-3xl p-0 gap-0"
+        closeLabel={t("closeDialog")}
+      >
         <AchievementsDialogBody
           achievements={achievements}
           unlockedCount={unlockedCount}

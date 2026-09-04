@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "task": "Task",
+    "solutions": "Solutions"
+  },
+  "loadError": {
+    "title": "No challenge",
+    "description": "There is no active task available. Check the database (migrate + seed) or try again later.",
+    "retry": "Reload"
+  },
+  "errors": {
+    "unknown": "Unknown error"
+  },
+  "toasts": {
+    "newChallenge": {
+      "title": "New daily challenge",
+      "description": "The UTC day has rolled over."
+    },
+    "compileFailed": {
+      "title": "Compilation failed",
+      "description": "Your code was not run."
+    },
+    "testsRun": {
+      "title": "Tests finished",
+      "description": "At least one test failed."
+    },
+    "runFailed": {
+      "title": "Test run failed"
+    },
+    "solutionUpdated": {
+      "title": "Solution updated",
+      "description": "Your submission for today has been replaced."
+    },
+    "submissionFailed": {
+      "title": "Submission did not pass",
+      "description": "At least one test failed, or the run itself went wrong."
+    },
+    "submitFailed": {
+      "title": "Submitting failed"
+    }
+  },
+  "description": {
+    "title": "Task description",
+    "examples": "Examples:",
+    "inputLabel": "Input:",
+    "outputLabel": "Output:"
+  },
+  "hints": {
+    "title": "Hints",
+    "levels": "{count, plural, one {# step} other {# steps}}",
+    "fallbackTitle": "Hint"
+  },
+  "editor": {
+    "title": "Code Editor",
+    "languagePlaceholder": "Language",
+    "runTests": "Run tests",
+    "running": "Running...",
+    "runTestsTitle": "Run tests, in the editor also with ⌘S / Ctrl+S",
+    "maximize": "Maximize editor",
+    "minimize": "Shrink editor",
+    "loading": "Editor is loading…",
+    "starter": {
+      "todo": "Implement your solution here",
+      "example": "Example:"
+    }
+  },
+  "compileError": {
+    "title": "Compilation failed",
+    "body": "Your code was not run, so there is no test result."
+  },
+  "execution": {
+    "slots": {
+      "runtimeCompile": "Runtime / compilation",
+      "runtime": "Runtime ({language})",
+      "configuration": "Configuration"
+    },
+    "missingCallable": "No callableByLanguage for this language in evaluationConfig.",
+    "noAutoGrading": "This challenge has no automatic grading (test cases with input and expected output) configured. The submission cannot be scored.",
+    "failed": "Execution failed: {cause}"
+  },
+  "submit": {
+    "sending": "Sending…",
+    "final": "Submit final",
+    "again": "Submit again"
+  },
+  "actions": {
+    "toResult": "To the result"
+  },
+  "history": {
+    "title": "Recent challenges",
+    "rank": "Rank #{rank}",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Not passed",
+      "skipped": "Skipped"
+    }
+  },
+  "result": {
+    "solvedOn": "solved on {date}",
+    "laterRevised": "revised later",
+    "yourCode": "Your code",
+    "improveSolution": "Improve solution"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "submissionStatus": {
+    "submittedAt": "Submitted at {time}",
+    "notSubmitted": {
+      "label": "Not submitted yet",
+      "description": "You can still hand in your solution"
+    },
+    "submitted": {
+      "label": "Submitted successfully",
+      "description": "Your solution has been handed in"
+    },
+    "pending": {
+      "label": "Being evaluated",
+      "description": "Your solution is being checked"
+    },
+    "failed": {
+      "label": "Submission did not pass",
+      "description": "Not all of the tests succeeded"
+    }
+  },
+  "testCase": {
+    "input": "Input: ",
+    "expected": "Expected: ",
+    "actual": "Actual: "
+  },
+  "panels": {
+    "task": "The task",
+    "testResults": "Test results",
+    "passed": "{passed}/{total} passed"
+  },
+  "solutions": {
+    "loading": "Loading solutions"
+  }
+}

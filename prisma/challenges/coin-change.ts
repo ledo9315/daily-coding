@@ -62,6 +62,58 @@ export const challenge: ChallengeContent = {
         "amount = 0 ist das zugleich schon die Antwort.",
     },
   ],
+  translations: {
+    en: {
+      title: "Coin Change",
+      description:
+        "Implement coinChange(data) with data = { coins, amount }.\n\n" +
+        "coins holds coin values, and there is an unlimited supply of each. Return the smallest " +
+        "number of coins that add up to exactly amount – or -1 if that is not possible. For " +
+        "amount = 0 the answer is 0. All coin values are positive, and coins is not sorted.\n\n" +
+        "Always taking the largest coin that fits looks right and is not. This task aims at the " +
+        "insight that the best solution for an amount follows from the best solutions for smaller " +
+        "amounts – every amount is exactly one coin away from a smaller one, and which coin that " +
+        "is you find out by trying them all.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "The smallest number of coins for an amount b is one more than the smallest number of " +
+            "coins for b minus the coin you laid down last. Which coin that is you do not know – " +
+            "but you can try them all as soon as the answers for every smaller amount are " +
+            "settled. So you build them up from 0 to amount.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "An array dp of length amount + 1, filled with a value that means \"unreachable\" – " +
+            "amount + 1 is enough, since no valid solution needs more coins than that. dp[0] = 0. " +
+            "For every amount b from 1 to amount and every coin c with c <= b you set dp[b] = " +
+            "min(dp[b], dp[b - c] + 1). At the end dp[amount] is the answer – unless the " +
+            "unreachable value is still sitting there, in which case you return -1.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "Greed: with coins = [1,3,4] and amount = 6 it takes 4 + 1 + 1 and reports 3. Right " +
+            "would be 3 + 3, so 2 coins.\n\n" +
+            "Encoding \"unreachable\" as the integer maximum and then adding 1: in typed languages " +
+            "that overflows into a negative number, which wins every minimum. Hence amount + 1." +
+            "\n\n" +
+            "dp[0] has to be 0, not unreachable – otherwise no amount is reachable at all. For " +
+            "amount = 0 that is the answer already.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Impossible",
+        "3": "Amount zero",
+        "4": "Greed fails",
+        "5": "Large",
+        "6": "Unsorted",
+      },
+    },
+  },
   examples: [{ input: '{ "coins": [1,2,5], "amount": 11 }', output: "3" }],
   supportedLanguages: [...ALL_LANGUAGES],
   evaluationConfig: {

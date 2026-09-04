@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
@@ -24,12 +25,18 @@ import {
 import { PageAmbience } from "@/components/page-ambience";
 import { getUserProfileData } from "@/lib/server/profile-data";
 
-export const metadata: Metadata = { title: "Profil" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("profile");
+  return { title: t("metadata.profile") };
+}
 
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
-  const profile = await getUserProfileData(session.user.id);
+  const [t, profile] = await Promise.all([
+    getTranslations("profile"),
+    getUserProfileData(session.user.id),
+  ]);
   if (!profile) {
     redirect("/api/auth/signout?callbackUrl=/login");
   }
@@ -57,7 +64,7 @@ export default async function ProfilePage() {
               </p>
               <div className="mt-2 flex items-center gap-3">
                 <StreakBadge count={profile.stats.streak} />
-                <PointsChip points={parseInt(profile.stats.points.replace(".", ""), 10)} variant="highlight" />
+                <PointsChip points={profile.stats.points} variant="highlight" />
               </div>
             </div>
           </div>
@@ -66,13 +73,27 @@ export default async function ProfilePage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="min-w-0 space-y-6 lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
-              <StatsCard title="LEVEL" value={profile.stats.level} icon={ArrowBarUp} />
-              <StatsCard title="GELÖST" value={String(profile.stats.totalSolved)} icon={Bullseye} />
-              <StatsCard title="REKORD" value={String(profile.stats.streakRecord)} icon={Zap} />
               <StatsCard
-                title="PLATZIERUNG"
+                title={t("profilePage.statsLevel")}
+                value={profile.stats.level}
+                icon={ArrowBarUp}
+              />
+              <StatsCard
+                title={t("profilePage.statsSolved")}
+                value={String(profile.stats.totalSolved)}
+                icon={Bullseye}
+              />
+              <StatsCard
+                title={t("profilePage.statsRecord")}
+                value={String(profile.stats.streakRecord)}
+                icon={Zap}
+              />
+              <StatsCard
+                title={t("profilePage.statsRank")}
                 value={profile.stats.totalSolved > 0 ? profile.stats.rank : "–"}
-                description={`von ${profile.stats.totalUsers}`}
+                description={t("profilePage.statsRankDescription", {
+                  total: profile.stats.totalUsers,
+                })}
                 icon={Trophy}
               />
             </div>
@@ -81,18 +102,18 @@ export default async function ProfilePage() {
               <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Tournament className="h-5 w-5 text-primary" />
-                  Fortschritt
+                  {t("profilePage.progressTitle")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <ProgressBar
-                  label={`Level ${profile.stats.level}`}
-                  value={parseInt(profile.stats.points.replace(".", ""), 10)}
+                  label={t("profilePage.progressLevelLabel", { level: profile.stats.level })}
+                  value={profile.stats.points}
                   max={profile.stats.levelMax}
                   variant="default"
                 />
                 <ProgressBar
-                  label="Streak zum Rekord"
+                  label={t("profilePage.progressStreakLabel")}
                   value={profile.stats.streak}
                   max={profile.stats.streakRecord}
                   variant="warning"
@@ -114,7 +135,7 @@ export default async function ProfilePage() {
               <CardHeader className="mb-2">
                 <CardTitle className="flex items-center gap-2">
                   <CalendarToday className="h-5 w-5 text-primary" />
-                  Aktivität
+                  {t("profilePage.activityTitle")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">

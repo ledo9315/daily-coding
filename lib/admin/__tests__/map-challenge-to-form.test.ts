@@ -41,4 +41,35 @@ describe("challengeToFormInitial", () => {
   it("returns an empty value when there is no date", () => {
     expect(challengeToFormInitial(base).dateUtcDay).toBe("");
   });
+
+  it("reports no English version when there is no translation row", () => {
+    expect(challengeToFormInitial(base).english).toBeNull();
+    expect(challengeToFormInitial(base, null).english).toBeNull();
+  });
+
+  it("prefills the English tab from the translation row", () => {
+    const initial = challengeToFormInitial(base, {
+      title: "Title",
+      description: "Description",
+      hints: [{ title: "Approach", body: "Modulo." }],
+      testCaseNames: { "1": "First case" },
+    });
+    expect(initial.english).toEqual({
+      title: "Title",
+      description: "Description",
+      hints: [{ title: "Approach", body: "Modulo." }],
+      testCaseNames: { "1": "First case" },
+    });
+  });
+
+  // `testCaseNames` is a Json column, so a hand-edited row can hold anything.
+  it("falls back to an empty name map when the column holds no object", () => {
+    const initial = challengeToFormInitial(base, {
+      title: "T",
+      description: "D",
+      hints: [],
+      testCaseNames: ["nope"],
+    });
+    expect(initial.english?.testCaseNames).toEqual({});
+  });
 });

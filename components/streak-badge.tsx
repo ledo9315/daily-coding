@@ -1,4 +1,5 @@
 import { Zap } from "@nsmr/pixelart-react";
+import { getTranslations } from "next-intl/server";
 import { cn } from "@/lib/utils";
 
 interface StreakBadgeProps {
@@ -7,11 +8,12 @@ interface StreakBadgeProps {
   className?: string;
 }
 
-export function StreakBadge({
+export async function StreakBadge({
   count,
   size = "md",
   className,
 }: StreakBadgeProps) {
+  const t = await getTranslations("profile");
   const sizeClasses = {
     sm: "px-2 py-1 text-xs",
     md: "px-3 py-1.5 text-sm",
@@ -33,7 +35,7 @@ export function StreakBadge({
       )}
     >
       <Zap className={cn(iconSizes[size], "animate-pulse")} />
-      <span>{count} Tage Streak</span>
+      <span>{t("profilePage.streakBadge", { count })}</span>
     </div>
   );
 }

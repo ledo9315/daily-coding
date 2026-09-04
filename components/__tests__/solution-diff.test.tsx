@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { SolutionDiff } from "@/components/challenge-result/solution-diff";
+import { renderWithIntl as render } from "@/components/__tests__/intl-render";
+import de from "@/messages/de/community.json";
 
 describe("SolutionDiff", () => {
   it("marks changed lines with a character, not only with a colour", () => {
-    const html = renderToStaticMarkup(
+    const html = render(
       <SolutionDiff
         mine={"const a = 1;\nreturn a;"}
         mineLanguage="javascript"
@@ -14,12 +15,12 @@ describe("SolutionDiff", () => {
     );
     expect(html).toContain(">-<");
     expect(html).toContain(">+<");
-    expect(html).toContain("nur bei dir");
-    expect(html).toContain("nur hier");
+    expect(html).toContain(de.solutionDiff.legendOnlyMine);
+    expect(html).toContain(de.solutionDiff.legendOnlyTheirs);
   });
 
   it("names identical code instead of showing an empty diff", () => {
-    const html = renderToStaticMarkup(
+    const html = render(
       <SolutionDiff
         mine={"const a = 1;\n"}
         mineLanguage="javascript"
@@ -27,12 +28,12 @@ describe("SolutionDiff", () => {
         theirsLanguage="javascript"
       />
     );
-    expect(html).toContain("Zeile für Zeile");
-    expect(html).not.toContain("nur bei dir");
+    expect(html).toContain(de.solutionDiff.identical);
+    expect(html).not.toContain(de.solutionDiff.legendOnlyMine);
   });
 
   it("names a different language instead of diffing across it", () => {
-    const html = renderToStaticMarkup(
+    const html = render(
       <SolutionDiff
         mine="const a = 1;"
         mineLanguage="javascript"
@@ -42,11 +43,11 @@ describe("SolutionDiff", () => {
     );
     expect(html).toContain("Python");
     expect(html).toContain("JavaScript");
-    expect(html).not.toContain("nur bei dir");
+    expect(html).not.toContain(de.solutionDiff.legendOnlyMine);
   });
 
   it("shows both sides and keeps the long lines inside their own scroller", () => {
-    const html = renderToStaticMarkup(
+    const html = render(
       <SolutionDiff
         mine="a"
         mineLanguage="javascript"
@@ -54,8 +55,8 @@ describe("SolutionDiff", () => {
         theirsLanguage="javascript"
       />
     );
-    expect(html).toContain("Deine Lösung");
-    expect(html).toContain("Diese Lösung");
+    expect(html).toContain(de.solutionDiff.columnMine);
+    expect(html).toContain(de.solutionDiff.columnTheirs);
     expect(html.match(/overflow-x-auto/g)).toHaveLength(2);
     expect(html).toContain("md:flex-row");
   });

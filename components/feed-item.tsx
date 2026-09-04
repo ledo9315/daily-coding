@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export interface FeedItemProps {
 }
 
 export function FeedItem({ user, event }: FeedItemProps) {
+  const t = useTranslations("community");
   const getEventStyles = (type: EventType) => {
     switch (type) {
       case "level-up":
@@ -36,28 +38,28 @@ export function FeedItem({ user, event }: FeedItemProps) {
           icon: ArrowBarUp,
           color: "bg-green-500/10 text-green-500 border-green-500/20",
           cardBorder: "",
-          badge: "Level-Aufstieg",
+          badge: t("feedItem.badges.levelUp"),
         };
       case "milestone":
         return {
           icon: Bullseye,
           color: "bg-amber-500/10 text-amber-500 border-amber-500/20",
           cardBorder: "",
-          badge: "Meilenstein",
+          badge: t("feedItem.badges.milestone"),
         };
       case "badge-earned":
         return {
           icon: Bookmark,
           color: "bg-purple-500/10 text-purple-500 border-purple-500/20",
           cardBorder: "",
-          badge: "Abzeichen",
+          badge: t("feedItem.badges.badgeEarned"),
         };
       case "challenge-solved":
         return {
           icon: Script,
           color: "bg-sky-500/10 text-sky-500 border-sky-500/20",
           cardBorder: "",
-          badge: "Challenge",
+          badge: t("feedItem.badges.challengeSolved"),
         };
     }
   };
@@ -111,7 +113,7 @@ export function FeedItem({ user, event }: FeedItemProps) {
               </div>
               {event.level && (
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Stufe {event.level}
+                  {t("feedItem.tier", { level: event.level })}
                 </span>
               )}
             </div>

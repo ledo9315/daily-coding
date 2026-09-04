@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PointsChip } from "@/components/points-chip";
 import { Trophy, ArrowRight, Clock } from "@nsmr/pixelart-react";
@@ -44,6 +45,8 @@ export function RankingPreviewCard({
   showTime = false,
   showPoints = true,
 }: RankingPreviewCardProps) {
+  const t = useTranslations("profile");
+
   return (
     <div className="pixel-box h-full">
       <div className="flex items-center justify-between p-4 border-b-2 border-border">
@@ -52,7 +55,7 @@ export function RankingPreviewCard({
           href={href}
           className="flex items-center gap-1 text-md text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
         >
-          ALLE
+          {t("rankingPreview.all")}
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -104,7 +107,7 @@ export function RankingPreviewCard({
                   </Link>
                   {user.level && (
                     <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
-                      Lvl {user.level}
+                      {t("rankingPreview.level", { level: user.level })}
                     </span>
                   )}
                 </div>

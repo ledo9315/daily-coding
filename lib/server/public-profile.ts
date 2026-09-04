@@ -2,9 +2,9 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { nameKeyOf } from "@/lib/display-name";
 import { calculateLevel } from "@/lib/level";
-import { formatDate } from "@/lib/format";
 import { loadAchievementFacts } from "@/lib/server/achievement-facts";
 import { buildUserAchievementsView } from "@/lib/server/achievements";
+import { findLocalizedAchievementDefs } from "@/lib/server/content-translations";
 import { buildMonthlyActivityGrid } from "@/lib/monthly-activity";
 import { utcDayKey } from "@/lib/streak-days";
 import type { Achievement, MonthlyActivity } from "@/lib/api";
@@ -18,10 +18,10 @@ export type PublicProfile = {
   streak: number;
   streakRecord: number;
   totalSolved: number;
-  /** Month and year the account was created, e.g. "Sep. 2026". */
-  memberSince: string;
-  /** Date of the most recent completed submission; null for an account that never solved one. */
-  lastSolvedAt: string | null;
+  /** Creation instant of the account - the page decides how much of it to show. */
+  memberSince: Date;
+  /** Most recent completed submission; null for an account that never solved one. */
+  lastSolvedAt: Date | null;
   /** Unlocked achievements only - a stranger has no use for someone else's progress bars. */
   achievements: Achievement[];
   badgesTotal: number;
@@ -79,7 +79,7 @@ export const getPublicProfile = cache(async (
    */
   const [facts, achievementDefs, userAchievements] = await Promise.all([
     loadAchievementFacts(prisma, user.id),
-    prisma.achievementDef.findMany({ orderBy: { id: "asc" } }),
+    findLocalizedAchievementDefs(),
     prisma.userAchievement.findMany({ where: { userId: user.id } }),
   ]);
 
@@ -102,12 +102,8 @@ export const getPublicProfile = cache(async (
     streak: user.streak,
     streakRecord: user.streakRecord,
     totalSolved: completed.length,
-    memberSince: user.createdAt.toLocaleDateString("de-DE", {
-      month: "short",
-      year: "numeric",
-      timeZone: "UTC",
-    }),
-    lastSolvedAt: lastSolvedAt ? formatDate(lastSolvedAt) : null,
+    memberSince: user.createdAt,
+    lastSolvedAt,
     achievements: achievements.filter((achievement) => achievement.unlocked),
     badgesTotal: achievementDefs.length,
     monthlyActivity: buildMonthlyActivityGrid(

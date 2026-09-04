@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { getSessionUserId } from "@/lib/auth-session";
 import { getUserProfileData } from "@/lib/server/profile-data";
 
@@ -8,11 +9,9 @@ export async function GET() {
   const { userId } = result;
   const data = await getUserProfileData(userId);
   if (!data) {
+    const t = await getTranslations("api");
     return NextResponse.json(
-      {
-        error:
-          "Benutzer nicht gefunden. Bitte abmelden und erneut anmelden (z. B. nach Datenbank-Reset).",
-      },
+      { error: t("user.notFound") },
       { status: 401 }
     );
   }

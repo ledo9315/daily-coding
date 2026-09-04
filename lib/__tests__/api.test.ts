@@ -200,7 +200,7 @@ describe("getUserStats", () => {
   it("returns user stats without team fields", async () => {
     const stats = {
       rank: "#1",
-      points: "1.500",
+      points: 1500,
       streak: 7,
       streakRecord: 14,
       totalSolved: 42,

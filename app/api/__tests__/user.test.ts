@@ -1,4 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 import { utcDaysInMonth } from "@/lib/monthly-challenge-goal";
 import { GET as getUserStatsHandler } from "../user/stats/route";
 import { GET as getUserProfileHandler } from "../user/profile/route";
@@ -138,7 +144,7 @@ describe("GET /api/user/stats", () => {
     expect(json.rank).toBe("#14");
   });
 
-  it("calculates points from completed submissions and formats with de-DE locale", async () => {
+  it("calculates points from completed submissions and leaves them unformatted", async () => {
     mockUserFindUnique.mockResolvedValueOnce(baseUser);
     mockGetAllTimeRankNumber.mockResolvedValueOnce(1);
     mockSubmissionFindMany.mockResolvedValueOnce([
@@ -147,7 +153,7 @@ describe("GET /api/user/stats", () => {
     ]);
     const res = await getUserStatsHandler();
     const json = await res.json();
-    expect(json.points).toBe("1.500");
+    expect(json.points).toBe(1500);
   });
 
   it("returns totalSolved equal to number of completed submissions", async () => {
@@ -171,7 +177,7 @@ describe("GET /api/user/stats", () => {
     mockSubmissionFindMany.mockResolvedValueOnce([]);
     const res = await getUserStatsHandler();
     const json = await res.json();
-    expect(json.points).toBe("0");
+    expect(json.points).toBe(0);
     expect(json.totalSolved).toBe(0);
     expect(json.monthlyChallengesSolved).toBe(0);
     expect(json.monthlyChallengeGoal).toBe(utcDaysInMonth());
@@ -285,7 +291,7 @@ describe("GET /api/user/profile", () => {
       unlocked: true,
       rarity: "common",
     });
-    expect(json.achievements[0].unlockedAt).toBeDefined();
+    expect(json.achievements[0].unlockedAtIso).toBe("2026-01-01T00:00:00.000Z");
   });
 
   it("maps submission history correctly", async () => {
@@ -335,7 +341,7 @@ describe("GET /api/user/profile", () => {
     const res = await getUserProfileHandler();
     const json = await res.json();
     expect(json.stats.totalSolved).toBe(2);
-    expect(json.stats.points).toBe("250");
+    expect(json.stats.points).toBe(250);
     expect(json.stats.monthlyChallengesSolved).toBe(2);
     expect(json.stats.monthlyChallengeGoal).toBe(utcDaysInMonth());
   });

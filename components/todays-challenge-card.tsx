@@ -5,6 +5,7 @@ import { DifficultyBadge } from "@/components/difficulty-badge";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PointsChip } from "@/components/points-chip";
 import { ArrowRight, Tournament, Zap, CheckDouble } from "@nsmr/pixelart-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -31,14 +32,15 @@ export function TodaysChallengeCard({
   todayStatus = null,
   className,
 }: TodaysChallengeCardProps) {
+  const t = useTranslations("dashboard");
   const submittedToday = todayStatus != null;
   // Say "solved" only when it actually passed. A failed attempt locks the page just
   // the same, but would be labelled wrongly.
   const label = !submittedToday
-    ? "CHALLENGE STARTEN"
+    ? t("todaysChallenge.start")
     : todayStatus === "completed"
-      ? "LÖSUNG ANSEHEN"
-      : "ABGABE ANSEHEN";
+      ? t("todaysChallenge.viewSolution")
+      : t("todaysChallenge.viewSubmission");
 
   return (
     <div className={cn("pixel-box relative overflow-hidden p-6", className)}>
@@ -49,7 +51,7 @@ export function TodaysChallengeCard({
           </div>
           <div>
             <p className="text-md uppercase tracking-wider text-muted-foreground">
-              TAGES-CHALLENGE
+              {t("todaysChallenge.eyebrow")}
             </p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs uppercase text-muted-foreground">
@@ -74,7 +76,7 @@ export function TodaysChallengeCard({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t-2 border-border pt-4">
         <div className="space-y-1">
           <p className="text-sm uppercase tracking-wider text-muted-foreground">
-            Zeit verbleibend
+            {t("todaysChallenge.timeRemaining")}
           </p>
           <CountdownTimer />
         </div>

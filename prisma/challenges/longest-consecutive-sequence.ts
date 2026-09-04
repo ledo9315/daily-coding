@@ -82,6 +82,57 @@ export const challenge: ChallengeContent = {
     { id: 5, name: "Duplikate", input: "[1,2,2,3]", expected: "3" },
     { id: 6, name: "Negative", input: "[-3,-2,-1,5]", expected: "3" },
   ],
+  translations: {
+    en: {
+      title: "Longest Consecutive Sequence",
+      description:
+        "Implement longestConsecutive(nums).\n\n" +
+        "Return the length of the longest run of directly consecutive integers that appear in " +
+        "nums – no matter where they sit in the array. In [100,4,200,1,3,2] that is 1,2,3,4, so " +
+        "4. An empty array gives 0.\n\n" +
+        "nums is unsorted and may contain duplicates and negative numbers.\n\n" +
+        "Sorting works and costs O(n log n) – the task aims at O(n): with every number in a set " +
+        "you can count each run from its start, without ever sorting.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "You spot a run by its start: a number n for which n - 1 does not appear. From " +
+            "there you count up as long as n + 1, n + 2, … are in the set. Every number belongs " +
+            "to exactly one run and is visited only once while counting – that is the whole " +
+            "reason this runs in linear time.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Put all the numbers into a set; that takes care of the duplicates along the way. " +
+            "Then walk over the elements of the set. If n - 1 is in the set, skip n – it is not " +
+            "a start. Otherwise count with an inner loop how far n + 1, n + 2, … keep going in " +
+            "the set, and remember the maximum. At the end you return the maximum, or 0 for an " +
+            "empty set.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "Starting the inner loop for every number instead of only for the starts counts the " +
+            "same run as often as it is long – that is O(n²). The check for n - 1 is not a " +
+            "detail, it is the algorithm.\n\n" +
+            "Duplicates must not count twice: [1,2,2,3] gives 3, not 4. With a set that happens " +
+            "by itself, with the array it does not.\n\n" +
+            "An empty array gives 0, a single element 1. And negative numbers are ordinary " +
+            "numbers: -3,-2,-1 is a run of length 3.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Long run",
+        "3": "Empty",
+        "4": "One element",
+        "5": "Duplicates",
+        "6": "Negatives",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

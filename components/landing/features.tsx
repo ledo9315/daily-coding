@@ -1,8 +1,8 @@
 "use client";
 
-// Hidden with the banner below: import Image from "next/image";
 import { AmbientGlow } from "@/components/landing/ambient-glow";
 import { motion, type Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 /**
  * The day, as a timed sequence instead of four feature cards.
@@ -15,31 +15,11 @@ import { motion, type Variants } from "framer-motion";
  * (`lib/server/challenge-day.ts`), `/api/challenge/[id]/run` has no limit, a second submission is
  * refused with 409 even after a failed one, and the streak counts consecutive UTC days with a
  * passing submission (`lib/server/streak.ts`).
+ *
+ * Only the ids live here; time, heading and body come from `dashboard.day.steps`. The order is
+ * the sequence and therefore belongs in the code, not in a message file.
  */
-const DAY = [
-  {
-    when: "00:00 UTC",
-    what: "Neue Aufgabe",
-    detail:
-      "Für alle dieselbe. Sie ergibt sich aus dem Kalendertag, nicht aus deinem Profil.",
-  },
-  {
-    when: "danach",
-    what: "Testen",
-    detail:
-      "Im Browser, in deiner Sprache. So oft du willst.",
-  },
-  {
-    when: "einmal",
-    what: "Abgeben",
-    detail: "Ein Versuch. Bestanden oder nicht, damit ist der Tag erledigt.",
-  },
-  {
-    when: "23:59 UTC",
-    what: "Streak",
-    detail: "Ein gelöster Tag verlängert ihn. Ein übersprungener setzt ihn auf null.",
-  },
-];
+const DAY = ["newTask", "test", "submit", "streak"] as const;
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -52,6 +32,8 @@ const item: Variants = {
 };
 
 export function LandingFeatures() {
+  const t = useTranslations("dashboard");
+
   return (
     /* Only a top border: the countdown section below shares this background, and a line between
        them would split what is meant to read as one block.
@@ -84,31 +66,33 @@ export function LandingFeatures() {
         >
           <motion.div variants={item} className="max-w-2xl">
             <p className="font-code text-xs uppercase tracking-[0.2em] text-primary">
-              Von Mitternacht zu Mitternacht
+              {t("day.eyebrow")}
             </p>
+            {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <h2 className="mt-4 font-heading text-2xl leading-tight sm:text-3xl">
-              EIN TAG AUF
+              {t("day.heading")}
               <br />
               DAILY CODING
             </h2>
+            {/* eslint-enable no-restricted-syntax */}
           </motion.div>
 
           <div className="mt-14 border-t border-border">
             {DAY.map((step) => (
               <motion.div
-                key={step.what}
+                key={step}
                 variants={item}
                 className="grid grid-cols-1 gap-2 border-b border-border py-6 sm:grid-cols-[9rem_1fr] sm:gap-8"
               >
                 <span className="font-code text-sm text-primary sm:pt-1">
-                  {step.when}
+                  {t(`day.steps.${step}.when`)}
                 </span>
                 <div className="sm:flex sm:items-baseline sm:gap-6">
                   <h3 className="font-heading text-base sm:w-40 sm:shrink-0">
-                    {step.what}
+                    {t(`day.steps.${step}.what`)}
                   </h3>
                   <p className="mt-2 text-lg text-muted-foreground sm:mt-0">
-                    {step.detail}
+                    {t(`day.steps.${step}.detail`)}
                   </p>
                 </div>
               </motion.div>
@@ -116,25 +100,6 @@ export function LandingFeatures() {
           </div>
         </motion.div>
       </div>
-
-      {/*
-        Hidden for now, kept for later. It closed the section rather than heading it: the table
-        walks from 00:00 to 23:59, so the picture was the moment right after the last row.
-        Full-bleed, outside the container, so the section edge is the edge of the picture.
-
-        No fade needed, the top pixel row of the artwork is #020912, the section's own colour.
-        The height is 648 and not the 724 of the other banner; a wrong ratio reserves the wrong
-        height and the section jumps once the file has loaded.
-
-        <Image
-          src="/pixel/banner6.webp"
-          alt="Nachtszene als Pixelgrafik: links eine Werkstatt mit grün leuchtendem Fenster, in der Mitte ein kahler Baum auf einem Hügel, rechts ein Uhrturm vor dem Vollmond, dessen Zeiger auf Mitternacht stehen"
-          width={2172}
-          height={648}
-          sizes="100vw"
-          className="block h-auto w-full [image-rendering:pixelated]"
-        />
-      */}
     </section>
   );
 }

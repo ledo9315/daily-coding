@@ -14,14 +14,22 @@ export const HINT_TITLE_MAX = 120;
  *
  * Entries without a body are dropped: an empty step is a trigger that unfolds to nothing.
  */
-export function normalizeHints(value: unknown): ChallengeHint[] {
+export function normalizeHints(
+  value: unknown,
+  /**
+   * Used when a row carries a body but no title. Passed in rather than defaulted here:
+   * this module has no request scope, and the daily route needs the reader's language
+   * while the admin form stays German.
+   */
+  fallbackTitle: string
+): ChallengeHint[] {
   if (!Array.isArray(value)) return [];
 
   return value.flatMap((entry) => {
     if (typeof entry !== "object" || entry === null) return [];
     const { title, body } = entry as Record<string, unknown>;
     if (typeof body !== "string" || body.trim() === "") return [];
-    const label = typeof title === "string" && title.trim() !== "" ? title.trim() : "Hinweis";
+    const label = typeof title === "string" && title.trim() !== "" ? title.trim() : fallbackTitle;
     return [{ title: label.slice(0, HINT_TITLE_MAX), body: body.trim() }];
   });
 }

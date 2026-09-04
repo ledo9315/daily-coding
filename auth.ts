@@ -5,6 +5,7 @@ import Google from "next-auth/providers/google";
 import { authJwtCallback, authSessionCallback, isFederatedAccount } from "@/lib/auth-callbacks";
 import { authorizeCredentials } from "@/lib/auth-credentials";
 import { findOrCreateOAuthUser, findOAuthUserByAccount } from "@/lib/server/oauth-user";
+import { localeFromRequestScope } from "@/lib/server/request-locale";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -70,11 +71,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               ? token.email
               : undefined);
 
+          /**
+           * NextAuth hands this callback no request, so the language cannot be read from
+           * an argument. `next/headers` reaches the same request from the outside: the
+           * provider redirects the browser back to `/api/auth/callback/<provider>`, which
+           * carries the visitor's `Accept-Language` and the cookie `proxy.ts` set on the
+           * login page. Only used for an account that does not exist yet.
+           */
           const dbUser = email
             ? await findOrCreateOAuthUser(
                 // The provider's picture URL is deliberately not passed on (#86).
                 { email, name: user?.name },
-                oauthAccount
+                oauthAccount,
+                await localeFromRequestScope()
               )
             : await findOAuthUserByAccount(oauthAccount);
 
@@ -90,6 +99,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.id = dbUser.id;
           token.role = dbUser.role;
           token.picture = dbUser.avatar;
+          token.locale = dbUser.locale;
           // OAuth sessions always use the full 30-day window
           token.exp = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
           return token;

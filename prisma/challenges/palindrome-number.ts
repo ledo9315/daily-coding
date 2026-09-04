@@ -83,6 +83,56 @@ export const challenge: ChallengeContent = {
     { id: 6, name: "Zwei Ziffern", input: "12", expected: "false" },
     { id: 7, name: "Eine Ziffer", input: "7", expected: "true" },
   ],
+  translations: {
+    en: {
+      title: "Palindrome Number",
+      description:
+        "Implement isPalindrome(x).\n\n" +
+        "Return true if the integer x reads the same forwards and backwards, otherwise false. " +
+        "Negative numbers are not palindromes: -121 read backwards is 121-. 0 is one, and so " +
+        "is every single digit.\n\n" +
+        "Turning the number into a string and mirroring it works – but it misses the point. " +
+        "The point of this task is to reverse the digits arithmetically: x % 10 gives you the " +
+        "last digit, and integer division by 10 drops it.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "Build a new number out of the digits, back to front: every digit you pick off is " +
+            "appended on the right of the reversal so far, by multiplying that reversal by 10 " +
+            "and adding the digit. What you end up with is the mirrored number – and that is " +
+            "what you compare with the original.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "If x is negative, return false right away. Remember the original and set rev to " +
+            "0. As long as x is greater than 0: rev = rev * 10 + x % 10, then divide x by 10 " +
+            "as an integer. At the end you return whether rev equals the original.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "Change x inside the loop without saving the original first and you have nothing " +
+            "left to compare at the end – rev then gets compared with 0.\n\n" +
+            "The division has to be an integer division. In JavaScript x / 10 gives you a " +
+            "fraction and the loop never ends; use Math.floor or Math.trunc, in Python //.\n\n" +
+            "The loop condition is x > 0, not x >= 0 – otherwise 0 spins forever. And the " +
+            "check for negative numbers comes first: in some languages -121 % 10 is -1, in " +
+            "others 9, and both lead the wrong way.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Negative",
+        "3": "Ends in zero",
+        "4": "Zero",
+        "5": "Seven digits",
+        "6": "Two digits",
+        "7": "One digit",
+      },
+    },
+  },
   starterCodes: starter,
   starterCode: starter.javascript,
 };

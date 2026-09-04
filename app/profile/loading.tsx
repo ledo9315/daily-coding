@@ -99,7 +99,7 @@ export default function ProfileLoading() {
               </CardContent>
             </Card>
 
-            {/* Aktivität / Calendar */}
+            {/* Activity / calendar */}
             <Card>
               <CardHeader>
                 <Skeleton className="h-5 w-20" />

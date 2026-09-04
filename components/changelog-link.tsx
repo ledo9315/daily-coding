@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   hasUnseenChangelog,
@@ -17,6 +18,7 @@ import {
  * release plus something to trigger it.
  */
 export function ChangelogLink({ className }: { className?: string }) {
+  const t = useTranslations("changelog");
   // Starts false and is decided after mount: reading storage during render would make the
   // server output and the first client render disagree.
   const [isNew, setIsNew] = useState(false);
@@ -41,10 +43,10 @@ export function ChangelogLink({ className }: { className?: string }) {
         setIsNew(false);
       }}
     >
-      Changelog
+      {t("link.label")}
       {isNew && (
         <span className="ml-2 border border-primary/40 bg-primary/15 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-primary">
-          Neu
+          {t("link.new")}
         </span>
       )}
     </Link>

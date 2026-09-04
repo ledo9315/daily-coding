@@ -1,4 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 import { NextResponse } from "next/server";
 import { DELETE } from "../user/account/route";
 
@@ -82,6 +88,40 @@ describe("DELETE /api/user/account", () => {
   it("returns 400 when confirmation text is invalid", async () => {
     const res = await DELETE(makeRequest({ confirmText: "falsch", currentPassword: "x" }));
     expect(res.status).toBe(400);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("names the phrase of the caller's language in the rejection", async () => {
+    const res = await DELETE(makeRequest({ confirmText: "falsch", currentPassword: "x" }));
+    const json = await res.json();
+    expect(json.error).toBe("Bitte bestätige mit KONTO LÖSCHEN.");
+  });
+
+  /** Someone who switches the language with the phrase already typed must not be stuck. */
+  it("accepts the confirmation phrase of the other language", async () => {
+    const res = await DELETE(
+      makeRequest({ confirmText: "DELETE ACCOUNT", currentPassword: "oldpassword" })
+    );
+
+    expect(res.status).toBe(200);
+    expect(mockDeleteUser).toHaveBeenCalledWith({ where: { id: "u-1" } });
+  });
+
+  it("ignores whitespace around the confirmation phrase", async () => {
+    const res = await DELETE(
+      makeRequest({ confirmText: "  KONTO LÖSCHEN  ", currentPassword: "oldpassword" })
+    );
+
+    expect(res.status).toBe(200);
+  });
+
+  it("keeps the comparison case-sensitive", async () => {
+    const res = await DELETE(
+      makeRequest({ confirmText: "konto löschen", currentPassword: "oldpassword" })
+    );
+
+    expect(res.status).toBe(400);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
   it("returns 400 when current password is wrong", async () => {

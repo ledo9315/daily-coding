@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 const mockVerifyEmailToken = vi.fn();
 
 vi.mock("@/lib/server/auth-service", () => ({
@@ -19,7 +24,7 @@ describe("GET /api/auth/verify-email", () => {
   });
 
   it("returns 400 when token is invalid", async () => {
-    mockVerifyEmailToken.mockResolvedValueOnce({ error: "Token ungültig." });
+    mockVerifyEmailToken.mockResolvedValueOnce({ error: "invalid" });
     const req = new NextRequest("http://localhost/api/auth/verify-email?token=bad");
     const res = await GET(req);
     expect(res.status).toBe(400);

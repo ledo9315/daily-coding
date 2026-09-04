@@ -25,6 +25,9 @@ import {
   Trophy,
   Zap,
 } from "@nsmr/pixelart-react";
+import { useLocale, useTranslations } from "next-intl";
+import type { ProgressLabel } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 // import type { LucideIcon } from "lucide-react"
 
@@ -68,9 +71,10 @@ interface AchievementBadgeProps {
   icon: React.ComponentType<{ className?: string }>;
   unlocked?: boolean;
   rarity?: "common" | "rare" | "epic" | "legendary";
-  unlockedAt?: string;
+  /** Unlock date as ISO, formatted here so it follows the reader's locale. */
+  unlockedAtIso?: string;
   /** Standing towards the goal; only rendered while locked (#96). */
-  progress?: { current: number; target: number; label?: string };
+  progress?: { current: number; target: number; label?: ProgressLabel };
   className?: string;
 }
 
@@ -80,28 +84,24 @@ const rarityConfig = {
     borderClassName: "border-green-500/30",
     iconClassName: "text-green-500",
     labelClassName: "text-green-500",
-    label: "Gewöhnlich",
   },
   rare: {
     bgClassName: "bg-blue-500/10",
     borderClassName: "border-blue-500/30",
     iconClassName: "text-blue-500",
     labelClassName: "text-blue-500",
-    label: "Selten",
   },
   epic: {
     bgClassName: "bg-purple-500/10",
     borderClassName: "border-purple-500/30",
     iconClassName: "text-purple-500",
     labelClassName: "text-purple-500",
-    label: "Episch",
   },
   legendary: {
     bgClassName: "bg-amber-500/10",
     borderClassName: "border-amber-500/30",
     iconClassName: "text-amber-500",
     labelClassName: "text-amber-500",
-    label: "Legendär",
   },
 };
 
@@ -111,11 +111,16 @@ export function AchievementBadge({
   icon: Icon,
   unlocked = true,
   rarity = "common",
-  unlockedAt,
+  unlockedAtIso,
   progress,
   className,
 }: AchievementBadgeProps) {
+  const t = useTranslations("profile");
+  const locale = useLocale();
   const config = rarityConfig[rarity];
+  const progressLabel = progress?.label
+    ? t(`achievements.progressLabels.${progress.label}`)
+    : undefined;
   const percent =
     progress && progress.target > 0
       ? Math.min(100, Math.round((progress.current / progress.target) * 100))
@@ -156,20 +161,30 @@ export function AchievementBadge({
             {/* Shown while locked too - it names the group the card sits in. The card's
                 grayscale takes the colour out of it, so it reads as muted, not as earned. */}
             <span className={cn("shrink-0 text-xs font-medium", config.labelClassName)}>
-              {config.label}
+              {t(`achievements.rarity.${rarity}`)}
             </span>
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
-          {unlocked && unlockedAt && (
+          {unlocked && unlockedAtIso && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Freigeschaltet am {unlockedAt}
+              {t("achievements.unlockedAt", {
+                date: formatDate(new Date(unlockedAtIso), locale),
+              })}
             </p>
           )}
           {!unlocked && progress && (
             <div className="mt-2">
               <p className="text-xs text-muted-foreground">
-                {progress.label ? `${progress.label}: ` : ""}
-                {progress.current}/{progress.target}
+                {progressLabel
+                  ? t("achievements.progressWithLabel", {
+                      label: progressLabel,
+                      current: progress.current,
+                      target: progress.target,
+                    })
+                  : t("achievements.progress", {
+                      current: progress.current,
+                      target: progress.target,
+                    })}
               </p>
               {/* ponytail: a div with an inline width, not the shadcn Progress
                   primitive - that one animates via a transform and would not survive

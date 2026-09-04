@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Code, TrendingUp, Zap } from "@nsmr/pixelart-react";
 import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { AnimatedFlickeringGrid } from "../ui/animated-flickering-grid";
 import { Meteors } from "../ui/meteors";
 import { BorderBeam } from "../ui/border-beam";
@@ -36,6 +37,11 @@ export function LandingHero({
 }: {
   todaysChallengeTitle: string | null;
 }) {
+  const t = useTranslations("dashboard");
+  const badge = todaysChallengeTitle
+    ? t("hero.todaysChallenge", { title: todaysChallengeTitle })
+    : null;
+
   return (
     <div className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
       <AnimatedFlickeringGrid
@@ -58,15 +64,13 @@ export function LandingHero({
         animate="visible"
         variants={containerVariants}
       >
-        {todaysChallengeTitle ? (
+        {badge ? (
           <motion.div
             variants={itemVariants}
             className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm"
           >
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span aria-label={`Heutige Challenge: ${todaysChallengeTitle}`}>
-              Heutige Challenge: {todaysChallengeTitle}
-            </span>
+            <span aria-label={badge}>{badge}</span>
           </motion.div>
         ) : null}
 
@@ -74,16 +78,19 @@ export function LandingHero({
           variants={itemVariants}
           className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6"
         >
-          EINE CHALLENGE<br />
-          <span className="text-chart-5 retro-glow">JEDEN TAG</span> <br />
+          {t("hero.headlineLine1")}
+          <br />
+          <span className="text-chart-5 retro-glow">
+            {t("hero.headlineLine2")}
+          </span>{" "}
+          <br />
         </motion.h1>
 
         <motion.p
           variants={itemVariants}
           className="mx-auto max-w-2xl text-xl text-muted-foreground mb-10"
         >
-          Keine Sammlung mit Tausenden Aufgaben, in der du nicht weißt, wo du
-          anfangen sollst. Eine Aufgabe am Tag: die, die heute für alle gilt.
+          {t("hero.subline")}
         </motion.p>
 
         <motion.div
@@ -94,13 +101,13 @@ export function LandingHero({
             href="/join?token=12312"
             className="pixel-btn bg-primary text-primary-foreground min-w-50 text-center"
           >
-            CHALLENGE STARTEN
+            {t("hero.startChallenge")}
           </Link>
           <Link
             href="#features"
             className="pixel-btn bg-card hover:bg-muted min-w-50 text-center"
           >
-            SO LÄUFT EIN TAG
+            {t("hero.howADayWorks")}
           </Link>
         </motion.div>
 
@@ -108,7 +115,7 @@ export function LandingHero({
           <BorderBeam size={250} duration={12} delay={9} />
           <Image
             src="/screen.webp"
-            alt="Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge"
+            alt={t("hero.screenshotAlt")}
             width={3338}
             height={1890}
             sizes="(max-width: 896px) calc(100vw - 48px), 896px"
@@ -124,23 +131,29 @@ export function LandingHero({
         >
           <div className="flex flex-col items-center gap-2">
             <Code className="h-8 w-8 text-chart-1" />
-            <span className="font-heading text-lg">TÄGLICHE AUFGABEN</span>
+            <span className="font-heading text-lg">
+              {t("hero.pillars.tasks.title")}
+            </span>
             <span className="text-muted-foreground text-sm">
-              Leicht, mittel, schwer im Wechsel
+              {t("hero.pillars.tasks.detail")}
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <Zap className="h-8 w-8 text-accent" />
-            <span className="font-heading text-lg">PUNKTE UND LEVEL</span>
+            <span className="font-heading text-lg">
+              {t("hero.pillars.points.title")}
+            </span>
             <span className="text-muted-foreground text-sm">
-              Streaks, Abzeichen, Wertungen
+              {t("hero.pillars.points.detail")}
             </span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <TrendingUp className="h-8 w-8 text-primary" />
-            <span className="font-heading text-lg">SKILL-WACHSTUM</span>
+            <span className="font-heading text-lg">
+              {t("hero.pillars.skills.title")}
+            </span>
             <span className="text-muted-foreground text-sm">
-              Algorithmen und Datenstrukturen
+              {t("hero.pillars.skills.detail")}
             </span>
           </div>
         </motion.div>

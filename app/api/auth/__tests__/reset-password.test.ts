@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+/** Route handlers translate themselves; `next-intl/server` throws outside react-server. */
+vi.mock("next-intl/server", async () =>
+  (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
+);
+
 const mockConsumePasswordResetToken = vi.fn();
 const mockCheckRateLimit = vi.fn();
 
@@ -41,7 +46,7 @@ describe("POST /api/auth/reset-password", () => {
   });
 
   it("returns 400 when token is invalid", async () => {
-    mockConsumePasswordResetToken.mockResolvedValueOnce({ error: "Token ungültig." });
+    mockConsumePasswordResetToken.mockResolvedValueOnce({ error: "invalid" });
     const res = await POST(makeRequest({ token: "bad", password: "newpassword1" }));
     expect(res.status).toBe(400);
   });

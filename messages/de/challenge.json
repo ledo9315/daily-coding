@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "task": "Aufgabe",
+    "solutions": "Lösungen"
+  },
+  "loadError": {
+    "title": "Keine Challenge",
+    "description": "Es ist keine aktive Aufgabe verfügbar. Bitte Datenbank prüfen (migrate + seed) oder später erneut versuchen.",
+    "retry": "Erneut laden"
+  },
+  "errors": {
+    "unknown": "Unbekannter Fehler"
+  },
+  "toasts": {
+    "newChallenge": {
+      "title": "Neue Daily Challenge",
+      "description": "Der UTC-Tag hat gewechselt."
+    },
+    "compileFailed": {
+      "title": "Kompilieren fehlgeschlagen",
+      "description": "Der Code wurde nicht ausgeführt."
+    },
+    "testsRun": {
+      "title": "Tests ausgeführt",
+      "description": "Mindestens ein Test ist fehlgeschlagen."
+    },
+    "runFailed": {
+      "title": "Testlauf fehlgeschlagen"
+    },
+    "solutionUpdated": {
+      "title": "Lösung aktualisiert",
+      "description": "Deine Abgabe für heute wurde ersetzt."
+    },
+    "submissionFailed": {
+      "title": "Abgabe nicht bestanden",
+      "description": "Mindestens ein Test ist fehlgeschlagen oder die Ausführung war fehlerhaft."
+    },
+    "submitFailed": {
+      "title": "Einreichen fehlgeschlagen"
+    }
+  },
+  "description": {
+    "title": "Aufgabenbeschreibung",
+    "examples": "Beispiele:",
+    "inputLabel": "Input:",
+    "outputLabel": "Output:"
+  },
+  "hints": {
+    "title": "Hinweise",
+    "levels": "{count, plural, one {# Stufe} other {# Stufen}}",
+    "fallbackTitle": "Hinweis"
+  },
+  "editor": {
+    "title": "Code Editor",
+    "languagePlaceholder": "Sprache",
+    "runTests": "Test ausführen",
+    "running": "Läuft...",
+    "runTestsTitle": "Test ausführen, im Editor auch mit ⌘S / Strg+S",
+    "maximize": "Editor maximieren",
+    "minimize": "Editor verkleinern",
+    "loading": "Editor wird geladen…",
+    "starter": {
+      "todo": "Implementiere deine Lösung hier",
+      "example": "Beispiel:"
+    }
+  },
+  "compileError": {
+    "title": "Kompilieren fehlgeschlagen",
+    "body": "Der Code wurde nicht ausgeführt, es gibt daher kein Testergebnis."
+  },
+  "execution": {
+    "slots": {
+      "runtimeCompile": "Laufzeit / Kompilierung",
+      "runtime": "Laufzeit ({language})",
+      "configuration": "Konfiguration"
+    },
+    "missingCallable": "Keine callableByLanguage für diese Sprache in evaluationConfig.",
+    "noAutoGrading": "Diese Challenge hat keine automatische Bewertung (Test-Cases mit Input/Expected) konfiguriert. Die Einreichung kann nicht gewertet werden.",
+    "failed": "Ausführung fehlgeschlagen: {cause}"
+  },
+  "submit": {
+    "sending": "Wird gesendet…",
+    "final": "Final abgeben",
+    "again": "Erneut abgeben"
+  },
+  "actions": {
+    "toResult": "Zum Ergebnis"
+  },
+  "history": {
+    "title": "Letzte Challenges",
+    "rank": "Rang #{rank}",
+    "status": {
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "failed": "Nicht bestanden",
+      "skipped": "Übersprungen"
+    }
+  },
+  "result": {
+    "solvedOn": "gelöst am {date}",
+    "laterRevised": "später überarbeitet",
+    "yourCode": "Dein Code",
+    "improveSolution": "Lösung verbessern"
+  },
+  "difficulty": {
+    "easy": "Einfach",
+    "medium": "Mittel",
+    "hard": "Schwer"
+  },
+  "submissionStatus": {
+    "submittedAt": "Abgegeben um {time}",
+    "notSubmitted": {
+      "label": "Noch nicht abgegeben",
+      "description": "Du kannst deine Lösung noch einreichen"
+    },
+    "submitted": {
+      "label": "Erfolgreich abgegeben",
+      "description": "Deine Lösung wurde eingereicht"
+    },
+    "pending": {
+      "label": "Wird ausgewertet",
+      "description": "Deine Lösung wird gerade überprüft"
+    },
+    "failed": {
+      "label": "Abgabe nicht bestanden",
+      "description": "Die Tests waren nicht vollständig erfolgreich"
+    }
+  },
+  "testCase": {
+    "input": "Input: ",
+    "expected": "Erwartet: ",
+    "actual": "Erhalten: "
+  },
+  "panels": {
+    "task": "Aufgabenstellung",
+    "testResults": "Testergebnisse",
+    "passed": "{passed}/{total} bestanden"
+  },
+  "solutions": {
+    "loading": "Lösungen werden geladen"
+  }
+}

@@ -1,9 +1,15 @@
+"use client";
+
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Header } from "@/components/header";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Without this file app/challenge/loading.tsx applies and the editor skeleton flashes here.
+// A client component only for the spinner's label; the rest is static markup.
 export default function ChallengeResultLoading() {
+  const t = useTranslations("challenge");
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* The ambient purple of the page itself, so the background does not change on load. */}
@@ -60,7 +66,7 @@ export default function ChallengeResultLoading() {
           {/* The same spinner the list shows while it fetches its first page. */}
           <div className="flex justify-center py-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
-            <span className="sr-only">Lösungen werden geladen</span>
+            <span className="sr-only">{t("solutions.loading")}</span>
           </div>
         </section>
       </main>

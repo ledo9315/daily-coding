@@ -59,6 +59,57 @@ export const challenge: ChallengeContent = {
         "starten.",
     },
   ],
+  translations: {
+    en: {
+      title: "Best Time to Buy and Sell Stock",
+      description:
+        "Implement maxProfit(prices).\n\n" +
+        "prices[i] is a stock's price on day i. You buy on one day and sell on a later day – " +
+        "exactly once. Return the largest profit that is possible that way. If no profit can be " +
+        "made, return 0; that holds for an empty array and for a single day as well.\n\n" +
+        "Trying every pair of buy and sell day costs O(n²). This task aims at the single pass: " +
+        "for any given day, all that matters is how low the price has already been before it.",
+      hints: [
+        {
+          title: "The idea",
+          body:
+            "If you sell on day i, you would have wanted to buy on the cheapest day before it. " +
+            "So the best profit for day i is prices[i] minus the minimum of all earlier prices. " +
+            "Walk from left to right carrying that minimum along and you know it on every day, " +
+            "without looking back.",
+        },
+        {
+          title: "The implementation",
+          body:
+            "Two variables: the lowest price seen so far (start with a very large value) and the " +
+            "best profit (start with 0). For each price: if it is lower than the minimum, it " +
+            "becomes the new minimum. Otherwise compute price minus minimum and keep the " +
+            "difference if it is larger than the best profit so far. At the end you return the " +
+            "best profit.",
+        },
+        {
+          title: "Where most people go wrong",
+          body:
+            "Largest minus smallest price across the whole array is wrong: for [3,8,1,5] that " +
+            "would be 7, but the price 1 comes after the 8. You can only sell after buying – so " +
+            "the minimum may only take in what lay before the current day.\n\n" +
+            "The best profit starts at 0, not at the first difference. Otherwise you return a " +
+            "negative value when prices fall.\n\n" +
+            "Initialising the minimum with prices[0] grabs at nothing on an empty array. Either " +
+            "catch that case up front or start with infinity, or with the largest integer.",
+        },
+      ],
+      testCaseNames: {
+        "1": "Example",
+        "2": "Falling",
+        "3": "One day",
+        "4": "Empty",
+        "5": "Best pair late",
+        "6": "Order matters",
+        "7": "Constant",
+      },
+    },
+  },
   examples: [
     { input: "[7,1,5,3,6,4]", output: "5" },
     { input: "[7,6,4,3,1]", output: "0" },

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { Message } from "@nsmr/pixelart-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,6 +44,8 @@ export function SolutionCard({
   /** Target of a notification link: scrolled to, with the discussion already open. */
   focused?: boolean;
 }) {
+  const t = useTranslations("community");
+  const locale = useLocale();
   const [comparing, setComparing] = useState(false);
   const [discussing, setDiscussing] = useState(focused);
   const [commentCount, setCommentCount] = useState(group.commentCount);
@@ -82,25 +85,33 @@ export function SolutionCard({
                   >
                     {author.name}
                   </Link>
-                  <span className="text-muted-foreground"> (Level {author.level})</span>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    {t("solutionCard.authorLevel", { level: author.level })}
+                  </span>
                 </Fragment>
               ))}
               {unnamed > 0 && (
-                <span className="text-muted-foreground"> und {unnamed} weitere</span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  {t("solutionCard.moreAuthors", { count: unnamed })}
+                </span>
               )}
             </p>
             <span className="shrink-0 font-code text-xs text-muted-foreground">
-              {formatDate(new Date(group.createdAt))}
+              {formatDate(new Date(group.createdAt), locale)}
               {/* Only meaningful while the group is one row: a group of many has no single
                   history that could have been revised. */}
-              {submissionCount === 1 && group.revised ? " · überarbeitet" : ""}
+              {submissionCount === 1 && group.revised
+                ? ` · ${t("solutionCard.revised")}`
+                : ""}
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-sm uppercase tracking-wider">
             {group.own && (
               <span className="border border-primary/40 bg-primary/10 px-2 py-0.5 text-primary">
-                Deine Lösung
+                {t("solutionCard.ownSolution")}
               </span>
             )}
             <span className="border border-border bg-secondary px-2 py-0.5 text-muted-foreground">
@@ -109,7 +120,7 @@ export function SolutionCard({
             {/* A count of one says nothing the card does not already show. */}
             {submissionCount > 1 && (
               <span className="text-muted-foreground">
-                {submissionCount} identische Abgaben
+                {t("solutionCard.identicalSubmissions", { count: submissionCount })}
               </span>
             )}
           </div>
@@ -134,7 +145,7 @@ export function SolutionCard({
           className={actionClass(discussing)}
         >
           <Message className="h-4 w-4 shrink-0" aria-hidden fill="currentColor" />
-          Kommentare
+          {t("solutionCard.comments")}
           <span
             className={`min-w-6 border px-1.5 text-center font-code text-xs ${
               discussing
@@ -152,7 +163,7 @@ export function SolutionCard({
           onClick={() => setComparing((v) => !v)}
           className={actionClass(comparing)}
         >
-          Mit deiner Lösung vergleichen
+          {t("solutionCard.compare")}
         </button>
       </div>
 
