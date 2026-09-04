@@ -28,7 +28,17 @@ vi.mock("next-intl/server", async () =>
 
 import { codeHash } from "@/lib/server/code-hash";
 import { NextRequest } from "next/server";
-import { GET as getDailyHandler } from "../challenge/daily/route";
+import { GET as dailyRoute } from "../challenge/daily/route";
+
+/**
+ * The route reads the language the caller asks for (#287), so every call needs a request.
+ * Without `?locale` it falls back to the request scope, which is what these assertions
+ * are about - they check the payload, not the language.
+ */
+const getDailyHandler = (query = "") =>
+  dailyRoute(
+    new NextRequest(new URL(`https://daily-coding.dev/api/challenge/daily${query}`))
+  );
 import { GET as getTodayHandler } from "../challenge/today/route";
 import { POST as runTestsHandler } from "../challenge/[id]/run/route";
 import { POST as submitHandler } from "../challenge/[id]/submit/route";

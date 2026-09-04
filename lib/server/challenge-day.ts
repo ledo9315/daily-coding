@@ -1,3 +1,4 @@
+import type { AppLocale } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
 import { resolveRingIndex } from "@/lib/server/challenge-ring";
@@ -73,7 +74,13 @@ export async function findRingPool() {
  * ponytail: with N challenges the ring repeats after N days - accepted on purpose, better than
  * standing still. The cure is more content, not more code.
  */
-export async function findDailyChallengeForApp() {
+export async function findDailyChallengeForApp(
+  /**
+   * The language to render the task in. Passed by the routes that answer the challenge
+   * page: that page is fixed to a language by its URL, and a route handler cannot see one.
+   */
+  locale?: AppLocale
+) {
   const pool = await findRingPool();
   if (pool.length === 0) return null;
 
@@ -91,7 +98,7 @@ export async function findDailyChallengeForApp() {
         day: startOfUtcDay(now),
       },
     });
-    return localizeChallenge(first);
+    return localizeChallenge(first, locale);
   }
 
   const { index, changed } = resolveRingIndex(pool, state, now);
@@ -113,5 +120,5 @@ export async function findDailyChallengeForApp() {
   // Translated at the exit, not per caller: the daily route, the dashboard card and the
   // landing badge all read the challenge through here. The ring itself has no language -
   // which challenge is live must not depend on who is asking.
-  return localizeChallenge(current);
+  return localizeChallenge(current, locale);
 }

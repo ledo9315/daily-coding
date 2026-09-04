@@ -95,7 +95,7 @@ describe("apiFetch error handling", () => {
     mockErrorResponse(409, {
       error: "Already submitted today (UTC).",
     });
-    await expect(submitSolution("ch-1", "code", "javascript")).rejects.toThrow(
+    await expect(submitSolution("ch-1", "code", "javascript", "de")).rejects.toThrow(
       "Already submitted today (UTC)."
     );
   });
@@ -232,10 +232,17 @@ describe("getUserProfile", () => {
 // ─── getDailyChallenge ────────────────────────────────────────────────────────
 
 describe("getDailyChallenge", () => {
-  it("calls GET /api/challenge/daily", async () => {
+  /**
+   * The language travels in the URL, not in a cookie: the challenge page is fixed to one
+   * by its own address, and the route handler cannot see that address (#287).
+   */
+  it.each(["de", "en"] as const)("asks GET /api/challenge/daily for %s", async (locale) => {
     mockOkResponse({});
-    await getDailyChallenge();
-    expect(mockFetch).toHaveBeenCalledWith("/api/challenge/daily", expect.anything());
+    await getDailyChallenge(locale);
+    expect(mockFetch).toHaveBeenCalledWith(
+      `/api/challenge/daily?locale=${locale}`,
+      expect.anything()
+    );
   });
 
   it("returns full challenge details", async () => {
@@ -261,7 +268,7 @@ describe("getDailyChallenge", () => {
       todaySubmission: null,
     };
     mockOkResponse(challenge);
-    const result = await getDailyChallenge();
+    const result = await getDailyChallenge("de");
     expect(result).toEqual(challenge);
   });
 });
@@ -271,9 +278,9 @@ describe("getDailyChallenge", () => {
 describe("submitSolution", () => {
   it("calls POST /api/challenge/:id/submit with code and language in body", async () => {
     mockOkResponse({ success: true, testCases: [] });
-    await submitSolution("ch-1", "function solve() {}", "javascript");
+    await submitSolution("ch-1", "function solve() {}", "javascript", "de");
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/challenge/ch-1/submit",
+      "/api/challenge/ch-1/submit?locale=de",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
@@ -287,9 +294,9 @@ describe("submitSolution", () => {
   // Regression test for #46: the solve time is created server-side, the client sends none.
   it("sends no client-side solve duration in the submit body", async () => {
     mockOkResponse({ success: true, testCases: [] });
-    await submitSolution("ch-1", "x", "javascript");
+    await submitSolution("ch-1", "x", "javascript", "de");
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/challenge/ch-1/submit",
+      "/api/challenge/ch-1/submit?locale=de",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ code: "x", language: "javascript" }),
@@ -300,13 +307,15 @@ describe("submitSolution", () => {
   it("returns success and test cases", async () => {
     const response = { success: true, testCases: [{ id: 1, name: "T1", status: "passed" as const }] };
     mockOkResponse(response);
-    const result = await submitSolution("ch-1", "code", "python");
+    const result = await submitSolution("ch-1", "code", "python", "en");
     expect(result).toEqual(response);
   });
 
   it("propagates API errors", async () => {
     mockErrorResponse(404);
-    await expect(submitSolution("nonexistent", "code", "javascript")).rejects.toThrow("API error 404");
+    await expect(submitSolution("nonexistent", "code", "javascript", "de")).rejects.toThrow(
+      "API error 404"
+    );
   });
 });
 
@@ -315,9 +324,9 @@ describe("submitSolution", () => {
 describe("runTests", () => {
   it("calls POST /api/challenge/:id/run with code and language in body", async () => {
     mockOkResponse({ testCases: [] });
-    await runTests("ch-2", "console.log('hi')", "typescript");
+    await runTests("ch-2", "console.log('hi')", "typescript", "en");
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/challenge/ch-2/run",
+      "/api/challenge/ch-2/run?locale=en",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
@@ -331,7 +340,7 @@ describe("runTests", () => {
   it("returns test cases", async () => {
     const response = { testCases: [{ id: 1, name: "T1", status: "passed" as const, time: "5ms" }] };
     mockOkResponse(response);
-    const result = await runTests("ch-2", "code", "javascript");
+    const result = await runTests("ch-2", "code", "javascript", "de");
     expect(result).toEqual(response);
   });
 });

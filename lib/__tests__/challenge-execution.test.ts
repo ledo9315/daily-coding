@@ -86,7 +86,8 @@ describe("runChallengeTests (IO evaluation)", () => {
       ioChallenge,
       "function solve(x){return x;}",
       "javascript",
-      "submit"
+      "submit",
+      "de"
     );
 
     expect(runtimeOk).toBe(true);
@@ -101,7 +102,7 @@ describe("runChallengeTests (IO evaluation)", () => {
       ioChallenge,
       "code",
       "javascript",
-      "submit"
+      "submit", "de"
     );
 
     expect(runtimeOk).toBe(false);
@@ -118,7 +119,7 @@ describe("runChallengeTests (IO evaluation)", () => {
       },
       "x",
       "javascript",
-      "run"
+      "run", "de"
     );
 
     expect(runtimeOk).toBe(false);
@@ -134,7 +135,7 @@ describe("runChallengeTests (smoke, no IO)", () => {
       { testCases: [{ id: 1, name: "T" }] },
       "console.log(1)",
       "javascript",
-      "run"
+      "run", "de"
     );
 
     expect(mockExecute).toHaveBeenCalledTimes(1);
@@ -150,7 +151,7 @@ describe("runChallengeTests (smoke, no IO)", () => {
       { testCases: [{ id: 1, name: "T" }] },
       "console.log(1)",
       "javascript",
-      "submit"
+      "submit", "de"
     );
 
     expect(runtimeOk).toBe(false);
@@ -165,7 +166,7 @@ describe("runChallengeTests (smoke, no IO)", () => {
       { testCases: [] },
       "console.log(1)",
       "javascript",
-      "run"
+      "run", "de"
     );
 
     expect(testCases[0]?.name).toContain("Laufzeit / Kompilierung");
@@ -180,7 +181,7 @@ describe("runChallengeTests (execution failure)", () => {
       { testCases: [{ id: 1, name: "T" }] },
       "console.log(1)",
       "javascript",
-      "run"
+      "run", "de"
     );
 
     expect(runtimeOk).toBe(false);
@@ -207,6 +208,7 @@ describe("compile errors", () => {
       "const x: number = 'nope';",
       "typescript",
       "run",
+      "de",
     );
 
     expect(mockExecute).toHaveBeenCalledTimes(1);
@@ -220,7 +222,7 @@ describe("compile errors", () => {
   it("renames Piston's main.ts.ts to the file the editor shows", async () => {
     mockExecute.mockResolvedValue(pistonCompileError("main.ts.ts(1,7): error TS2322: nope"));
 
-    const { compileError } = await runChallengeTests(ioChallenge, "code", "typescript", "run");
+    const { compileError } = await runChallengeTests(ioChallenge, "code", "typescript", "run", "de");
 
     expect(compileError).toContain("solution.ts(1,7)");
     expect(compileError).not.toContain("main.ts");
