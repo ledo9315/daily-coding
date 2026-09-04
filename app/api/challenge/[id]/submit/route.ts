@@ -14,6 +14,7 @@ import {
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { localeFromQuery, localeFromRequestScope } from "@/lib/server/request-locale";
 import { codeHash } from "@/lib/server/code-hash";
 import {
   codeExceedsLimit,
@@ -25,7 +26,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const t = await getTranslations("api");
+  const locale = localeFromQuery(request.url) ?? (await localeFromRequestScope());
+  const t = await getTranslations({ locale, namespace: "api" });
   const result = await getSessionUserId();
   if (result.error) return result.error;
   const { userId } = result;
@@ -59,7 +61,7 @@ export async function POST(
     return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
   }
 
-  const challenge = await findDailyChallengeForApp();
+  const challenge = await findDailyChallengeForApp(locale);
   if (!challenge || challenge.id !== challengeId) {
     return NextResponse.json({ error: t("challenge.notFound") }, { status: 404 });
   }
@@ -84,7 +86,8 @@ export async function POST(
     challenge,
     code,
     language,
-    "submit"
+    "submit",
+    locale
   );
 
   // Once passed, it stays passed: rewriting a green solution and breaking it must not

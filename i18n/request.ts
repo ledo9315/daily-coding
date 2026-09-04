@@ -1,4 +1,5 @@
 import { getRequestConfig } from "next-intl/server";
+import { isAppLocale, type AppLocale } from "@/lib/locale";
 import { localeFromRequestScope } from "@/lib/server/request-locale";
 
 /**
@@ -23,13 +24,29 @@ const NAMESPACES = [
   "profile",
 ] as const;
 
-export default getRequestConfig(async () => {
-  /**
-   * No `user` argument: reading the session would mean a database round trip on every
-   * render. `proxy.ts` writes the account's locale into the cookie instead, so by the time
-   * this runs the cookie already carries it.
-   */
-  const locale = await localeFromRequestScope();
+/**
+ * The language one render or one route handler reads in.
+ *
+ * `requested` is set when a caller names a language itself - `getTranslations({ locale })`
+ * in the routes that answer the challenge page, which is fixed to a language by its URL
+ * that no route handler can see (#287). Ignoring it, as this file did, means those routes
+ * fall back to the cookie and label an English panel in German.
+ *
+ * Otherwise the request decides. No `user` argument: reading the session would mean a
+ * database round trip on every render. `proxy.ts` writes the account's locale into the
+ * cookie instead, so by the time this runs the cookie already carries it.
+ *
+ * Exported for its test: vitest resolves `next-intl` to the client build, where calling
+ * the configuration `getRequestConfig` returns is refused.
+ */
+export function configLocale(requested: string | undefined): Promise<AppLocale> {
+  return isAppLocale(requested)
+    ? Promise.resolve(requested)
+    : localeFromRequestScope();
+}
+
+export default getRequestConfig(async ({ locale: requested }) => {
+  const locale = await configLocale(requested);
 
   const namespaces = await Promise.all(
     NAMESPACES.map(async (namespace) => {

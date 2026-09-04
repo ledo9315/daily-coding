@@ -343,14 +343,27 @@ export function getUserProfile(): Promise<UserProfile> {
 
 // ─── Challenge ────────────────────────────────────────────────────────────────
 
-export function getDailyChallenge(): Promise<DailyChallenge> {
-  return apiFetch<DailyChallenge>("/api/challenge/daily");
+/**
+ * The language the challenge page is rendering in, appended to every call that answers
+ * with challenge content.
+ *
+ * The page is fixed to a language by its URL since #287, and a route handler never sees
+ * that URL - it would fall back to the cookie and hand `/de/challenge` an English task
+ * under German headings.
+ */
+function localeQuery(locale: AppLocale): string {
+  return `?locale=${locale}`;
+}
+
+export function getDailyChallenge(locale: AppLocale): Promise<DailyChallenge> {
+  return apiFetch<DailyChallenge>(`/api/challenge/daily${localeQuery(locale)}`);
 }
 
 export function submitSolution(
   challengeId: string,
   code: string,
-  language: CodeLanguageId
+  language: CodeLanguageId,
+  locale: AppLocale
 ): Promise<{
     success: boolean;
     /** Stored status of today's submission after this attempt. */
@@ -367,7 +380,7 @@ export function submitSolution(
     /** Set when the compiler rejected the program, so no test ever ran. */
     compileError?: string;
   }> {
-  return apiFetch(`/api/challenge/${challengeId}/submit`, {
+  return apiFetch(`/api/challenge/${challengeId}/submit${localeQuery(locale)}`, {
     method: "POST",
     body: JSON.stringify({ code, language }),
   });
@@ -376,7 +389,8 @@ export function submitSolution(
 export function runTests(
   challengeId: string,
   code: string,
-  language: CodeLanguageId
+  language: CodeLanguageId,
+  locale: AppLocale
 ): Promise<{
     testCases: ChallengeTestCase[];
     language?: CodeLanguageId;
@@ -385,7 +399,7 @@ export function runTests(
     /** Set when the compiler rejected the program, so no test ever ran. */
     compileError?: string;
   }> {
-  return apiFetch(`/api/challenge/${challengeId}/run`, {
+  return apiFetch(`/api/challenge/${challengeId}/run${localeQuery(locale)}`, {
     method: "POST",
     body: JSON.stringify({ code, language }),
   });

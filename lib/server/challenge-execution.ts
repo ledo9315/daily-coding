@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { AppLocale } from "@/lib/locale";
 import type { ChallengeTestCase } from "@/lib/api";
 import { LANGUAGES, languageFileName, type CodeLanguageId } from "@/lib/challenge-languages";
 import type { Prisma } from "@/lib/generated/prisma/client";
@@ -324,7 +325,14 @@ export async function runChallengeTests(
   challenge: ChallengeLike,
   code: string,
   language: CodeLanguageId,
-  mode: ChallengeExecutionMode
+  mode: ChallengeExecutionMode,
+  /**
+   * The language of the page these results are going back to. Passed in rather than read
+   * from the request: the challenge page is fixed to a language by its URL, which a route
+   * handler cannot see, and these labels sit in the same panel as the test-case names
+   * (#287).
+   */
+  locale: AppLocale
 ): Promise<ChallengeRunResult> {
   if (!isCodeExecutionEnabled()) {
     if (mode === "submit") {
@@ -341,7 +349,7 @@ export async function runChallengeTests(
     };
   }
 
-  const t = await getTranslations("challenge");
+  const t = await getTranslations({ locale, namespace: "challenge" });
   const labels: ExecutionLabels = {
     runtimeSlot: t("execution.slots.runtimeCompile"),
     configSlot: t("execution.slots.configuration"),

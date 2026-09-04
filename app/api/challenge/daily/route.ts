@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
+import { localeFromQuery, localeFromRequestScope } from "@/lib/server/request-locale";
 import {
   findDailyChallengeForApp,
   findTodaySubmission,
@@ -13,11 +15,16 @@ import {
 import { stripTestCaseSecretsForClient } from "@/lib/server/public-challenge";
 import { normalizeHints } from "@/lib/challenge-hints";
 
-export async function GET() {
-  const challenge = await findDailyChallengeForApp();
+export async function GET(request: NextRequest) {
+  /**
+   * The page asks in the language its URL fixed; without that the cookie would answer, and
+   * `/de/challenge` could render an English task under German headings (#287).
+   */
+  const locale = localeFromQuery(request.url) ?? (await localeFromRequestScope());
+  const challenge = await findDailyChallengeForApp(locale);
 
   if (!challenge) {
-    const t = await getTranslations("api");
+    const t = await getTranslations({ locale, namespace: "api" });
     return NextResponse.json({ error: t("challenge.noneActive") }, { status: 404 });
   }
 
@@ -58,7 +65,7 @@ export async function GET() {
     }
   }
 
-  const tc = await getTranslations("challenge");
+  const tc = await getTranslations({ locale, namespace: "challenge" });
 
   return NextResponse.json({
     id: challenge.id,

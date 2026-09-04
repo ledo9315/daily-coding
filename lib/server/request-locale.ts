@@ -42,3 +42,19 @@ export async function localeFromRequestScope(
     return resolveLocale({ user });
   }
 }
+
+/**
+ * The language a client explicitly asks an API for, or `undefined`.
+ *
+ * The challenge page is language-fixed by its path since #287, but the task itself arrives
+ * from a route handler, and no path reaches that one - it would fall back to the cookie and
+ * answer with the other language, which is how a German task ended up under an English
+ * heading. So the page names the language it is rendering in.
+ *
+ * Only for JSON a caller reads about itself. It is deliberately *not* honoured on a page:
+ * there the URL decides, or the same address could be crawled in either language.
+ */
+export function localeFromQuery(url: string): AppLocale | undefined {
+  const value = new URL(url).searchParams.get("locale");
+  return isAppLocale(value) ? value : undefined;
+}

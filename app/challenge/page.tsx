@@ -41,6 +41,7 @@ import {
   submitSolution,
   type CodeLanguageId,
 } from "@/lib/api";
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
 import { storeResultHandover } from "@/lib/challenge-result-handover";
 import { challengeResultPath } from "@/lib/navigation";
 import { languageFileName, languageLabel } from "@/lib/challenge-languages";
@@ -70,7 +71,9 @@ export default function ChallengePage() {
   const prevChallengeIdRef = useRef<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
+  /** `useLocale` is typed as a plain string; the API layer wants the union. */
+  const rawLocale = useLocale();
+  const locale: AppLocale = isAppLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = useTranslations("challenge");
   const { status: sessionStatus } = useSession();
   /**
@@ -86,8 +89,10 @@ export default function ChallengePage() {
     error: loadError,
     refetch,
   } = useQuery({
-    queryKey: ["daily-challenge"],
-    queryFn: getDailyChallenge,
+    // The locale belongs in the key: switching the language must refetch the task, not
+    // reuse the copy fetched in the other one.
+    queryKey: ["daily-challenge", locale],
+    queryFn: () => getDailyChallenge(locale),
     refetchInterval: CHALLENGE_POLL_MS,
     staleTime: CHALLENGE_POLL_MS,
   });
@@ -159,7 +164,7 @@ export default function ChallengePage() {
 
   const { mutate: runTestsMutation, isPending: isRunning } = useMutation({
     mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
-      runTests(challenge!.id, code, lang),
+      runTests(challenge!.id, code, lang, locale),
     onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
       setCompileError(result.compileError ?? null);
@@ -182,7 +187,7 @@ export default function ChallengePage() {
 
   const { mutate: submitMutation, isPending: isSubmitting } = useMutation({
     mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
-      submitSolution(challenge!.id, code, lang),
+      submitSolution(challenge!.id, code, lang, locale),
     onSuccess: (result) => {
       setTestCases(result.testCases as TestCase[]);
       setCompileError(result.compileError ?? null);
