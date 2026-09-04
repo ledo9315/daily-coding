@@ -78,9 +78,51 @@ function mailsFor(t: Translate): { subject: string; content: EmailContent }[] {
         lines: [t("solutionActivity.comment", { actor: ACTOR, challenge: CHALLENGE })],
         action: {
           label: t("solutionActivity.action"),
-          url: `${APP}/challenge/demo/loesungen?loesung=demo`,
+          url: `${APP}/challenge/demo/solutions?loesung=demo`,
         },
         footer: t("solutionActivity.footer"),
+      },
+    },
+    {
+      subject: t("dailyReminder.subject", { title: CHALLENGE }),
+      content: {
+        heading: t("dailyReminder.heading"),
+        lines: [
+          t("dailyReminder.task", {
+            title: CHALLENGE,
+            difficulty: t("dailyReminder.difficulty.medium"),
+            points: 30,
+          }),
+          t("dailyReminder.streak", { days: 12 }),
+        ],
+        action: { label: t("dailyReminder.action"), url: `${APP}/challenge` },
+        footer: t("dailyReminder.footer"),
+        unsubscribe: {
+          label: t("dailyReminder.unsubscribe"),
+          url: `${APP}/unsubscribe?u=demo&t=demo`,
+        },
+      },
+    },
+    {
+      // The same mail for someone without a streak: it is a different sentence, not a
+      // missing one, and it is the version a new reader gets.
+      subject: t("dailyReminder.subject", { title: CHALLENGE }),
+      content: {
+        heading: t("dailyReminder.heading"),
+        lines: [
+          t("dailyReminder.task", {
+            title: CHALLENGE,
+            difficulty: t("dailyReminder.difficulty.easy"),
+            points: 10,
+          }),
+          t("dailyReminder.noStreak"),
+        ],
+        action: { label: t("dailyReminder.action"), url: `${APP}/challenge` },
+        footer: t("dailyReminder.footer"),
+        unsubscribe: {
+          label: t("dailyReminder.unsubscribe"),
+          url: `${APP}/unsubscribe?u=demo&t=demo`,
+        },
       },
     },
   ];

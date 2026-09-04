@@ -95,6 +95,15 @@ model User {
   /// Opt-out for activity mails; the in-app bell is not affected by it (#257).
   notifyByEmail Boolean     @default(true)
 
+  /// Opt-out for the daily reminder, kept apart from `notifyByEmail` (#288). Hearing about
+  /// a comment on your solution and wanting a nudge every morning are two decisions, and
+  /// one switch for both would make the quieter of the two impossible.
+  notifyDailyReminder Boolean @default(true)
+
+  /// When the last reminder actually went out. The cron may run twice on a day - a retry,
+  /// a manual trigger - and this is what keeps the second run silent.
+  dailyReminderSentAt DateTime?
+
   /// Interface and mail language. `de` for every existing row: the app has always been
   /// German, and a default of `en` would take the language away from them overnight (E7).
   /// A mail is sent without a request, so there is no cookie to read - this column is the

@@ -495,16 +495,22 @@ export function markNotificationsRead(): Promise<{ read: number }> {
   return apiFetch("/api/notifications/read", { method: "POST" });
 }
 
-export function getEmailNotificationSetting(): Promise<{ notifyByEmail: boolean }> {
+export interface EmailNotificationSettings {
+  notifyByEmail: boolean;
+  notifyDailyReminder: boolean;
+}
+
+export function getEmailNotificationSetting(): Promise<EmailNotificationSettings> {
   return apiFetch("/api/user/notifications");
 }
 
+/** Writes the switch that moved; the route takes a partial body and answers with both. */
 export function setEmailNotificationSetting(
-  notifyByEmail: boolean
-): Promise<{ notifyByEmail: boolean }> {
+  change: Partial<EmailNotificationSettings>
+): Promise<EmailNotificationSettings> {
   return apiFetch("/api/user/notifications", {
     method: "PATCH",
-    body: JSON.stringify({ notifyByEmail }),
+    body: JSON.stringify(change),
   });
 }
 

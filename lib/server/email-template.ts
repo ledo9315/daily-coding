@@ -83,6 +83,12 @@ export interface EmailContent {
   lines: string[];
   action?: { label: string; url: string };
   footer: string;
+  /**
+   * The way out, for a mail that is not an answer to something the reader just did. It
+   * belongs in the mail rather than only in the settings: someone who wants it to stop is
+   * looking at the mail, not at an account page they may not remember having.
+   */
+  unsubscribe?: { label: string; url: string };
 }
 
 export interface RenderedEmail {
@@ -140,6 +146,18 @@ export function renderEmail(
         </tr>`
     : "";
 
+  /**
+   * Quieter than the tagline above it and the only underlined link in the mail: it has to
+   * be findable without competing with the button.
+   */
+  const unsubscribe = content.unsubscribe
+    ? `<tr>
+          <td style="padding-top:14px;font-family:${SANS};font-size:12px;line-height:18px;color:${FAINT};">
+            <a href="${content.unsubscribe.url}" style="color:${FAINT};text-decoration:underline;">${escapeHtml(content.unsubscribe.label)}</a>
+          </td>
+        </tr>`
+    : "";
+
   /** What the inbox shows next to the subject. Without it clients grab the wordmark. */
   const preheader = lines[0] ?? footer;
 
@@ -185,6 +203,7 @@ export function renderEmail(
         <tr>
           <td style="padding-top:8px;font-family:${SANS};font-size:13px;line-height:21px;color:${FAINT};">${escapeHtml(t("layout.tagline"))}</td>
         </tr>
+        ${unsubscribe}
       </table>
     </td>
   </tr>
@@ -205,6 +224,9 @@ export function renderEmail(
     content.footer,
     "",
     t("layout.tagline"),
+    ...(content.unsubscribe
+      ? ["", content.unsubscribe.label + ":", content.unsubscribe.url]
+      : []),
   ].join("\n");
 
   return { html, text };

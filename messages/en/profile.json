@@ -93,6 +93,8 @@
       "title": "Notifications",
       "description": "Whenever someone comments on or rates your solution, you always see it in the bell in the header. Also by email:",
       "emailLabel": "Notifications by email",
+      "reminderLabel": "Daily reminder",
+      "reminderHint": "One mail a day, and only while the challenge of the day is still open.",
       "saveFailed": "Could not save the setting."
     },
     "language": {

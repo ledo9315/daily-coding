@@ -73,14 +73,13 @@ export async function findRingPool() {
  *
  * ponytail: with N challenges the ring repeats after N days - accepted on purpose, better than
  * standing still. The cure is more content, not more code.
+ *
+ * Returns the row as it stands in the database, so in the content language. Callers that
+ * render it for a reader want `findDailyChallengeForApp`; the daily reminder wants this
+ * one, because it writes to recipients in two languages and there is no request to read
+ * a locale from (#288).
  */
-export async function findDailyChallengeForApp(
-  /**
-   * The language to render the task in. Passed by the routes that answer the challenge
-   * page: that page is fixed to a language by its URL, and a route handler cannot see one.
-   */
-  locale?: AppLocale
-) {
+export async function findDailyChallengeRow() {
   const pool = await findRingPool();
   if (pool.length === 0) return null;
 
@@ -98,7 +97,7 @@ export async function findDailyChallengeForApp(
         day: startOfUtcDay(now),
       },
     });
-    return localizeChallenge(first, locale);
+    return first;
   }
 
   const { index, changed } = resolveRingIndex(pool, state, now);
@@ -117,8 +116,24 @@ export async function findDailyChallengeForApp(
     });
   }
 
-  // Translated at the exit, not per caller: the daily route, the dashboard card and the
-  // landing badge all read the challenge through here. The ring itself has no language -
-  // which challenge is live must not depend on who is asking.
-  return localizeChallenge(current, locale);
+  return current;
+}
+
+/**
+ * The challenge of the day, ready to be read.
+ *
+ * Translated at the exit, not per caller: the daily route, the dashboard card and the
+ * landing badge all read the challenge through here. The ring itself has no language -
+ * which challenge is live must not depend on who is asking.
+ */
+export async function findDailyChallengeForApp(
+  /**
+   * The language to render the task in. Passed by the routes that answer the challenge
+   * page: that page is fixed to a language by its URL, and a route handler cannot see one
+   * (#287). Omitted elsewhere, where the request decides.
+   */
+  locale?: AppLocale
+) {
+  const current = await findDailyChallengeRow();
+  return current ? localizeChallenge(current, locale) : null;
 }

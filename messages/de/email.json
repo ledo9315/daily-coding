@@ -41,5 +41,31 @@
     "clever": "{actor} findet deine Lösung zu „{challenge}“ clever.",
     "action": "Zur Lösung",
     "footer": "Diese Benachrichtigungen kannst du in deinen Einstellungen jederzeit abschalten."
+  },
+  "dailyReminder": {
+    "subject": "Heute: {title} – Daily Coding",
+    "heading": "Die Aufgabe von heute",
+    "task": "{title} · {difficulty} · {points, plural, one {# Punkt} other {# Punkte}}",
+    "streak": "Deine Serie steht bei {days, plural, one {# Tag} other {# Tagen}} und ist heute noch offen.",
+    "noStreak": "Noch keine Serie. Heute wäre ein guter Tag, um eine anzufangen.",
+    "action": "Zur Aufgabe",
+    "footer": "Diese Erinnerung kommt höchstens einmal am Tag, und nur solange die Aufgabe offen ist.",
+    "unsubscribe": "Erinnerung abbestellen",
+    "difficulty": {
+      "easy": "Einfach",
+      "medium": "Mittel",
+      "hard": "Schwer"
+    }
+  },
+  "unsubscribe": {
+    "metaTitle": "Erinnerung abbestellen",
+    "doneTitle": "Erinnerung abbestellt",
+    "doneBody": "Die tägliche Erinnerung ist aus. Benachrichtigungen zu deinen Lösungen bleiben davon unberührt.",
+    "resume": "Doch wieder erinnern lassen",
+    "resumedTitle": "Erinnerung wieder aktiv",
+    "resumedBody": "Die tägliche Erinnerung kommt wieder, solange die Aufgabe des Tages offen ist.",
+    "invalidTitle": "Link ungültig",
+    "invalidBody": "Dieser Link gehört zu keinem Konto. In den Einstellungen lässt sich die Erinnerung jederzeit abschalten.",
+    "toChallenge": "Zur heutigen Aufgabe"
   }
 }

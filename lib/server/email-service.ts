@@ -53,10 +53,12 @@ async function send(
   to: string,
   locale: AppLocale,
   subject: string,
-  content: EmailContent
+  content: EmailContent,
+  /** `List-Unsubscribe` goes here: a header, not body copy, is what an inbox reads. */
+  headers?: Record<string, string>
 ): Promise<void> {
   const { html, text } = renderEmail(content, locale);
-  await getResend().emails.send({ from: getFrom(), to, subject, html, text });
+  await getResend().emails.send({ from: getFrom(), to, subject, html, text, headers });
 }
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
@@ -137,4 +139,65 @@ export async function sendSolutionActivityEmail(
     action: { label: t("solutionActivity.action"), url: `${getAppUrl()}${activity.path}` },
     footer: t("solutionActivity.footer"),
   });
+}
+
+export interface DailyReminderRecipient {
+  email: string;
+  locale: AppLocale;
+  /** Days in a row so far. `0` changes what the mail has to say, not whether it is sent. */
+  streak: number;
+  /** App-relative and signed; the absolute URL is built here, as for the activity mail. */
+  unsubscribePath: string;
+}
+
+export interface DailyReminderChallenge {
+  title: string;
+  difficulty: "easy" | "medium" | "hard";
+  points: number;
+}
+
+/**
+ * The one mail nobody asked for by clicking (#288), which is why it carries an unsubscribe
+ * in two places: the header every inbox understands, and a link the reader can see.
+ *
+ * The locale is passed in rather than looked up by address like the other senders - the
+ * caller selected these rows and already holds it, and a run of a few hundred recipients
+ * should not spend a query per mail to learn what it knows.
+ */
+export async function sendDailyReminderEmail(
+  recipient: DailyReminderRecipient,
+  challenge: DailyReminderChallenge
+): Promise<void> {
+  const { locale } = recipient;
+  const t = emailTranslator(locale);
+  const unsubscribeUrl = `${getAppUrl()}${recipient.unsubscribePath}`;
+
+  await send(
+    recipient.email,
+    locale,
+    t("dailyReminder.subject", { title: challenge.title }),
+    {
+      heading: t("dailyReminder.heading"),
+      lines: [
+        t("dailyReminder.task", {
+          title: challenge.title,
+          difficulty: t(`dailyReminder.difficulty.${challenge.difficulty}`),
+          points: challenge.points,
+        }),
+        recipient.streak > 0
+          ? t("dailyReminder.streak", { days: recipient.streak })
+          : t("dailyReminder.noStreak"),
+      ],
+      action: {
+        label: t("dailyReminder.action"),
+        url: `${getAppUrl()}${localizedPath("/challenge", locale)}`,
+      },
+      footer: t("dailyReminder.footer"),
+      unsubscribe: {
+        label: t("dailyReminder.unsubscribe"),
+        url: unsubscribeUrl,
+      },
+    },
+    { "List-Unsubscribe": `<${unsubscribeUrl}>` }
+  );
 }
