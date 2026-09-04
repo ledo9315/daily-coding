@@ -105,6 +105,11 @@
     "viewSolution": "VIEW SOLUTION",
     "viewSubmission": "VIEW SUBMISSION"
   },
+  "countdown": {
+    "hours": "Hrs",
+    "minutes": "Min",
+    "seconds": "Sec"
+  },
   "home": {
     "welcome": "WELCOME BACK!",
     "prompt": "Ready for today's challenge?",
