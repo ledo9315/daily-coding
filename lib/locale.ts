@@ -15,18 +15,47 @@ export type AppLocale = (typeof LOCALES)[number];
 
 /**
  * Two jobs in one constant, and they only look like a coincidence: the locale a visitor
- * gets when nothing at all is known about them, and the locale that will later own the
- * unprefixed URL. Both are German today and both become English in the same release as
- * the domain switch, so the flip stays one line (plan, section 3b).
+ * gets when nothing at all is known about them, and the locale that owns the unprefixed
+ * URL. Both were German until the domain moved to `.dev`; they flipped together, in one
+ * release, so that German moved once in the index instead of twice.
  */
-export const DEFAULT_LOCALE: AppLocale = "de";
+export const DEFAULT_LOCALE: AppLocale = "en";
+
+/** The locale that keeps a URL prefix - everything that is not `DEFAULT_LOCALE`. */
+export const PREFIXED_LOCALE: AppLocale = "de";
 
 /**
- * `NEXT_LOCALE` is `next-intl`'s own cookie name. Nothing reads it as such yet - the
- * request config reads it by hand - but should the public pages ever get a URL prefix,
- * its middleware picks up this cookie without a second migration.
+ * The language the seeded content is written in - the one sitting in the columns of
+ * `Challenge`, `Category` and `AchievementDef`, with every other language in a
+ * `*Translation` table beside it.
+ *
+ * Deliberately its own constant and not `DEFAULT_LOCALE`, which it happened to equal until
+ * the domain moved. They answer different questions: this one is "what does the database
+ * already hold", the other is "what does an unprefixed URL show". Sharing a constant meant
+ * the flip silently claimed English needed no translation row - and English would have
+ * rendered the German columns.
+ */
+export const CONTENT_SOURCE_LOCALE: AppLocale = "de";
+
+/**
+ * `NEXT_LOCALE` is `next-intl`'s own cookie name. The request config reads it by hand, but
+ * keeping the name means a later move to next-intl's own routing middleware costs no
+ * cookie migration.
  */
 export const LOCALE_COOKIE = "NEXT_LOCALE";
+
+/**
+ * How `proxy.ts` tells the request config which language a *public* URL stands for. On
+ * those pages the path decides, not the cookie: `/impressum` is the English one and
+ * `/de/impressum` the German one, whoever is reading. That is what makes them indexable
+ * in both languages - a URL whose content depends on a cookie can only ever be crawled
+ * in one.
+ *
+ * Set on the rewritten request, never trusted from the outside: `proxy.ts` strips any
+ * inbound copy first, otherwise a visitor could pick the language of a page that is
+ * supposed to be fixed.
+ */
+export const LOCALE_HEADER = "x-app-locale";
 
 export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 

@@ -239,7 +239,7 @@ describe("authorizeCredentials", () => {
       image: "",
       role: "user",
       // No `locale` on the fixture, so the default fills in.
-      locale: "de",
+      locale: "en",
       rememberMe: true,
     });
     expect(mockCompare).not.toHaveBeenCalled();

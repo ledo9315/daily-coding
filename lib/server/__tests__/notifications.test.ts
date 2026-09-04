@@ -8,6 +8,27 @@ const mockChallengeFindUnique = vi.fn();
 const mockCheckRateLimit = vi.fn();
 const mockSendActivityEmail = vi.fn();
 
+/**
+ * This test is about the query logic, not about language. Stubbed rather than taught to the
+ * prisma mock: the German columns are the source, so a request in any other language now
+ * reaches for a translation row - a lookup that has nothing to do with what is asserted here.
+ */
+vi.mock("@/lib/server/content-translations", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/server/content-translations")>();
+  return {
+    ...actual,
+    localizeChallenge: async <T,>(challenge: T) => challenge,
+    localizeChallengeTitles: async () => new Map<string, string>(),
+    localizeChallengeTitle: async (_id: string, title: string) => title,
+    localizeAchievements: async <T,>(defs: T) => defs,
+    // Reaches for the mocked prisma, so the catalogue still comes from the fixture.
+    findLocalizedAchievementDefs: async () =>
+      (await import("@/lib/prisma")).prisma.achievementDef.findMany({
+        orderBy: { id: "asc" },
+      }),
+  };
+});
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     submission: { findMany: (...a: unknown[]) => mockSubmissionFindMany(...a) },

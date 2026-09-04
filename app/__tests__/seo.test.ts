@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 
-const SITE = "https://daily-coding.de";
+const SITE = "https://daily-coding.dev";
 
 describe("robots.txt", () => {
   const rules = robots();
@@ -38,14 +38,35 @@ describe("sitemap.xml", () => {
   const entries = sitemap();
   const urls = entries.map((e) => e.url);
 
-  it("lists exactly the pages that carry content", () => {
-    expect(urls).toEqual([
+  it("lists exactly the pages that carry content, in both languages", () => {
+    // Sorted: a sitemap gives its entries no order, so the assertion must not invent one.
+    expect([...urls].sort()).toEqual(
+      [
       // The landing lives on the apex URL since #130 - `/landing` only redirects there.
-      `${SITE}/`,
-      `${SITE}/changelog`,
-      `${SITE}/impressum`,
-      `${SITE}/datenschutz`,
-    ]);
+        `${SITE}/`,
+        `${SITE}/de`,
+        `${SITE}/changelog`,
+        `${SITE}/de/changelog`,
+        `${SITE}/impressum`,
+        `${SITE}/de/impressum`,
+        `${SITE}/datenschutz`,
+        `${SITE}/de/datenschutz`,
+      ].sort()
+    );
+  });
+
+  /**
+   * Without the pairing the two URLs of a page read as duplicates of each other rather
+   * than as two versions of one, and a search engine picks one and drops the other.
+   */
+  it("names every language of a page on each of its entries", () => {
+    for (const entry of entries) {
+      expect(Object.keys(entry.alternates?.languages ?? {})).toEqual([
+        "de",
+        "en",
+        "x-default",
+      ]);
+    }
   });
 
   /**
@@ -58,7 +79,8 @@ describe("sitemap.xml", () => {
   });
 
   it("uses absolute URLs on the canonical host", () => {
-    for (const url of urls) expect(url.startsWith(`${SITE}/`)).toBe(true);
+    // `${SITE}` alone, not `${SITE}/`: the English landing is the bare origin.
+    for (const url of urls) expect(url.startsWith(SITE)).toBe(true);
   });
 
   it("lists no page that requires a login", () => {

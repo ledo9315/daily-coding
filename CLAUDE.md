@@ -200,8 +200,30 @@ only restates what the code does is worth deleting rather than translating.
 
 ### Where a string goes
 
-`next-intl` 4, **without** i18n routing - no `/de` or `/en` prefix, one URL per page. The
-locale comes from the cookie `NEXT_LOCALE`, which `proxy.ts` writes on every response.
+`next-intl` 4, **without** its routing middleware. Two regimes, and mixing them up is the
+mistake to avoid:
+
+- **Public pages** - `/`, `/changelog`, `/impressum`, `/datenschutz` (`LOCALIZED_PATHS` in
+  `lib/site.ts`) - the *path* fixes the language. `/impressum` is English, `/de/impressum`
+  German, whoever is reading and whatever their cookie says. That is what makes them
+  indexable in both languages: a URL whose content depends on a cookie can only ever be
+  crawled in one. `proxy.ts` strips the `/de` prefix before the router sees it and passes
+  the language on in `LOCALE_HEADER`.
+- **Everywhere else** - behind the login, the API, `/login`, `/register` - the cookie
+  `NEXT_LOCALE` decides, and `proxy.ts` writes it on change. No prefix; those pages are
+  disallowed in robots.txt, so a second URL would buy nothing.
+
+Three locale constants that are *not* interchangeable, though two of them held the same
+value until the domain moved:
+
+| | |
+|---|---|
+| `DEFAULT_LOCALE` | what an unprefixed URL shows, and the fallback when nothing is known - `en` |
+| `PREFIXED_LOCALE` | the one that keeps a URL prefix - `de` |
+| `CONTENT_SOURCE_LOCALE` | the language sitting in the DB columns, with every other in a `*Translation` table - `de` |
+
+Reaching for `DEFAULT_LOCALE` in `lib/server/content-translations.ts` means the default
+language skips the translation lookup and renders the German columns under an English URL.
 
 - Client components (`"use client"`): `const t = useTranslations("<area>")`
 - Server components and route handlers: `const t = await getTranslations("<area>")`

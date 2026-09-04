@@ -101,7 +101,7 @@ describe("the locale chain behind an outgoing mail", () => {
 
     await send.accountDeletion();
 
-    expect(subjectOf()).toBe(de.accountDeletion.subject);
+    expect(subjectOf()).toBe(en.accountDeletion.subject);
   });
 
   /** A value the enum does not know must not reach `Intl` or the message lookup. */
@@ -110,6 +110,6 @@ describe("the locale chain behind an outgoing mail", () => {
 
     await send.verification();
 
-    expect(subjectOf()).toBe(de.verification.subject);
+    expect(subjectOf()).toBe(en.verification.subject);
   });
 });

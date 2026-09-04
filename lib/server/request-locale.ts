@@ -1,5 +1,11 @@
 import { cookies, headers } from "next/headers";
-import { LOCALE_COOKIE, resolveLocale, type AppLocale } from "@/lib/locale";
+import {
+  LOCALE_COOKIE,
+  LOCALE_HEADER,
+  isAppLocale,
+  resolveLocale,
+  type AppLocale,
+} from "@/lib/locale";
 
 /**
  * The same resolution as `localeFromRequest` in `lib/request-locale.ts`, but for code that
@@ -13,6 +19,15 @@ export async function localeFromRequestScope(
 ): Promise<AppLocale> {
   try {
     const [cookieStore, headerList] = await Promise.all([cookies(), headers()]);
+
+    /**
+     * A public page whose language the path fixed. It outranks even the account setting:
+     * `/de/impressum` is the German Impressum for everyone, or it could not be the URL a
+     * search engine files under German. `proxy.ts` is the only writer of this header.
+     */
+    const fromPath = headerList.get(LOCALE_HEADER);
+    if (isAppLocale(fromPath)) return fromPath;
+
     return resolveLocale({
       user,
       cookie: cookieStore.get(LOCALE_COOKIE)?.value,

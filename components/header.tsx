@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -27,6 +27,7 @@ import { NAV_ITEMS } from "@/lib/navigation";
 import { MobileNav } from "@/components/mobile-nav";
 import { NotificationBell } from "@/components/notification-bell";
 import { useMenuFocusReturn } from "@/hooks/use-menu-focus-return";
+import { localizedPath } from "@/lib/site";
 
 /**
  * `NAV_ITEMS` stores German labels, so the namespace keys the labels by destination
@@ -43,6 +44,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
 export function Header() {
   const pathname = usePathname();
   const t = useTranslations("community");
+  const locale = useLocale();
   const { data: session, status } = useSession();
   /**
    * Seeded from the module cache, not from null: this component remounts on every
@@ -135,7 +137,7 @@ export function Header() {
         <div className="flex min-w-0 items-center gap-3 md:gap-8">
           {/* Below md the nav bar is hidden; this is the only way in (#79). */}
           <MobileNav isAdmin={isAdminFromDb} />
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href={localizedPath("/", locale)} className="flex items-center gap-3 group">
             <span className="text-xl font-pixel tracking-tighter text-primary">
               {">_"}
             </span>

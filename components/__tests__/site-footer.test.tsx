@@ -10,6 +10,7 @@ import de from "@/messages/de/community.json";
 vi.mock("next-intl/server", () => ({
   getTranslations: async (namespace: "community") =>
     createTranslator({ locale: "de", messages: { community: de }, namespace }),
+  getLocale: async () => "en",
 }));
 
 import { SiteFooter } from "@/components/site-footer";

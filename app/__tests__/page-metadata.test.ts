@@ -151,7 +151,9 @@ describe("page metadata", () => {
       const sources = candidates
         .filter((f) => existsSync(f))
         .map((f) => readFileSync(f, "utf8"));
-      expect(sources.some((s) => s.includes("canonical"))).toBe(true);
+      // `alternates`, not `canonical`: a public page declares its canonical through
+      // `localizedAlternates`, which also names the other language of the page.
+      expect(sources.some((s) => s.includes("alternates"))).toBe(true);
     }
   );
 });

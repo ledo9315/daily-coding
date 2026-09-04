@@ -44,12 +44,12 @@ describe("formatDate", () => {
     expect(formatDate(new Date("2026-03-15T12:00:00Z"), "en")).toBe("03/15/2026");
   });
 
-  it("falls back to German without a locale - the caller has yet to be migrated", () => {
-    expect(formatDate(new Date("2026-03-15T12:00:00Z"))).toBe("15.03.2026");
+  it("falls back to the default locale without one - the caller has yet to be migrated", () => {
+    expect(formatDate(new Date("2026-03-15T12:00:00Z"))).toBe("03/15/2026");
   });
 
-  it("falls back to German for a locale the app does not serve", () => {
-    expect(formatDate(new Date("2026-03-15T12:00:00Z"), "fr")).toBe("15.03.2026");
+  it("falls back to the default locale for one the app does not serve", () => {
+    expect(formatDate(new Date("2026-03-15T12:00:00Z"), "fr")).toBe("03/15/2026");
   });
 });
 
@@ -67,8 +67,8 @@ describe("formatNumber", () => {
     expect(formatNumber(520, "en")).toBe("520");
   });
 
-  it("falls back to German without a locale", () => {
-    expect(formatNumber(1500)).toBe("1.500");
+  it("falls back to the default locale without one", () => {
+    expect(formatNumber(1500)).toBe("1,500");
   });
 });
 
