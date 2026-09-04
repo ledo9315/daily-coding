@@ -33,8 +33,9 @@ describe("Header on small screens", () => {
     expect(html).toContain("md:flex");
   });
 
+  // Rendered in German, so the two paths with a language pair carry the prefix (#287).
   it("reaches every primary destination through one of the two", () => {
-    for (const href of ["/", "/challenge", "/ranking", "/profile"]) {
+    for (const href of ["/de", "/de/challenge", "/ranking", "/profile"]) {
       expect(html).toContain(`href="${href}"`);
     }
   });

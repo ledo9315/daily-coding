@@ -72,11 +72,33 @@ describe("proxy", () => {
     expect(res.status).toBe(307);
   });
 
-  it("protects /challenge (exact path, no subpath)", async () => {
-    mockGetToken.mockResolvedValueOnce(null);
+  it("lets a guest read /challenge (#287)", async () => {
     const res = await proxy(req("http://localhost:3000/challenge"));
+    expect(mockGetToken).not.toHaveBeenCalled();
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("lets a guest read the German /de/challenge as well", async () => {
+    const res = await proxy(req("http://localhost:3000/de/challenge"));
+    expect(mockGetToken).not.toHaveBeenCalled();
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("still protects the solutions below it", async () => {
+    mockGetToken.mockResolvedValueOnce(null);
+    const res = await proxy(req("http://localhost:3000/challenge/abc/solutions"));
     expect(res.status).toBe(307);
-    expect(res.headers.get("location")).toContain("callbackUrl=%2Fchallenge");
+  });
+
+  /**
+   * The rewrite drops the prefix before the router sees it, so a guard reading the
+   * address bar would let `/de/profile` render the profile without a token.
+   */
+  it("does not let the language prefix walk past the guard", async () => {
+    mockGetToken.mockResolvedValueOnce(null);
+    const res = await proxy(req("http://localhost:3000/de/profile"));
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toContain("/login");
   });
 
   it("allows /admin when token exists (admin role is checked in the app via DB)", async () => {

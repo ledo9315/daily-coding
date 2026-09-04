@@ -3,11 +3,13 @@
 import { Suspense, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizedPath } from "@/lib/site";
 
 function VerifyEmailPageContent() {
   const t = useTranslations("auth");
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -30,12 +32,12 @@ function VerifyEmailPageContent() {
         return;
       }
 
-      router.replace("/challenge");
+      router.replace(localizedPath("/challenge", locale));
       router.refresh();
     };
 
     void run();
-  }, [router, searchParams]);
+  }, [locale, router, searchParams]);
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">

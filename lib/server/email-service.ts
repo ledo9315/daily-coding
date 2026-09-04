@@ -7,6 +7,7 @@ import {
 } from "@/lib/server/email-template";
 import { localeFromRequestScope } from "@/lib/server/request-locale";
 import type { AppLocale } from "@/lib/locale";
+import { localizedPath } from "@/lib/site";
 import {
   NOTIFICATION_MESSAGE_KEYS,
   type NotificationKindId,
@@ -88,7 +89,12 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   await send(to, locale, t("welcome.subject"), {
     heading: t("welcome.heading", { name }),
     lines: [t("welcome.lineOne"), t("welcome.lineTwo")],
-    action: { label: t("welcome.action"), url: `${getAppUrl()}/challenge` },
+    action: {
+      label: t("welcome.action"),
+      // The task page has one URL per language since #287; a German reader must not be
+      // sent to the English one by their own welcome mail.
+      url: `${getAppUrl()}${localizedPath("/challenge", locale)}`,
+    },
     footer: t("welcome.footer"),
   });
 }

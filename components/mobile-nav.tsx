@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Menu, Close, Sliders, Tournament } from "@nsmr/pixelart-react";
 import {
   Sheet,
@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { NAV_ITEMS } from "@/lib/navigation";
+import { localizedPath } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
@@ -36,6 +37,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
 export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   const t = useTranslations("community");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
 
   return (
@@ -71,12 +73,13 @@ export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
 
         <nav className="flex flex-col gap-2 p-4">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href;
+            const href = localizedPath(item.href, locale);
+            const isActive = pathname === href;
             const labelKey = NAV_LABEL_KEYS[item.href];
             return (
               <Link
                 key={item.name}
-                href={item.href}
+                href={href}
                 // Closing on click matters here: without it the sheet stays open over the
                 // page that just loaded behind it.
                 onClick={() => setOpen(false)}

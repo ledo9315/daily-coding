@@ -60,7 +60,12 @@ function declaredTitle(filePath: string): string | null {
   const namespace = namespaceOf(source);
   if (!namespace) return null;
   const nestedKey = /title:\s*\{[\s\S]*?default:\s*t\(\s*["']([^"']+)["']/.exec(source);
-  const plainKey = /title:\s*t\(\s*["']([^"']+)["']/.exec(source);
+  /**
+   * The optional left half covers a title that is really content: `/challenge` names
+   * today's task and keeps the catalogue value as the fallback, so what a reader sees is
+   * the task and what this test can check is the fallback.
+   */
+  const plainKey = /title:\s*(?:[^,\n]*?\?\?\s*)?t\(\s*["']([^"']+)["']/.exec(source);
   const key = nestedKey?.[1] ?? plainKey?.[1];
   return key ? messageFor(namespace, key) : null;
 }

@@ -3,9 +3,10 @@ import { SITE_URL, SITEMAP_PATHS, languageAlternates, localizedPath } from "@/li
 import { LOCALES } from "@/lib/locale";
 
 /**
- * Only the pages that carry content (#114, #132). Listing `/challenge` or `/ranking` would
- * point a crawler at the login form and claim they are content; listing `/login` itself
- * would recommend a form for indexing.
+ * Only the pages that carry content (#114, #132). `/ranking` is still left out - it would
+ * point a crawler at the login form and claim it is content - and so is `/login`, which
+ * would recommend a form for indexing. `/challenge` joined the list when the task became
+ * readable without an account (#287).
  *
  * Every path appears once per language, and each entry names the other one under
  * `alternates.languages`. Without that pairing the two URLs read as duplicates of each

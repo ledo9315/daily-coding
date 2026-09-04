@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CountdownTimer } from "@/components/countdown-timer";
+import { localizedPath } from "@/lib/site";
 import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
 
 /**
@@ -23,6 +24,7 @@ import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid
  */
 export function LandingCTA() {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
 
   return (
     <section className="landing-deferred relative overflow-hidden bg-[#020912]">
@@ -61,8 +63,10 @@ export function LandingCTA() {
             {t("cta.body")}
           </p>
 
+          {/* „Oder fang mit der von heute an" - the body promises today's task, and since
+              #287 the link can keep that promise. */}
           <Link
-            href="/join?token=123124"
+            href={localizedPath("/challenge", locale)}
             className="pixel-btn mt-8 inline-block bg-primary px-8 py-4 text-xl text-primary-foreground transition-transform hover:scale-105"
           >
             {t("cta.action")}
