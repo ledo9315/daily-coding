@@ -4,6 +4,7 @@ import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-
 import { runChallengeTests } from "@/lib/server/challenge-execution";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { localeFromQuery, localeFromRequestScope } from "@/lib/server/request-locale";
 import {
   codeExceedsLimit,
   MAX_CHALLENGE_REQUEST_BYTES,
@@ -15,7 +16,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const t = await getTranslations("api");
+  // Same reason as in the daily route: the test-case names come from the challenge, so a
+  // run must not answer in the other language than the page it fills.
+  const locale = localeFromQuery(request.url) ?? (await localeFromRequestScope());
+  const t = await getTranslations({ locale, namespace: "api" });
   const { id: challengeId } = await params;
   if (requestBodyExceedsLimit(request, MAX_CHALLENGE_REQUEST_BYTES)) {
     return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
@@ -35,7 +39,7 @@ export async function POST(
     return NextResponse.json({ error: t("challenge.codeTooLong") }, { status: 413 });
   }
 
-  const challenge = await findDailyChallengeForApp();
+  const challenge = await findDailyChallengeForApp(locale);
   if (!challenge || challenge.id !== challengeId) {
     return NextResponse.json({ error: t("challenge.notFound") }, { status: 404 });
   }
@@ -55,7 +59,8 @@ export async function POST(
     challenge,
     code,
     language,
-    "run"
+    "run",
+    locale
   );
   return NextResponse.json({ testCases, language, runtimeOk, compileError });
 }
