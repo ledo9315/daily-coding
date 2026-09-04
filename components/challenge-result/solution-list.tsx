@@ -38,7 +38,13 @@ export function SolutionList({
    * of the user's own and there are few of those, so it is on the first page - without the
    * filter the list would have to page blindly until the hash shows up.
    */
-  const focusHash = useSearchParams().get("loesung");
+  const searchParams = useSearchParams();
+  /**
+   * `loesung` is the parameter this page used before the route was renamed. Mails carrying
+   * it are already out and cannot be recalled, and the redirect from the old path preserves
+   * the query string as it is - so the old name has to keep resolving.
+   */
+  const focusHash = searchParams.get("solution") ?? searchParams.get("loesung");
   const [groups, setGroups] = useState<ChallengeSolutionGroup[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -116,7 +122,7 @@ export function SolutionList({
   // Once per visit: scrolling again after „Mehr laden" would yank the reader back up.
   useEffect(() => {
     if (!focusHash || scrolledToFocus.current || initialLoading) return;
-    const card = document.getElementById(`loesung-${focusHash}`);
+    const card = document.getElementById(`solution-${focusHash}`);
     if (!card) return;
     scrolledToFocus.current = true;
     // Jump, not glide: the link promises a place, and a smooth scroll of a whole page

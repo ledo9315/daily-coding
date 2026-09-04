@@ -120,7 +120,7 @@ describe("notifySolutionActivity", () => {
       actorName: "Leonid",
       kind: "comment",
       challengeTitle: "Two Sum",
-      path: `/challenge/chal-1/loesungen?loesung=${HASH}`,
+      path: `/challenge/chal-1/solutions?solution=${HASH}`,
     });
   });
 

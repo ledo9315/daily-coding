@@ -7,7 +7,7 @@ import en from "@/messages/en/email.json";
 describe("solutionLink", () => {
   it("points at the code hash, which is what a solution card is keyed by", () => {
     expect(solutionLink("chal-1", "a".repeat(64))).toBe(
-      `/challenge/chal-1/loesungen?loesung=${"a".repeat(64)}`
+      `/challenge/chal-1/solutions?solution=${"a".repeat(64)}`
     );
   });
 });

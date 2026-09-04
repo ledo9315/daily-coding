@@ -110,7 +110,7 @@ describe("GET /api/notifications", () => {
     expect(body.unreadCount).toBe(3);
     expect(body.items[0]).toMatchObject({
       id: "n1",
-      href: `/challenge/chal-1/loesungen?loesung=${HASH}`,
+      href: `/challenge/chal-1/solutions?solution=${HASH}`,
       read: false,
     });
     expect(body.items[0].text).toContain("Watson");

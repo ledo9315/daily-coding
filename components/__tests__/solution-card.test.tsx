@@ -123,7 +123,7 @@ describe("SolutionCard", () => {
 
 describe("a card a notification links to", () => {
   it("carries the anchor the link scrolls to", () => {
-    expect(render(makeGroup())).toContain('id="loesung-hash-a"');
+    expect(render(makeGroup())).toContain('id="solution-hash-a"');
   });
 
   it("has its discussion open, since that is what the notification was about", () => {

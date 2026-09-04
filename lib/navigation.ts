@@ -37,5 +37,5 @@ export const NAV_ITEMS = [
 export type NavItem = (typeof NAV_ITEMS)[number];
 
 export function challengeResultPath(challengeId: string): string {
-  return `/challenge/${challengeId}/loesungen`;
+  return `/challenge/${challengeId}/solutions`;
 }

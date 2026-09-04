@@ -54,7 +54,7 @@ export function SolutionCard({
 
   return (
     <article
-      id={`loesung-${group.codeHash}`}
+      id={`solution-${group.codeHash}`}
       // scroll-mt keeps the sticky header from covering the card the link jumped to. No
       // extra frame for `focused`: the jump plus the open discussion already say which card
       // was meant, and a second green outline around a card that is often the own one made
