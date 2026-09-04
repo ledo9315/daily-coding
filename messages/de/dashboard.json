@@ -105,6 +105,11 @@
     "viewSolution": "LÖSUNG ANSEHEN",
     "viewSubmission": "ABGABE ANSEHEN"
   },
+  "countdown": {
+    "hours": "Std",
+    "minutes": "Min",
+    "seconds": "Sek"
+  },
   "home": {
     "welcome": "WILLKOMMEN ZURÜCK!",
     "prompt": "Bereit für die heutige Challenge?",

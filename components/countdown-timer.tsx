@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Clock } from "@nsmr/pixelart-react";
 import { getMsUntilNextUtcMidnight } from "@/lib/utc-midnight";
 
+/**
+ * The unit labels used to be prop strings - `label="Std"` - which the ESLint ratchet cannot
+ * see: a literal handed to a component is syntactically a value, not copy (#293).
+ */
 interface CountdownTimerProps {
   className?: string;
   /**
@@ -33,6 +38,7 @@ export function CountdownTimer({
   className,
   variant = "inline",
 }: CountdownTimerProps) {
+  const t = useTranslations("dashboard");
   const [timeLeft, setTimeLeft] = useState(() => getMsUntilNextUtcMidnight());
 
   useEffect(() => {
@@ -48,11 +54,11 @@ export function CountdownTimer({
   if (variant === "display") {
     return (
       <div className={cn("flex items-start gap-2 sm:gap-4", className)}>
-        <TimePlate value={hours} label="Std" />
+        <TimePlate value={hours} label={t("countdown.hours")} />
         <Colon />
-        <TimePlate value={minutes} label="Min" />
+        <TimePlate value={minutes} label={t("countdown.minutes")} />
         <Colon />
-        <TimePlate value={seconds} label="Sek" />
+        <TimePlate value={seconds} label={t("countdown.seconds")} />
       </div>
     );
   }
@@ -61,11 +67,11 @@ export function CountdownTimer({
     <div className={cn("flex items-center gap-3", className)}>
       <Clock className="h-5 w-5 text-muted-foreground" />
       <div className="flex items-start gap-1">
-        <TimeBlock value={hours} label="Std" />
+        <TimeBlock value={hours} label={t("countdown.hours")} />
         <span className="text-xl font-bold text-muted-foreground">:</span>
-        <TimeBlock value={minutes} label="Min" />
+        <TimeBlock value={minutes} label={t("countdown.minutes")} />
         <span className="text-xl font-bold text-muted-foreground">:</span>
-        <TimeBlock value={seconds} label="Sek" />
+        <TimeBlock value={seconds} label={t("countdown.seconds")} />
       </div>
     </div>
   );
