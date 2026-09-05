@@ -139,7 +139,7 @@ Before every pull request, `pnpm test`, `pnpm exec tsc --noEmit` and `pnpm lint`
 
 Branches are named after the issue number (`feature/DAI-42-short-title`), commits follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat(DAI-42): …`). Nothing is committed directly to `main`.
 
-New behaviour comes with tests. The conventions in detail - including the language rule that code and comments are English and everything user-facing lives bilingually in `messages/<locale>/` - are in [`CLAUDE.md`](CLAUDE.md).
+Setup, workflow and how to add a challenge are in [`CONTRIBUTING.md`](CONTRIBUTING.md). New behaviour comes with tests. The conventions in detail - including the language rule that code and comments are English and everything user-facing lives bilingually in `messages/<locale>/` - are in [`CLAUDE.md`](CLAUDE.md).
 
 ## License
 
@@ -275,7 +275,7 @@ Vor jedem Pull Request müssen `pnpm test`, `pnpm exec tsc --noEmit` und `pnpm l
 
 Zweige heißen nach der Issue-Nummer (`feature/DAI-42-kurzer-titel`), Commits folgen [Conventional Commits](https://www.conventionalcommits.org/) (`feat(DAI-42): …`). Direkt auf `main` wird nicht committet.
 
-Neues Verhalten kommt mit Tests. Die Konventionen im Detail - auch die Sprachregel, dass Code und Kommentare englisch sind und alles Nutzersichtbare zweisprachig in `messages/<locale>/` liegt - stehen in [`CLAUDE.md`](CLAUDE.md).
+Einrichtung, Ablauf und wie man eine Challenge beisteuert stehen in [`CONTRIBUTING.md`](CONTRIBUTING.md). Neues Verhalten kommt mit Tests. Die Konventionen im Detail - auch die Sprachregel, dass Code und Kommentare englisch sind und alles Nutzersichtbare zweisprachig in `messages/<locale>/` liegt - stehen in [`CLAUDE.md`](CLAUDE.md).
 
 ## Lizenz
 
