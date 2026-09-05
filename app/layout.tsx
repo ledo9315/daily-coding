@@ -45,6 +45,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("dashboard");
   const ogAlt = t("meta.ogImageAlt");
   const locale = await getLocale();
+  const ogLocale = isAppLocale(locale) ? locale : DEFAULT_LOCALE;
+  const ogImage = `/og-image.${ogLocale}.jpg`;
 
   return {
     /**
@@ -73,26 +75,28 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: t("meta.description"),
     /**
-     * The card a shared link shows: the landing above the fold, captured at 2400x1260 and
-     * scaled down, so the headline is the same one a visitor lands on.
+     * The card a shared link shows: the landing above the fold in the language of the page,
+     * captured at 2400x1260 and scaled down, so the headline is the same one a visitor
+     * lands on. One file per locale, because `/de/...` links travel through German chats
+     * and `/...` links through English ones.
      *
-     * The capture starts below the navigation on purpose. It also stops above the badge
-     * naming today's challenge: that name changes daily, and a file cached by every crawler
-     * and chat client would keep announcing a challenge from months ago.
+     * The capture leaves out the navigation and the badge naming today's challenge: that
+     * name changes daily, and a file cached by every crawler and chat client would keep
+     * announcing a challenge from months ago.
      *
-     * Exactly 1200x630, the ratio every platform lays the card out for, and 110 KB. Size
-     * matters here: WhatsApp drops the preview above roughly 300 KB, and a chat message is
-     * how a link like this travels.
+     * Exactly 1200x630, the ratio every platform lays the card out for, and about 50 KB.
+     * Size matters here: WhatsApp drops the preview above roughly 300 KB, and a chat
+     * message is how a link like this travels.
      */
     openGraph: {
       type: "website",
-      locale: OG_LOCALES[isAppLocale(locale) ? locale : DEFAULT_LOCALE],
+      locale: OG_LOCALES[ogLocale],
       siteName: "Daily Coding",
-      images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: ogAlt }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
     twitter: {
       card: "summary_large_image",
-      images: [{ url: "/og-image.jpg", alt: ogAlt }],
+      images: [{ url: ogImage, alt: ogAlt }],
     },
     generator: "v0.app",
     icons: {
