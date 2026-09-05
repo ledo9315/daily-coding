@@ -56,6 +56,14 @@ open an issue/ask and it can be added. The steps below use the recommended split
    - OAuth vars only if you enable social login
 3. Add your custom domain and deploy. Set `NEXTAUTH_URL`/`APP_URL` to the final
    domain **before** relying on the email links (they embed this URL).
+4. Keep the function region next to the database and the sandbox. `vercel.json` pins
+   `regions: ["fra1"]` (Frankfurt) because Neon runs in `eu-central-1` and Piston in
+   Falkenstein; Vercel's default is `iad1` (US East), and with that every one of the
+   eight or so database round trips and both Piston calls of a test run crossed the
+   Atlantic - 2.5 to 3.8 s per run instead of about 1 s. Check with
+   `curl -sD - -o /dev/null https://<domain>/api/challenge/today | grep x-vercel-id`:
+   the second segment is the function region. If you host database and sandbox
+   elsewhere, move the region with them.
 
 ## 3. Piston (small VPS)
 
