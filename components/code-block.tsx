@@ -59,7 +59,10 @@ export function CodeBlock({
       className={cn(
         // Canvas, size and line height of the editor, so the code reads the same whether it
         // is being written or being read back.
-        "overflow-auto border-2 border-border bg-[var(--frappe-editorCanvas)] p-4 font-code",
+        // Ligatures off, matching `fontLigatures: false` in the editor: JetBrains Mono ships
+        // them on, so `<=` and `===` arrived as single glyphs here and as two characters
+        // there - the same line of code, spelled differently on one page.
+        "overflow-auto border-2 border-border bg-[var(--frappe-editorCanvas)] p-4 font-code [font-variant-ligatures:none]",
         "text-[13px] leading-[22px] sm:text-sm sm:leading-[24px]",
         className
       )}

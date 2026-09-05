@@ -97,7 +97,9 @@ export function ShareResult({ text }: { text: string }) {
         {t("share.hint")}
       </p>
 
-      <pre className="mt-4 overflow-x-auto border-2 border-border bg-background p-3 font-code text-xs leading-relaxed text-foreground/90 sm:text-sm">
+      {/* The canvas the code blocks below use, not the page ground: this is the same kind
+          of surface, and `--background` next to them reads as a hole in the page. */}
+      <pre className="mt-4 overflow-x-auto border-2 border-border bg-[var(--frappe-editorCanvas)] p-3 font-code text-xs leading-relaxed text-foreground/90 sm:text-sm">
         {text}
       </pre>
 

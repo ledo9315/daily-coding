@@ -38,10 +38,31 @@ describe("frappe palette", () => {
     }
   );
 
-  it("paints the block on the canvas the editor uses", () => {
-    const block = readFileSync(resolve(process.cwd(), "components/code-block.tsx"), "utf8");
+  /**
+   * Every surface that shows monospaced content on the result page sits on the editor's
+   * canvas. `--background` beside them reads as a hole in the page rather than as a block.
+   */
+  it.each([
+    "components/code-block.tsx",
+    "components/challenge-result/solution-diff.tsx",
+    "components/challenge-result/share-result.tsx",
+  ])("paints %s on the canvas the editor uses", (file) => {
+    const source = readFileSync(resolve(process.cwd(), file), "utf8");
 
-    expect(block).toContain("bg-[var(--frappe-editorCanvas)]");
+    expect(source).toContain("bg-[var(--frappe-editorCanvas)]");
     expect(css).toContain(`--frappe-editorCanvas: #${FRAPPE.editorCanvas};`);
+  });
+
+  /**
+   * The editor runs `fontLigatures: false`. JetBrains Mono ships them on, so without this
+   * the same `<=` was one glyph in the block and two characters in the editor.
+   */
+  it.each([
+    "components/code-block.tsx",
+    "components/challenge-result/solution-diff.tsx",
+  ])("spells operators in %s the way the editor does", (file) => {
+    const source = readFileSync(resolve(process.cwd(), file), "utf8");
+
+    expect(source).toContain("[font-variant-ligatures:none]");
   });
 });
