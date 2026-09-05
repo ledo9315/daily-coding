@@ -1,18 +1,32 @@
 # Daily Coding
+
+[![CI](https://github.com/ledo9315/daily-coding/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ledo9315/daily-coding/actions/workflows/ci.yml)
+[![Letzter Commit](https://img.shields.io/github/last-commit/ledo9315/daily-coding?label=letzter%20Commit&color=c4fe4d)](https://github.com/ledo9315/daily-coding/commits/main)
+[![Aufrufe](https://hits.sh/github.com/ledo9315/daily-coding.svg?label=Aufrufe&color=c4fe4d)](https://hits.sh/github.com/ledo9315/daily-coding/)
+
+![Next.js](https://img.shields.io/badge/Next.js-16-0d1117?logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-0d1117?logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-0d1117?logo=typescript&logoColor=3178C6)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-0d1117?logo=tailwindcss&logoColor=38BDF8)
+![Prisma](https://img.shields.io/badge/Prisma-7-0d1117?logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-0d1117?logo=postgresql&logoColor=4169E1)
+![Vitest](https://img.shields.io/badge/Vitest-1489%20Tests-0d1117?logo=vitest&logoColor=6E9F18)
+
 <img width="800" height="462" alt="dashboard" src="https://github.com/user-attachments/assets/726bd133-a25e-449b-805d-e0420d553243" />
 
 Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bewertet gegen echte Testfälle in einer Sandbox. Mit Bestenliste, Streaks, Levels und Abzeichen.
 
-**Live:** [daily-coding.de](https://daily-coding.de)
+**Live:** [daily-coding.dev](https://daily-coding.dev)
+
 ---
 
 ## Was es kann
 
-- **Tägliche Challenge** - eine Aufgabe pro Tag, für alle Nutzer dieselbe. Die Auswahl rotiert deterministisch aus dem UTC-Kalendertag (`lib/server/challenge-day.ts`), es braucht also keinen Cronjob.
+- **Tägliche Challenge** - eine Aufgabe pro Tag, für alle Nutzer dieselbe. Welche Aufgabe läuft, steht als Reihenfolge plus Zeiger in der Datenbank (`lib/server/challenge-ring.ts`); der Zeiger rückt beim ersten Aufruf eines neuen UTC-Tages weiter, ein Cronjob dafür entfällt.
 - **Zehn Sprachen** - JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java, Go, C++, C# und Rust stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
 - **Bewertung gegen Testfälle** - der eingereichte Code wird pro Testfall mit einem Harness aufgerufen und das Ergebnis verglichen. Kein Vergleich von Konsolenausgaben.
 - **Bestenliste** für Woche und Monat, mit Podium und Platzierungen nach Wettkampfregel (Gleichstand teilt den Platz).
-- **Fortschritt** - Punkte, Level, Streak samt Rekord, sechs Abzeichen, Monatsübersicht der gelösten Tage.
+- **Fortschritt** - Punkte, Level, Streak samt Rekord, 23 Abzeichen, Monatsübersicht der gelösten Tage.
 - **Community-Feed** - wer hat welche Challenge gelöst und wer ist im Level aufgestiegen.
 - **Konten** per E-Mail und Passwort oder über GitHub und Google. E-Mail-Verifizierung, Passwort-Zurücksetzen, Konto-Löschung.
 - **Admin-Bereich** zum Anlegen und Bearbeiten von Challenges samt Testfällen.
@@ -27,7 +41,7 @@ Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bew
 | Anmeldung | Auth.js (NextAuth v5), JWT-Sitzungen |
 | Code-Ausführung | Piston in Docker, hinter einem Reverse-Proxy mit Bearer-Token |
 | E-Mail | Resend |
-| Tests | Vitest, 66 Testdateien |
+| Tests | Vitest, 135 Testdateien |
 | Betrieb | Vercel, Neon (Datenbank), Hetzner (Sandbox) |
 
 ## Lokal starten
@@ -35,8 +49,8 @@ Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bew
 Voraussetzungen: **Node 20 oder neuer** (entwickelt mit 22), **pnpm 11**, **Docker**.
 
 ```bash
-git clone https://github.com/ledo9315/daily-coding-challenge.git
-cd daily-coding-challenge
+git clone https://github.com/ledo9315/daily-coding.git
+cd daily-coding
 pnpm install
 
 cp .env.example .env.local          # Werte anpassen, siehe unten
@@ -120,9 +134,9 @@ Vor jedem Pull Request müssen `pnpm test`, `pnpm exec tsc --noEmit` und `pnpm l
 
 ## Mitwirken
 
-Zweige heißen nach der Issue-Nummer, Commits folgen [Conventional Commits](https://www.conventionalcommits.org/) (`feat(#42): …`). Direkt auf `main` wird nicht committet.
+Zweige heißen nach der Issue-Nummer (`feature/DAI-42-kurzer-titel`), Commits folgen [Conventional Commits](https://www.conventionalcommits.org/) (`feat(DAI-42): …`). Direkt auf `main` wird nicht committet.
 
-Neues Verhalten kommt mit Tests. Die Konventionen im Detail - auch die Sprachregel, dass Code und Kommentare englisch sind und alles Nutzersichtbare deutsch - stehen in [`CLAUDE.md`](CLAUDE.md).
+Neues Verhalten kommt mit Tests. Die Konventionen im Detail - auch die Sprachregel, dass Code und Kommentare englisch sind und alles Nutzersichtbare zweisprachig in `messages/<locale>/` liegt - stehen in [`CLAUDE.md`](CLAUDE.md).
 
 ## Lizenz
 
