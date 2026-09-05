@@ -14,6 +14,7 @@ import {
 import { computeConsecutiveStreakDays } from "@/lib/server/streak";
 import { persistAchievementUnlocks } from "@/lib/server/achievement-unlocks";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { reserveCompiledLanguageRun } from "@/lib/server/compiled-language-budget";
 import { localeFromQuery, localeFromRequestScope } from "@/lib/server/request-locale";
 import { codeHash } from "@/lib/server/code-hash";
 import {
@@ -74,6 +75,13 @@ export async function POST(
     return NextResponse.json(
       { error: t("challenge.unsupportedLanguage") },
       { status: 400 }
+    );
+  }
+
+  if (!(await reserveCompiledLanguageRun(language))) {
+    return NextResponse.json(
+      { error: t("challenge.compiledLanguagesBusy") },
+      { status: 429 }
     );
   }
 

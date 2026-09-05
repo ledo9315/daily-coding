@@ -30,6 +30,7 @@
     "codeTooLong": "Code ist zu lang.",
     "tooManyRuns": "Zu viele Testläufe. Bitte kurz warten.",
     "tooManySubmissions": "Zu viele Abgaben. Bitte kurz warten.",
+    "compiledLanguagesBusy": "Die Sandbox für kompilierte Sprachen ist gerade ausgelastet. Bitte in einer Minute noch einmal versuchen oder vorerst in JavaScript, TypeScript, Python, PHP oder Ruby testen.",
     "unsupportedLanguage": "Ungültige oder nicht unterstützte Sprache für diese Challenge.",
     "sessionOutOfSync": "Dein Login passt nicht zur Datenbank (z. B. nach migrate/seed). Bitte abmelden und erneut anmelden."
   },

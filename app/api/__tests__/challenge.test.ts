@@ -440,6 +440,32 @@ describe("POST /api/challenge/[id]/run", () => {
     expect(res.status).toBe(429);
   });
 
+  it("answers 429 with its own message when the compiled-language budget is spent", async () => {
+    mockChallengeFindMany.mockResolvedValue([
+      { ...activeChallenge, supportedLanguages: [...activeChallenge.supportedLanguages, "java"] },
+    ]);
+    // The per-IP limit still has room, the global compiled-language bucket does not.
+    mockCheckRateLimit.mockImplementation(async (key: string) => key !== "challenge-compiled:global");
+    const res = await runTestsHandler(makeRequest("ch-1", "class X {}", "java"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(429);
+    const json = await res.json();
+    expect(json.error).toContain("compiled languages");
+    expect(mockCheckRateLimit.mock.calls[1][0]).toBe("challenge-compiled:global");
+    expect(mockRunChallengeTests).not.toHaveBeenCalled();
+  });
+
+  it("does not charge an interpreted language to the compiled-language bucket", async () => {
+    mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
+    const res = await runTestsHandler(makeRequest("ch-1"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(200);
+    expect(mockCheckRateLimit).toHaveBeenCalledTimes(1);
+    expect(mockCheckRateLimit.mock.calls[0][0]).toMatch(/^challenge-run:/);
+  });
+
   it("returns 400 when language is not allowed", async () => {
     mockFindUniqueChallenge.mockResolvedValueOnce(activeChallenge);
     const res = await runTestsHandler(makeRequest("ch-1", "x", "rust"), {
@@ -517,6 +543,20 @@ describe("POST /api/challenge/[id]/submit", () => {
     const json = await res.json();
     expect(json.success).toBe(true);
     expect(Array.isArray(json.testCases)).toBe(true);
+  });
+
+  it("answers 429 and stores nothing when the compiled-language budget is spent", async () => {
+    mockChallengeFindMany.mockResolvedValue([
+      { ...activeChallenge, supportedLanguages: [...activeChallenge.supportedLanguages, "rust"] },
+    ]);
+    // The per-user limit still has room, the global compiled-language bucket does not.
+    mockCheckRateLimit.mockImplementation(async (key: string) => key !== "challenge-compiled:global");
+    const res = await submitHandler(makeRequest("ch-1", "fn solve() {}", "rust"), {
+      params: Promise.resolve({ id: "ch-1" }),
+    });
+    expect(res.status).toBe(429);
+    expect(mockCheckRateLimit.mock.calls[1][0]).toBe("challenge-compiled:global");
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 
   it("returns 404 when challenge does not exist", async () => {

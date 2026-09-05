@@ -4,6 +4,7 @@ import { parseCodeLanguage, normalizeSupportedLanguages } from "@/lib/challenge-
 import { runChallengeTests } from "@/lib/server/challenge-execution";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { reserveCompiledLanguageRun } from "@/lib/server/compiled-language-budget";
 import { localeFromQuery, localeFromRequestScope } from "@/lib/server/request-locale";
 import {
   codeExceedsLimit,
@@ -52,6 +53,13 @@ export async function POST(
     return NextResponse.json(
       { error: t("challenge.unsupportedLanguage") },
       { status: 400 }
+    );
+  }
+
+  if (!(await reserveCompiledLanguageRun(language))) {
+    return NextResponse.json(
+      { error: t("challenge.compiledLanguagesBusy") },
+      { status: 429 }
     );
   }
 
