@@ -12,7 +12,7 @@ vi.mock("next-intl/server", async () =>
   (await import("@/app/api/__tests__/api-translations-mock")).apiTranslationsMock()
 );
 
-import { SHARE_WEEK_DAYS, shareResultText } from "@/lib/share-result";
+import { SHARE_TARGETS, SHARE_WEEK_DAYS, shareResultText } from "@/lib/share-result";
 import { completedWeekStrip } from "@/lib/streak-days";
 import { buildShareResultText } from "@/lib/server/share-result";
 
@@ -133,5 +133,49 @@ describe("buildShareResultText", () => {
     const text = await buildShareResultText(params);
 
     expect(text).not.toMatch(/function|=>|passed|\bconst\b/);
+  });
+});
+
+describe("SHARE_TARGETS", () => {
+  const text = shareResultText({
+    challengeTitle: "Zwei Summen",
+    difficultyLabel: "Mittel",
+    dateLabel: "05.09.2026",
+    days: [true, true, false, true, true, true, true],
+    streakLabel: "4 Tage in Folge",
+    url: "https://daily-coding.dev/de/challenge",
+  });
+
+  it.each(SHARE_TARGETS)("$label carries the whole block in one parameter", (target) => {
+    const url = new URL(target.href(text));
+    const carried = [...url.searchParams.values()];
+
+    expect(carried).toContain(text);
+  });
+
+  it.each(SHARE_TARGETS)("$label escapes the newlines and the squares", (target) => {
+    const href = target.href(text);
+
+    // Raw, a newline would end the query and the block would arrive as its first line.
+    expect(href).not.toContain("\n");
+    expect(href).toContain("%0A");
+    expect(href).toContain(encodeURIComponent("🟩"));
+  });
+
+  it.each(SHARE_TARGETS)("$label opens over https", (target) => {
+    expect(new URL(target.href(text)).protocol).toBe("https:");
+  });
+
+  it("stays under the 280 characters X counts, with room for a long title", () => {
+    const longest = shareResultText({
+      challengeTitle: "Binärbaum-Traversierung in beiden Richtungen",
+      difficultyLabel: "Schwer",
+      dateLabel: "05.09.2026",
+      days: [true, true, true, true, true, true, true],
+      streakLabel: "365 Tage in Folge",
+      url: "https://daily-coding.dev/de/challenge",
+    });
+
+    expect([...longest].length).toBeLessThan(280);
   });
 });

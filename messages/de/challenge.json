@@ -111,12 +111,13 @@
   },
   "share": {
     "title": "Ergebnis teilen",
-    "hint": "Der Block verrät weder deinen Code noch die Lösung – nur deine Woche und die Aufgabe von heute.",
+    "hint": "Der Block verrät weder deinen Code noch die Lösung, nur deine Woche und die Aufgabe von heute.",
     "streak": "{count, plural, one {# Tag in Folge} other {# Tage in Folge}}",
     "copy": "Kopieren",
     "copied": "Kopiert",
     "share": "Teilen",
-    "copyFailed": "Kopieren hat nicht geklappt. Markiere den Text und kopiere ihn von Hand."
+    "copyFailed": "Kopieren hat nicht geklappt. Markiere den Text und kopiere ihn von Hand.",
+    "onNetwork": "Auf {network} teilen"
   },
   "difficulty": {
     "easy": "Einfach",

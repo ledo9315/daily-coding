@@ -47,3 +47,32 @@ export function shareResultText(input: ShareResultInput): string {
     input.url,
   ].join("\n");
 }
+
+/**
+ * The networks that get a button of their own, beside the copy button.
+ *
+ * A fixed link rather than `navigator.share`, because that one has no say in which apps
+ * the system offers: on macOS its sheet lists Mail, Notes and Reminders and nothing a
+ * result would sensibly go to. These open a composer with the block already in it, on
+ * every operating system and whether or not an app is installed.
+ *
+ * Both carry the whole text in one parameter. That is the reason the list is short:
+ * LinkedIn dropped prefilled text in 2022 and would post the bare link, which is exactly
+ * the part of the block that says nothing. Reddit prefills, but a personal daily result
+ * is a post nobody subscribed to.
+ */
+export const SHARE_TARGETS = [
+  {
+    id: "x",
+    /** Brand, so it is written out rather than translated. */
+    label: "X",
+    href: (text: string) => `https://x.com/intent/post?text=${encodeURIComponent(text)}`,
+  },
+  {
+    id: "whatsapp",
+    label: "WhatsApp",
+    href: (text: string) => `https://wa.me/?text=${encodeURIComponent(text)}`,
+  },
+] as const;
+
+export type ShareTarget = (typeof SHARE_TARGETS)[number];
