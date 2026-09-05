@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 
-const OG_FILE = resolve(process.cwd(), "public", "og-image.jpg");
+const OG_FILES = ["de", "en"].map((locale) => resolve(process.cwd(), "public", `og-image.${locale}.jpg`));
 const layout = readFileSync(resolve(process.cwd(), "app", "layout.tsx"), "utf8");
 
 /** The alt text as a crawler receives it - one message per language, not a literal. */
@@ -42,21 +42,25 @@ function jpegSize(path: string): { width: number; height: number } {
  * now a drawn brand card.
  */
 describe("Open Graph image", () => {
-  it("is the file the metadata points at", () => {
-    expect(layout).toContain('url: "/og-image.jpg"');
+  it("is one file per locale, and the metadata points at the locale's file", () => {
+    expect(layout).toContain("const ogImage = `/og-image.${ogLocale}.jpg`");
+    expect(layout).toContain("images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }]");
+    expect(layout).toContain("images: [{ url: ogImage, alt: ogAlt }]");
     expect(layout).toContain('card: "summary_large_image"');
-    expect(statSync(OG_FILE).isFile()).toBe(true);
+    for (const file of OG_FILES) expect(statSync(file).isFile()).toBe(true);
   });
 
   it("has the dimensions the metadata declares", () => {
-    const { width, height } = jpegSize(OG_FILE);
-    expect({ width, height }).toEqual({ width: 1200, height: 630 });
+    for (const file of OG_FILES) {
+      const { width, height } = jpegSize(file);
+      expect({ width, height }).toEqual({ width: 1200, height: 630 });
+    }
     expect(layout).toMatch(/width:\s*1200,\s*height:\s*630/);
   });
 
   it("stays under 300 KB, or WhatsApp drops the preview", () => {
     // The documented soft limit for chat previews - the way a link like this spreads.
-    expect(statSync(OG_FILE).size).toBeLessThan(300 * 1024);
+    for (const file of OG_FILES) expect(statSync(file).size).toBeLessThan(300 * 1024);
   });
 
   it("describes what the image actually shows", () => {
