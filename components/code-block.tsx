@@ -57,14 +57,28 @@ export function CodeBlock({
   return (
     <pre
       className={cn(
-        "overflow-auto border-2 border-border bg-background p-4 font-code text-[13px] leading-[1.6] sm:text-sm",
+        // Canvas, size and line height of the editor, so the code reads the same whether it
+        // is being written or being read back.
+        // Ligatures off, matching `fontLigatures: false` in the editor: JetBrains Mono ships
+        // them on, so `<=` and `===` arrived as single glyphs here and as two characters
+        // there - the same line of code, spelled differently on one page.
+        "overflow-auto border-2 border-border bg-[var(--frappe-editorCanvas)] p-4 font-code [font-variant-ligatures:none]",
+        "text-[13px] leading-[22px] sm:text-sm sm:leading-[24px]",
         className
       )}
     >
+      {/*
+        `font-code` again on the `code`, not only on the `pre` around it. Tailwind's preflight
+        styles `code, kbd, samp, pre` with `--font-mono`, which in this palette is VT323, the
+        pixel face of the body text - and a rule that names the element beats what it would
+        inherit from its parent. The block was therefore set in VT323 while the editor beside
+        it ran in JetBrains Mono: narrower by a third, and paler, because the thin pixel
+        strokes cover fewer pixels at the same colour.
+      */}
       {html === null ? (
-        <code>{code}</code>
+        <code className="font-code">{code}</code>
       ) : (
-        <code className="hljs" dangerouslySetInnerHTML={{ __html: html }} />
+        <code className="hljs font-code" dangerouslySetInnerHTML={{ __html: html }} />
       )}
     </pre>
   );

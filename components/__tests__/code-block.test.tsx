@@ -49,4 +49,27 @@ describe("CodeBlock", () => {
     expect(html).toContain("max-h-[32rem]");
     expect(html).toContain("font-code");
   });
+
+  /**
+   * Tailwind's preflight styles `code, kbd, samp, pre` with `--font-mono`, which is VT323
+   * here - the pixel face of the body text. A rule naming the element beats what it would
+   * inherit, so the `code` needs the class of its own: without it the block was set a third
+   * narrower than the editor beside it, and paler, because the thin strokes cover fewer
+   * pixels at the same colour.
+   */
+  it.each([
+    ['const greeting = "hallo";', "javascript"],
+    ["SELECT 1", "brainfuck"],
+  ])("sets the code element in the code face, highlighted or not (%s)", (code, language) => {
+    const html = renderToStaticMarkup(<CodeBlock code={code} language={language} />);
+    const codeTag = html.match(/<code[^>]*>/)?.[0] ?? "";
+
+    expect(codeTag).toContain("font-code");
+  });
+
+  it("paints on the canvas of the editor", () => {
+    const html = renderToStaticMarkup(<CodeBlock code="a" language="javascript" />);
+
+    expect(html).toContain("bg-[var(--frappe-editorCanvas)]");
+  });
 });

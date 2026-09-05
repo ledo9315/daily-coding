@@ -35,7 +35,7 @@ function DiffColumn({
     <div className="min-w-0 flex-1">
       <p className="mb-2 text-sm uppercase tracking-wider text-muted-foreground">{title}</p>
       {/* Long lines scroll inside the column; the page itself never moves sideways. */}
-      <div className="overflow-x-auto border-2 border-border bg-background py-2 font-code text-[13px] leading-[1.6]">
+      <div className="overflow-x-auto border-2 border-border bg-[var(--frappe-editorCanvas)] py-2 font-code [font-variant-ligatures:none] text-[13px] leading-[22px] sm:text-sm sm:leading-[24px]">
         {lines.map((line, index) =>
           line.type === hide ? (
             <div key={index} className="px-2 whitespace-pre" aria-hidden>

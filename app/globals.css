@@ -41,17 +41,58 @@
   --success-foreground: #0d1117;
   --warning: #f0b429;
   --warning-foreground: #0d1117;
+
+  /*
+    Catppuccin Frappe, the editor's theme. Kept here as well because the result page paints
+    code with highlight.js rather than with Monaco, and the two have to agree; the source of
+    record is FRAPPE in lib/monaco-catppuccin-frappe.ts and a test compares them.
+  */
+  --frappe-rosewater: #f2d5cf;
+  --frappe-flamingo: #eebebe;
+  --frappe-pink: #f4b8e4;
+  --frappe-mauve: #ca9ee6;
+  --frappe-red: #e78284;
+  --frappe-maroon: #ea999c;
+  --frappe-peach: #ef9f76;
+  --frappe-yellow: #e5c890;
+  --frappe-green: #a6d189;
+  --frappe-teal: #81c8be;
+  --frappe-sky: #99d1db;
+  --frappe-sapphire: #85c1dc;
+  --frappe-blue: #8caaee;
+  --frappe-lavender: #babbf1;
+  --frappe-text: #c6d0f5;
+  --frappe-subtext1: #b5bfe2;
+  --frappe-subtext0: #a5adce;
+  --frappe-overlay2: #949cbb;
+  --frappe-overlay1: #838ba7;
+  --frappe-overlay0: #737994;
+  --frappe-surface2: #626880;
+  --frappe-surface1: #51576d;
+  --frappe-surface0: #414559;
+  --frappe-base: #303446;
+  --frappe-mantle: #292c3c;
+  --frappe-crust: #232634;
+  --frappe-editorCanvas: #1a1c27;
 }
 
 /**
- * Syntax highlighting, mapped onto the palette above instead of one of highlight.js' own
- * themes: those ship their own background and their own greys, and drop a foreign-looking
- * block into the middle of the terminal look. The hues follow GitHub dark, which this
- * palette already is.
+ * Syntax highlighting, mapped class by class onto the token rules of the editor's theme
+ * (`registerCatppuccinFrappeTheme`). The result page shows the same code twice - written in
+ * Monaco, read back in a block - and the two used to disagree on every colour: `return` was
+ * mauve while typing and red while reading.
+ *
+ * highlight.js and Monaco cut tokens differently, so the mapping is by meaning, not by name.
+ * `hljs-literal` covers true/false/null, which Monaco tokenises as keywords; `hljs-built_in`
+ * and `hljs-type` share the rule Monaco gives `type` and `class`.
  */
+.hljs {
+  color: var(--frappe-text);
+}
+
 .hljs-comment,
 .hljs-quote {
-  color: var(--muted-foreground);
+  color: var(--frappe-overlay0);
   font-style: italic;
 }
 
@@ -59,42 +100,59 @@
 .hljs-selector-tag,
 .hljs-literal,
 .hljs-doctag,
-.hljs-name {
-  color: #ff7b72;
+.hljs-name,
+.hljs-meta,
+.hljs-tag {
+  color: var(--frappe-mauve);
 }
 
 .hljs-string,
-.hljs-regexp,
 .hljs-addition,
-.hljs-template-tag {
-  color: #a5d6ff;
+.hljs-template-tag,
+.hljs-attribute {
+  color: var(--frappe-green);
+}
+
+.hljs-regexp {
+  color: var(--frappe-pink);
 }
 
 .hljs-number,
 .hljs-symbol,
 .hljs-bullet,
 .hljs-variable.constant_ {
-  color: #79c0ff;
+  color: var(--frappe-peach);
 }
 
 .hljs-title,
 .hljs-title.function_,
-.hljs-title.class_,
 .hljs-section {
-  color: #d2a8ff;
+  color: var(--frappe-blue);
 }
 
+.hljs-title.class_,
 .hljs-built_in,
 .hljs-type,
-.hljs-attr,
-.hljs-attribute,
-.hljs-params {
-  color: #ffa657;
+.hljs-attr {
+  color: var(--frappe-yellow);
 }
 
-.hljs-meta,
+.hljs-params {
+  color: var(--frappe-flamingo);
+}
+
+.hljs-variable,
+.hljs-property {
+  color: var(--frappe-text);
+}
+
+.hljs-operator,
+.hljs-punctuation {
+  color: var(--frappe-overlay2);
+}
+
 .hljs-deletion {
-  color: var(--muted-foreground);
+  color: var(--frappe-red);
 }
 
 .hljs-emphasis {

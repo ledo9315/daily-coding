@@ -30,8 +30,8 @@ const SECTIONS = [
 
 /** Endonyms - a language names itself the same way in every UI language. */
 const LOCALE_OPTIONS: { id: AppLocale; label: string }[] = [
-  { id: "de", label: "Deutsch" },
   { id: "en", label: "English" },
+  { id: "de", label: "Deutsch" },
 ];
 
 type SectionId = (typeof SECTIONS)[number]["id"];
