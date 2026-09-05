@@ -3,6 +3,7 @@
 [![CI](https://github.com/ledo9315/daily-coding/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ledo9315/daily-coding/actions/workflows/ci.yml)
 [![Letzter Commit](https://img.shields.io/github/last-commit/ledo9315/daily-coding?label=letzter%20Commit&color=c4fe4d)](https://github.com/ledo9315/daily-coding/commits/main)
 [![Aufrufe](https://hits.sh/github.com/ledo9315/daily-coding.svg?label=Aufrufe&color=c4fe4d)](https://hits.sh/github.com/ledo9315/daily-coding/)
+[![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-c4fe4d)](LICENSE)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-0d1117?logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-0d1117?logo=react&logoColor=61DAFB)
@@ -140,4 +141,6 @@ Neues Verhalten kommt mit Tests. Die Konventionen im Detail - auch die Sprachreg
 
 ## Lizenz
 
-Noch keine. Ohne Lizenzdatei gilt das volle Urheberrecht: dieser Code darf nicht verwendet, kopiert oder verändert werden, auch wenn das Repository öffentlich ist. Eine Lizenz folgt.
+[MIT](LICENSE). Der Code darf frei verwendet, verändert und weitergegeben werden, solange der Urheberhinweis erhalten bleibt.
+
+Die Pixel-Art unter `public/user/` (Avatare) und `public/pixel/` (Landing-Banner) ist mit ChatGPT erzeugt. Nach den OpenAI-Nutzungsbedingungen liegen die Rechte an den Ausgaben beim Nutzer; die Bilder stehen daher ohne Einschränkung unter derselben MIT-Lizenz.
