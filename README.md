@@ -15,7 +15,7 @@
 
 **English** · [Deutsch](#deutsch)
 
-<img width="800" height="462" alt="dashboard" src="https://github.com/user-attachments/assets/726bd133-a25e-449b-805d-e0420d553243" />
+<img width="800" height="471" alt="The Daily Coding landing page: one challenge every day, with the dashboard below" src="docs/landing.webp" />
 
 A coding challenge platform: one task a day, solved in the browser, graded against real test cases in a sandbox. With a leaderboard, streaks, levels and badges.
 
