@@ -30,3 +30,26 @@ export function consecutiveStreakFromCompletedDaySet(
 ): number {
   return currentStreakDayKeys(dayStartUtc, completedDays).size;
 }
+
+/**
+ * The last `days` UTC days ending at `dayStartUtc` (inclusive), oldest first, each true
+ * when it carries a completed submission.
+ *
+ * Unlike the streak this does not stop at the first gap - a week with a hole in it is
+ * exactly what the shared result is meant to show.
+ */
+export function completedWeekStrip(
+  dayStartUtc: Date,
+  completedDays: Set<string>,
+  days: number
+): boolean[] {
+  const cursor = new Date(dayStartUtc);
+  cursor.setUTCDate(cursor.getUTCDate() - (days - 1));
+
+  const strip: boolean[] = [];
+  for (let i = 0; i < days; i += 1) {
+    strip.push(completedDays.has(utcDayKey(cursor)));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return strip;
+}

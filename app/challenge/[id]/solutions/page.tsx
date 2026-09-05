@@ -12,6 +12,7 @@ import { PointsChip } from "@/components/points-chip";
 import type { TestCase } from "@/components/test-results";
 import { ChallengePanels } from "@/components/challenge-result/challenge-panels";
 import { ResultEffects } from "@/components/challenge-result/result-effects";
+import { ShareResult } from "@/components/challenge-result/share-result";
 import { SolutionList } from "@/components/challenge-result/solution-list";
 import { PageAmbience } from "@/components/page-ambience";
 import { languageLabel, type CodeLanguageId } from "@/lib/challenge-languages";
@@ -20,6 +21,7 @@ import { challengeResultPath } from "@/lib/navigation";
 import { localizedPath } from "@/lib/site";
 import { prisma } from "@/lib/prisma";
 import { getOwnChallengeResult } from "@/lib/server/challenge-result";
+import { buildShareResultText } from "@/lib/server/share-result";
 
 // Overrides the title of app/challenge/layout.tsx - and its alternates, which name the
 // public task page and would otherwise be inherited as this page's canonical.
@@ -59,6 +61,14 @@ export default async function ChallengeResultPage({ params }: PageProps) {
   const isTodaysChallenge = rotation?.challengeId === challenge.id;
 
   const revised = submission.updatedAt.getTime() !== submission.createdAt.getTime();
+
+  const shareText = await buildShareResultText({
+    userId: session.user.id,
+    submittedAt: submission.createdAt,
+    challengeTitle: challenge.title,
+    difficulty: challenge.difficulty,
+    locale,
+  });
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -109,6 +119,10 @@ export default async function ChallengeResultPage({ params }: PageProps) {
             </>
           )}
         </p>
+
+        {/* Above the task, not below the code: the reader arrives here straight from a
+            passing submission, and this is the one thing on the page that leads outward. */}
+        <ShareResult text={shareText} />
 
         <ChallengePanels description={challenge.description} testResults={testCases} />
 
