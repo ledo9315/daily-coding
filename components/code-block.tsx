@@ -64,10 +64,18 @@ export function CodeBlock({
         className
       )}
     >
+      {/*
+        `font-code` again on the `code`, not only on the `pre` around it. Tailwind's preflight
+        styles `code, kbd, samp, pre` with `--font-mono`, which in this palette is VT323, the
+        pixel face of the body text - and a rule that names the element beats what it would
+        inherit from its parent. The block was therefore set in VT323 while the editor beside
+        it ran in JetBrains Mono: narrower by a third, and paler, because the thin pixel
+        strokes cover fewer pixels at the same colour.
+      */}
       {html === null ? (
-        <code>{code}</code>
+        <code className="font-code">{code}</code>
       ) : (
-        <code className="hljs" dangerouslySetInnerHTML={{ __html: html }} />
+        <code className="hljs font-code" dangerouslySetInnerHTML={{ __html: html }} />
       )}
     </pre>
   );
