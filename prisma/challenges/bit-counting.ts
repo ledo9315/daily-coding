@@ -22,10 +22,10 @@ export const challenge: ChallengeContent = {
     "stehen. 1234 ist binär 10011010010 und enthält fünf Einsen, also ist die Antwort 5. Für 0 " +
     "ist die Antwort 0.\n\n" +
     "n bleibt im Bereich einer vorzeichenbehafteten 32-Bit-Zahl, der größte Wert ist also " +
-    "2147483647 – und der hat 31 Einsen.\n\n" +
+    "2147483647, und der hat 31 Einsen.\n\n" +
     "Die Aufgabe prüft, ob du eine Zahl als Bitfolge lesen kannst. Der Umweg über einen String " +
-    "funktioniert, die eigentliche Idee ist aber, die Bits mit Rest und Division – oder mit " +
-    "Shift und Und – einzeln abzufragen.",
+    "funktioniert, die eigentliche Idee ist aber, die Bits mit Rest und Division, oder mit " +
+    "Shift und Und, einzeln abzufragen.",
   difficulty: "easy",
   points: 100,
   categoryId: CATEGORY.algorithmen,
@@ -33,8 +33,8 @@ export const challenge: ChallengeContent = {
     {
       title: "Die Idee",
       body:
-        "Das unterste Bit einer Zahl ist n % 2 bzw. n & 1. Halbierst du n – ganzzahlig durch 2 " +
-        "oder n >> 1 –, rückt das nächste Bit nach unten. So ziehst du die Binärdarstellung Bit " +
+        "Das unterste Bit einer Zahl ist n % 2 bzw. n & 1. Halbierst du n (ganzzahlig durch 2 " +
+        "oder n >> 1), rückt das nächste Bit nach unten. So ziehst du die Binärdarstellung Bit " +
         "für Bit ab, ohne sie je als Ganzes aufzuschreiben.",
     },
     {
@@ -42,7 +42,7 @@ export const challenge: ChallengeContent = {
       body:
         "Starte mit count = 0. Solange n größer als 0 ist: addiere n & 1 zu count und setze n " +
         "auf n >> 1. Am Ende steht in count die Anzahl der Einsen.\n\n" +
-        "Alternativ wandelst du n in einen Binärstring um und zählst die Zeichen „1“ – in den " +
+        "Alternativ wandelst du n in einen Binärstring um und zählst die Zeichen „1“, in den " +
         "meisten Sprachen eine Zeile, und für diese Aufgabe völlig legitim.",
     },
     {
@@ -64,17 +64,17 @@ export const challenge: ChallengeContent = {
         "Return how many ones the binary representation of the non-negative integer n contains. " +
         "1234 is 10011010010 in binary and contains five ones, so the answer is 5. For 0 the " +
         "answer is 0.\n\n" +
-        "n stays within the range of a signed 32-bit number, so the largest value is 2147483647 " +
-        "– and that one has 31 ones.\n\n" +
+        "n stays within the range of a signed 32-bit number, so the largest value is 2147483647, " +
+        "and that one has 31 ones.\n\n" +
         "This task checks whether you can read a number as a sequence of bits. The detour through " +
         "a string works, but the actual idea is to ask for the bits one at a time with remainder " +
-        "and division – or with a shift and a bitwise and.",
+        "and division, or with a shift and a bitwise and.",
       hints: [
         {
           title: "The idea",
           body:
-            "The lowest bit of a number is n % 2, or n & 1. Halve n – integer division by 2, or " +
-            "n >> 1 – and the next bit moves down into that place. That way you peel the binary " +
+            "The lowest bit of a number is n % 2, or n & 1. Halve n (integer division by 2 or " +
+            "n >> 1), and the next bit moves down into that place. That way you peel the binary " +
             "representation off bit by bit, without ever writing it out as a whole.",
         },
         {
@@ -82,7 +82,7 @@ export const challenge: ChallengeContent = {
           body:
             "Start with count = 0. As long as n is greater than 0: add n & 1 to count and set n " +
             "to n >> 1. At the end count holds the number of ones.\n\n" +
-            "Alternatively you convert n into a binary string and count the \"1\" characters – one " +
+            "Alternatively you convert n into a binary string and count the \"1\" characters, one " +
             "line in most languages, and perfectly legitimate for this task.",
         },
         {

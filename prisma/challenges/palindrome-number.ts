@@ -21,7 +21,7 @@ export const challenge: ChallengeContent = {
     "Gib true zurück, wenn die ganze Zahl x vorwärts und rückwärts gelesen gleich ist, " +
     "sonst false. Negative Zahlen sind keine Palindrome: -121 liest sich rückwärts als " +
     "121-. Die 0 ist eines, jede einzelne Ziffer auch.\n\n" +
-    "Die Zahl in einen String zu verwandeln und zu spiegeln funktioniert – geht aber am " +
+    "Die Zahl in einen String zu verwandeln und zu spiegeln funktioniert, geht aber am " +
     "Kern vorbei. Der Punkt der Aufgabe ist, die Ziffern arithmetisch umzudrehen: Die " +
     "letzte Ziffer liefert x % 10, und die ganzzahlige Division durch 10 streicht sie.",
   difficulty: "easy",
@@ -33,7 +33,7 @@ export const challenge: ChallengeContent = {
       body:
         "Baue aus den Ziffern von hinten eine neue Zahl auf: Jede abgeholte Ziffer wird " +
         "rechts an die bisherige Umkehrung angehängt, indem du die Umkehrung mit 10 " +
-        "multiplizierst und die Ziffer addierst. Am Ende steht die gespiegelte Zahl – " +
+        "multiplizierst und die Ziffer addierst. Am Ende steht die gespiegelte Zahl, " +
         "und die vergleichst du mit dem Original.",
     },
     {
@@ -47,10 +47,10 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Wer x in der Schleife verändert, ohne das Original zu sichern, hat am Ende " +
-        "nichts mehr zum Vergleichen – rev wird dann mit 0 verglichen.\n\n" +
+        "nichts mehr zum Vergleichen. Rev wird dann mit 0 verglichen.\n\n" +
         "Die Division muss ganzzahlig sein. In JavaScript liefert x / 10 einen Bruch " +
         "und die Schleife endet nie; nimm Math.floor oder Math.trunc, in Python //.\n\n" +
-        "Die Schleifenbedingung ist x > 0, nicht x >= 0 – sonst dreht sich die 0 endlos. " +
+        "Die Schleifenbedingung ist x > 0, nicht x >= 0, sonst dreht sich die 0 endlos. " +
         "Und die Prüfung auf negative Zahlen kommt zuerst: In manchen Sprachen ist -121 % " +
         "10 gleich -1, in anderen 9, und beides führt in eine falsche Richtung.",
     },
@@ -91,7 +91,7 @@ export const challenge: ChallengeContent = {
         "Return true if the integer x reads the same forwards and backwards, otherwise false. " +
         "Negative numbers are not palindromes: -121 read backwards is 121-. 0 is one, and so " +
         "is every single digit.\n\n" +
-        "Turning the number into a string and mirroring it works – but it misses the point. " +
+        "Turning the number into a string and mirroring it works, but it misses the point. " +
         "The point of this task is to reverse the digits arithmetically: x % 10 gives you the " +
         "last digit, and integer division by 10 drops it.",
       hints: [
@@ -100,7 +100,7 @@ export const challenge: ChallengeContent = {
           body:
             "Build a new number out of the digits, back to front: every digit you pick off is " +
             "appended on the right of the reversal so far, by multiplying that reversal by 10 " +
-            "and adding the digit. What you end up with is the mirrored number – and that is " +
+            "and adding the digit. What you end up with is the mirrored number, and that is " +
             "what you compare with the original.",
         },
         {
@@ -114,10 +114,10 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "Change x inside the loop without saving the original first and you have nothing " +
-            "left to compare at the end – rev then gets compared with 0.\n\n" +
+            "left to compare at the end. Rev then gets compared with 0.\n\n" +
             "The division has to be an integer division. In JavaScript x / 10 gives you a " +
             "fraction and the loop never ends; use Math.floor or Math.trunc, in Python //.\n\n" +
-            "The loop condition is x > 0, not x >= 0 – otherwise 0 spins forever. And the " +
+            "The loop condition is x > 0, not x >= 0, otherwise 0 spins forever. And the " +
             "check for negative numbers comes first: in some languages -121 % 10 is -1, in " +
             "others 9, and both lead the wrong way.",
         },

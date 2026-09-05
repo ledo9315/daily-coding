@@ -47,7 +47,7 @@ export const challenge: ChallengeContent = {
         "15, greift sie bei 15 zuerst und „FizzBuzz\" kommt nie zustande.\n\n" +
         "Im Array stehen ausschließlich Strings, auch die Zahlen selbst: 1 wird zu \"1\". " +
         "Eine Zahl im Array lässt den Vergleich mit der Erwartung scheitern.\n\n" +
-        "Die Schleife läuft bei 1 los und schließt n mit ein – nicht bei 0 beginnen und " +
+        "Die Schleife läuft bei 1 los und schließt n mit ein, nicht bei 0 beginnen und " +
         "nicht vor n abbrechen.",
     },
   ],
@@ -115,7 +115,7 @@ export const challenge: ChallengeContent = {
             "The array holds strings and nothing else, the numbers included: 1 becomes " +
             '"1". A number in the array makes the comparison with the expected value ' +
             "fail.\n\n" +
-            "The loop starts at 1 and includes n – do not start at 0 and do not stop " +
+            "The loop starts at 1 and includes n. Do not start at 0 and do not stop " +
             "before n.",
         },
       ],

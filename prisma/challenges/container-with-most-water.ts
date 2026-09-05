@@ -35,7 +35,7 @@ export const challenge: ChallengeContent = {
       body:
         "Fang mit dem breitesten Behälter an: die Linie ganz links und die ganz rechts. Jeder " +
         "Schritt nach innen macht ihn schmaler, also lohnt er sich nur, wenn die Höhe wachsen " +
-        "kann – und die gibt die niedrigere Linie vor. Die höhere Seite stehen zu lassen und die " +
+        "kann, und die gibt die niedrigere Linie vor. Die höhere Seite stehen zu lassen und die " +
         "niedrigere nach innen zu schieben ist deshalb der einzige Zug, der etwas gewinnen kann.",
     },
     {
@@ -49,7 +49,7 @@ export const challenge: ChallengeContent = {
     {
       title: "Woran die meisten scheitern",
       body:
-        "Die Fläche ist die Höhe der niedrigeren Linie mal den Abstand der Indizes – nicht die " +
+        "Die Fläche ist die Höhe der niedrigeren Linie mal den Abstand der Indizes, nicht die " +
         "Summe der Höhen und nicht der Abstand plus eins. Bei [1,1] ist der Abstand 1, also ist " +
         "die Fläche 1.\n\n" +
         "Wer den höheren Zeiger bewegt, verliert Breite ohne eine Chance auf mehr Höhe: Beim " +
@@ -76,7 +76,7 @@ export const challenge: ChallengeContent = {
           title: "The idea",
           body:
             "Start with the widest container: the leftmost line and the rightmost one. Every step " +
-            "inwards makes it narrower, so it only pays off if the height can grow – and the " +
+            "inwards makes it narrower, so it only pays off if the height can grow, and the " +
             "shorter line is what sets that height. Leaving the taller side where it is and " +
             "moving the shorter one inwards is therefore the only move that can gain anything.",
         },
@@ -91,7 +91,7 @@ export const challenge: ChallengeContent = {
         {
           title: "Where most people go wrong",
           body:
-            "The area is the height of the shorter line times the distance between the indices – " +
+            "The area is the height of the shorter line times the distance between the indices, " +
             "not the sum of the heights, and not the distance plus one. For [1,1] the distance is " +
             "1, so the area is 1.\n\n" +
             "Moving the taller pointer loses width without any chance at more height: on the " +

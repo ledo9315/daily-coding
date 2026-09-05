@@ -221,7 +221,7 @@ export function AdminChallengeForm({
     if (!english && englishTouched) {
       setContentLang("en");
       toast.error(
-        "Die englische Fassung braucht Titel und Beschreibung – oder alle englischen Felder leeren.",
+        "Die englische Fassung braucht Titel und Beschreibung, oder alle englischen Felder leeren.",
       );
       return;
     }
@@ -436,7 +436,7 @@ export function AdminChallengeForm({
                 className="rounded-none font-mono text-xs min-h-[120px]"
               />
               <p className="text-xs text-muted-foreground">
-                Werden einzeln aufgeklappt. Vom Groben zum Konkreten sortieren – der letzte
+                Werden einzeln aufgeklappt. Vom Groben zum Konkreten sortieren. Der letzte
                 Schritt darf die typischen Fehler nennen.
               </p>
             </div>
@@ -448,7 +448,7 @@ export function AdminChallengeForm({
                 className="rounded-none font-mono text-xs min-h-[140px]"
               />
               <p className="text-xs text-muted-foreground">
-                Jeder Testfall braucht eine <code>id</code> – der englische Name hängt daran,
+                Jeder Testfall braucht eine <code>id</code>. Der englische Name hängt daran,
                 nicht an der Position.
               </p>
             </div>
@@ -482,7 +482,7 @@ export function AdminChallengeForm({
               <Label>Hints</Label>
               {germanHints.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Keine Hinweise im deutschen Reiter – oder das JSON dort ist noch ungültig.
+                  Keine Hinweise im deutschen Reiter, oder das JSON dort ist noch ungültig.
                 </p>
               ) : (
                 germanHints.map((german, index) => (
@@ -511,13 +511,13 @@ export function AdminChallengeForm({
               <Label>Test case names</Label>
               {germanTestCases.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Keine Testfälle im deutschen Reiter – oder das JSON dort ist noch ungültig.
+                  Keine Testfälle im deutschen Reiter, oder das JSON dort ist noch ungültig.
                 </p>
               ) : (
                 germanTestCases.map((testCase, index) =>
                   testCase.id === undefined ? (
                     <p key={index} className="text-xs text-muted-foreground">
-                      {index + 1}. {testCase.name || "(ohne Name)"} – ohne{" "}
+                      {index + 1}. {testCase.name || "(ohne Name)"}: ohne{" "}
                       <code>id</code> nicht übersetzbar.
                     </p>
                   ) : (
@@ -544,7 +544,7 @@ export function AdminChallengeForm({
         </Tabs>
         <p className="text-xs text-muted-foreground">
           Punkte, Schwierigkeit, Kategorie, Beispiele, Testdaten, Funktionsnamen und
-          Starter-Code gehören zur Aufgabe und nicht zu einer Sprache – sie stehen nur einmal
+          Starter-Code gehören zur Aufgabe und nicht zu einer Sprache. Sie stehen nur einmal
           im Formular.
         </p>
       </div>

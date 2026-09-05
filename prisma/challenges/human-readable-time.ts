@@ -23,7 +23,7 @@ export const challenge: ChallengeContent = {
     'zwei Stellen, bei Bedarf mit führender Null: 5 Sekunden werden zu "00:00:05", 3661 ' +
     'Sekunden zu "01:01:01".\n\n' +
     "seconds liegt zwischen 0 und 359999. Die Stunden laufen nicht bei 24 über, sondern zählen " +
-    'einfach weiter – der größte Wert ergibt "99:59:59".\n\n' +
+    'einfach weiter. Der größte Wert ergibt "99:59:59".\n\n' +
     "Die Rechnung ist Division mit Rest, dreimal. Die Aufgabe prüft, ob du die Anteile in der " +
     "richtigen Reihenfolge herauslöst und die Formatierung nicht dem Zufall überlässt.",
   difficulty: "easy",
@@ -40,15 +40,15 @@ export const challenge: ChallengeContent = {
     {
       title: "Die Umsetzung",
       body:
-        "Berechne h, m und s wie in der Idee beschrieben. Formatiere jede Zahl zweistellig – " +
-        'padStart(2, "0") in JavaScript, f"{h:02d}" in Python, String.format("%02d") in Java – ' +
+        "Berechne h, m und s wie in der Idee beschrieben. Formatiere jede Zahl zweistellig: " +
+        'padStart(2, "0") in JavaScript, f"{h:02d}" in Python, String.format("%02d") in Java, ' +
         "und füge sie mit Doppelpunkten zusammen. Wer lieber selbst rechnet: Bei Werten unter " +
         'zehn eine "0" voranstellen tut es auch.',
     },
     {
       title: "Woran die meisten scheitern",
       body:
-        'Die Stunden bei 24 abschneiden. Es sind Dauern, keine Uhrzeiten – 86400 Sekunden sind "24:00:00", ' +
+        'Die Stunden bei 24 abschneiden. Es sind Dauern, keine Uhrzeiten. 86400 Sekunden sind "24:00:00", ' +
         'nicht "00:00:00".\n\n' +
         "Die Division muss ganzzahlig sein. In JavaScript liefert 3661 / 3600 einen Bruch, du " +
         "brauchst Math.floor; in Python ist es // statt /.\n\n" +
@@ -92,7 +92,7 @@ export const challenge: ChallengeContent = {
         'digits, padded with a leading zero where needed: 5 seconds become "00:00:05", 3661 ' +
         'seconds become "01:01:01".\n\n' +
         "seconds is between 0 and 359999. The hours do not wrap at 24, they simply keep " +
-        'counting – the largest value gives "99:59:59".\n\n' +
+        'counting. The largest value gives "99:59:59".\n\n' +
         "The math is integer division with a remainder, three times. The task checks whether " +
         "you pull the parts out in the right order and do not leave the formatting to chance.",
       hints: [
@@ -106,15 +106,15 @@ export const challenge: ChallengeContent = {
         {
           title: "The implementation",
           body:
-            "Compute h, m and s as described in the idea. Format each number to two digits – " +
+            "Compute h, m and s as described in the idea. Format each number to two digits: " +
             'padStart(2, "0") in JavaScript, f"{h:02d}" in Python, String.format("%02d") in ' +
-            'Java – and join them with colons. If you would rather do it by hand: prefixing a "0" ' +
+            'Java, and join them with colons. If you would rather do it by hand: prefixing a "0" ' +
             "for values below ten works just as well.",
         },
         {
           title: "Where most people go wrong",
           body:
-            "Cutting the hours off at 24. These are durations, not clock times – 86400 seconds " +
+            "Cutting the hours off at 24. These are durations, not clock times. 86400 Seconds " +
             'are "24:00:00", not "00:00:00".\n\n' +
             "The division has to drop the fraction. In JavaScript 3661 / 3600 gives a decimal, " +
             "you need Math.floor; in Python it is // instead of /.\n\n" +

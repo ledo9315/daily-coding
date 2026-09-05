@@ -50,7 +50,7 @@
     },
     "registration": {
       "title": "2. Processing for registration and your account",
-      "p1": "To use Daily Coding you create a user account. In doing so we process your name, your email address and your password. The password is stored solely as a cryptographic hash (bcrypt) – at no point is it available to us in plain text. To verify your email address and to reset your password we generate tokens with a limited lifetime.",
+      "p1": "To use Daily Coding you create a user account. In doing so we process your name, your email address and your password. The password is stored solely as a cryptographic hash (bcrypt). At no point is it available to us in plain text. To verify your email address and to reset your password we generate tokens with a limited lifetime.",
       "p2": "The legal basis is the performance of the terms of use pursuant to Art. 6 (1) (b) GDPR."
     },
     "oauth": {

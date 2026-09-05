@@ -19,7 +19,7 @@ export const challenge: ChallengeContent = {
   description:
     "Implementiere maxProfit(prices).\n\n" +
     "prices[i] ist der Kurs einer Aktie am Tag i. Du kaufst an einem Tag und verkaufst an " +
-    "einem späteren Tag – genau einmal. Gib den größten Gewinn zurück, der so möglich ist. " +
+    "einem späteren Tag, genau einmal. Gib den größten Gewinn zurück, der so möglich ist. " +
     "Lässt sich kein Gewinn erzielen, gib 0 zurück; das gilt auch für ein leeres Array und " +
     "für einen einzelnen Tag.\n\n" +
     "Jedes Paar aus Kauf- und Verkaufstag durchzuprobieren kostet O(n²). Die Aufgabe " +
@@ -50,7 +50,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Größter minus kleinster Kurs im ganzen Array ist falsch: Bei [3,8,1,5] wäre das " +
-        "7, aber der Kurs 1 kommt nach der 8. Verkaufen geht nur nach dem Kaufen – deshalb " +
+        "7, aber der Kurs 1 kommt nach der 8. Verkaufen geht nur nach dem Kaufen. Deshalb " +
         "darf ins Minimum nur einfließen, was vor dem aktuellen Tag lag.\n\n" +
         "Der beste Gewinn startet bei 0, nicht bei der ersten Differenz. Sonst gibst du " +
         "bei fallenden Kursen einen negativen Wert zurück.\n\n" +
@@ -64,7 +64,7 @@ export const challenge: ChallengeContent = {
       title: "Best Time to Buy and Sell Stock",
       description:
         "Implement maxProfit(prices).\n\n" +
-        "prices[i] is a stock's price on day i. You buy on one day and sell on a later day – " +
+        "prices[i] is a stock's price on day i. You buy on one day and sell on a later day, " +
         "exactly once. Return the largest profit that is possible that way. If no profit can be " +
         "made, return 0; that holds for an empty array and for a single day as well.\n\n" +
         "Trying every pair of buy and sell day costs O(n²). This task aims at the single pass: " +
@@ -91,7 +91,7 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "Largest minus smallest price across the whole array is wrong: for [3,8,1,5] that " +
-            "would be 7, but the price 1 comes after the 8. You can only sell after buying – so " +
+            "would be 7, but the price 1 comes after the 8. You can only sell after buying, so " +
             "the minimum may only take in what lay before the current day.\n\n" +
             "The best profit starts at 0, not at the first difference. Otherwise you return a " +
             "negative value when prices fall.\n\n" +

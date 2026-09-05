@@ -24,7 +24,7 @@ export const challenge: ChallengeContent = {
     "Gib true zurück, wenn t ein Anagramm von s ist, also aus denselben Buchstaben in " +
     "derselben Anzahl besteht.\n\n" +
     "Zwei Wege führen zum Ziel: sortieren und vergleichen, oder zählen und " +
-    "vergleichen. Der erste ist kürzer, der zweite schneller – ein Fall, an dem sich " +
+    "vergleichen. Der erste ist kürzer, der zweite schneller, ein Fall, an dem sich " +
     "gut sehen lässt, was ein Sortiervorgang kostet.",
   difficulty: "easy",
   points: 100,
@@ -51,11 +51,11 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Die Länge zuerst. Sind s und t unterschiedlich lang, kann es kein Anagramm " +
-        "sein – und beim Zählweg würdest du das sonst leicht übersehen, weil ein " +
+        "sein, und beim Zählweg würdest du das sonst leicht übersehen, weil ein " +
         "zusätzlicher Buchstabe in t nur einen Zähler ins Minus schiebt.\n\n" +
         "Zwei leere Strings sind ein Anagramm: die Antwort ist true, nicht false.\n\n" +
         "Beim Vergleich von Buchstabentabellen reicht es nicht, dass jeder Buchstabe " +
-        "aus s in t vorkommt. Es geht um die Anzahl – prüfe die Zähler, nicht bloß " +
+        "aus s in t vorkommt. Es geht um die Anzahl. Prüfe die Zähler, nicht bloß " +
         "die Anwesenheit.",
     },
   ],
@@ -92,7 +92,7 @@ export const challenge: ChallengeContent = {
         "Return true if t is an anagram of s, meaning it consists of the same letters " +
         "in the same counts.\n\n" +
         "Two ways get you there: sort and compare, or count and compare. The first is " +
-        "shorter, the second faster – a case where it is easy to see what a sort " +
+        "shorter, the second faster, a case where it is easy to see what a sort " +
         "actually costs.",
       hints: [
         {
@@ -115,11 +115,11 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "The length first. If s and t have different lengths it cannot be an " +
-            "anagram – and when counting you would easily miss that, " +
+            "anagram, and when counting you would easily miss that, " +
             "because one extra letter in t only pushes a single counter below zero.\n\n" +
             "Two empty strings are an anagram: the answer is true, not false.\n\n" +
             "When comparing letter tables it is not enough that every letter from s " +
-            "occurs in t. It is about the counts – check the counters, not just " +
+            "occurs in t. It is about the counts. Check the counters, not just " +
             "presence.",
         },
       ],

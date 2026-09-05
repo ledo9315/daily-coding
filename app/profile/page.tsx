@@ -90,7 +90,7 @@ export default async function ProfilePage() {
               />
               <StatsCard
                 title={t("profilePage.statsRank")}
-                value={profile.stats.totalSolved > 0 ? profile.stats.rank : "–"}
+                value={profile.stats.totalSolved > 0 ? profile.stats.rank : "-"}
                 description={t("profilePage.statsRankDescription", {
                   total: profile.stats.totalUsers,
                 })}

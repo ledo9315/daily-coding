@@ -35,7 +35,7 @@ export const challenge: ChallengeContent = {
       title: "Die Idee",
       body:
         "Nimm das erste Wort als Kandidaten für das Präfix. Jedes weitere Wort kann " +
-        "den Kandidaten nur kürzen – auf den Teil, den beide gemeinsam haben. Ist der " +
+        "den Kandidaten nur kürzen, auf den Teil, den beide gemeinsam haben. Ist der " +
         "Kandidat nach allen Wörtern noch nicht leer, ist er das gesuchte Präfix.\n\n" +
         "Alternativ gehst du Position für Position: Solange alle Wörter an Stelle i " +
         "dasselbe Zeichen haben, gehört es zum Präfix. Beim ersten Unterschied ist Schluss.",
@@ -47,7 +47,7 @@ export const challenge: ChallengeContent = {
         "Zeichen, solange das Wort nicht mit prefix beginnt. Wird prefix dabei leer, " +
         "kannst du sofort den leeren String zurückgeben. Bleibt nach dem letzten Wort " +
         "etwas übrig, gib es zurück.\n\n" +
-        "Fast jede Sprache hat eine Funktion wie startsWith – die spart dir den " +
+        "Fast jede Sprache hat eine Funktion wie startsWith. Die spart dir den " +
         "Zeichenvergleich von Hand.",
     },
     {
@@ -56,10 +56,10 @@ export const challenge: ChallengeContent = {
         "Über das Ende eines kürzeren Wortes hinauslesen: \"flow\" hat kein fünftes " +
         "Zeichen. Wer zeichenweise vergleicht, prüft zuerst die Länge und dann das Zeichen.\n\n" +
         "Gesucht ist ein Präfix, kein gemeinsamer Teilstring. \"flow\" und \"slow\" teilen " +
-        "sich \"low\", aber kein Präfix – das Ergebnis ist \"\".\n\n" +
+        "sich \"low\", aber kein Präfix. Das Ergebnis ist \"\".\n\n" +
         "Bei einem einzelnen Wort läuft der Vergleich ins Leere, das Wort selbst ist die " +
         "Antwort. Und gib bei „nichts gemeinsam“ den leeren String zurück, nicht null " +
-        "oder undefined. Ein leeres Wort im Array macht das Präfix sofort leer – der Kandidat " +
+        "oder undefined. Ein leeres Wort im Array macht das Präfix sofort leer. Der Kandidat " +
         "wird auf nichts gekürzt.",
     },
   ],
@@ -107,7 +107,7 @@ export const challenge: ChallengeContent = {
           title: "The idea",
           body:
             "Take the first word as the candidate for the prefix. Every further word can only " +
-            "cut the candidate down – to the part the two have in common. If the candidate is " +
+            "cut the candidate down, to the part the two have in common. If the candidate is " +
             "still not empty after all the words, it is the prefix you are looking for.\n\n" +
             "Alternatively you go position by position: as long as every word has the same " +
             "character at position i, that character belongs to the prefix. The first difference " +
@@ -120,7 +120,7 @@ export const challenge: ChallengeContent = {
             "prefix as long as the word does not start with prefix. If prefix runs empty on the " +
             "way, you can return the empty string right away. If something is left after the " +
             "last word, return it.\n\n" +
-            "Almost every language has a function like startsWith – that saves you comparing " +
+            "Almost every language has a function like startsWith. That saves you comparing " +
             "characters by hand.",
         },
         {
@@ -129,10 +129,10 @@ export const challenge: ChallengeContent = {
             'Reading past the end of a shorter word: "flow" has no fifth character. If you ' +
             "compare character by character, check the length first and the character second.\n\n" +
             'What is asked for is a prefix, not a common substring. "flow" and "slow" share ' +
-            '"low", but no prefix – the result is "".\n\n' +
+            '"low", but no prefix. The result is "".\n\n' +
             "With a single word there is nothing to compare; the word itself is the " +
             'answer. And for "nothing in common" return the empty string, not null or ' +
-            "undefined. An empty word in the array makes the prefix empty at once – the " +
+            "undefined. An empty word in the array makes the prefix empty at once. The " +
             "candidate gets cut down to nothing.",
         },
       ],

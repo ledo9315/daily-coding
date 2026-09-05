@@ -20,10 +20,10 @@ export const challenge: ChallengeContent = {
   description:
     "Implementiere longestConsecutive(nums).\n\n" +
     "Gib die Länge der längsten Folge direkt aufeinanderfolgender ganzer Zahlen zurück, die " +
-    "in nums vorkommen – egal, wo sie im Array stehen. In [100,4,200,1,3,2] ist das 1,2,3,4, " +
+    "in nums vorkommen, egal, wo sie im Array stehen. In [100,4,200,1,3,2] ist das 1,2,3,4, " +
     "also 4. Ein leeres Array ergibt 0.\n\n" +
     "nums ist unsortiert und kann Duplikate und negative Zahlen enthalten.\n\n" +
-    "Sortieren funktioniert und kostet O(n log n) – die Aufgabe zielt auf O(n): Wer alle " +
+    "Sortieren funktioniert und kostet O(n log n). Die Aufgabe zielt auf O(n): Wer alle " +
     "Zahlen in einem Set hat, kann jede Kette von ihrem Anfang aus abzählen, ohne je zu " +
     "sortieren.",
   difficulty: "medium",
@@ -35,14 +35,14 @@ export const challenge: ChallengeContent = {
       body:
         "Eine Kette erkennt man an ihrem Anfang: eine Zahl n, für die n - 1 nicht vorkommt. " +
         "Von dort zählst du hoch, solange n + 1, n + 2, … im Set liegen. Jede Zahl gehört zu " +
-        "genau einer Kette und wird beim Abzählen nur einmal besucht – das ist der ganze " +
+        "genau einer Kette und wird beim Abzählen nur einmal besucht. Das ist der ganze " +
         "Grund, warum das linear läuft.",
     },
     {
       title: "Die Umsetzung",
       body:
         "Lege alle Zahlen in ein Set; das erledigt nebenbei die Duplikate. Laufe dann über " +
-        "die Elemente des Sets. Liegt n - 1 im Set, überspring n – es ist kein Anfang. Sonst " +
+        "die Elemente des Sets. Liegt n - 1 im Set, überspring n. Es ist kein Anfang. Sonst " +
         "zähle mit einer inneren Schleife, wie lange n + 1, n + 2, … noch im Set stecken, " +
         "und merk dir das Maximum. Am Ende gibst du das Maximum zurück, bei leerem Set 0.",
     },
@@ -50,7 +50,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Wer die innere Schleife für jede Zahl startet statt nur für die Anfänge, zählt " +
-        "dieselbe Kette so oft, wie sie lang ist – das ist O(n²). Die Prüfung auf n - 1 " +
+        "dieselbe Kette so oft, wie sie lang ist. Das ist O(n²). Die Prüfung auf n - 1 " +
         "ist kein Detail, sie ist der Algorithmus.\n\n" +
         "Duplikate dürfen nicht doppelt zählen: [1,2,2,3] ergibt 3, nicht 4. Mit einem Set " +
         "passiert das von allein, mit dem Array nicht.\n\n" +
@@ -88,10 +88,10 @@ export const challenge: ChallengeContent = {
       description:
         "Implement longestConsecutive(nums).\n\n" +
         "Return the length of the longest run of directly consecutive integers that appear in " +
-        "nums – no matter where they sit in the array. In [100,4,200,1,3,2] that is 1,2,3,4, so " +
+        "nums, no matter where they sit in the array. In [100,4,200,1,3,2] that is 1,2,3,4, so " +
         "4. An empty array gives 0.\n\n" +
         "nums is unsorted and may contain duplicates and negative numbers.\n\n" +
-        "Sorting works and costs O(n log n) – the task aims at O(n): with every number in a set " +
+        "Sorting works and costs O(n log n). The task aims at O(n): with every number in a set " +
         "you can count each run from its start, without ever sorting.",
       hints: [
         {
@@ -99,14 +99,14 @@ export const challenge: ChallengeContent = {
           body:
             "You spot a run by its start: a number n for which n - 1 does not appear. From " +
             "there you count up as long as n + 1, n + 2, … are in the set. Every number belongs " +
-            "to exactly one run and is visited only once while counting – that is the whole " +
+            "to exactly one run and is visited only once while counting. That is the whole " +
             "reason this runs in linear time.",
         },
         {
           title: "The implementation",
           body:
             "Put all the numbers into a set; that takes care of the duplicates along the way. " +
-            "Then walk over the elements of the set. If n - 1 is in the set, skip n – it is not " +
+            "Then walk over the elements of the set. If n - 1 is in the set, skip n. It is not " +
             "a start. Otherwise count with an inner loop how far n + 1, n + 2, … keep going in " +
             "the set, and remember the maximum. At the end you return the maximum, or 0 for an " +
             "empty set.",
@@ -115,7 +115,7 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "Starting the inner loop for every number instead of only for the starts counts the " +
-            "same run as often as it is long – that is O(n²). The check for n - 1 is not a " +
+            "same run as often as it is long. That is O(n²). The check for n - 1 is not a " +
             "detail, it is the algorithm.\n\n" +
             "Duplicates must not count twice: [1,2,2,3] gives 3, not 4. With a set that happens " +
             "by itself, with the array it does not.\n\n" +

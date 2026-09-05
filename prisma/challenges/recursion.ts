@@ -32,7 +32,7 @@ export const challenge: ChallengeContent = {
       body:
         "Die Definition ist schon der Algorithmus: fibonacci(n) ist fibonacci(n-1) " +
         "plus fibonacci(n-2). Damit das nicht endlos weiterläuft, brauchst du " +
-        "Haltepunkte – zwei Werte, die du direkt weißt, ohne weiter zu fragen: 0 und " +
+        "Haltepunkte: zwei Werte, die du direkt weißt, ohne weiter zu fragen: 0 und " +
         "1.",
     },
     {
@@ -101,7 +101,7 @@ export const challenge: ChallengeContent = {
           body:
             "The definition is already the algorithm: fibonacci(n) is fibonacci(n-1) plus " +
             "fibonacci(n-2). To keep that from running on forever you need stopping " +
-            "points – two values you know straight away, without asking any further: 0 " +
+            "points, two values you know straight away, without asking any further: 0 " +
             "and 1.",
         },
         {

@@ -20,7 +20,7 @@ export const challenge: ChallengeContent = {
     "Implementiere digitalRoot(n).\n\n" +
     "Addiere wiederholt die Ziffern von n, bis nur noch eine einzelne Ziffer von 0 " +
     "bis 9 übrig ist, und gib sie zurück.\n\n" +
-    "Aus 132189 wird 24, daraus 6. Einmal Quersumme reicht also nicht – gefragt ist " +
+    "Aus 132189 wird 24, daraus 6. Einmal Quersumme reicht also nicht. Gefragt ist " +
     "das Falten, bis nichts mehr zu falten ist.",
   difficulty: "easy",
   points: 100,
@@ -42,18 +42,18 @@ export const challenge: ChallengeContent = {
         "übrig ist, und summiere.\n\n" +
         "Diesen Schritt legst du in eine äußere Schleife, die läuft, solange n " +
         "mindestens 10 ist. Am Ende gibst du n zurück. Wer mag, geht über den Umweg " +
-        "String und zerlegt die Zahl in Zeichen – das ist langsamer, aber genauso " +
+        "String und zerlegt die Zahl in Zeichen. Das ist langsamer, aber genauso " +
         "richtig.",
     },
     {
       title: "Woran die meisten scheitern",
       body:
         "Nur einmal falten. Bei 942 kommt 15 heraus, und 15 ist keine Ziffer. Die " +
-        "Bedingung muss geprüft werden, bevor und nachdem summiert wurde – eine " +
+        "Bedingung muss geprüft werden, bevor und nachdem summiert wurde, eine " +
         "while-Schleife tut genau das.\n\n" +
         "Die 0. Sie ist bereits einstellig, die Antwort ist 0. Eine Schleife mit " +
         "do-while oder eine Bedingung auf n > 0 kann hier danebengreifen.\n\n" +
-        "Ganzzahldivision. In JavaScript ist n / 10 eine Kommazahl – ohne " +
+        "Ganzzahldivision. In JavaScript ist n / 10 eine Kommazahl, ohne " +
         "Math.floor summierst du Nachkommastellen mit.",
     },
   ],
@@ -64,7 +64,7 @@ export const challenge: ChallengeContent = {
         "Implement digitalRoot(n).\n\n" +
         "Add up the digits of n over and over until a single digit from 0 to 9 is left, " +
         "and return it.\n\n" +
-        "132189 becomes 24, and that becomes 6. So one digit sum is not enough – what " +
+        "132189 becomes 24, and that becomes 6. So one digit sum is not enough. What " +
         "is asked for is folding until there is nothing left to fold.",
       hints: [
         {
@@ -83,17 +83,17 @@ export const challenge: ChallengeContent = {
             "is left, and sum as you go.\n\n" +
             "That step goes inside an outer loop that runs as long as n is at least 10. " +
             "At the end you return n. If you prefer, take the detour through a string and " +
-            "split the number into characters – slower, but just as correct.",
+            "split the number into characters, slower, but just as correct.",
         },
         {
           title: "Where most people go wrong",
           body:
             "Folding only once. For 942 you get 15, and 15 is not a digit. The condition " +
-            "has to be checked before and after summing – a while loop does exactly " +
+            "has to be checked before And after summing. a while loop does exactly " +
             "that.\n\n" +
             "Zero. It already has a single digit, so the answer is 0. A do-while loop or " +
             "a condition on n > 0 can get this one wrong.\n\n" +
-            "Integer division. In JavaScript n / 10 is a floating-point number – " +
+            "Integer division. In JavaScript n / 10 is a floating-point number, " +
             "without Math.floor you sum decimals along with it.",
         },
       ],

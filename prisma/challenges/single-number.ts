@@ -18,7 +18,7 @@ export const challenge: ChallengeContent = {
   title: "Single Number",
   description:
     "Implementiere singleNumber(nums).\n\n" +
-    "In nums kommt jede Zahl genau zweimal vor – bis auf eine, die nur einmal da ist. Gib " +
+    "In nums kommt jede Zahl genau zweimal vor, bis auf eine, die nur einmal da ist. Gib " +
     "diese Zahl zurück. Das Array ist nie leer, die Werte können negativ sein, und die " +
     "Reihenfolge ist beliebig: Die einzelne Zahl kann vorne, hinten oder irgendwo in der " +
     "Mitte stehen.\n\n" +
@@ -34,7 +34,7 @@ export const challenge: ChallengeContent = {
       body:
         "Es gibt eine Verknüpfung, bei der eine Zahl mit sich selbst 0 ergibt und 0 mit " +
         "irgendetwas dieses Etwas: das bitweise XOR. a ^ a ist 0, a ^ 0 ist a. Verknüpfst " +
-        "du alle Elemente miteinander, heben sich die Paare gegenseitig auf – egal, wie " +
+        "du alle Elemente miteinander, heben sich die Paare gegenseitig auf, egal, wie " +
         "weit sie auseinanderliegen, denn XOR ist kommutativ und assoziativ. Übrig bleibt " +
         "die Zahl ohne Partner.",
     },
@@ -48,7 +48,7 @@ export const challenge: ChallengeContent = {
     {
       title: "Woran die meisten scheitern",
       body:
-        "XOR ist ^ – in allen Sprachen dieser Aufgabe, von JavaScript bis Rust. Wer ^ für " +
+        "XOR ist ^, in allen Sprachen dieser Aufgabe, von JavaScript bis Rust. Wer ^ für " +
         "„hoch“ hält, denkt in Mathe-Notation: Potenzen sind ** oder pow, und mit ihnen löscht " +
         "sich hier nichts aus.\n\n" +
         "Negative Zahlen machen dem XOR nichts aus: Das Zweierkomplement wird bitweise " +
@@ -93,7 +93,7 @@ export const challenge: ChallengeContent = {
       title: "Single Number",
       description:
         "Implement singleNumber(nums).\n\n" +
-        "Every number in nums appears exactly twice – except one, which appears only once. " +
+        "Every number in nums appears exactly twice, except one, which appears only once. " +
         "Return that number. The array is never empty, the values can be negative, and the order " +
         "is arbitrary: the single number can sit at the front, at the back or somewhere in the " +
         "middle.\n\n" +
@@ -106,7 +106,7 @@ export const challenge: ChallengeContent = {
           body:
             "There is an operation where a number combined with itself gives 0, and 0 combined " +
             "with anything gives that anything: bitwise XOR. a ^ a is 0, a ^ 0 is a. Combine all " +
-            "the elements and the pairs cancel each other out – no matter how far apart they " +
+            "the elements and the pairs cancel each other out, no matter how far apart they " +
             "are, because XOR is commutative and associative. What is left is the number without " +
             "a partner.",
         },
@@ -120,7 +120,7 @@ export const challenge: ChallengeContent = {
         {
           title: "Where most people go wrong",
           body:
-            "XOR is ^ – in every language in this task, from JavaScript to Rust. If you read " +
+            "XOR is ^, in every language in this task, from JavaScript to Rust. If you read " +
             "^ as \"to the power of\", you are thinking in math notation: powers are ** or pow, " +
             "and nothing cancels out with those.\n\n" +
             "Negative numbers do not bother XOR: two's complement is wiped out bit by bit just " +

@@ -30,7 +30,7 @@ export const challenge: ChallengeContent = {
       body:
         "Zwei Dinge laufen parallel: der Zustand, der zwischen den Operationen " +
         "bestehen bleibt, und das Protokoll, das du zurückgibst. Jede Operation " +
-        "verändert den Zustand und hängt genau einen Eintrag ans Protokoll – auch " +
+        "verändert den Zustand und hängt genau einen Eintrag ans Protokoll, auch " +
         "dann, wenn sie nichts Sichtbares liefert.",
     },
     {
@@ -53,7 +53,7 @@ export const challenge: ChallengeContent = {
         "Bei delete muss die Prüfung vor dem Löschen stehen. Danach ist der Schlüssel " +
         "weg und die Antwort immer false.\n\n" +
         "Ein fehlender Schlüssel ergibt null, nicht undefined und nicht None. In " +
-        "JavaScript liefert map.get genau dann undefined – das musst du auf null " +
+        "JavaScript liefert map.get genau dann undefined. Das musst du auf null " +
         "abbilden, sonst fällt es beim JSON-Vergleich auf.",
     },
   ],
@@ -121,7 +121,7 @@ export const challenge: ChallengeContent = {
           body:
             "Two things run side by side: the state that survives from one operation to " +
             "the next, and the log you return. Every operation changes the state and " +
-            "appends exactly one entry to the log – even when it produces nothing " +
+            "appends exactly one entry to the log, even when it produces nothing " +
             "visible.",
         },
         {
@@ -142,7 +142,7 @@ export const challenge: ChallengeContent = {
             "For delete, the check has to come before the removal. Afterwards the key is " +
             "gone and the answer is always false.\n\n" +
             "A missing key yields null, not undefined and not None. In this case " +
-            "JavaScript's map.get returns exactly that: undefined – you have to map it " +
+            "JavaScript's map.get returns exactly that: undefined. You have to map it " +
             "onto null, or the JSON comparison catches it.",
         },
       ],

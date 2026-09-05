@@ -22,12 +22,12 @@ export const challenge: ChallengeContent = {
   description:
     "Implementiere coinChange(data) mit data = { coins, amount }.\n\n" +
     "coins enthält Münzwerte, von jedem gibt es unbegrenzt viele. Gib die kleinste Anzahl an " +
-    "Münzen zurück, die zusammen genau amount ergeben – oder -1, wenn das nicht geht. Für " +
+    "Münzen zurück, die zusammen genau amount ergeben, oder -1, wenn das nicht geht. Für " +
     "amount = 0 ist die Antwort 0. Alle Münzwerte sind positiv, und coins ist nicht " +
     "sortiert.\n\n" +
     "Immer die größte passende Münze zu nehmen sieht richtig aus und ist es nicht. Die Aufgabe " +
     "zielt auf die Einsicht, dass die beste Lösung für einen Betrag aus den besten Lösungen " +
-    "für kleinere Beträge folgt – jeder Betrag ist genau eine Münze von einem kleineren " +
+    "für kleinere Beträge folgt. Jeder Betrag ist genau eine Münze von einem kleineren " +
     "entfernt, und welche, probierst du durch.",
   difficulty: "medium",
   points: 150,
@@ -37,17 +37,17 @@ export const challenge: ChallengeContent = {
       title: "Die Idee",
       body:
         "Die kleinste Münzzahl für einen Betrag b ist eins mehr als die kleinste Münzzahl für b " +
-        "minus die zuletzt gelegte Münze. Welche Münze das ist, weißt du nicht – aber du kannst " +
+        "minus die zuletzt gelegte Münze. Welche Münze das ist, weißt du nicht, aber du kannst " +
         "alle durchprobieren, sobald die Antworten für alle kleineren Beträge feststehen. Also " +
         "baust du sie von 0 bis amount auf.",
     },
     {
       title: "Die Umsetzung",
       body:
-        "Ein Array dp der Länge amount + 1, gefüllt mit einem Wert, der „unerreichbar“ bedeutet " +
-        "– amount + 1 reicht, denn keine gültige Lösung braucht mehr Münzen. dp[0] = 0. Für " +
+        "Ein Array dp der Länge amount + 1, gefüllt mit einem Wert, der „unerreichbar“ bedeutet: " +
+        "amount + 1 reicht, denn keine gültige Lösung braucht mehr Münzen. dp[0] = 0. Für " +
         "jeden Betrag b von 1 bis amount und jede Münze c mit c <= b setzt du dp[b] = " +
-        "min(dp[b], dp[b - c] + 1). Am Ende ist dp[amount] die Antwort – es sei denn, dort steht " +
+        "min(dp[b], dp[b - c] + 1). Am Ende ist dp[amount] die Antwort, es sei denn, dort steht " +
         "noch der Unerreichbar-Wert, dann gibst du -1 zurück.",
     },
     {
@@ -58,7 +58,7 @@ export const challenge: ChallengeContent = {
         "„Unerreichbar“ als Integer-Maximum kodieren und dann + 1 rechnen: In typisierten " +
         "Sprachen läuft das zu einer negativen Zahl über, die jedes Minimum gewinnt. Deshalb " +
         "amount + 1.\n\n" +
-        "dp[0] muss 0 sein, nicht unerreichbar – sonst ist gar kein Betrag erreichbar. Für " +
+        "dp[0] muss 0 sein, nicht unerreichbar, sonst ist gar kein Betrag erreichbar. Für " +
         "amount = 0 ist das zugleich schon die Antwort.",
     },
   ],
@@ -68,28 +68,28 @@ export const challenge: ChallengeContent = {
       description:
         "Implement coinChange(data) with data = { coins, amount }.\n\n" +
         "coins holds coin values, and there is an unlimited supply of each. Return the smallest " +
-        "number of coins that add up to exactly amount – or -1 if that is not possible. For " +
+        "number of coins that add up to exactly amount, or -1 if that is not possible. For " +
         "amount = 0 the answer is 0. All coin values are positive, and coins is not sorted.\n\n" +
         "Always taking the largest coin that fits looks right and is not. This task aims at the " +
         "insight that the best solution for an amount follows from the best solutions for smaller " +
-        "amounts – every amount is exactly one coin away from a smaller one, and which coin that " +
+        "amounts. Every amount is exactly one coin away from a smaller one, and which coin that " +
         "is you find out by trying them all.",
       hints: [
         {
           title: "The idea",
           body:
             "The smallest number of coins for an amount b is one more than the smallest number of " +
-            "coins for b minus the coin you laid down last. Which coin that is you do not know – " +
+            "coins for b minus the coin you laid down last. Which coin that is you do not know, " +
             "but you can try them all as soon as the answers for every smaller amount are " +
             "settled. So you build them up from 0 to amount.",
         },
         {
           title: "The implementation",
           body:
-            "An array dp of length amount + 1, filled with a value that means \"unreachable\" – " +
-            "amount + 1 is enough, since no valid solution needs more coins than that. dp[0] = 0. " +
+            "An array dp of length amount + 1, filled with a value that means \"unreachable\". " +
+            "Amount + 1 is enough, since no valid solution needs more coins than that. dp[0] = 0. " +
             "For every amount b from 1 to amount and every coin c with c <= b you set dp[b] = " +
-            "min(dp[b], dp[b - c] + 1). At the end dp[amount] is the answer – unless the " +
+            "min(dp[b], dp[b - c] + 1). At the end dp[amount] is the answer, unless the " +
             "unreachable value is still sitting there, in which case you return -1.",
         },
         {
@@ -100,7 +100,7 @@ export const challenge: ChallengeContent = {
             "Encoding \"unreachable\" as the integer maximum and then adding 1: in typed languages " +
             "that overflows into a negative number, which wins every minimum. Hence amount + 1." +
             "\n\n" +
-            "dp[0] has to be 0, not unreachable – otherwise no amount is reachable at all. For " +
+            "dp[0] has to be 0, not unreachable, otherwise no amount is reachable at all. For " +
             "amount = 0 that is the answer already.",
         },
       ],

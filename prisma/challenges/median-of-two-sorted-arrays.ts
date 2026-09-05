@@ -23,13 +23,13 @@ export const challenge: ChallengeContent = {
   description:
     "Implementiere findMedianSortedArrays(data) mit data = { nums1, nums2 }.\n\n" +
     "nums1 und nums2 sind jeweils aufsteigend sortiert. Gib den Median aller Zahlen aus " +
-    "beiden Arrays zusammen zurück – als Gleitkommazahl. Bei ungerader Gesamtanzahl ist das " +
+    "beiden Arrays zusammen zurück, als Gleitkommazahl. Bei ungerader Gesamtanzahl ist das " +
     "die mittlere Zahl, bei gerader der Mittelwert der beiden mittleren: [1,3] und [2] " +
     "ergeben 2, [1,2] und [3,4] ergeben 2.5.\n\n" +
     "Eines der Arrays kann leer sein, beide zusammen enthalten mindestens eine Zahl. Die " +
     "Längen dürfen sich beliebig unterscheiden.\n\n" +
     "Beide Arrays zusammenzuführen und in die Mitte zu greifen funktioniert und kostet " +
-    "O(m+n) – damit bestehst du. Die eigentliche Herausforderung ist O(log(m+n)): eine " +
+    "O(m+n), damit bestehst du. Die eigentliche Herausforderung ist O(log(m+n)): eine " +
     "binäre Suche nach der Trennlinie, die beide Arrays so teilt, dass links genau die " +
     "Hälfte aller Zahlen liegt.",
   difficulty: "hard",
@@ -42,7 +42,7 @@ export const challenge: ChallengeContent = {
         "Der Median trennt alle Zahlen in eine linke und eine rechte Hälfte. Schneidest du " +
         "das kürzere Array an Position i, liegt der Schnitt im längeren damit fest: " +
         "j = (m + n + 1) / 2 - i. Der Schnitt stimmt, wenn alles links von beiden Schnitten " +
-        "kleiner oder gleich allem rechts ist – und das prüfst du mit nur vier Werten: dem " +
+        "kleiner oder gleich allem rechts ist, und das prüfst du mit nur vier Werten: dem " +
         "letzten links und dem ersten rechts in jedem Array.",
     },
     {
@@ -63,10 +63,10 @@ export const challenge: ChallengeContent = {
         "über das Ende hinauslaufen. Wer die Arrays nicht tauscht, bekommt Indexfehler, die " +
         "nur bei manchen Eingaben auftauchen.\n\n" +
         "Die Rückgabe ist eine Gleitkommazahl. In Sprachen mit Ganzzahldivision ergibt " +
-        "(2 + 3) / 2 den Wert 2 statt 2.5 – teile durch 2.0 oder wandle vorher um. 2 und 2.0 " +
+        "(2 + 3) / 2 den Wert 2 statt 2.5. Teile durch 2.0 oder wandle vorher um. 2 und 2.0 " +
         "gelten dabei als gleich.\n\n" +
         "Ein leeres Array ist ein normaler Fall: Alle seine Ränder sind unendlich, der Median " +
-        "ist der des anderen Arrays. Und [0,0] mit [0,0] ergibt 0 – doppelte Werte sind " +
+        "ist der des anderen Arrays. Und [0,0] mit [0,0] ergibt 0. Doppelte Werte sind " +
         "erlaubt, die Vergleiche brauchen deshalb <= statt <.",
     },
   ],
@@ -105,12 +105,12 @@ export const challenge: ChallengeContent = {
       description:
         "Implement findMedianSortedArrays(data) with data = { nums1, nums2 }.\n\n" +
         "nums1 and nums2 are each sorted in ascending order. Return the median of all the " +
-        "numbers from both arrays together – as a floating-point number. With an odd total " +
+        "numbers from both arrays together, as a floating-point number. With an odd total " +
         "count that is the middle number, with an even one the average of the two middle " +
         "ones: [1,3] and [2] give 2, [1,2] and [3,4] give 2.5.\n\n" +
         "One of the arrays may be empty, together they hold at least one number. The lengths " +
         "may differ by any amount.\n\n" +
-        "Merging both arrays and reaching into the middle works and costs O(m+n) – that gets " +
+        "Merging both arrays and reaching into the middle works and costs O(m+n). That gets " +
         "you a pass. The real challenge is O(log(m+n)): a binary search for the dividing line " +
         "that splits both arrays so that exactly half of all the numbers lie to its left.",
       hints: [
@@ -120,7 +120,7 @@ export const challenge: ChallengeContent = {
             "The median separates all the numbers into a left and a right half. Cut the " +
             "shorter array at position i and the cut in the longer one is fixed with it: " +
             "j = (m + n + 1) / 2 - i. The cut is right when everything left of both cuts is " +
-            "less than or equal to everything on the right – and you check that with only four " +
+            "less than or equal to everything on the right, and you check that with only four " +
             "values: the last one on the left and the first one on the right in each array.",
         },
         {
@@ -141,10 +141,10 @@ export const challenge: ChallengeContent = {
             "run past the end. Skip the swap and you get index errors that only show up on " +
             "some inputs.\n\n" +
             "The return value is a floating-point number. In languages with integer division " +
-            "(2 + 3) / 2 comes out as 2 instead of 2.5 – divide by 2.0 or convert first. 2 and " +
+            "(2 + 3) / 2 comes out as 2 instead of 2.5. Divide by 2.0 or convert first. 2 and " +
             "2.0 count as equal here.\n\n" +
             "An empty array is a normal case: all of its boundaries are infinite, and the " +
-            "median is the one of the other array. And [0,0] with [0,0] gives 0 – duplicate " +
+            "median is the one of the other array. And [0,0] with [0,0] gives 0. Duplicate " +
             "values are allowed, which is why the comparisons need <= rather than <.",
         },
       ],

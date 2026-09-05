@@ -41,7 +41,7 @@ export const challenge: ChallengeContent = {
       body:
         "Geh den String Zeichen für Zeichen durch. Bei einer öffnenden Klammer legst " +
         "du sie auf den Stack. Bei einer schließenden nimmst du das oberste Element " +
-        "herunter und prüfst, ob es die passende Öffnung ist – sonst gib sofort false " +
+        "herunter und prüfst, ob es die passende Öffnung ist, sonst gib sofort false " +
         "zurück.\n\n" +
         "Eine Map von schließender auf öffnende Klammer erspart dir drei " +
         "Vergleichsketten.",
@@ -51,7 +51,7 @@ export const challenge: ChallengeContent = {
       body:
         "Der Stack am Ende. Wer nur prüft, dass jede schließende Klammer gepasst hat, " +
         "hält \"(((\" für gültig. Die Antwort ist nur dann true, wenn der Stack " +
-        "danach leer ist – jede offene Klammer wurde geschlossen.\n\n" +
+        "danach leer ist. Jede offene Klammer wurde geschlossen.\n\n" +
         "Die schließende Klammer auf leerem Stack. Bei \")\" gibt es nichts " +
         "herunterzunehmen; ohne Prüfung liest du undefined und vergleichst ins Leere. " +
         "Ein leerer Stack an dieser Stelle heißt false.\n\n" +
@@ -112,7 +112,7 @@ export const challenge: ChallengeContent = {
           body:
             "Walk the string character by character. On an opening bracket you push " +
             "it onto the stack. On a closing one you pop the top element and check " +
-            "whether it is the matching opening – otherwise return false " +
+            "whether it is the matching opening, otherwise return false " +
             "immediately.\n\n" +
             "A map from closing to opening bracket saves you three chains of " +
             "comparisons.",
@@ -122,7 +122,7 @@ export const challenge: ChallengeContent = {
           body:
             "The stack at the end. Check only that every closing bracket matched, and " +
             "\"(((\" looks valid to you. The answer is true only if the stack is empty " +
-            "afterwards – every bracket that was opened got closed.\n\n" +
+            "afterwards. Every bracket that was opened got closed.\n\n" +
             "The closing bracket on an empty stack. With \")\" there is nothing to pop; " +
             "without a check you read undefined and compare against nothing. An empty " +
             "stack at that point means false.\n\n" +

@@ -23,7 +23,7 @@ export const challenge: ChallengeContent = {
     "Reihenfolge zählt: 1+2 und 2+1 sind zwei Arten.\n\n" +
     "Alle Wege einzeln aufzuzählen scheitert schon bei n = 40 an der Zeit. Die Aufgabe " +
     "zielt auf die Erkenntnis, dass die Anzahl für n allein aus den Anzahlen für n-1 und " +
-    "n-2 folgt – und dass man dafür nur zwei Zahlen mitführen muss.",
+    "n-2 folgt, und dass man dafür nur zwei Zahlen mitführen muss.",
   difficulty: "easy",
   points: 100,
   categoryId: CATEGORY.algorithmen,
@@ -55,7 +55,7 @@ export const challenge: ChallengeContent = {
         "Die Startwerte sind 1 und 2 für n = 1 und n = 2. Wer mit 0 und 1 beginnt, liegt " +
         "um eine Stufe daneben, wenn die Schleife nicht dazu passt.\n\n" +
         "Das Ergebnis für n = 45 ist 1836311903 und passt gerade noch in einen 32-Bit-" +
-        "Integer – größere n sind nicht gefragt.",
+        "Integer. Größere n sind nicht gefragt.",
     },
   ],
   translations: {
@@ -67,7 +67,7 @@ export const challenge: ChallengeContent = {
         "Return how many different ways there are to reach the top. Order matters: 1+2 and 2+1 " +
         "are two ways.\n\n" +
         "Listing every path one by one runs out of time at n = 40 already. This task aims at the " +
-        "realisation that the count for n follows from the counts for n-1 and n-2 alone – and " +
+        "realisation that the count for n follows from the counts for n-1 and n-2 alone, and " +
         "that you only have to carry two numbers along for it.",
       hints: [
         {
@@ -95,7 +95,7 @@ export const challenge: ChallengeContent = {
             "in a map (memoization) or you compute from the bottom up.\n\n" +
             "The starting values are 1 and 2, for n = 1 and n = 2. Beginning with 0 and 1 puts " +
             "you one step off unless the loop is built to match.\n\n" +
-            "The result for n = 45 is 1836311903 and just fits into a 32-bit integer – larger n " +
+            "The result for n = 45 is 1836311903 and just fits into a 32-bit integer. Larger n " +
             "are not asked for.",
         },
       ],

@@ -30,8 +30,8 @@ export const challenge: ChallengeContent = {
     {
       title: "Die Idee",
       body:
-        "Statt jedes Zeichen gegen zehn Varianten zu vergleichen – a, A, e, E und so " +
-        "weiter – bringst du es erst in eine einheitliche Form und prüfst dann gegen " +
+        "Statt jedes Zeichen gegen zehn Varianten zu vergleichen, a, A, e, E und so " +
+        "weiter, bringst du es erst in eine einheitliche Form und prüfst dann gegen " +
         "eine einzige Menge von fünf Buchstaben.",
     },
     {
@@ -44,11 +44,11 @@ export const challenge: ChallengeContent = {
     {
       title: "Woran die meisten scheitern",
       body:
-        "Die Groß-/Kleinschreibung. \"AEIOU\" muss 5 ergeben – wer nur gegen " +
+        "Die Groß-/Kleinschreibung. \"AEIOU\" muss 5 ergeben. Wer nur gegen " +
         "Kleinbuchstaben prüft und nicht umwandelt, bekommt 0.\n\n" +
         "y ist hier kein Vokal. \"why\" ergibt 0, auch wenn man es im Englischen " +
         "anders sehen kann. Halte dich an die fünf, die in der Aufgabe stehen.\n\n" +
-        "Der leere String ergibt 0, nicht null oder einen Fehler – die Schleife läuft " +
+        "Der leere String ergibt 0, nicht null oder einen Fehler. Die Schleife läuft " +
         "dann einfach keinmal, wenn der Zähler vorher bei 0 startet.",
     },
   ],
@@ -66,8 +66,8 @@ export const challenge: ChallengeContent = {
         {
           title: "The idea",
           body:
-            "Instead of comparing every character against ten variants – a, A, e, E and " +
-            "so on – you first bring it into one uniform form and then check it against " +
+            "Instead of comparing every character against ten variants, a, A, e, E and " +
+            "so on, you first bring it into one uniform form and then check it against " +
             "a single set of five letters.",
         },
         {
@@ -80,11 +80,11 @@ export const challenge: ChallengeContent = {
         {
           title: "Where most people go wrong",
           body:
-            "Case. \"AEIOU\" has to give 5 – check only against lower-case letters " +
+            "Case. \"AEIOU\" has to give 5. Check only against lower-case letters " +
             "without converting and you get 0.\n\n" +
             "y is not a vowel here. \"why\" gives 0, even if English can see it " +
             "differently. Stick to the five the task names.\n\n" +
-            "The empty string gives 0, not null and not an error – the loop simply runs " +
+            "The empty string gives 0, not null and not an error. The loop simply runs " +
             "no times at all, as long as the counter starts at 0.",
         },
       ],

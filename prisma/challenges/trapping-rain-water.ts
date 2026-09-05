@@ -22,10 +22,10 @@ export const challenge: ChallengeContent = {
     "ist 1 breit. Gib zurück, wie viele Einheiten Wasser nach einem Regen zwischen den Säulen " +
     "stehen bleiben. Bei [0,1,0,2,1,0,1,3,2,1,2,1] sind es 6.\n\n" +
     "Ein leeres oder durchgehend steigendes Profil hält kein Wasser. Wasser steht nur dort, wo " +
-    "es links und rechts eine höhere Wand gibt – die Frage ist, wie hoch es an jeder Stelle " +
+    "es links und rechts eine höhere Wand gibt. Die Frage ist, wie hoch es an jeder Stelle " +
     "steigt.\n\n" +
     "Für jede Position beide Maxima zu suchen funktioniert und kostet O(n²). Die Aufgabe " +
-    "zielt auf einen Durchlauf mit zwei Zeigern, die von außen nach innen laufen – oder auf " +
+    "zielt auf einen Durchlauf mit zwei Zeigern, die von außen nach innen laufen, oder auf " +
     "zwei Hilfsarrays, wenn du es dir erst einmal einfacher machen willst.",
   difficulty: "hard",
   points: 200,
@@ -44,7 +44,7 @@ export const challenge: ChallengeContent = {
       body:
         "Zwei Zeiger, left am Anfang und right am Ende, dazu maxLeft und maxRight, beide 0. " +
         "Solange left < right: Ist height[left] kleiner als height[right], ist die linke Seite " +
-        "die begrenzende – aktualisiere maxLeft mit height[left], addiere " +
+        "die begrenzende. Aktualisiere maxLeft mit height[left], addiere " +
         "maxLeft - height[left] zum Wasser und schiebe left nach rechts. Sonst dasselbe " +
         "spiegelverkehrt mit right. Am Ende ist die Summe das Ergebnis.",
     },
@@ -55,10 +55,10 @@ export const challenge: ChallengeContent = {
         "ist. Nur dann steht fest, dass ihr Maximum den Wasserstand begrenzt, obwohl du das " +
         "Maximum der anderen Seite noch gar nicht vollständig kennst. Wer immer dieselbe " +
         "Seite bewegt, rechnet mit einem falschen Wasserstand.\n\n" +
-        "Erst das Maximum aktualisieren, dann das Wasser addieren – sonst wird der Beitrag " +
+        "Erst das Maximum aktualisieren, dann das Wasser addieren, sonst wird der Beitrag " +
         "bei einer neuen höchsten Säule negativ.\n\n" +
         "Ein leeres Array ergibt 0. In Sprachen mit vorzeichenlosen Längen ist len - 1 dann " +
-        "kein -1, sondern eine riesige Zahl – fang den Fall vorher ab.",
+        "kein -1, sondern eine riesige Zahl. Fang den Fall vorher ab.",
     },
   ],
   examples: [{ input: "[0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" }],
@@ -96,10 +96,10 @@ export const challenge: ChallengeContent = {
         "every bar is 1 wide. Return how many units of water are left standing between the bars " +
         "after it rains. For [0,1,0,2,1,0,1,3,2,1,2,1] it is 6.\n\n" +
         "A profile that is empty or rises all the way holds no water. Water only stands where " +
-        "there is a higher wall to the left and to the right – the question is how high it rises " +
+        "there is a higher wall to the left and to the right. The question is how high it rises " +
         "at each position.\n\n" +
         "Looking for both maxima at every position works and costs O(n²). The task is after a " +
-        "single pass with two pointers running inwards from the outside – or after two helper " +
+        "single pass with two pointers running inwards from the outside, or after two helper " +
         "arrays, if you want to make it easier on yourself first.",
       hints: [
         {
@@ -115,7 +115,7 @@ export const challenge: ChallengeContent = {
           body:
             "Two pointers, left at the beginning and right at the end, plus maxLeft and " +
             "maxRight, both 0. As long as left < right: if height[left] is smaller than " +
-            "height[right], the left side is the limiting one – update maxLeft with " +
+            "height[right], the left side is the limiting one. Update maxLeft with " +
             "height[left], add maxLeft - height[left] to the water and move left to the right. " +
             "Otherwise the same thing mirrored with right. At the end the sum is the result.",
         },
@@ -126,10 +126,10 @@ export const challenge: ChallengeContent = {
             "then is it certain that its maximum limits the water level, even though you do not " +
             "yet know the maximum of the other side in full. If you always move the same side, " +
             "you are computing with the wrong water level.\n\n" +
-            "Update the maximum first, then add the water – otherwise the contribution turns " +
+            "Update the maximum first, then add the water, otherwise the contribution turns " +
             "negative at a new tallest bar.\n\n" +
             "An empty array gives 0. In languages with unsigned lengths, len - 1 is then not -1 " +
-            "but a huge number – catch that case beforehand.",
+            "but a huge number. Catch that case beforehand.",
         },
       ],
       testCaseNames: {

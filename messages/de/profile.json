@@ -5,7 +5,7 @@
     "ranking": "Rangliste",
     "settings": "Einstellungen",
     "publicProfileNotFound": "Profil nicht gefunden",
-    "publicProfile": "{name} – Öffentliches Profil",
+    "publicProfile": "{name} · Öffentliches Profil",
     "publicProfileDescription": "Level {level}, {solved} gelöste Challenges und eine Streak von {streak} Tagen."
   },
   "profilePage": {

@@ -21,7 +21,7 @@ export const challenge: ChallengeContent = {
     "Implementiere reverseString(s).\n\n" +
     "Gib den übergebenen String in umgekehrter Zeichenreihenfolge zurück.\n\n" +
     "Jede Sprache hat dafür einen Einzeiler, und der ist hier auch eine gültige " +
-    "Antwort. Wer etwas mitnehmen will, schreibt die Schleife einmal selbst – sie " +
+    "Antwort. Wer etwas mitnehmen will, schreibt die Schleife einmal selbst. Sie " +
     "steckt in jedem Palindrom-Check und in jeder Zwei-Zeiger-Aufgabe wieder.",
   difficulty: "easy",
   points: 100,
@@ -51,8 +51,8 @@ export const challenge: ChallengeContent = {
         "einen Fehler, je nach Sprache.\n\n" +
         "Strings sind in JavaScript und Python unveränderlich: Du kannst kein Zeichen " +
         "über s[i] = … zuweisen, sondern baust ein neues Ergebnis auf.\n\n" +
-        "Der leere String ergibt den leeren String. Ein Palindrom ergibt sich selbst – " +
-        "beides sind gültige Eingaben und keine Sonderfälle, die du abfangen musst.",
+        "Der leere String ergibt den leeren String. Ein Palindrom ergibt sich selbst. " +
+        "Beides sind gültige Eingaben und keine Sonderfälle, die du abfangen musst.",
     },
   ],
   examples: [
@@ -90,7 +90,7 @@ export const challenge: ChallengeContent = {
         "Implement reverseString(s).\n\n" +
         "Return the given string with its characters in reverse order.\n\n" +
         "Every language has a one-liner for this, and that is a valid answer here too. " +
-        "If you want to take something away from it, write the loop yourself once – it " +
+        "If you want to take something away from it, write the loop yourself once. It " +
         "shows up again in every palindrome check and every two-pointer task.",
       hints: [
         {
@@ -117,8 +117,8 @@ export const challenge: ChallengeContent = {
             "or an error, depending on the language.\n\n" +
             "Strings are immutable in JavaScript and Python: you cannot assign a " +
             "character via s[i] = …, you build a new result instead.\n\n" +
-            "The empty string yields the empty string. A palindrome yields itself " +
-            "– both are valid inputs, not special cases you have to catch.",
+            "The empty string yields the empty string. A palindrome yields itself. " +
+            "Both are valid inputs, not special cases you have to catch.",
         },
       ],
       testCaseNames: {

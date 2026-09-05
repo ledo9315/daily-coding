@@ -22,7 +22,7 @@ export const challenge: ChallengeContent = {
     '["Max", "John", "Mark"] → "Max, John and Mark like this"\n' +
     '["Alex", "Jacob", "Mark", "Max"] → "Alex, Jacob and 2 others like this"\n\n' +
     "Ab vier Namen werden die ersten beiden genannt und der Rest gezählt. Die Ausgabe bleibt " +
-    "englisch – sie ist die Vorgabe der Aufgabe und wird Zeichen für Zeichen verglichen.\n\n" +
+    "englisch. Sie ist die Vorgabe der Aufgabe und wird Zeichen für Zeichen verglichen.\n\n" +
     "Zu berechnen gibt es fast nichts. Die Aufgabe prüft, ob du die Fälle sauber trennst und " +
     "beim Zusammensetzen der Strings keine Kleinigkeit übersiehst.",
   difficulty: "easy",
@@ -39,7 +39,7 @@ export const challenge: ChallengeContent = {
     {
       title: "Die Umsetzung",
       body:
-        "Verzweige über die Länge – switch, if-Kette oder eine Map von Schablonen, das ist " +
+        "Verzweige über die Länge: switch, if-Kette oder eine Map von Schablonen, das ist " +
         "Geschmackssache. Setze in jedem Zweig den String aus den passenden Namen zusammen und " +
         "gib ihn zurück. Der Fall ab vier Namen ist der default-Zweig, in dem du die Zahl der " +
         "Übrigen berechnest.",
@@ -122,7 +122,7 @@ export const challenge: ChallengeContent = {
         {
           title: "The implementation",
           body:
-            "Branch on the length – switch, a chain of ifs or a map of templates, that is a " +
+            "Branch on the length: switch, a chain of ifs or a map of templates, that is a " +
             "matter of taste. In each branch, put the string together from the matching names " +
             "and return it. The case from four names on is the default branch, the one where " +
             "you work out how many are left over.",

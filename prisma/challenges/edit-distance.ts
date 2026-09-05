@@ -54,7 +54,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Die Tabelle ist um eins größer als die Wörter, weil Zeile 0 und Spalte 0 die leeren " +
-        "Präfixe darstellen. dp[i][j] vergleicht deshalb word1[i-1] mit word2[j-1] – wer " +
+        "Präfixe darstellen. dp[i][j] vergleicht deshalb word1[i-1] mit word2[j-1]. Wer " +
         "word1[i] nimmt, liest ein Zeichen zu weit.\n\n" +
         "Die erste Zeile und Spalte müssen wirklich mit 0, 1, 2, … gefüllt sein, nicht mit Nullen. " +
         "Sonst ist die Distanz zu einem leeren Wort 0.\n\n" +
@@ -126,8 +126,8 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "The table is one larger than the words, because row 0 and column 0 stand for " +
-            "the empty prefixes. That is why dp[i][j] compares word1[i-1] with word2[j-1] – " +
-            "taking word1[i] reads one character too far.\n\n" +
+            "the empty prefixes. That is why dp[i][j] compares word1[i-1] with word2[j-1]. " +
+            "Taking word1[i] reads one character too far.\n\n" +
             "The first row and column really have to be filled with 0, 1, 2, …, not with " +
             "zeros. Otherwise the distance to an empty word comes out as 0.\n\n" +
             "All three transitions belong in the minimum. Forgetting the replace turns " +

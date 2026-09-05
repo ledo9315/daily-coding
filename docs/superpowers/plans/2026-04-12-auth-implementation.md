@@ -470,7 +470,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
   await resend.emails.send({
     from: FROM,
     to,
-    subject: "E-Mail Adresse bestätigen – Daily Dev",
+    subject: "E-Mail Adresse bestätigen · Daily Dev",
     html: `<p>Klicke auf den folgenden Link um deine E-Mail zu bestätigen:</p>
 <p><a href="${url}">${url}</a></p>
 <p>Dieser Link ist 24 Stunden gültig.</p>`,
@@ -482,7 +482,7 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
   await resend.emails.send({
     from: FROM,
     to,
-    subject: "Passwort zurücksetzen – Daily Dev",
+    subject: "Passwort zurücksetzen · Daily Dev",
     html: `<p>Klicke auf den folgenden Link um dein Passwort zurückzusetzen:</p>
 <p><a href="${url}">${url}</a></p>
 <p>Dieser Link ist 1 Stunde gültig. Wenn du kein Zurücksetzen beantragt hast, ignoriere diese E-Mail.</p>`,

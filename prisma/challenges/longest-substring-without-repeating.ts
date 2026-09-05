@@ -35,8 +35,8 @@ export const challenge: ChallengeContent = {
       title: "Die Idee",
       body:
         "Halte ein Fenster [left, right] ohne doppelte Zeichen. Rückt right um eins vor und das " +
-        "neue Zeichen steht bereits im Fenster, springt left hinter dessen letztes Vorkommen – " +
-        "alles davor kann ohnehin kein längeres gültiges Fenster mehr liefern. Die größte " +
+        "neue Zeichen steht bereits im Fenster, springt left hinter dessen letztes Vorkommen. " +
+        "Alles davor kann ohnehin kein längeres gültiges Fenster mehr liefern. Die größte " +
         "Fensterbreite unterwegs ist die Antwort.",
     },
     {
@@ -51,9 +51,9 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         'Der linke Zeiger darf nie zurückwandern. Bei "abba" steht beim letzten a das erste a ' +
-        "mit Index 0 in der Map – left ist aber schon bei 2. Wer left blind auf 0 + 1 setzt, " +
+        "mit Index 0 in der Map. Left ist aber schon bei 2. Wer left blind auf 0 + 1 setzt, " +
         'zieht das Fenster wieder auf und zählt "bba" als gültig; erwartet ist 2. Daher die ' +
-        "Bedingung: nur springen, wenn das gespeicherte Vorkommen im aktuellen Fenster liegt – " +
+        "Bedingung: nur springen, wenn das gespeicherte Vorkommen im aktuellen Fenster liegt, " +
         "oder left = max(left, index + 1).\n\n" +
         "Der leere String ergibt 0, ein einzelnes Leerzeichen ist ein gültiges Zeichen und " +
         "ergibt 1.\n\n" +
@@ -107,7 +107,7 @@ export const challenge: ChallengeContent = {
           body:
             "Keep a window [left, right] with no repeated characters. When right moves on by one " +
             "and the new character is already in the window, left jumps past that character's " +
-            "last occurrence – nothing before it can yield a longer valid window anyway. The " +
+            "last occurrence. Nothing before it can yield a longer valid window anyway. The " +
             "largest window width along the way is the answer.",
         },
         {
@@ -122,9 +122,9 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             'The left pointer must never move back. In "abba", at the last a the first a sits in ' +
-            "the map with index 0 – but left is already at 2. Set left blindly to 0 + 1 and you " +
+            "the map with index 0, but left is already at 2. Set left blindly to 0 + 1 and you " +
             'pull the window open again and count "bba" as valid; expected is 2. Hence the ' +
-            "condition: only jump when the stored occurrence lies inside the current window – or " +
+            "condition: only jump when the stored occurrence lies inside the current window, or " +
             "left = max(left, index + 1).\n\n" +
             "The empty string gives 0; a single space is a valid character and gives 1.\n\n" +
             'Measure the window after every step, not only on a hit: in "dvdf" the longest ' +
