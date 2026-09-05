@@ -28,7 +28,11 @@ const SECTIONS = [
   { id: "account", icon: Trash },
 ] as const;
 
-/** Endonyms - a language names itself the same way in every UI language. */
+/**
+ * Endonyms - a language names itself the same way in every UI language. English leads:
+ * it is what an unprefixed URL shows, so it is the site's default rather than the
+ * language the content happens to be authored in.
+ */
 const LOCALE_OPTIONS: { id: AppLocale; label: string }[] = [
   { id: "en", label: "English" },
   { id: "de", label: "Deutsch" },
