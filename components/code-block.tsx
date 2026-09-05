@@ -57,7 +57,10 @@ export function CodeBlock({
   return (
     <pre
       className={cn(
-        "overflow-auto border-2 border-border bg-background p-4 font-code text-[13px] leading-[1.6] sm:text-sm",
+        // Canvas, size and line height of the editor, so the code reads the same whether it
+        // is being written or being read back.
+        "overflow-auto border-2 border-border bg-[var(--frappe-editorCanvas)] p-4 font-code",
+        "text-[13px] leading-[22px] sm:text-sm sm:leading-[24px]",
         className
       )}
     >
