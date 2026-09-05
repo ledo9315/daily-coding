@@ -89,7 +89,7 @@ export function ShareResult({ text }: { text: string }) {
   }
 
   return (
-    <section className="mt-6 border-2 border-primary/40 bg-primary/[0.06] p-4 sm:p-5">
+    <section className="mt-6 border-2 border-chart-5/50 bg-chart-5/[0.06] p-4 shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)] sm:p-5">
       <h2 className="font-pixel text-sm uppercase tracking-wide sm:text-base">
         {t("share.title")}
       </h2>
