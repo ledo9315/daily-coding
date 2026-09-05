@@ -119,10 +119,10 @@ export function LandingHero({
         <div className="relative mt-16 mx-auto max-w-4xl rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm">
           <BorderBeam size={250} duration={12} delay={9} />
           <Image
-            src="/screen.webp"
+            src={locale === "de" ? "/screen.de.webp" : "/screen.en.webp"}
             alt={t("hero.screenshotAlt")}
             width={3338}
-            height={1890}
+            height={2296}
             sizes="(max-width: 896px) calc(100vw - 48px), 896px"
             loading="eager"
             fetchPriority="high"
