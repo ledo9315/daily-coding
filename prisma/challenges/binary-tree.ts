@@ -17,7 +17,7 @@ export const challenge: ChallengeContent = {
     "Gib die Knotenwerte in In-order-Reihenfolge als Array zurück: erst der linke " +
     "Teilbaum, dann die Wurzel, dann der rechte. Ein Knoten hat die Form " +
     "{ val, left, right }, leere Teilbäume sind null.\n\n" +
-    "Bei einem Suchbaum ist das Ergebnis sortiert – nicht durch Zufall, sondern weil " +
+    "Bei einem Suchbaum ist das Ergebnis sortiert, nicht durch Zufall, sondern weil " +
     "genau das die Ordnung ist, die ein Suchbaum herstellt.",
   difficulty: "hard",
   points: 200,
@@ -29,7 +29,7 @@ export const challenge: ChallengeContent = {
         "Jeder Teilbaum ist selbst wieder ein Baum. Was du für die Wurzel tust, tust " +
         "du für jeden Knoten: links alles einsammeln, dann den eigenen Wert, dann " +
         "rechts alles einsammeln.\n\n" +
-        "Die Rekursion endet dort, wo kein Knoten mehr ist – und ein leerer Baum " +
+        "Die Rekursion endet dort, wo kein Knoten mehr ist, und ein leerer Baum " +
         "steuert eine leere Liste bei.",
     },
     {
@@ -48,7 +48,7 @@ export const challenge: ChallengeContent = {
         "Teilbaum angehängt, ist das Pre-order: der Suchbaum kommt dann als [2,1,3] " +
         "statt [1,2,3] heraus. Alle Testfälle bis auf den Einzelknoten fallen darüber.\n\n" +
         "Der Abbruch bei null muss vor jedem Zugriff stehen, nicht nur ganz oben. " +
-        "Jeder Blattknoten hat zwei null-Kinder – ohne die Prüfung greifst du auf " +
+        "Jeder Blattknoten hat zwei null-Kinder, ohne die Prüfung greifst du auf " +
         "root.val eines nicht vorhandenen Knotens zu.\n\n" +
         "Der leere Baum ist selbst eine Eingabe: root ist dann direkt null, und die " +
         "Antwort ist das leere Array.",
@@ -62,7 +62,7 @@ export const challenge: ChallengeContent = {
         "Return the node values in in-order as an array: first the left subtree, then " +
         "the root, then the right one. A node has the shape { val, left, right }, empty " +
         "subtrees are null.\n\n" +
-        "For a search tree the result comes out sorted – not by accident, but because " +
+        "For a search tree the result comes out sorted, not by accident, but because " +
         "that is exactly the order a search tree establishes.",
       hints: [
         {
@@ -71,7 +71,7 @@ export const challenge: ChallengeContent = {
             "Every subtree is a tree in its own right. What you do for the root, you do " +
             "for every node: collect everything on the left, then your own value, then " +
             "everything on the right.\n\n" +
-            "The recursion ends where there is no node left – and an empty tree " +
+            "The recursion ends where there is no node left, and an empty tree " +
             "contributes an empty list.",
         },
         {
@@ -90,7 +90,7 @@ export const challenge: ChallengeContent = {
             "and you have pre-order: the search tree then comes out as [2,1,3] instead " +
             "of [1,2,3]. Every test case except the single node trips over it.\n\n" +
             "The null check has to come before every access, not just at the very top. " +
-            "Every leaf node has two null children – without the check you reach for " +
+            "Every leaf node has two null children, without the check you reach for " +
             "root.val of a node that is not there.\n\n" +
             "The empty tree is an input of its own: root is null right away, and the " +
             "answer is the empty array.",

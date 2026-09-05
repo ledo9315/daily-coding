@@ -22,10 +22,10 @@ export const challenge: ChallengeContent = {
     "miteinander multiplizieren, bis nur noch eine einzelne Ziffer übrig ist? Für 39 sind " +
     "das drei Schritte: 3 · 9 = 27, 2 · 7 = 14, 1 · 4 = 4. Für 999 sind es vier: 729, " +
     "126, 12, 2. Eine Zahl, die schon einstellig ist, hat die Persistenz 0.\n\n" +
-    "n ist immer eine positive ganze Zahl. Die Aufgabe ist eine Schleife um ein Ziffernprodukt " +
-    "– die Kunst liegt darin, das Ziffernprodukt sauber zu bauen und die Schleife im " +
+    "n ist immer eine positive ganze Zahl. Die Aufgabe ist eine Schleife um ein Ziffernprodukt. " +
+    "Die Kunst liegt darin, das Ziffernprodukt sauber zu bauen und die Schleife im " +
     "richtigen Moment zu verlassen.\n\n" +
-    "Wer Digital Root gelöst hat, kennt die Schleife – neu ist hier nur, was ein Produkt " +
+    "Wer Digital Root gelöst hat, kennt die Schleife. Neu ist hier nur, was ein Produkt " +
     "anders macht als eine Summe.",
   difficulty: "easy",
   points: 100,
@@ -36,7 +36,7 @@ export const challenge: ChallengeContent = {
       body:
         "Zwei Dinge, die getrennt einfach sind: die Ziffern einer Zahl multiplizieren, und " +
         "das so lange wiederholen, wie die Zahl mindestens zweistellig ist. Ein Zähler " +
-        "merkt sich, wie oft du multipliziert hast – er ist das Ergebnis.",
+        "merkt sich, wie oft du multipliziert hast. Er ist das Ergebnis.",
     },
     {
       title: "Die Umsetzung",
@@ -49,7 +49,7 @@ export const challenge: ChallengeContent = {
     {
       title: "Woran die meisten scheitern",
       body:
-        "Das Produkt startet bei 1, nicht bei 0 – sonst ist jedes Ziffernprodukt 0 und die " +
+        "Das Produkt startet bei 1, nicht bei 0, sonst ist jedes Ziffernprodukt 0 und die " +
         "Schleife endet nach einem Schritt mit dem falschen Zähler.\n\n" +
         "Einstellige Zahlen sind sofort fertig: persistence(4) ist 0, nicht 1. Wer den " +
         "Zähler vor der Prüfung erhöht oder eine do-while-Schleife nimmt, zählt einen " +
@@ -58,7 +58,7 @@ export const challenge: ChallengeContent = {
         "Zahlen wandeln. JavaScript zwingt bei \"3\" * \"9\" die Strings stillschweigend in " +
         "Zahlen und liefert 27; Python und Ruby werfen an derselben Stelle einen Fehler. Wandle " +
         "die Ziffern deshalb überall ausdrücklich um, bevor du multiplizierst. Bei einer Null " +
-        "unter den Ziffern ist das Produkt 0 und die Schleife endet – das ist richtig so, " +
+        "unter den Ziffern ist das Produkt 0 und die Schleife endet. Das ist richtig so, " +
         "persistence(10) ist 1.",
     },
   ],
@@ -98,9 +98,9 @@ export const challenge: ChallengeContent = {
         "the digits of n together until only a single digit is left? For 39 that takes three " +
         "steps: 3 · 9 = 27, 2 · 7 = 14, 1 · 4 = 4. For 999 it takes four: 729, 126, 12, 2. A " +
         "number that already has one digit has persistence 0.\n\n" +
-        "n is always a positive integer. The task is a loop around a digit product – the craft " +
+        "n is always a positive integer. The task is a loop around a digit product. The craft " +
         "lies in building that product cleanly and leaving the loop at the right moment.\n\n" +
-        "If you have solved Digital Root you know the loop – the only new thing here is what a " +
+        "If you have solved Digital Root you know the loop. The only new thing here is what a " +
         "product does differently from a sum.",
       hints: [
         {
@@ -108,7 +108,7 @@ export const challenge: ChallengeContent = {
           body:
             "Two things that are easy on their own: multiplying the digits of a number, and " +
             "repeating that as long as the number has at least two digits. A counter remembers " +
-            "how often you multiplied – it is the answer.",
+            "how often you multiplied. It is the answer.",
         },
         {
           title: "The implementation",
@@ -121,7 +121,7 @@ export const challenge: ChallengeContent = {
         {
           title: "Where most people go wrong",
           body:
-            "The product starts at 1, not at 0 – otherwise every digit product is 0 and the " +
+            "The product starts at 1, not at 0, otherwise every digit product is 0 and the " +
             "loop ends after one step with the wrong counter.\n\n" +
             "Single-digit numbers are done immediately: persistence(4) is 0, not 1. Increase " +
             "the counter before the check, or reach for a do-while loop, and you count one step " +
@@ -130,7 +130,7 @@ export const challenge: ChallengeContent = {
             "before multiplying. JavaScript silently coerces the strings in \"3\" * \"9\" into " +
             "numbers and hands you 27; Python and Ruby raise an error at the same spot. So " +
             "convert the digits explicitly everywhere before you multiply. With a zero among " +
-            "the digits the product is 0 and the loop ends – that is correct, persistence(10) " +
+            "the digits the product is 0 and the loop ends. That is correct, persistence(10) " +
             "is 1.",
         },
       ],

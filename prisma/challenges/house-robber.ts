@@ -19,7 +19,7 @@ export const challenge: ChallengeContent = {
   description:
     "Implementiere rob(nums).\n\n" +
     "nums[i] ist der Geldbetrag im i-ten Haus einer Straße. Du darfst beliebig viele Häuser " +
-    "ausrauben, aber keine zwei benachbarten – sonst geht der Alarm los. Gib den höchsten " +
+    "ausrauben, aber keine zwei benachbarten, sonst geht der Alarm los. Gib den höchsten " +
     "Betrag zurück, den du erbeuten kannst. Alle Beträge sind nicht negativ; ein leeres Array " +
     "bringt 0.\n\n" +
     "Einfach jedes zweite Haus zu nehmen scheitert schon an [2,7,9,3,1]. Die Aufgabe zielt " +
@@ -34,7 +34,7 @@ export const challenge: ChallengeContent = {
       body:
         "An jedem Haus gibt es genau zwei Möglichkeiten. Du nimmst es: Dann steht dir das Beste " +
         "bis zwei Häuser davor plus sein Betrag zu. Oder du lässt es aus: Dann bleibt das Beste " +
-        "bis zum Haus davor. Das Maximum der beiden ist das Beste bis hierher – und mehr als " +
+        "bis zum Haus davor. Das Maximum der beiden ist das Beste bis hierher, und mehr als " +
         "diese zwei Zwischenstände musst du nie kennen.",
     },
     {
@@ -43,7 +43,7 @@ export const challenge: ChallengeContent = {
         "Zwei Variablen, prev2 und prev1, beide 0: das Beste bis vor zwei Häusern und das Beste " +
         "bis zum letzten Haus. Für jedes nums[i] rechnest du current = max(prev1, prev2 + " +
         "nums[i]) und rückst dann auf: prev2 = prev1, prev1 = current. Nach dem letzten Haus " +
-        "steht die Antwort in prev1 – bei einem leeren Array ist das 0, ganz ohne Sonderfall.",
+        "steht die Antwort in prev1, bei einem leeren Array ist das 0, ganz ohne Sonderfall.",
     },
     {
       title: "Woran die meisten scheitern",
@@ -53,7 +53,7 @@ export const challenge: ChallengeContent = {
         "Häusern dürfen auch zwei oder mehr liegen.\n\n" +
         "Die Reihenfolge beim Aufrücken: Wer prev1 überschreibt, bevor er es in prev2 gesichert " +
         "hat, rechnet im nächsten Schritt mit dem falschen Wert.\n\n" +
-        "Ein Array mit einem Haus liefert dessen Betrag, ein leeres 0 – beides sollte deine " +
+        "Ein Array mit einem Haus liefert dessen Betrag, ein leeres 0. Beides sollte deine " +
         "Schleife überstehen, ohne je auf nums[1] zuzugreifen.",
     },
   ],
@@ -88,7 +88,7 @@ export const challenge: ChallengeContent = {
       description:
         "Implement rob(nums).\n\n" +
         "nums[i] is the amount of money in the i-th house on a street. You may rob as many " +
-        "houses as you like, but never two neighboring ones – otherwise the alarm goes off. " +
+        "houses as you like, but never two neighboring ones, otherwise the alarm goes off. " +
         "Return the highest amount you can get away with. All amounts are non-negative; an " +
         "empty array yields 0.\n\n" +
         "Simply taking every second house already fails on [2,7,9,3,1]. The task aims at " +
@@ -100,7 +100,7 @@ export const challenge: ChallengeContent = {
           body:
             "At every house there are exactly two options. You take it: then you get the best " +
             "up to two houses before it plus its amount. Or you skip it: then the best up to " +
-            "the previous house stays. The maximum of the two is the best up to here – and " +
+            "the previous house stays. The maximum of the two is the best up to here, and " +
             "you never need to know more than these two running values.",
         },
         {
@@ -109,7 +109,7 @@ export const challenge: ChallengeContent = {
             "Two variables, prev2 and prev1, both 0: the best up to two houses back and the " +
             "best up to the last house. For every nums[i] you compute current = max(prev1, " +
             "prev2 + nums[i]) and then shift along: prev2 = prev1, prev1 = current. After the " +
-            "last house the answer sits in prev1 – for an empty array that is 0, without any " +
+            "last house the answer sits in prev1, for an empty array that is 0, without any " +
             "special case.",
         },
         {
@@ -120,7 +120,7 @@ export const challenge: ChallengeContent = {
             "houses you take there may also be two or more.\n\n" +
             "The order when shifting along: overwriting prev1 before saving it into prev2 " +
             "means computing with the wrong value in the next step.\n\n" +
-            "An array with one house yields its amount, an empty one 0 – your loop should " +
+            "An array with one house yields its amount, an empty one 0. Your loop should " +
             "survive both without ever reaching for nums[1].",
         },
       ],

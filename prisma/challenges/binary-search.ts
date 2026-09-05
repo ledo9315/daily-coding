@@ -21,11 +21,11 @@ export const challenge: ChallengeContent = {
   title: "Binary Search",
   description:
     "Implementiere binarySearch(data) mit data = { arr, target }.\n\n" +
-    "arr ist aufsteigend sortiert. Gib den Index von target zurück – oder -1, wenn " +
+    "arr ist aufsteigend sortiert. Gib den Index von target zurück, oder -1, wenn " +
     "target nicht enthalten ist.\n\n" +
     "Die binäre Suche nutzt aus, dass das Array sortiert ist: statt jedes Element zu " +
     "prüfen, halbiert sie den Suchbereich mit jedem Vergleich. Das ist O(log n) statt " +
-    "O(n) – bei einer Million Einträgen rund 20 Schritte statt einer Million. Ein " +
+    "O(n), bei einer Million Einträgen rund 20 Schritte statt einer Million. Ein " +
     "indexOf besteht die Tests, geht aber an der Aufgabe vorbei.",
   difficulty: "easy",
   points: 120,
@@ -53,7 +53,7 @@ export const challenge: ChallengeContent = {
         "auf mid stehen, schrumpft der Bereich irgendwann nicht mehr und die Schleife " +
         "läuft endlos.\n\n" +
         "Und mid gehört in jeden Durchlauf neu berechnet, nicht vor die Schleife.\n\n" +
-        "Endet die Schleife ohne Treffer, ist die Antwort -1 – das deckt auch das " +
+        "Endet die Schleife ohne Treffer, ist die Antwort -1. Das deckt auch das " +
         "leere Array ab.",
     },
   ],
@@ -62,11 +62,11 @@ export const challenge: ChallengeContent = {
       title: "Binary Search",
       description:
         "Implement binarySearch(data) with data = { arr, target }.\n\n" +
-        "arr is sorted in ascending order. Return the index of target – or -1 if target " +
+        "arr is sorted in ascending order. Return the index of target, or -1 if target " +
         "is not in it.\n\n" +
         "Binary search exploits the fact that the array is sorted: instead of checking " +
         "every element, it halves the search range with each comparison. That is " +
-        "O(log n) instead of O(n) – with a million entries, around 20 steps instead of a " +
+        "O(log n) instead of O(n), with a million entries, around 20 steps instead of a " +
         "million. An indexOf passes the tests but misses the point of the task.",
       hints: [
         {
@@ -92,7 +92,7 @@ export const challenge: ChallengeContent = {
             "forever.\n\n" +
             "And mid has to be recomputed on every pass, not once in front of the " +
             "loop.\n\n" +
-            "If the loop ends without a hit, the answer is -1 – that covers the empty " +
+            "If the loop ends without a hit, the answer is -1. That covers the empty " +
             "array too.",
         },
       ],

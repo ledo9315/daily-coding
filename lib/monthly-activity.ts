@@ -19,7 +19,7 @@ export type MonthlyActivity = {
 };
 
 /**
- * Calendar grid for the UTC month of `now`: Mon–Sun columns, filler cells at the
+ * Calendar grid for the UTC month of `now`: Mon-Sun columns, filler cells at the
  * start of the month, one cell per calendar day. The streak follows the same
  * UTC-day rules as the rest of the app.
  */

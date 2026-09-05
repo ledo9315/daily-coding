@@ -21,7 +21,7 @@ export const challenge: ChallengeContent = {
     "Wandle eine römische Zahl in ihren ganzzahligen Wert um. Es gilt I=1, V=5, X=10, " +
     "L=50, C=100, D=500, M=1000.\n\n" +
     "Steht ein kleinerer Wert vor einem größeren, wird er abgezogen statt addiert: IV " +
-    "ist 4, IX ist 9. Diese eine Ausnahme ist die ganze Aufgabe – man braucht keine " +
+    "ist 4, IX ist 9. Diese eine Ausnahme ist die ganze Aufgabe. Man braucht keine " +
     "Liste der sechs Sonderfälle, sondern eine Regel, die sie alle erzeugt.",
   difficulty: "medium",
   points: 150,
@@ -49,7 +49,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Das letzte Zeichen hat keinen Nachfolger. Ohne Absicherung liest du über das " +
-        "Ende hinaus – in JavaScript kommt undefined heraus, der Vergleich wird " +
+        "Ende hinaus, in JavaScript kommt undefined heraus, der Vergleich wird " +
         "false, und das Zeichen wird zufällig richtig addiert. Verlass dich nicht " +
         "darauf, behandle den letzten Schritt bewusst.\n\n" +
         "Die Sonderfälle einzeln abzufangen. Wer nach \"IV\" und \"IX\" im String " +
@@ -95,7 +95,7 @@ export const challenge: ChallengeContent = {
         "Convert a Roman numeral to its integer value. I=1, V=5, X=10, L=50, C=100, " +
         "D=500, M=1000.\n\n" +
         "When a smaller value stands before a larger one, it is subtracted instead of " +
-        "added: IV is 4, IX is 9. That one exception is the whole task – you do not " +
+        "added: IV is 4, IX is 9. That one exception is the whole task. You do not " +
         "need a list of the six special cases, you need one rule that produces them all.",
       hints: [
         {
@@ -120,12 +120,12 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "The last character has no successor. Without a guard you read past the " +
-            "end – in JavaScript you get undefined, the comparison comes out " +
+            "end, in JavaScript you get undefined, the comparison comes out " +
             "false, and the character happens to be added correctly. Do not rely on " +
             "that, handle the last step deliberately.\n\n" +
             "Catching the special cases one by one. Search the string for \"IV\" and " +
             "\"IX\" and replace them, and MCMXCIV leaves you three replacements to " +
-            "keep track of – you will miss one.\n\n" +
+            "keep track of. You will miss one.\n\n" +
             "Smaller than the successor means strictly smaller. In II the successor is " +
             "the same size, and both count as positive.",
         },

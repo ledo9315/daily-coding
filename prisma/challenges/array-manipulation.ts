@@ -47,7 +47,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Die verschachtelte Schleife. Wer für jede Position wieder bei Index 0 " +
-        "anfängt, bekommt dasselbe Ergebnis in quadratischer Zeit – bei dieser Aufgabe " +
+        "anfängt, bekommt dasselbe Ergebnis in quadratischer Zeit, bei dieser Aufgabe " +
         "geht es genau um den Unterschied.\n\n" +
         "Gefragt ist ein neues Array. Das übergebene zu überschreiben ist unsauber, " +
         "auch wenn die Tests es hier nicht bemerken.\n\n" +
@@ -83,7 +83,7 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "The nested loop. Start over at index 0 for every position and you get the " +
-            "same result in quadratic time – and that difference is the whole point of " +
+            "same result in quadratic time, and that difference is the whole point of " +
             "this task.\n\n" +
             "A new array is what is asked for. Overwriting the one you were handed is " +
             "sloppy, even if the tests here do not notice.\n\n" +

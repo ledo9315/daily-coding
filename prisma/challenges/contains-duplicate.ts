@@ -33,7 +33,7 @@ export const challenge: ChallengeContent = {
       title: "Die Idee",
       body:
         "Ein Duplikat ist ein Wert, den du vorher schon einmal gesehen hast. Die Frage " +
-        "„habe ich diesen Wert schon gesehen“ beantwortet ein Set in einem Schritt – " +
+        "„habe ich diesen Wert schon gesehen“ beantwortet ein Set in einem Schritt, " +
         "unabhängig davon, wie viele Werte schon darin liegen. Damit reicht ein einziger " +
         "Durchlauf.",
     },
@@ -51,7 +51,7 @@ export const challenge: ChallengeContent = {
       body:
         "Das false gehört hinter die Schleife, nicht hinein. Wer beim ersten neuen Wert " +
         "schon false zurückgibt, sieht das Duplikat am Ende nie.\n\n" +
-        "Bei einem leeren Array läuft die Schleife kein einziges Mal – das Ergebnis ist " +
+        "Bei einem leeren Array läuft die Schleife kein einziges Mal. Das Ergebnis ist " +
         "trotzdem false, nicht ein Fehler oder undefined.\n\n" +
         "Wer stattdessen sortiert und Nachbarn vergleicht, darf i+1 nicht über das Ende " +
         "hinauslaufen lassen. Und -1 und 1 sind verschiedene Werte, auch wenn sie nach " +
@@ -103,7 +103,7 @@ export const challenge: ChallengeContent = {
           title: "The idea",
           body:
             'A duplicate is a value you have seen before. The question "have I seen this ' +
-            'value" is answered by a set in one step – no matter how many values are already ' +
+            'value" is answered by a set in one step, no matter how many values are already ' +
             "in it. That makes a single pass enough.",
         },
         {
@@ -120,7 +120,7 @@ export const challenge: ChallengeContent = {
           body:
             "The false belongs after the loop, not inside it. Returning false at the first " +
             "new value means never seeing the duplicate further on.\n\n" +
-            "For an empty array the loop never runs once – the result is still false, not an " +
+            "For an empty array the loop never runs once. The result is still false, not an " +
             "error and not undefined.\n\n" +
             "If you sort instead and compare neighbors, do not let i+1 run past the end. And " +
             "-1 and 1 are different values, even when sorting puts them side by side.",

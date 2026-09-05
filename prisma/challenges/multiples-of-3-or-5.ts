@@ -41,19 +41,19 @@ export const challenge: ChallengeContent = {
       body:
         "Setze sum = 0. Laufe mit i von 1 bis ausschließlich n. Wenn i % 3 === 0 oder " +
         "i % 5 === 0 gilt, addiere i auf sum. Gib sum zurück. Für n <= 0 läuft die " +
-        "Schleife kein einziges Mal, und 0 kommt von allein heraus – du brauchst keine " +
+        "Schleife kein einziges Mal, und 0 kommt von allein heraus. Du brauchst keine " +
         "Sonderbehandlung, solange die Schleife bei 1 beginnt.",
     },
     {
       title: "Woran die meisten scheitern",
       body:
         "Die Zahl 15 ist durch 3 und durch 5 teilbar. Wer zwei getrennte Schleifen schreibt " +
-        "– eine für die Vielfachen von 3, eine für die von 5 – zählt 15, 30, 45 doppelt und " +
+        "(eine für die Vielfachen von 3, eine für die von 5), zählt 15, 30, 45 doppelt und " +
         "bekommt für n = 20 die Summe 93 statt 78. Eine Bedingung mit „oder“ zählt jede " +
         "Zahl genau einmal.\n\n" +
         "„Unterhalb von n“ heißt ausschließlich n. Für n = 10 gehört die 10 nicht dazu, " +
         "auch wenn sie durch 5 teilbar ist. Eine Schleife bis <= n liefert 33 statt 23.\n\n" +
-        "Negative n sind erlaubt und ergeben 0 – nicht eine Endlosschleife und nicht eine " +
+        "Negative n sind erlaubt und ergeben 0, nicht eine Endlosschleife und nicht eine " +
         "negative Summe.",
     },
   ],
@@ -108,18 +108,18 @@ export const challenge: ChallengeContent = {
           body:
             "Set sum = 0. Loop with i from 1 up to but not including n. If i % 3 === 0 or " +
             "i % 5 === 0, add i to sum. Return sum. For n <= 0 the loop never runs at all, and " +
-            "0 falls out by itself – you need no special case as long as the loop starts at 1.",
+            "0 falls out by itself. You need no special case as long as the loop starts at 1.",
         },
         {
           title: "Where most people go wrong",
           body:
-            "The number 15 is divisible by 3 and by 5. Write two separate loops – one for the " +
-            "multiples of 3, one for those of 5 – and you count 15, 30, 45 twice, which gives " +
+            "The number 15 is divisible by 3 and by 5. Write two separate loops, one for the " +
+            "multiples of 3, one for those of 5, and you count 15, 30, 45 twice, which gives " +
             "93 instead of 78 for n = 20. A single condition with \"or\" counts every number " +
             "exactly once.\n\n" +
             "\"Below n\" means n excluded. For n = 10 the 10 does not belong, even though it " +
             "is divisible by 5. A loop running up to <= n gives 33 instead of 23.\n\n" +
-            "Negative n are allowed and give 0 – not an endless loop and not a negative sum.",
+            "Negative n are allowed and give 0, not an endless loop and not a negative sum.",
         },
       ],
       testCaseNames: {

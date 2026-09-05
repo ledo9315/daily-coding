@@ -32,7 +32,7 @@ export const challenge: ChallengeContent = {
       body:
         "Geh das Array von links nach rechts und frag dich an jeder Stelle nur eines: " +
         "Hilft mir, was links von mir liegt?\n\n" +
-        "Ist die Summe bis hierher negativ, ist sie Ballast – jedes Teil-Array, das sie " +
+        "Ist die Summe bis hierher negativ, ist sie Ballast. Jedes Teil-Array, das sie " +
         "mitschleppt, wäre ohne sie größer. Dann fängst du beim aktuellen Element neu " +
         "an. Andernfalls führst du sie fort. Mehr musst du über die Vergangenheit nicht " +
         "wissen.",
@@ -49,7 +49,7 @@ export const challenge: ChallengeContent = {
     {
       title: "Woran die meisten scheitern",
       body:
-        "Die Null als Startwert. Bei [-3,-1,-2] ist die Antwort -1, nicht 0 – ein leeres " +
+        "Die Null als Startwert. Bei [-3,-1,-2] ist die Antwort -1, nicht 0, ein leeres " +
         "Teil-Array ist nicht erlaubt. Starte deshalb mit dem ersten Element, nicht mit " +
         "0, und laufe ab dem zweiten los.\n\n" +
         "Zwei getrennte Werte, nicht einer. Wer nur die laufende Summe führt und sie am " +
@@ -100,7 +100,7 @@ export const challenge: ChallengeContent = {
           body:
             "Walk the array from left to right and ask yourself only one thing at every " +
             "position: does what lies to my left help me?\n\n" +
-            "If the sum up to here is negative, it is dead weight – every subarray that " +
+            "If the sum up to here is negative, it is dead weight. Every subarray that " +
             "drags it along would be larger without it. Then you start over at the current " +
             "element. Otherwise you carry it on. There is nothing else you need to know " +
             "about the past.",
@@ -117,7 +117,7 @@ export const challenge: ChallengeContent = {
         {
           title: "Where most people go wrong",
           body:
-            "Zero as the starting value. For [-3,-1,-2] the answer is -1, not 0 – an empty " +
+            "Zero as the starting value. For [-3,-1,-2] the answer is -1, not 0. An empty " +
             "subarray is not allowed. So start with the first element, not with 0, and run " +
             "from the second one on.\n\n" +
             "Two separate values, not one. Keep only the running sum and return it at the " +

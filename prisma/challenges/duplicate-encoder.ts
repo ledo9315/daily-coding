@@ -20,9 +20,9 @@ export const challenge: ChallengeContent = {
     "Implementiere duplicateEncode(word).\n\n" +
     'Wandle den String in einen neuen String gleicher Länge um: Jedes Zeichen wird zu "(", ' +
     'wenn es im Wort nur einmal vorkommt, und zu ")", wenn es mehrfach vorkommt. Groß- und ' +
-    'Kleinschreibung spielen dabei keine Rolle – "a" und "A" sind dasselbe Zeichen. ' +
+    'Kleinschreibung spielen dabei keine Rolle. "a" und "A" sind dasselbe Zeichen. ' +
     "Leerzeichen, Klammern und Sonderzeichen werden wie Buchstaben behandelt.\n\n" +
-    "Der Reflex ist, für jedes Zeichen den ganzen String abzusuchen – O(n²). Die Aufgabe " +
+    "Der Reflex ist, für jedes Zeichen den ganzen String abzusuchen: O(n²). Die Aufgabe " +
     "zielt auf zwei Durchläufe: erst zählen, dann übersetzen.",
   difficulty: "easy",
   points: 120,
@@ -52,9 +52,9 @@ export const challenge: ChallengeContent = {
         "Am einfachsten wandelst du einmal ganz am Anfang um und rechnest danach nur noch " +
         "mit der Kleinbuchstaben-Version.\n\n" +
         'Leerzeichen und Symbole zählen wie Buchstaben. In "(( @" kommt das Leerzeichen einmal ' +
-        'vor und wird zu "(", die runden Klammern kommen zweimal vor und werden zu ")" – ' +
-        "das Ergebnis besteht selbst aus Klammern, die mit den Klammern der Eingabe nichts zu " +
-        "tun haben – und das ist richtig so.\n\n" +
+        'vor und wird zu "(", die runden Klammern kommen zweimal vor und werden zu ")". ' +
+        "Das Ergebnis besteht selbst aus Klammern, die mit den Klammern der Eingabe nichts zu " +
+        "tun haben, und das ist richtig so.\n\n" +
         "Wer für jedes Zeichen indexOf und lastIndexOf vergleicht, bekommt zwar das richtige " +
         "Ergebnis, aber in O(n²). Das reicht hier, gehört aber nicht zur Idee.",
     },
@@ -93,9 +93,9 @@ export const challenge: ChallengeContent = {
         "Implement duplicateEncode(word).\n\n" +
         'Turn the string into a new string of the same length: every character becomes "(" ' +
         'if it appears only once in the word, and ")" if it appears more than once. Case ' +
-        'does not matter here – "a" and "A" are the same character. Spaces, parentheses and ' +
+        'does not matter here. "a" and "A" are the same character. Spaces, parentheses and ' +
         "special characters are treated like letters.\n\n" +
-        "The reflex is to search the whole string for every character – O(n²). The task aims " +
+        "The reflex is to search the whole string for every character: O(n²). The task aims " +
         "at two passes: count first, then translate.",
       hints: [
         {
@@ -122,9 +122,9 @@ export const challenge: ChallengeContent = {
             'instead of ")())())". The easiest way is to convert once at the very start and ' +
             "work only with the lowercase version from then on.\n\n" +
             'Spaces and symbols count like letters. In "(( @" the space appears once and ' +
-            'becomes "(", the parentheses appear twice and become ")" – so the result is ' +
+            'becomes "(", the parentheses appear twice and become ")", so the result is ' +
             "itself made of parentheses that have nothing to do with the parentheses in the " +
-            "input – and that is exactly right.\n\n" +
+            "input, and that is exactly right.\n\n" +
             "Comparing indexOf and lastIndexOf for every character does give the right " +
             "result, but in O(n²). It is good enough here, yet it is not the idea.",
         },

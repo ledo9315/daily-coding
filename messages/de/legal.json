@@ -50,7 +50,7 @@
     },
     "registration": {
       "title": "2. Verarbeitung bei Registrierung und Konto",
-      "p1": "Zur Nutzung von Daily Coding legst du ein Nutzerkonto an. Dabei verarbeiten wir deinen Namen, deine E-Mail-Adresse und dein Passwort. Das Passwort wird ausschließlich als kryptografischer Hash (bcrypt) gespeichert – es ist uns zu keiner Zeit im Klartext zugänglich. Zur Verifizierung deiner E-Mail-Adresse und für das Zurücksetzen des Passworts erzeugen wir zeitlich befristete Token.",
+      "p1": "Zur Nutzung von Daily Coding legst du ein Nutzerkonto an. Dabei verarbeiten wir deinen Namen, deine E-Mail-Adresse und dein Passwort. Das Passwort wird ausschließlich als kryptografischer Hash (bcrypt) gespeichert. Es ist uns zu keiner Zeit im Klartext zugänglich. Zur Verifizierung deiner E-Mail-Adresse und für das Zurücksetzen des Passworts erzeugen wir zeitlich befristete Token.",
       "p2": "Rechtsgrundlage ist die Erfüllung des Nutzungsvertrags gemäß Art. 6 Abs. 1 lit. b DSGVO."
     },
     "oauth": {

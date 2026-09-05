@@ -26,7 +26,7 @@ export const challenge: ChallengeContent = {
     "k ist nicht negativ und darf größer sein als die Länge des Arrays. Das Array hat mindestens " +
     "ein Element.\n\n" +
     "Mit einer Kopie ist die Aufgabe in einer Zeile gelöst. Interessant wird sie, wenn du ohne " +
-    "zusätzlichen Speicher auskommen willst – es gibt einen Trick mit drei Umkehrungen, der " +
+    "zusätzlichen Speicher auskommen willst. Es gibt einen Trick mit drei Umkehrungen, der " +
     "genau das schafft.",
   difficulty: "medium",
   points: 150,
@@ -37,13 +37,13 @@ export const challenge: ChallengeContent = {
       body:
         "Das Element an Position i landet an Position (i + k) % n. Anders gelesen: Die letzten k " +
         "Elemente wandern nach vorne, die ersten n - k rücken nach hinten. Rotation um k ist " +
-        "dasselbe wie Rotation um k % n – nach n Schritten steht alles wieder an seinem Platz.",
+        "dasselbe wie Rotation um k % n, nach n Schritten steht alles wieder an seinem Platz.",
     },
     {
       title: "Die Umsetzung",
       body:
         "Der direkte Weg: Reduziere k auf k % n und gib die letzten k Elemente gefolgt von den " +
-        "ersten n - k zurück – mit slice bzw. Slicing sind das zwei Teilstücke, die du " +
+        "ersten n - k zurück, mit slice bzw. Slicing sind das zwei Teilstücke, die du " +
         "aneinanderhängst. Alternativ legst du ein neues Array gleicher Länge an und schreibst " +
         "nums[i] an Position (i + k) % n.",
     },
@@ -51,11 +51,11 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "k größer als die Länge. Wer ohne k % n arbeitet, greift bei [1,2,3] und k = 5 neben das " +
-        "Array oder dreht falsch – erwartet ist [2,3,1]. Und k = n muss das Array unverändert " +
+        "Array oder dreht falsch. Erwartet ist [2,3,1]. Und k = n muss das Array unverändert " +
         "lassen.\n\n" +
         "Die Richtung: Rechts heißt, das letzte Element kommt nach vorne. Wer die ersten k " +
         "Elemente ans Ende schiebt, dreht nach links.\n\n" +
-        "Wer es ohne zusätzlichen Speicher versucht: dreimal umkehren – erst das ganze Array, " +
+        "Wer es ohne zusätzlichen Speicher versucht: dreimal umkehren, erst das ganze Array, " +
         "dann die ersten k Elemente, dann den Rest ab Position k. Das ergibt genau die " +
         "Rechtsrotation in O(1) Zusatzspeicher, und die Reihenfolge der drei Schritte ist nicht " +
         "beliebig.",
@@ -98,21 +98,21 @@ export const challenge: ChallengeContent = {
         "k is not negative and may be larger than the length of the array. The array has at " +
         "least one element.\n\n" +
         "With a copy the task is one line. It gets interesting once you want to manage without " +
-        "extra memory – there is a trick with three reversals that does exactly that.",
+        "extra memory. There is a trick with three reversals that does exactly that.",
       hints: [
         {
           title: "The idea",
           body:
             "The element at position i ends up at position (i + k) % n. Read the other way " +
             "round: the last k elements move to the front, the first n - k move to the back. " +
-            "Rotating by k is the same as rotating by k % n – after n steps everything is back " +
+            "Rotating by k is the same as rotating by k % n. After n steps everything is back " +
             "in its place.",
         },
         {
           title: "The implementation",
           body:
             "The direct way: reduce k to k % n and return the last k elements followed by the " +
-            "first n - k – with slice or slicing those are two pieces that you join together. " +
+            "first n - k, with slice or slicing those are two pieces that you join together. " +
             "Alternatively, create a new array of the same length and write nums[i] to position " +
             "(i + k) % n.",
         },
@@ -120,11 +120,11 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "k larger than the length. Without k % n you reach past the array for [1,2,3] and " +
-            "k = 5, or you rotate wrongly – expected is [2,3,1]. And k = n has to leave the " +
+            "k = 5, or you rotate wrongly. Expected is [2,3,1]. And k = n has to leave the " +
             "array unchanged.\n\n" +
             "The direction: to the right means the last element comes to the front. If you push " +
             "the first k elements to the end, you are rotating to the left.\n\n" +
-            "If you try it without extra memory: reverse three times – first the whole array, " +
+            "If you try it without extra memory: reverse three times, first the whole array, " +
             "then the first k elements, then the rest from position k. That gives exactly the " +
             "right rotation with O(1) extra memory, and the order of the three steps is not " +
             "arbitrary.",

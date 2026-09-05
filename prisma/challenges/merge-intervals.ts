@@ -31,7 +31,7 @@ export const challenge: ChallengeContent = {
       title: "Die Idee",
       body:
         "Sind die Intervalle nach start sortiert, kann sich ein Intervall nur noch mit seinem " +
-        "Vorgänger im Ergebnis überlappen – alles davor endete früher oder steckt schon in " +
+        "Vorgänger im Ergebnis überlappen. Alles davor endete früher oder steckt schon in " +
         "diesem Vorgänger. Damit bleibt pro Intervall genau eine Frage: Beginnt es, bevor das " +
         "letzte Ergebnis endet?",
     },
@@ -47,7 +47,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Das neue Ende ist das Maximum beider Enden, nicht das des aktuellen Intervalls. Bei " +
-        "[[1,10],[2,3]] endet das Ergebnis bei 10 – wer blind überschreibt, macht daraus " +
+        "[[1,10],[2,3]] endet das Ergebnis bei 10. Wer blind überschreibt, macht daraus " +
         "[1,3].\n\n" +
         "Berühren zählt als überlappen: Die Bedingung ist start <= letztes Ende, nicht <. " +
         "Sonst bleiben [1,4] und [4,5] getrennt.\n\n" +
@@ -101,14 +101,14 @@ export const challenge: ChallengeContent = {
         "Two intervals that only touch overlap as well: [1,4] and [4,5] give [1,5]. The input " +
         "is not sorted, and one interval can swallow several others at once.\n\n" +
         "Compare every pair with every other one and you land at O(n²) and still have to tidy " +
-        "up afterwards. The task is: sort once, then a single pass – after that an interval can " +
+        "up afterwards. The task is: sort once, then a single pass. After that an interval can " +
         "only merge with the last result you built.",
       hints: [
         {
           title: "The idea",
           body:
             "Once the intervals are sorted by start, an interval can only overlap with its " +
-            "predecessor in the result – everything before that ended earlier or is already " +
+            "predecessor in the result. Everything before that ended earlier or is already " +
             "part of that predecessor. Which leaves exactly one question per interval: does it " +
             "begin before the last result ends?",
         },
@@ -124,7 +124,7 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "The new end is the maximum of both ends, not the end of the current interval. " +
-            "For [[1,10],[2,3]] the result ends at 10 – overwrite it blindly and you turn it " +
+            "For [[1,10],[2,3]] the result ends at 10. Overwrite it blindly and you turn it " +
             "into [1,3].\n\n" +
             "Touching counts as overlapping: the condition is start <= last end, not <. " +
             "Otherwise [1,4] and [4,5] stay apart.\n\n" +

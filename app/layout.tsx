@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     /**
      * `template` composes every other page's title, so no page repeats the brand by hand.
-     * Three different suffix styles had grown before that - `– Daily Coding`, `| Admin` and
+     * Three different suffix styles had grown before that - `- Daily Coding`, `| Admin` and
      * none at all (#131). It stays untranslated: it is the product name plus a separator.
      *
      * The default is the landing's title: `/` renders the landing for visitors without a

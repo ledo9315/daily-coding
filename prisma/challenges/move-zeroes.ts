@@ -30,7 +30,7 @@ export const challenge: ChallengeContent = {
       title: "Die Idee",
       body:
         "Dreh die Aufgabe um. Statt Nullen nach hinten zu schieben, ziehst du alles, " +
-        "was keine Null ist, nach vorn – in genau der Reihenfolge, in der es " +
+        "was keine Null ist, nach vorn, in genau der Reihenfolge, in der es " +
         "vorkommt. Was hinten übrig bleibt, sind zwangsläufig die Nullen.",
     },
     {
@@ -47,7 +47,7 @@ export const challenge: ChallengeContent = {
       title: "Woran die meisten scheitern",
       body:
         "Nullen einzeln nach hinten zu tauschen. Bei [4,0,5,0,0,6] holt jeder Tausch " +
-        "ein Element von hinten nach vorn und zerstört die Reihenfolge – aus 4,5,6 " +
+        "ein Element von hinten nach vorn und zerstört die Reihenfolge, aus 4,5,6 " +
         "wird 4,6,5.\n\n" +
         "Die Länge. Das Ergebnis hat genauso viele Elemente wie die Eingabe. Wer die " +
         "Nullen nur herausfiltert und das Auffüllen vergisst, gibt ein zu kurzes " +
@@ -95,7 +95,7 @@ export const challenge: ChallengeContent = {
           title: "The idea",
           body:
             "Turn the task around. Instead of pushing zeroes to the back, you pull " +
-            "everything that is not a zero to the front – in exactly the order it " +
+            "everything that is not a zero to the front, in exactly the order it " +
             "appears. What is left at the back is bound to be the zeroes.",
         },
         {
@@ -112,7 +112,7 @@ export const challenge: ChallengeContent = {
           title: "Where most people go wrong",
           body:
             "Swapping zeroes to the back one at a time. For [4,0,5,0,0,6] every swap pulls " +
-            "an element from the back to the front and destroys the order – 4,5,6 turns " +
+            "an element from the back to the front and destroys the order. 4,5,6 Turns " +
             "into 4,6,5.\n\n" +
             "The length. The result has exactly as many elements as the input. Filter the " +
             "zeroes out and forget the padding, and you return an array that is too " +

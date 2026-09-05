@@ -25,7 +25,7 @@ export const challenge: ChallengeContent = {
     "Es existiert genau eine Lösung.\n\n" +
     "Jedes Paar durchzuprobieren funktioniert und kostet O(n²). Die Aufgabe zielt auf " +
     "den einen Durchlauf: Wer sich merkt, was er schon gesehen hat, muss den Partner " +
-    "nicht suchen – er weiß, ob es ihn gibt.",
+    "nicht suchen. Er weiß, ob es ihn gibt.",
   difficulty: "medium",
   points: 150,
   categoryId: CATEGORY.algorithmen,
@@ -52,7 +52,7 @@ export const challenge: ChallengeContent = {
         "Erst nachschlagen, dann eintragen. In der anderen Reihenfolge findet sich ein " +
         "Element bei target = 2 * nums[i] selbst und du gibst zweimal denselben Index " +
         "zurück.\n\n" +
-        "Gefragt sind die Indizes, nicht die Werte – und aufsteigend. Wenn du beim " +
+        "Gefragt sind die Indizes, nicht die Werte, und aufsteigend. Wenn du beim " +
         "Treffer den gespeicherten Index zuerst nennst, stimmt die Reihenfolge von " +
         "allein, denn er liegt zwangsläufig vor i.\n\n" +
         "Doppelte Werte sind erlaubt: Die Map darf einen bereits belegten Wert " +
@@ -93,7 +93,7 @@ export const challenge: ChallengeContent = {
         "There is exactly one solution.\n\n" +
         "Trying every pair works and costs O(n²). The point of the task is the single " +
         "pass: if you remember what you have already seen, you do not have to search " +
-        "for the partner – you know whether it exists.",
+        "for the partner. You know whether it exists.",
       hints: [
         {
           title: "The idea",
@@ -116,7 +116,7 @@ export const challenge: ChallengeContent = {
           body:
             "Look up first, then insert. In the other order an element finds itself " +
             "when target = 2 * nums[i] and you return the same index twice.\n\n" +
-            "You are asked for the indices, not the values – and in ascending order. " +
+            "You are asked for the indices, not the values, and in ascending order. " +
             "If you name the stored index first on a hit, the order comes out right by " +
             "itself, because it necessarily lies before i.\n\n" +
             "Duplicate values are allowed: the map may overwrite a value that is " +

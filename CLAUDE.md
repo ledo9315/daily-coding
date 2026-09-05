@@ -110,7 +110,7 @@ harness:
   compile stage, so nothing special is needed there. A Java compile error arrives as exit 1 with
   `error: compilation failed`; Go exits 2 for both a rejected build and a panic, told apart by
   `# command-line-arguments` and `./main.go:line:col`.
-- Both burn CPU before running a line - javac plus JVM startup 2.5–3 s, the Go toolchain about
+- Both burn CPU before running a line - javac plus JVM startup 2.5-3 s, the Go toolchain about
   1.7 s - over Piston's 3000 ms default. The ceiling is raised in `docker-compose.yml`;
   `piston-runner.ts` asks for the larger budget for Java and Go only. **A Piston host without
   those env vars kills every such submission with SIGKILL and an empty output.**
