@@ -56,10 +56,10 @@ export function shareResultText(input: ShareResultInput): string {
  * result would sensibly go to. These open a composer with the block already in it, on
  * every operating system and whether or not an app is installed.
  *
- * Both carry the whole text in one parameter. That is the reason the list is short:
- * LinkedIn dropped prefilled text in 2022 and would post the bare link, which is exactly
- * the part of the block that says nothing. Reddit prefills, but a personal daily result
- * is a post nobody subscribed to.
+ * All three carry the whole text in one parameter, which is what keeps the list short:
+ * a target that takes only a URL would post the bare link - exactly the part of the block
+ * that says nothing. Reddit would prefill, but a personal daily result is a post nobody
+ * subscribed to.
  */
 export const SHARE_TARGETS = [
   {
@@ -72,6 +72,18 @@ export const SHARE_TARGETS = [
     id: "whatsapp",
     label: "WhatsApp",
     href: (text: string) => `https://wa.me/?text=${encodeURIComponent(text)}`,
+  },
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    /**
+     * The feed composer, not `sharing/share-offsite`: that one takes a URL and nothing
+     * else, so the squares would never arrive. This opens the composer with the block
+     * already in it, and a signed-out reader keeps it - the login redirect carries the
+     * parameter through and returns to the filled composer.
+     */
+    href: (text: string) =>
+      `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`,
   },
 ] as const;
 
