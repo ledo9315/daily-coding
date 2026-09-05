@@ -229,6 +229,102 @@ describe("compile errors", () => {
   });
 });
 
+describe("case scheduling", () => {
+  const ioChallenge = {
+    evaluationConfig: { callableByLanguage: { javascript: "solve" } },
+    testCases: [
+      { id: 1, name: "A", input: "[1]", expected: "[1]" },
+      { id: 2, name: "B", input: "[2]", expected: "[2]" },
+      { id: 3, name: "C", input: "[3]", expected: "[3]" },
+      { id: 4, name: "D", input: "[4]", expected: "[4]" },
+    ],
+  };
+
+  /** A Piston call the test resolves by hand, to observe what is in flight at each moment. */
+  function deferred() {
+    let resolve!: (value: ReturnType<typeof pistonOk>) => void;
+    const promise = new Promise<ReturnType<typeof pistonOk>>((r) => (resolve = r));
+    return { promise, resolve };
+  }
+
+  it("runs the first case alone and the remaining cases together", async () => {
+    const calls = [deferred(), deferred(), deferred(), deferred()];
+    calls.forEach((c) => mockExecute.mockReturnValueOnce(c.promise));
+
+    const run = runChallengeTests(ioChallenge, "code", "javascript", "run", "de");
+    await Promise.resolve();
+    // Only the probe is out: a compile error must not cost one compiler run per case.
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+
+    calls[0].resolve(pistonOk("[1]"));
+    await vi.waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(4));
+
+    calls[1].resolve(pistonOk("[2]"));
+    calls[2].resolve(pistonOk("[3]"));
+    calls[3].resolve(pistonOk("[4]"));
+    const { runtimeOk } = await run;
+    expect(runtimeOk).toBe(true);
+  });
+
+  it("keeps the catalogue order even when a later case answers first", async () => {
+    const calls = [deferred(), deferred(), deferred(), deferred()];
+    calls.forEach((c) => mockExecute.mockReturnValueOnce(c.promise));
+
+    const run = runChallengeTests(ioChallenge, "code", "javascript", "run", "de");
+    calls[0].resolve(pistonOk("[1]"));
+    await vi.waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(4));
+    calls[3].resolve(pistonOk("[4]"));
+    calls[2].resolve(pistonOk("wrong"));
+    calls[1].resolve(pistonOk("[2]"));
+
+    const { runtimeOk, testCases } = await run;
+    expect(runtimeOk).toBe(false);
+    expect(testCases.map((t) => t.id)).toEqual([1, 2, 3, 4]);
+    expect(testCases.map((t) => t.status)).toEqual(["passed", "passed", "failed", "passed"]);
+    expect(testCases[2].actual).toBe("wrong");
+  });
+
+  it("passes each case its own input, since the typed harnesses bake it into the program", async () => {
+    mockExecute.mockResolvedValue(pistonOk("[1]"));
+
+    await runChallengeTests(ioChallenge, "code", "javascript", "run", "de");
+
+    expect(mockExecute.mock.calls.map((c) => c[2])).toEqual(["[1]", "[2]", "[3]", "[4]"]);
+  });
+
+  it("leaves a case without input or expected value pending and does not send it to Piston", async () => {
+    mockExecute.mockResolvedValue(pistonOk("[1]"));
+    const challenge = {
+      ...ioChallenge,
+      testCases: [
+        { id: 1, name: "A", input: "[1]", expected: "[1]" },
+        { id: 2, name: "B" },
+        { id: 3, name: "C", input: "[1]", expected: "[1]" },
+      ],
+    };
+
+    const { runtimeOk, testCases } = await runChallengeTests(challenge, "code", "javascript", "run", "de");
+
+    expect(mockExecute).toHaveBeenCalledTimes(2);
+    expect(runtimeOk).toBe(false);
+    expect(testCases.map((t) => t.status)).toEqual(["passed", "pending", "passed"]);
+  });
+
+  it("reports a compile error from a later case the same way as from the first", async () => {
+    mockExecute
+      .mockResolvedValueOnce(pistonOk("[1]"))
+      .mockResolvedValueOnce(pistonOk("[2]"))
+      .mockResolvedValueOnce(pistonCompileError("main.js:1 boom"))
+      .mockResolvedValueOnce(pistonOk("[4]"));
+
+    const { runtimeOk, testCases, compileError } = await runChallengeTests(ioChallenge, "code", "javascript", "run", "de");
+
+    expect(runtimeOk).toBe(false);
+    expect(compileError).toContain("boom");
+    expect(testCases.map((t) => t.status)).toEqual(["pending", "pending", "pending", "pending"]);
+  });
+});
+
 describe("withEditorFileName", () => {
   it("subtracts the harness offset so a line number points at the user's code", () => {
     // javac counts from the top of the generated file, three lines above the solution's line 1.
