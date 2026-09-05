@@ -57,10 +57,12 @@ export function SolutionCard({
       id={`solution-${group.codeHash}`}
       // scroll-mt keeps the sticky header from covering the card the link jumped to. No
       // extra frame for `focused`: the jump plus the open discussion already say which card
-      // was meant, and a second green outline around a card that is often the own one made
-      // the page shout.
+      // was meant, and a second outline around a card that is often the own one made the
+      // page shout.
       className={`scroll-mt-24 border-2 bg-card ${
-        group.own ? "border-primary/50" : "border-border"
+        group.own
+          ? "border-chart-5/50 shadow-[0_0_40px_-10px_rgba(163,113,247,0.3)]"
+          : "border-border"
       }`}
     >
       <div className="flex flex-col gap-4 p-4 sm:flex-row">
@@ -110,7 +112,7 @@ export function SolutionCard({
 
           <div className="flex flex-wrap items-center gap-2 text-sm uppercase tracking-wider">
             {group.own && (
-              <span className="border border-primary/40 bg-primary/10 px-2 py-0.5 text-primary">
+              <span className="border border-chart-5/40 bg-chart-5/10 px-2 py-0.5 text-chart-5">
                 {t("solutionCard.ownSolution")}
               </span>
             )}
