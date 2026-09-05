@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Play,
+  Loader,
   ArrowRight,
   Alert as AlertIcon,
   BookOpen,
@@ -175,6 +176,12 @@ export default function ChallengePage() {
       } else if (result.runtimeOk === false) {
         toast.message(t("toasts.testsRun.title"), {
           description: t("toasts.testsRun.description"),
+        });
+      } else {
+        toast.success(t("toasts.testsPassed.title"), {
+          description: t("toasts.testsPassed.description", {
+            count: result.testCases.length,
+          }),
         });
       }
     },
@@ -396,11 +403,20 @@ export default function ChallengePage() {
                     variant="outline"
                     onClick={handleRunTests}
                     disabled={isRunning || !language}
+                    aria-busy={isRunning}
                     title={t("editor.runTestsTitle")}
-                    className="gap-2 rounded-none cursor-pointer border-border bg-transparent hover:bg-primary/15 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                    className={cn(
+                      "gap-2 rounded-none cursor-pointer border-primary/60 bg-primary/15 text-primary hover:bg-primary/25 hover:text-primary dark:bg-primary/20 dark:hover:bg-primary/30 dark:hover:text-primary disabled:cursor-not-allowed",
+                      // Running keeps the colour: a greyed-out button reads as "nothing happening".
+                      isRunning ? "disabled:opacity-100" : "disabled:opacity-40"
+                    )}
                   >
-                    <Play className="h-4 w-4" fill="currentColor" />
-                    {isRunning ? t("editor.running") : t("editor.runTests")}
+                    {isRunning ? (
+                      <Loader className="h-4 w-4 animate-spin" aria-hidden />
+                    ) : (
+                      <Play className="h-4 w-4" fill="currentColor" />
+                    )}
+                    {t("editor.runTests")}
                   </Button>
                   <Button
                     variant="outline"
