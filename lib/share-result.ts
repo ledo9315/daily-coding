@@ -71,7 +71,15 @@ export const SHARE_TARGETS = [
   {
     id: "whatsapp",
     label: "WhatsApp",
-    href: (text: string) => `https://wa.me/?text=${encodeURIComponent(text)}`,
+    /**
+     * `api.whatsapp.com` directly, never the `wa.me` short form: that one answers with a
+     * redirect, and the redirect re-encodes the text as Latin-1. Everything above that
+     * range comes back as U+FFFD, which is every square and the flame - the whole block.
+     * `·` survives, which is what made it look like a font problem rather than a
+     * transport one. This endpoint is where `wa.me` points anyway and answers 200.
+     */
+    href: (text: string) =>
+      `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,
   },
   {
     id: "linkedin",
