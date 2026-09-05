@@ -139,6 +139,40 @@ out of `supportedLanguages` and never appears in the dropdown. Hash Map (mixed t
 array) and Binary Tree Traversal (recursive structure) are the two seeded challenges without
 them - Ruby covers both, since `data` there is just a value.
 
+### Sandbox capacity and latency
+
+Measured 2026-09-05 on the production Piston host (Hetzner, 4 vCPU, 7.6 GB, Falkenstein),
+one trivial execute per request, all requests started at once:
+
+| Language | Parallel | Result |
+|---|---|---|
+| JavaScript | 400 | all ok, ~35-40 executes/s, p50 7.3 s |
+| Python | 100 | all ok, ~35/s |
+| Java | 25 | all ok, p50 8 s |
+| Java | 50 | 18 of 50 SIGKILL - the 15 s timeout, load average 28 |
+
+Piston queues what it cannot run (no `PISTON_MAX_CONCURRENT_JOBS` override, default 64), so the
+interpreted languages only get slower under load. The compiled ones burn CPU per job and starve
+each other; that, not the Piston limits, is what fails first. Consequences in the code:
+
+- `lib/server/compiled-language-budget.ts` caps Java, Go, C++, C# and Rust at 30 runs a minute
+  across all users and both endpoints (`run` and `submit`). A run is six executes, so 30 a
+  minute is about the three Java executes a second the host finishes. A bigger host means
+  raising that one constant. The per-IP (20/min on `run`) and per-user (5/min on `submit`)
+  limits stay as they are; they protect against one caller, the budget against many.
+- `runPistonIoCases` in `lib/server/challenge-execution.ts` runs the first test case alone and
+  the rest in parallel: two round trips instead of six. Not all six at once, because a program
+  the compiler rejects would then be compiled six times for one answer.
+- `vercel.json` pins the functions to `fra1`. With Vercel's default `iad1` every database
+  round trip (about eight per run, Neon in `eu-central-1`) and both Piston calls crossed the
+  Atlantic: 2.5-3.8 s per test run, 0.8 s once in Frankfurt, 0.85 s locally. The second segment
+  of the `x-vercel-id` response header is the function region.
+
+Re-measuring: Caddy in front of Piston admits only the app's bearer token, so run a load
+script on the host itself against `127.0.0.1:2000` (Python is installed there, Node is not).
+From outside, the app's `run` endpoint answers the 21st request in a minute with 429, which
+is the limiter working, not the sandbox failing.
+
 ### Authentication
 
 - `auth.ts` configures NextAuth with credentials provider
