@@ -25,6 +25,10 @@
       "title": "Tests ausgeführt",
       "description": "Mindestens ein Test ist fehlgeschlagen."
     },
+    "testsPassed": {
+      "title": "Alle Tests bestanden",
+      "description": "{count, plural, one {# Testfall} other {# Testfälle}} erfolgreich."
+    },
     "runFailed": {
       "title": "Testlauf fehlgeschlagen"
     },
@@ -55,7 +59,6 @@
     "title": "Code Editor",
     "languagePlaceholder": "Sprache",
     "runTests": "Test ausführen",
-    "running": "Läuft...",
     "runTestsTitle": "Test ausführen, im Editor auch mit ⌘S / Strg+S",
     "maximize": "Editor maximieren",
     "minimize": "Editor verkleinern",

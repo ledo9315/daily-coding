@@ -25,6 +25,10 @@
       "title": "Tests finished",
       "description": "At least one test failed."
     },
+    "testsPassed": {
+      "title": "All tests passed",
+      "description": "{count, plural, one {# test case} other {# test cases}} passed."
+    },
     "runFailed": {
       "title": "Test run failed"
     },
@@ -55,7 +59,6 @@
     "title": "Code Editor",
     "languagePlaceholder": "Language",
     "runTests": "Run tests",
-    "running": "Running...",
     "runTestsTitle": "Run tests, in the editor also with ⌘S / Ctrl+S",
     "maximize": "Maximize editor",
     "minimize": "Shrink editor",
