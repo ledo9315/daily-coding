@@ -14,11 +14,14 @@ import { SHARE_TARGETS } from "@/lib/share-result";
  * second design of the same thing and would have to promise that the clipboard matches
  * it; this way the promise is trivially kept.
  *
- * `navigator.share` is detected after mount rather than rendered on the server: the
- * server has no way to know, and guessing would swap a button under the reader on
- * hydration. It stays as the last of the buttons rather than the only one - the system
- * decides what its sheet offers, and on a desktop that is Mail and Reminders. The two
- * named targets are what makes the block shareable there at all.
+ * `navigator.share` is offered on touch devices only, and detected after mount rather
+ * than rendered on the server: the server has no way to know, and guessing would swap a
+ * button under the reader on hydration.
+ *
+ * The coarse pointer is the condition because the system decides what its sheet offers.
+ * On a phone that is every messenger installed; on a desktop it is Mail, Notes and
+ * Reminders, none of which is a place a result goes - and the receiving app may drop the
+ * squares on the way. The named targets carry the block there instead.
  */
 /**
  * The two brand marks, inline. `@nsmr/pixelart-react` carries no logos, and a mark drawn
@@ -57,7 +60,8 @@ export function ShareResult({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setCanShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
+    const touch = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+    setCanShare(touch && typeof navigator.share === "function");
   }, []);
 
   useEffect(() => {

@@ -166,6 +166,27 @@ describe("SHARE_TARGETS", () => {
     expect(new URL(target.href(text)).protocol).toBe("https:");
   });
 
+  /**
+   * #300: the WhatsApp button pointed at the `wa.me` short form, whose redirect re-encodes
+   * the text as Latin-1 - every square and the flame arrived as U+FFFD. A shortener is
+   * therefore not a cosmetic choice here: the block only survives an endpoint that answers
+   * without redirecting.
+   */
+  it.each(SHARE_TARGETS)("$label survives the round trip through its own parameter", (target) => {
+    const url = new URL(target.href(text));
+    const carried = [...url.searchParams.values()].find((v) => v.includes("DAILY CODING"));
+
+    expect(carried).toBe(text);
+    expect(carried).toContain("🟩");
+    expect(carried).toContain("🔥");
+  });
+
+  it("addresses WhatsApp without the wa.me redirect", () => {
+    const whatsapp = SHARE_TARGETS.find((t) => t.id === "whatsapp");
+
+    expect(new URL(whatsapp!.href(text)).host).toBe("api.whatsapp.com");
+  });
+
   it("stays under the 280 characters X counts, with room for a long title", () => {
     const longest = shareResultText({
       challengeTitle: "Binärbaum-Traversierung in beiden Richtungen",
