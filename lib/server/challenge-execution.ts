@@ -10,7 +10,7 @@ import {
   HARNESS_LINE_OFFSETS,
   outputsMatch,
 } from "@/lib/server/io-harness";
-import { executeWithPiston } from "@/lib/server/piston-runner";
+import { executeWithPiston, type PistonRunResult } from "@/lib/server/piston-runner";
 import { stubRunResults, stubSubmitPassedResults } from "@/lib/server/challenge-run-stub";
 
 type ChallengeLike = {
@@ -166,89 +166,96 @@ async function runPistonIoCases(
   let list = parseTestCasesIo(challenge.testCases);
   if (list.length === 0) list = defaultSlots(labels);
 
-  const results: ChallengeTestCase[] = [];
-  let allPassed = true;
+  const pendingSlots = () =>
+    list.map((slot) => ({ id: slot.id, name: slot.name, status: "pending" as const }));
 
-  for (const tc of list) {
-    if (tc.input == null || tc.expected == null) {
-      results.push({
-        id: tc.id,
-        name: tc.name,
-        status: "pending",
-        time: undefined,
-      });
-      allPassed = false;
-      continue;
-    }
+  type CaseOutcome =
+    | { kind: "result"; testCase: ChallengeTestCase }
+    | { kind: "compileError"; piston: PistonRunResult };
 
+  const evaluateCase = async (tc: ParsedIoTestCase): Promise<CaseOutcome> => {
     /*
       Built per case, not once: the Java and Go harnesses bake the input in as typed literals
       rather than parsing it at runtime, so the program differs from case to case. The other
       languages ignore the argument and produce the same string every time.
     */
-    const wrapped = buildWrappedProgram(language, code, callable, tc.input);
-    const piston = await executeWithPiston(language, wrapped, tc.input);
-    const timeStr = `${piston.durationMs}ms`;
+    const wrapped = buildWrappedProgram(language, code, callable, tc.input as string);
+    const piston = await executeWithPiston(language, wrapped, tc.input as string);
+    if (piston.compileFailed) return { kind: "compileError", piston };
+    const time = `${piston.durationMs}ms`;
+    const expected = tc.expected as string;
 
-    if (piston.compileFailed) {
-      /*
-        One compile error, reported once. Every case runs the same program, so the remaining
-        four calls would fail identically - five compiler runs, some fifteen seconds, for an
-        answer that was settled after the first.
-      */
+    if (!piston.ok) {
       return {
-        testCases: list.map((slot) => ({
-          id: slot.id,
-          name: slot.name,
-          status: "pending" as const,
-        })),
-        runtimeOk: false,
-        compileError: withEditorFileName(
-          (piston.compileOutput || piston.stderr || `Exit ${piston.exitCode}`).slice(0, 2000),
-          language
-        ),
+        kind: "result",
+        testCase: {
+          id: tc.id,
+          name: tc.name,
+          status: "failed",
+          input: tc.input as string,
+          expected,
+          actual: (piston.stderr || piston.stdout || `Exit ${piston.exitCode}`).slice(0, 2000),
+          time,
+        },
       };
     }
 
-    if (!piston.ok) {
-      allPassed = false;
-      results.push({
-        id: tc.id,
-        name: tc.name,
-        status: "failed",
-        input: tc.input,
-        expected: tc.expected,
-        actual: (piston.stderr || piston.stdout || `Exit ${piston.exitCode}`).slice(0, 2000),
-        time: timeStr,
-      });
-      continue;
-    }
-
     const out = extractIoProgramOutput(piston.stdout);
-    const outDisplay = out.slice(0, 2000);
-    if (!outputsMatch(out, tc.expected)) {
-      allPassed = false;
-      results.push({
+    return {
+      kind: "result",
+      testCase: {
         id: tc.id,
         name: tc.name,
-        status: "failed",
-        input: tc.input,
-        expected: tc.expected,
-        actual: outDisplay,
-        time: timeStr,
-      });
-    } else {
-      results.push({
-        id: tc.id,
-        name: tc.name,
-        status: "passed",
-        input: tc.input,
-        expected: tc.expected,
-        actual: outDisplay,
-        time: timeStr,
-      });
+        status: outputsMatch(out, expected) ? "passed" : "failed",
+        input: tc.input as string,
+        expected,
+        actual: out.slice(0, 2000),
+        time,
+      },
+    };
+  };
+
+  const compileErrorResult = (piston: PistonRunResult): ChallengeRunResult => ({
+    testCases: pendingSlots(),
+    runtimeOk: false,
+    compileError: withEditorFileName(
+      (piston.compileOutput || piston.stderr || `Exit ${piston.exitCode}`).slice(0, 2000),
+      language
+    ),
+  });
+
+  const runnable = list.filter((tc) => tc.input != null && tc.expected != null);
+  const outcomes = new Map<number, CaseOutcome>();
+
+  /*
+    The first case runs alone, the rest together. Every case is a round trip to the sandbox,
+    and six of them in a row were most of what a user waited for. Running all six at once
+    would cut that further, but a program the compiler rejects would then be compiled six
+    times for one answer - so the first case doubles as the compile check, and only when it
+    comes back as a result do the others go out.
+  */
+  const [first, ...rest] = runnable;
+  if (first) {
+    const outcome = await evaluateCase(first);
+    if (outcome.kind === "compileError") return compileErrorResult(outcome.piston);
+    outcomes.set(first.id, outcome);
+    const others = await Promise.all(rest.map(evaluateCase));
+    for (const [i, outcome] of others.entries()) {
+      if (outcome.kind === "compileError") return compileErrorResult(outcome.piston);
+      outcomes.set(rest[i].id, outcome);
     }
   }
+
+  let allPassed = true;
+  const results: ChallengeTestCase[] = list.map((tc) => {
+    const outcome = outcomes.get(tc.id);
+    if (!outcome || outcome.kind !== "result") {
+      allPassed = false;
+      return { id: tc.id, name: tc.name, status: "pending", time: undefined };
+    }
+    if (outcome.testCase.status !== "passed") allPassed = false;
+    return outcome.testCase;
+  });
 
   return { testCases: results, runtimeOk: allPassed };
 }
