@@ -9,12 +9,13 @@ import php from "highlight.js/lib/languages/php";
 import python from "highlight.js/lib/languages/python";
 import ruby from "highlight.js/lib/languages/ruby";
 import rust from "highlight.js/lib/languages/rust";
+import swift from "highlight.js/lib/languages/swift";
 import typescript from "highlight.js/lib/languages/typescript";
 import type { CodeLanguageId } from "@/lib/challenge-languages";
 import { cn } from "@/lib/utils";
 
 /**
- * The ten languages of the registry, registered by hand rather than through
+ * The eleven languages of the registry, registered by hand rather than through
  * `highlight.js/lib/common`, whose bundle carries three dozen grammars nobody here submits in.
  */
 const GRAMMARS: Record<CodeLanguageId, LanguageFn> = {
@@ -28,6 +29,7 @@ const GRAMMARS: Record<CodeLanguageId, LanguageFn> = {
   cpp,
   csharp,
   rust,
+  swift,
 };
 
 for (const [id, grammar] of Object.entries(GRAMMARS)) {

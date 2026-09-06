@@ -11,6 +11,7 @@ const starter = {
   cpp: "int persistence(int n) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int Persistence(int n) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn persistence(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func persistence(_ n: Int) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -79,6 +80,7 @@ export const challenge: ChallengeContent = {
       cpp: "persistence",
       csharp: "Persistence",
       rust: "persistence",
+      swift: "persistence",
     },
   },
   testCases: [

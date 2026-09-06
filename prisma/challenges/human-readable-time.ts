@@ -12,6 +12,7 @@ const starter = {
   cpp: 'string humanReadable(int seconds) {\n    // Your solution here\n    return "";\n}\n',
   csharp: 'static string HumanReadable(int seconds) {\n    // Your solution here\n    return "";\n}\n',
   rust: "fn human_readable(seconds: i64) -> String {\n    // Your solution here\n    String::new()\n}\n",
+  swift: "func humanReadable(_ seconds: Int) -> String {\n    // Your solution here\n    return \"\"\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -73,6 +74,7 @@ export const challenge: ChallengeContent = {
       cpp: "humanReadable",
       csharp: "HumanReadable",
       rust: "human_readable",
+      swift: "humanReadable",
     },
   },
   testCases: [

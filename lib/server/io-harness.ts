@@ -121,6 +121,50 @@ const CSHARP_HEADER_LINES = [
   "public class Program {",
 ];
 
+/*
+  String.raw, so the backslashes below are Swift's and not doubled for the template - the Rust
+  block above pays for that in six backslashes per escape.
+*/
+const SWIFT_HARNESS = String.raw`
+protocol __ToJson {
+    func __toJson() -> String
+}
+
+extension Int: __ToJson {
+    func __toJson() -> String { return String(self) }
+}
+extension Double: __ToJson {
+    func __toJson() -> String { return String(self) }
+}
+extension Bool: __ToJson {
+    func __toJson() -> String { return String(self) }
+}
+extension String: __ToJson {
+    func __toJson() -> String { return __jsonStr(self) }
+}
+extension Array: __ToJson where Element: __ToJson {
+    func __toJson() -> String {
+        return "[" + self.map { $0.__toJson() }.joined(separator: ",") + "]"
+    }
+}
+
+func __jsonStr(_ s: String) -> String {
+    var out = "\""
+    for c in s.unicodeScalars {
+        switch c {
+        case "\"": out += "\\\""
+        case "\\": out += "\\\\"
+        case "\n": out += "\\n"
+        case "\r": out += "\\r"
+        case "\t": out += "\\t"
+        default: out.unicodeScalars.append(c)
+        }
+    }
+    out += "\""
+    return out
+}
+`;
+
 export const HARNESS_LINE_OFFSETS: Partial<Record<CodeLanguageId, number>> = {
   typescript: TS_HEADER_LINES.length,
   java: JAVA_HEADER_LINES.length,
@@ -248,10 +292,10 @@ function goLiteral(kind: ScalarKind, value: number | boolean | string): string {
 }
 
 /*
-  Rust escapes a code point as \u{XXXX}, with the braces - the \uXXXX that Java, Go, C++ and C#
-  share is a syntax error there.
+  Rust and Swift escape a code point as \u{XXXX}, with the braces - the \uXXXX that Java, Go, C++
+  and C# share is a syntax error in both.
 */
-function rustStringLiteral(str: string): string {
+function bracedStringLiteral(str: string): string {
   let out = '"';
   for (const ch of str) {
     const code = ch.codePointAt(0)!;
@@ -276,7 +320,7 @@ const RUST_TYPE: Record<ScalarKind, string> = {
 };
 
 function rustLiteral(kind: ScalarKind, value: number | boolean | string): string {
-  if (kind === "string") return `${rustStringLiteral(String(value))}.to_string()`;
+  if (kind === "string") return `${bracedStringLiteral(String(value))}.to_string()`;
   return String(value);
 }
 
@@ -292,6 +336,42 @@ export function buildRustArguments(input: string): { decls: string[]; names: str
     return `    let ${name}: ${RUST_TYPE[shape.kind]} = ${rustLiteral(shape.kind, shape.value)};`;
   });
   return { decls, names: args.map((a) => a.name) };
+}
+
+/** Int is 64 bit on every platform Piston runs, so int and long are one type, as in Go. */
+const SWIFT_TYPE: Record<ScalarKind, string> = {
+  int: "Int",
+  long: "Int",
+  double: "Double",
+  bool: "Bool",
+  string: "String",
+};
+
+function swiftLiteral(kind: ScalarKind, value: number | boolean | string): string {
+  return kind === "string" ? bracedStringLiteral(String(value)) : String(value);
+}
+
+/**
+ * Swift declarations for one test case, plus the arguments to pass.
+ *
+ * Swift labels its arguments, and a call has to spell the labels out: `twoSum(nums: nums,
+ * target: target)`. The keys of the test input are the labels, which is what the starters
+ * declare. A bare input - a string or an array without a key - has no name a solver would want
+ * to write, so it is passed positionally and the starter declares its parameter with `_`.
+ */
+export function buildSwiftArguments(input: string): { decls: string[]; args: string[] } {
+  const args = inferArguments(input, "Swift");
+  const decls = args.map(({ name, shape }) => {
+    if (shape.kind === "array") {
+      const items = shape.values.map((v) => swiftLiteral(shape.elem, v)).join(", ");
+      return `let ${name}: [${SWIFT_TYPE[shape.elem]}] = [${items}]`;
+    }
+    return `let ${name}: ${SWIFT_TYPE[shape.kind]} = ${swiftLiteral(shape.kind, shape.value)}`;
+  });
+  return {
+    decls,
+    args: args.map(({ name }) => (name === "__input" ? name : `${name}: ${name}`)),
+  };
 }
 
 const CSHARP_TYPE: Record<ScalarKind, string> = {
@@ -704,6 +784,25 @@ fn main() {
 ${decls.join("\n")}
     print!("{}", ${callable}(${names.join(", ")}).to_json());
 }
+`;
+    }
+    case "swift": {
+      if (input == null) {
+        throw new Error("Swift harness: cannot build a program without a test input.");
+      }
+      const { decls, args } = buildSwiftArguments(input);
+      /*
+        Solution first, as in Rust: top-level functions in main.swift are visible everywhere in
+        the file, so the harness can follow the user's code and line numbers stay correct.
+
+        Serialisation is a protocol with a conditional conformance for Array - Foundation's
+        JSONSerialization refuses a bare Int or String at the top level, and half the challenges
+        return exactly that. `String(2.0)` is "2.0", which `outputsMatch` reads as the number.
+      */
+      return `${trimmed}
+${SWIFT_HARNESS}
+${decls.join("\n")}
+print(${callable}(${args.join(", ")}).__toJson(), terminator: "")
 `;
     }
     case "ruby":

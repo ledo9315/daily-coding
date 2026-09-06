@@ -11,6 +11,7 @@ const starter = {
   cpp: "int fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int Fibonacci(int n) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn fibonacci(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func fibonacci(_ n: Int) -> Int {\n    // Your solution here\n    return 0\n}\n",
   ruby: "def fibonacci(n)\n  # Your solution here\n  0\nend\n",
 };
 
@@ -75,6 +76,7 @@ export const challenge: ChallengeContent = {
       cpp: "fibonacci",
       csharp: "Fibonacci",
       rust: "fibonacci",
+      swift: "fibonacci",
     },
   },
   testCases: [

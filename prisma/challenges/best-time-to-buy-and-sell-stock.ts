@@ -11,6 +11,7 @@ const starter = {
   cpp: "int maxProfit(vector<int> prices) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int MaxProfit(int[] prices) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn max_profit(prices: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func maxProfit(_ prices: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -127,6 +128,7 @@ export const challenge: ChallengeContent = {
       cpp: "maxProfit",
       csharp: "MaxProfit",
       rust: "max_profit",
+      swift: "maxProfit",
     },
   },
   testCases: [

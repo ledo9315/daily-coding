@@ -11,6 +11,7 @@ const starter = {
   cpp: "bool isPalindrome(int x) {\n    // Your solution here\n    return false;\n}\n",
   csharp: "static bool IsPalindrome(int x) {\n    // Your solution here\n    return false;\n}\n",
   rust: "fn is_palindrome(x: i64) -> bool {\n    // Your solution here\n    false\n}\n",
+  swift: "func isPalindrome(_ x: Int) -> Bool {\n    // Your solution here\n    return false\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -72,6 +73,7 @@ export const challenge: ChallengeContent = {
       cpp: "isPalindrome",
       csharp: "IsPalindrome",
       rust: "is_palindrome",
+      swift: "isPalindrome",
     },
   },
   testCases: [

@@ -12,6 +12,7 @@ const starter = {
   cpp: "bool containsDuplicate(vector<int> nums) {\n    // Your solution here\n    return false;\n}\n",
   csharp: "static bool ContainsDuplicate(int[] nums) {\n    // Your solution here\n    return false;\n}\n",
   rust: "fn contains_duplicate(nums: Vec<i64>) -> bool {\n    // Your solution here\n    false\n}\n",
+  swift: "func containsDuplicate(_ nums: [Int]) -> Bool {\n    // Your solution here\n    return false\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -75,6 +76,7 @@ export const challenge: ChallengeContent = {
       cpp: "containsDuplicate",
       csharp: "ContainsDuplicate",
       rust: "contains_duplicate",
+      swift: "containsDuplicate",
     },
   },
   testCases: [

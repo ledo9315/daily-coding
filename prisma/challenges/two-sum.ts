@@ -13,6 +13,7 @@ const starter = {
   cpp: "vector<int> twoSum(vector<int> nums, int target) {\n    // Your solution here\n    return {};\n}\n",
   csharp: "static int[] TwoSum(int[] nums, int target) {\n    // Your solution here\n    return new int[]{};\n}\n",
   rust: "fn two_sum(nums: Vec<i64>, target: i64) -> Vec<i64> {\n    // Your solution here\n    vec![]\n}\n",
+  swift: "func twoSum(nums: [Int], target: Int) -> [Int] {\n    // Your solution here\n    return []\n}\n",
   ruby: "def two_sum(data)\n  nums, target = data['nums'], data['target']\n  # Your solution here\n  []\nend\n",
 };
 
@@ -73,6 +74,7 @@ export const challenge: ChallengeContent = {
       cpp: "twoSum",
       csharp: "TwoSum",
       rust: "two_sum",
+      swift: "twoSum",
     },
   },
   testCases: [

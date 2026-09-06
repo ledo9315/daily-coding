@@ -15,6 +15,7 @@ const starter = {
   csharp:
     "static double FindMedianSortedArrays(int[] nums1, int[] nums2) {\n    // Your solution here\n    return 0.0;\n}\n",
   rust: "fn find_median_sorted_arrays(nums1: Vec<i64>, nums2: Vec<i64>) -> f64 {\n    // Your solution here\n    0.0\n}\n",
+  swift: "func findMedianSortedArrays(nums1: [Int], nums2: [Int]) -> Double {\n    // Your solution here\n    return 0.0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -84,6 +85,7 @@ export const challenge: ChallengeContent = {
       cpp: "findMedianSortedArrays",
       csharp: "FindMedianSortedArrays",
       rust: "find_median_sorted_arrays",
+      swift: "findMedianSortedArrays",
     },
   },
   testCases: [

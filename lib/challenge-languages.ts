@@ -10,6 +10,7 @@ export const CODE_LANGUAGES = [
   "cpp",
   "csharp",
   "rust",
+  "swift",
 ] as const;
 export type CodeLanguageId = (typeof CODE_LANGUAGES)[number];
 
@@ -198,6 +199,25 @@ export const LANGUAGES: Record<CodeLanguageId, LanguageSpec> = {
     compiledInRunStep: false,
     starter:
       "// Implement your solution\nfn solve(arr: Vec<i64>) -> Vec<i64> {\n    arr\n}\n",
+  },
+  swift: {
+    id: "swift",
+    label: "Swift",
+    monacoId: "swift",
+    editorFile: "main.swift",
+    // With the extension, as for Rust: the interpreter names the file it was handed in every error.
+    pistonFile: "main.swift",
+    pistonPackage: "swift",
+    typed: true,
+    /*
+      Piston's package has no compile stage; `swift main.swift` type-checks and interprets in one
+      step. Cheap all the same - about 400 ms for a trivial program, where javac needs three
+      seconds - but a rejected program still surfaces as a failed run, hence the pattern below.
+    */
+    compiledInRunStep: true,
+    compileFailure: /^main\.swift:\d+:\d+: error:/mu,
+    starter:
+      "// Implement your solution\nfunc solve(arr: [Int]) -> [Int] {\n    return arr\n}\n",
   },
 };
 

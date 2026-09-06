@@ -11,6 +11,7 @@ const starter = {
   cpp: "int singleNumber(vector<int> nums) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int SingleNumber(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn single_number(nums: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func singleNumber(_ nums: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -76,6 +77,7 @@ export const challenge: ChallengeContent = {
       cpp: "singleNumber",
       csharp: "SingleNumber",
       rust: "single_number",
+      swift: "singleNumber",
     },
   },
   testCases: [

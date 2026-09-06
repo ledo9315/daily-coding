@@ -11,6 +11,7 @@ const starter = {
   cpp: 'string duplicateEncode(string word) {\n    // Your solution here\n    return "";\n}\n',
   csharp: 'static string DuplicateEncode(string word) {\n    // Your solution here\n    return "";\n}\n',
   rust: "fn duplicate_encode(word: String) -> String {\n    // Your solution here\n    String::new()\n}\n",
+  swift: "func duplicateEncode(_ word: String) -> String {\n    // Your solution here\n    return \"\"\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -76,6 +77,7 @@ export const challenge: ChallengeContent = {
       cpp: "duplicateEncode",
       csharp: "DuplicateEncode",
       rust: "duplicate_encode",
+      swift: "duplicateEncode",
     },
   },
   testCases: [

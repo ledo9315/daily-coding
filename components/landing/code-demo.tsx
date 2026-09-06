@@ -199,6 +199,21 @@ const SOLUTIONS: Record<
       "}",
     ],
   },
+  swift: {
+    ms: [420, 390, 400, 385, 395],
+    entry: "binarySearch",
+    code: [
+      "func binarySearch(arr: [Int], target: Int) -> Int {",
+      "    var low = 0, high = arr.count - 1",
+      "    while low <= high {",
+      "        let mid = (low + high) / 2",
+      "        if arr[mid] == target { return mid }",
+      "        if arr[mid] < target { low = mid + 1 } else { high = mid - 1 }",
+      "    }",
+      "    return -1",
+      "}",
+    ],
+  },
   java: {
     ms: [1480, 1390, 1420, 1360, 1410],
     entry: "binarySearch",

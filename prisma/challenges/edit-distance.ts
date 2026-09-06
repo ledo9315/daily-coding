@@ -14,6 +14,7 @@ const starter = {
   cpp: "int minDistance(string word1, string word2) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int MinDistance(string word1, string word2) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn min_distance(word1: String, word2: String) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func minDistance(word1: String, word2: String) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -76,6 +77,7 @@ export const challenge: ChallengeContent = {
       cpp: "minDistance",
       csharp: "MinDistance",
       rust: "min_distance",
+      swift: "minDistance",
     },
   },
   testCases: [

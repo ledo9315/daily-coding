@@ -3,6 +3,7 @@ import {
   outputsMatch,
   buildGoArguments,
   buildRustArguments,
+  buildSwiftArguments,
   buildJavaArguments,
   buildWrappedProgram,
   extractIoProgramOutput,
@@ -114,6 +115,36 @@ describe("buildWrappedProgram", () => {
     // \uXXXX is a syntax error in Rust; the other typed languages all take it.
     const { decls } = buildRustArguments('"a\u00e4"');
     expect(decls[0]).toContain("\\u{e4}");
+  });
+
+  it("Swift: solution first, labelled arguments from the input keys", () => {
+    const src = buildWrappedProgram(
+      "swift",
+      "func twoSum(nums: [Int], target: Int) -> [Int] { return [0, 1] }",
+      "twoSum",
+      '{"nums":[2,7,11,15],"target":9}'
+    );
+    expect(src.startsWith("func twoSum")).toBe(true);
+    expect(src).toContain("let nums: [Int] = [2, 7, 11, 15]");
+    expect(src).toContain("let target: Int = 9");
+    // Swift insists on the labels, so the call names them.
+    expect(src).toContain('print(twoSum(nums: nums, target: target).__toJson(), terminator: "")');
+    expect(src).toContain("extension Array: __ToJson where Element: __ToJson");
+  });
+
+  it("Swift: a bare input is passed positionally", () => {
+    const { decls, args } = buildSwiftArguments('"hello"');
+    expect(decls).toEqual(['let __input: String = "hello"']);
+    expect(args).toEqual(["__input"]);
+  });
+
+  it("Swift: escapes a code point with braces and emits Swift's own escapes", () => {
+    const { decls } = buildSwiftArguments('"a\u00e4"');
+    expect(decls[0]).toContain("\\u{e4}");
+    // The serialiser's escapes must arrive as Swift source, not as the template's.
+    const src = buildWrappedProgram("swift", "func f(_ s: String) -> String { return s }", "f", '"x"');
+    expect(src).toContain('case "\\"": out += "\\\\\\""');
+    expect(src).toContain('case "\\n": out += "\\\\n"');
   });
 
   it("C#: one serialiser with ordered type tests, no System.Text.Json", () => {

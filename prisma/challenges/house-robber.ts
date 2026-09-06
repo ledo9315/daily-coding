@@ -11,6 +11,7 @@ const starter = {
   cpp: "int rob(vector<int> nums) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int Rob(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn rob(nums: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func rob(_ nums: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -71,6 +72,7 @@ export const challenge: ChallengeContent = {
       cpp: "rob",
       csharp: "Rob",
       rust: "rob",
+      swift: "rob",
     },
   },
   testCases: [

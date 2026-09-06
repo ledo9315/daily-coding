@@ -98,7 +98,7 @@ Adding a language means: registry entry, Prisma enum plus migration, a `case` in
 `json.dumps` - deliberately not `JSON.generate`, which refuses a bare String or Integer at the
 top level, and half the challenges return exactly that.
 
-Java, Go, C++, C# and Rust are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
+Java, Go, C++, C#, Rust and Swift are the typed ones and share `inferArguments` in `io-harness.ts`: the test input is
 turned into typed parameters (one per JSON key, in key order) and baked into the program as
 literals. Both differ from the interpreted languages in ways worth knowing before touching the
 harness:
@@ -127,14 +127,24 @@ harness:
   word comes back as a list of letters.
 - Rust puts the solution *first* - no class to nest in, so line numbers need no correction at
   all - and serialises through a `ToJson` trait, where a blanket `impl<T: ToJson> for Vec<T>`
-  covers nesting in one line. Its string escapes are `\u{XXXX}` with braces, unlike every other
-  typed language here.
+  covers nesting in one line. Its string escapes are `\u{XXXX}` with braces, which only Swift
+  shares.
+- Swift follows the Rust layout (solution first, a `__ToJson` protocol with a conditional
+  conformance for `Array`) and is the one language whose harness has to spell out **argument
+  labels**: the test input's keys become the labels, `twoSum(nums: nums, target: target)`, and
+  the starters declare them the same way. A bare input (a string or array without a key) is
+  passed positionally and the starter takes it as `_ s: String`. Piston's package has no compile
+  stage; `swift main.swift` type-checks and interprets in one step, so a rejected program is a
+  failed run (`main.swift:L:C: error:`, exit 1) - but at about 400 ms per program it is the
+  cheapest of the typed languages, not the dearest. A crash (index out of range) arrives as a
+  signal with `Fatal error:` on stderr, which `piston-runner.ts` tells from a timeout by the
+  output not being empty.
 - C# runs on **Mono**, not on the `csharp.net` runtime Piston also offers: that one scaffolds a
   project per execution, ten seconds of CPU with its progress on stdout. Mono cannot start under
   the QEMU emulation the amd64 image needs on Apple Silicon, so C# is only testable against the
   real host - `piston-integration.test.ts` skips a runtime that dies in the sandbox keeper.
 
-Java, Go, C++, C# and Rust are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
+Java, Go, C++, C#, Rust and Swift are opt-in per challenge: no `callableByLanguage.<lang>` means the language is left
 out of `supportedLanguages` and never appears in the dropdown. Hash Map (mixed types in one
 array) and Binary Tree Traversal (recursive structure) are the two seeded challenges without
 them - Ruby covers both, since `data` there is just a value.
@@ -155,7 +165,7 @@ Piston queues what it cannot run (no `PISTON_MAX_CONCURRENT_JOBS` override, defa
 interpreted languages only get slower under load. The compiled ones burn CPU per job and starve
 each other; that, not the Piston limits, is what fails first. Consequences in the code:
 
-- `lib/server/compiled-language-budget.ts` caps Java, Go, C++, C# and Rust at 30 runs a minute
+- `lib/server/compiled-language-budget.ts` caps Java, Go, C++, C#, Rust and Swift at 30 runs a minute
   across all users and both endpoints (`run` and `submit`). A run is six executes, so 30 a
   minute is about the three Java executes a second the host finishes. A bigger host means
   raising that one constant. The per-IP (20/min on `run`) and per-user (5/min on `submit`)

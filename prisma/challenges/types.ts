@@ -84,4 +84,12 @@ export const BASE_LANGUAGES: CodeLanguage[] = ["javascript", "typescript", "pyth
  * type, or an object of those - `inferArguments` in the harness turns each key into a typed
  * parameter and cannot express anything nested or mixed.
  */
-export const ALL_LANGUAGES: CodeLanguage[] = [...BASE_LANGUAGES, "java", "go", "cpp", "csharp", "rust"];
+export const ALL_LANGUAGES: CodeLanguage[] = [
+  ...BASE_LANGUAGES,
+  "java",
+  "go",
+  "cpp",
+  "csharp",
+  "rust",
+  "swift",
+];
