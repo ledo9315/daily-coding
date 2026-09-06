@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { localizedPath } from "@/lib/site";
+import { BrandMark } from "@/components/brand-mark";
 
 export function LandingNavbar() {
   const t = useTranslations("dashboard");
@@ -9,10 +10,8 @@ export function LandingNavbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={localizedPath("/", locale)} className="flex items-center gap-3 group">
-          <span className="text-xl font-pixel tracking-tighter text-primary">
-            {">_"}
-          </span>
+        <Link href={localizedPath("/", locale)} className="flex items-center gap-2 group">
+          <BrandMark />
           {/* Two lines, like the header on every signed-in page - one logo, one shape. */}
           {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
           <span className="font-pixel text-[10px] leading-tight tracking-tight text-foreground sm:text-xs">

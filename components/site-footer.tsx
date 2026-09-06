@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { BrandMark } from "@/components/brand-mark";
 import { ChangelogLink } from "@/components/changelog-link";
 import { localizedPath } from "@/lib/site";
 
@@ -31,14 +32,15 @@ export async function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <Link href={path("/")} className="flex items-center gap-3">
-              <span className="font-pixel text-xl tracking-tighter text-primary">
-                {">_"}
+            <Link href={path("/")} className="flex items-center gap-2">
+              <BrandMark />
+              {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
+              <span className="font-pixel text-xs leading-tight tracking-tight text-foreground">
+                DAILY
+                <br />
+                CODING
               </span>
-              {/* eslint-disable-next-line no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
-              <span className="font-pixel text-xs tracking-tight text-foreground">
-                DAILY CODING
-              </span>
+              {/* eslint-enable no-restricted-syntax */}
             </Link>
             <p className="mt-4 max-w-sm font-code text-sm leading-relaxed text-muted-foreground">
               {t("footer.tagline")}

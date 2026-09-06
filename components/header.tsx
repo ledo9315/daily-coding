@@ -28,6 +28,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { NotificationBell } from "@/components/notification-bell";
 import { useMenuFocusReturn } from "@/hooks/use-menu-focus-return";
 import { localizedPath } from "@/lib/site";
+import { BrandMark } from "@/components/brand-mark";
 
 /**
  * `NAV_ITEMS` stores German labels, so the namespace keys the labels by destination
@@ -137,10 +138,8 @@ export function Header() {
         <div className="flex min-w-0 items-center gap-3 md:gap-8">
           {/* Below md the nav bar is hidden; this is the only way in (#79). */}
           <MobileNav isAdmin={isAdminFromDb} />
-          <Link href={localizedPath("/", locale)} className="flex items-center gap-3 group">
-            <span className="text-xl font-pixel tracking-tighter text-primary">
-              {">_"}
-            </span>
+          <Link href={localizedPath("/", locale)} className="flex items-center gap-2 group">
+            <BrandMark />
             {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
             <span className="font-pixel text-[10px] leading-tight tracking-tight text-foreground sm:text-xs">
               DAILY
