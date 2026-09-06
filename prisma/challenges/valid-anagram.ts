@@ -13,6 +13,7 @@ const starter = {
   cpp: "bool isAnagram(string s, string t) {\n    // Your solution here\n    return false;\n}\n",
   csharp: "static bool IsAnagram(string s, string t) {\n    // Your solution here\n    return false;\n}\n",
   rust: "fn is_anagram(s: String, t: String) -> bool {\n    // Your solution here\n    false\n}\n",
+  swift: "func isAnagram(s: String, t: String) -> Bool {\n    // Your solution here\n    return false\n}\n",
   ruby: "def is_anagram(data)\n  s, t = data['s'], data['t']\n  # Your solution here\n  false\nend\n",
 };
 
@@ -73,6 +74,7 @@ export const challenge: ChallengeContent = {
       cpp: "isAnagram",
       csharp: "IsAnagram",
       rust: "is_anagram",
+      swift: "isAnagram",
     },
   },
   testCases: [

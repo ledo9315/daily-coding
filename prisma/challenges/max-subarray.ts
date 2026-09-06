@@ -10,6 +10,7 @@ const starter = {
   cpp: "int maxSubArray(vector<int> nums) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int MaxSubArray(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn max_sub_array(nums: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func maxSubArray(_ nums: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
   ruby: "def max_sub_array(nums)\n  # Your solution here\n  0\nend\n",
 };
 
@@ -73,6 +74,7 @@ export const challenge: ChallengeContent = {
       cpp: "maxSubArray",
       csharp: "MaxSubArray",
       rust: "max_sub_array",
+      swift: "maxSubArray",
     },
   },
   testCases: [

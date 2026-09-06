@@ -62,7 +62,7 @@ What a challenge needs:
 
 - a description, hints, difficulty and points;
 - structured `testCases` with `input` and `expected` as JSON;
-- the list of `supportedLanguages`, in `evaluationConfig.callableByLanguage` the function name to call per language, and a starter snippet per language in `starterCodes`. Java, Go, C++, C# and Rust are opt-in: leave them out when the test input cannot be typed (mixed types in one array, recursive structures).
+- the list of `supportedLanguages`, in `evaluationConfig.callableByLanguage` the function name to call per language, and a starter snippet per language in `starterCodes`. Java, Go, C++, C#, Rust and Swift are opt-in: leave them out when the test input cannot be typed (mixed types in one array, recursive structures).
 
 Before opening the pull request:
 
@@ -164,7 +164,7 @@ Was eine Challenge braucht:
 
 - Beschreibung, Hinweise, Schwierigkeit und Punkte;
 - strukturierte `testCases` mit `input` und `expected` als JSON;
-- die Liste `supportedLanguages`, in `evaluationConfig.callableByLanguage` den aufzurufenden Funktionsnamen pro Sprache und in `starterCodes` einen Starter pro Sprache. Java, Go, C++, C# und Rust sind optional: weglassen, wenn sich die Testeingabe nicht typisieren lässt (gemischte Typen in einem Array, rekursive Strukturen).
+- die Liste `supportedLanguages`, in `evaluationConfig.callableByLanguage` den aufzurufenden Funktionsnamen pro Sprache und in `starterCodes` einen Starter pro Sprache. Java, Go, C++, C#, Rust und Swift sind optional: weglassen, wenn sich die Testeingabe nicht typisieren lässt (gemischte Typen in einem Array, rekursive Strukturen).
 
 Vor dem Pull Request:
 

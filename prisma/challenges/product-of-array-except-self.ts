@@ -13,6 +13,7 @@ const starter = {
   csharp:
     "static int[] ProductExceptSelf(int[] nums) {\n    // Your solution here\n    return new int[]{};\n}\n",
   rust: "fn product_except_self(nums: Vec<i64>) -> Vec<i64> {\n    // Your solution here\n    vec![]\n}\n",
+  swift: "func productExceptSelf(_ nums: [Int]) -> [Int] {\n    // Your solution here\n    return []\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -73,6 +74,7 @@ export const challenge: ChallengeContent = {
       cpp: "productExceptSelf",
       csharp: "ProductExceptSelf",
       rust: "product_except_self",
+      swift: "productExceptSelf",
     },
   },
   testCases: [

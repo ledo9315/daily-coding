@@ -11,6 +11,7 @@ const starter = {
   cpp: "int findOdd(vector<int> arr) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int FindOdd(int[] arr) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn find_odd(arr: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func findOdd(_ arr: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -76,6 +77,7 @@ export const challenge: ChallengeContent = {
       cpp: "findOdd",
       csharp: "FindOdd",
       rust: "find_odd",
+      swift: "findOdd",
     },
   },
   testCases: [

@@ -11,6 +11,7 @@ const starter = {
   cpp: "int climbStairs(int n) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int ClimbStairs(int n) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn climb_stairs(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func climbStairs(_ n: Int) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -126,6 +127,7 @@ export const challenge: ChallengeContent = {
       cpp: "climbStairs",
       csharp: "ClimbStairs",
       rust: "climb_stairs",
+      swift: "climbStairs",
     },
   },
   testCases: [

@@ -14,6 +14,7 @@ const starter = {
   cpp: "int coinChange(vector<int> coins, int amount) {\n    // Your solution here\n    return -1;\n}\n",
   csharp: "static int CoinChange(int[] coins, int amount) {\n    // Your solution here\n    return -1;\n}\n",
   rust: "fn coin_change(coins: Vec<i64>, amount: i64) -> i64 {\n    // Your solution here\n    -1\n}\n",
+  swift: "func coinChange(coins: [Int], amount: Int) -> Int {\n    // Your solution here\n    return -1\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -128,6 +129,7 @@ export const challenge: ChallengeContent = {
       cpp: "coinChange",
       csharp: "CoinChange",
       rust: "coin_change",
+      swift: "coinChange",
     },
   },
   testCases: [

@@ -26,7 +26,7 @@ A coding challenge platform: one task a day, solved in the browser, graded again
 ## What it does
 
 - **Daily challenge** - one task per day, the same for every user. Which task is running is stored as an order plus a pointer in the database (`lib/server/challenge-ring.ts`); the pointer advances on the first request of a new UTC day, so no cron job is needed.
-- **Ten languages** - JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust. The editor is Monaco, the code runs in a self-hosted [Piston](https://github.com/engineer-man/piston) instance. Java, Go, C++, C# and Rust are only offered for tasks whose test inputs can be typed; the other five are available everywhere.
+- **Eleven languages** - JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust, Swift. The editor is Monaco, the code runs in a self-hosted [Piston](https://github.com/engineer-man/piston) instance. Java, Go, C++, C#, Rust and Swift are only offered for tasks whose test inputs can be typed; the other five are available everywhere.
 - **Grading against test cases** - the submitted code is called once per test case through a harness and the result is compared. No comparison of console output.
 - **Leaderboard** for week and month, with a podium and competition ranking (ties share a place).
 - **Progress** - points, levels, streak with personal record, 23 badges, a monthly calendar of solved days.
@@ -162,7 +162,7 @@ Eine Coding-Challenge-Plattform: jeden Tag eine Aufgabe, gelöst im Browser, bew
 ## Was es kann
 
 - **Tägliche Challenge** - eine Aufgabe pro Tag, für alle Nutzer dieselbe. Welche Aufgabe läuft, steht als Reihenfolge plus Zeiger in der Datenbank (`lib/server/challenge-ring.ts`); der Zeiger rückt beim ersten Aufruf eines neuen UTC-Tages weiter, ein Cronjob dafür entfällt.
-- **Zehn Sprachen** - JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java, Go, C++, C# und Rust stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
+- **Elf Sprachen** - JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust, Swift. Der Editor ist Monaco, der Code läuft in einer selbst betriebenen [Piston](https://github.com/engineer-man/piston)-Instanz. Java, Go, C++, C#, Rust und Swift stehen nur bei Aufgaben zur Wahl, deren Testeingaben sich typisieren lassen; die übrigen fünf gelten überall.
 - **Bewertung gegen Testfälle** - der eingereichte Code wird pro Testfall mit einem Harness aufgerufen und das Ergebnis verglichen. Kein Vergleich von Konsolenausgaben.
 - **Bestenliste** für Woche und Monat, mit Podium und Platzierungen nach Wettkampfregel (Gleichstand teilt den Platz).
 - **Fortschritt** - Punkte, Level, Streak samt Rekord, 23 Abzeichen, Monatsübersicht der gelösten Tage.

@@ -13,6 +13,7 @@ const starter = {
   csharp:
     'static string LongestCommonPrefix(string[] strs) {\n    // Your solution here\n    return "";\n}\n',
   rust: "fn longest_common_prefix(strs: Vec<String>) -> String {\n    // Your solution here\n    String::new()\n}\n",
+  swift: "func longestCommonPrefix(_ strs: [String]) -> String {\n    // Your solution here\n    return \"\"\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -80,6 +81,7 @@ export const challenge: ChallengeContent = {
       cpp: "longestCommonPrefix",
       csharp: "LongestCommonPrefix",
       rust: "longest_common_prefix",
+      swift: "longestCommonPrefix",
     },
   },
   testCases: [

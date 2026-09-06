@@ -11,6 +11,7 @@ const starter = {
   cpp: "int sumMultiples(int n) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int SumMultiples(int n) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn sum_multiples(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func sumMultiples(_ n: Int) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -74,6 +75,7 @@ export const challenge: ChallengeContent = {
       cpp: "sumMultiples",
       csharp: "SumMultiples",
       rust: "sum_multiples",
+      swift: "sumMultiples",
     },
   },
   testCases: [

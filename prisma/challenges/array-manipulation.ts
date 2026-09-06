@@ -11,6 +11,7 @@ const starter = {
   cpp: "vector<int> transformArray(vector<int> arr) {\n    // Your solution here\n    return {};\n}\n",
   csharp: "static int[] TransformArray(int[] arr) {\n    // Your solution here\n    return new int[]{};\n}\n",
   rust: "fn transform_array(arr: Vec<i64>) -> Vec<i64> {\n    // Your solution here\n    vec![]\n}\n",
+  swift: "func transformArray(_ arr: [Int]) -> [Int] {\n    // Your solution here\n    return []\n}\n",
   ruby: "def transform_array(arr)\n  # Your solution here\n  []\nend\n",
 };
 
@@ -116,6 +117,7 @@ export const challenge: ChallengeContent = {
       cpp: "transformArray",
       csharp: "TransformArray",
       rust: "transform_array",
+      swift: "transformArray",
     },
   },
   testCases: [

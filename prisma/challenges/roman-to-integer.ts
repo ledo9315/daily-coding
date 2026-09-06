@@ -10,6 +10,7 @@ const starter = {
   cpp: "int romanToInt(string s) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int RomanToInt(string s) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn roman_to_int(s: String) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func romanToInt(_ s: String) -> Int {\n    // Your solution here\n    return 0\n}\n",
   ruby: "def roman_to_int(s)\n  # Your solution here\n  0\nend\n",
 };
 
@@ -76,6 +77,7 @@ export const challenge: ChallengeContent = {
       cpp: "romanToInt",
       csharp: "RomanToInt",
       rust: "roman_to_int",
+      swift: "romanToInt",
     },
   },
   testCases: [

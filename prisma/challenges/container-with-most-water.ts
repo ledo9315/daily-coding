@@ -11,6 +11,7 @@ const starter = {
   cpp: "int maxArea(vector<int> height) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int MaxArea(int[] height) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn max_area(height: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func maxArea(_ height: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -124,6 +125,7 @@ export const challenge: ChallengeContent = {
       cpp: "maxArea",
       csharp: "MaxArea",
       rust: "max_area",
+      swift: "maxArea",
     },
   },
   testCases: [

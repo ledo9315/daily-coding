@@ -10,6 +10,7 @@ const starter = {
   cpp: "vector<int> moveZeroes(vector<int> nums) {\n    // Your solution here\n    return nums;\n}\n",
   csharp: "static int[] MoveZeroes(int[] nums) {\n    // Your solution here\n    return nums;\n}\n",
   rust: "fn move_zeroes(nums: Vec<i64>) -> Vec<i64> {\n    // Your solution here\n    nums\n}\n",
+  swift: "func moveZeroes(_ nums: [Int]) -> [Int] {\n    // Your solution here\n    return nums\n}\n",
   ruby: "def move_zeroes(nums)\n  # Your solution here\n  nums\nend\n",
 };
 
@@ -70,6 +71,7 @@ export const challenge: ChallengeContent = {
       cpp: "moveZeroes",
       csharp: "MoveZeroes",
       rust: "move_zeroes",
+      swift: "moveZeroes",
     },
   },
   testCases: [

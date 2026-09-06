@@ -73,6 +73,7 @@ enum CodeLanguage {
   cpp
   csharp
   rust
+  swift
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────

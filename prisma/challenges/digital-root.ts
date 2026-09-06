@@ -10,6 +10,7 @@ const starter = {
   cpp: "int digitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int DigitalRoot(int n) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn digital_root(n: i64) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func digitalRoot(_ n: Int) -> Int {\n    // Your solution here\n    return 0\n}\n",
   ruby: "def digital_root(n)\n  # Your solution here\n  0\nend\n",
 };
 
@@ -120,6 +121,7 @@ export const challenge: ChallengeContent = {
       cpp: "digitalRoot",
       csharp: "DigitalRoot",
       rust: "digital_root",
+      swift: "digitalRoot",
     },
   },
   testCases: [

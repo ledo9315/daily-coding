@@ -11,6 +11,7 @@ const starter = {
   cpp: "string reverseString(string s) {\n    // Your solution here\n    return s;\n}\n",
   csharp: "static string ReverseString(string s) {\n    // Your solution here\n    return s;\n}\n",
   rust: "fn reverse_string(s: String) -> String {\n    // Your solution here\n    s\n}\n",
+  swift: "func reverseString(_ s: String) -> String {\n    // Your solution here\n    return s\n}\n",
   ruby: "def reverse_string(s)\n  # Your solution here\n  s\nend\n",
 };
 
@@ -72,6 +73,7 @@ export const challenge: ChallengeContent = {
       cpp: "reverseString",
       csharp: "ReverseString",
       rust: "reverse_string",
+      swift: "reverseString",
     },
   },
   testCases: [

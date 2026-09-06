@@ -11,6 +11,7 @@ const starter = {
   cpp: "bool canJump(vector<int> nums) {\n    // Your solution here\n    return false;\n}\n",
   csharp: "static bool CanJump(int[] nums) {\n    // Your solution here\n    return false;\n}\n",
   rust: "fn can_jump(nums: Vec<i64>) -> bool {\n    // Your solution here\n    false\n}\n",
+  swift: "func canJump(_ nums: [Int]) -> Bool {\n    // Your solution here\n    return false\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -72,6 +73,7 @@ export const challenge: ChallengeContent = {
       cpp: "canJump",
       csharp: "CanJump",
       rust: "can_jump",
+      swift: "canJump",
     },
   },
   testCases: [

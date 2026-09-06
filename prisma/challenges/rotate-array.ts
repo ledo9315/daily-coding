@@ -13,6 +13,7 @@ const starter = {
   cpp: "vector<int> rotate(vector<int> nums, int k) {\n    // Your solution here\n    return {};\n}\n",
   csharp: "static int[] Rotate(int[] nums, int k) {\n    // Your solution here\n    return new int[]{};\n}\n",
   rust: "fn rotate(nums: Vec<i64>, k: i64) -> Vec<i64> {\n    // Your solution here\n    vec![]\n}\n",
+  swift: "func rotate(nums: [Int], k: Int) -> [Int] {\n    // Your solution here\n    return []\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -75,6 +76,7 @@ export const challenge: ChallengeContent = {
       cpp: "rotate",
       csharp: "Rotate",
       rust: "rotate",
+      swift: "rotate",
     },
   },
   testCases: [

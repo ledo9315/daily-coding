@@ -85,6 +85,17 @@ end`,
     best
 }`,
   },
+  swift: {
+    callable: "maxSubArray",
+    code: `func maxSubArray(_ nums: [Int]) -> Int {
+    var best = nums[0], cur = nums[0]
+    for n in nums.dropFirst() {
+        cur = max(n, cur + n)
+        best = max(best, cur)
+    }
+    return best
+}`,
+  },
   csharp: {
     callable: "MaxSubArray",
     code: `static int MaxSubArray(int[] nums) {

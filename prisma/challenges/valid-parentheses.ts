@@ -10,6 +10,7 @@ const starter = {
   cpp: "bool isValid(string s) {\n    // Your solution here\n    return false;\n}\n",
   csharp: "static bool IsValid(string s) {\n    // Your solution here\n    return false;\n}\n",
   rust: "fn is_valid(s: String) -> bool {\n    // Your solution here\n    false\n}\n",
+  swift: "func isValid(_ s: String) -> Bool {\n    // Your solution here\n    return false\n}\n",
   ruby: "def is_valid(s)\n  # Your solution here\n  false\nend\n",
 };
 
@@ -76,6 +77,7 @@ export const challenge: ChallengeContent = {
       cpp: "isValid",
       csharp: "IsValid",
       rust: "is_valid",
+      swift: "isValid",
     },
   },
   testCases: [

@@ -10,6 +10,7 @@ const starter = {
   cpp: "vector<string> fizzBuzz(int n) {\n    // Your solution here\n    return {};\n}\n",
   csharp: "static string[] FizzBuzz(int n) {\n    // Your solution here\n    return new string[]{};\n}\n",
   rust: "fn fizz_buzz(n: i64) -> Vec<String> {\n    // Your solution here\n    vec![]\n}\n",
+  swift: "func fizzBuzz(_ n: Int) -> [String] {\n    // Your solution here\n    return []\n}\n",
   ruby: "def fizz_buzz(n)\n  # Your solution here\n  []\nend\n",
 };
 
@@ -65,6 +66,7 @@ export const challenge: ChallengeContent = {
       cpp: "fizzBuzz",
       csharp: "FizzBuzz",
       rust: "fizz_buzz",
+      swift: "fizzBuzz",
     },
   },
   testCases: [

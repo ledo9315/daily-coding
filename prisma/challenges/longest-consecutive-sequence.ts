@@ -12,6 +12,7 @@ const starter = {
   cpp: "int longestConsecutive(vector<int> nums) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int LongestConsecutive(int[] nums) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn longest_consecutive(nums: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func longestConsecutive(_ nums: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -72,6 +73,7 @@ export const challenge: ChallengeContent = {
       cpp: "longestConsecutive",
       csharp: "LongestConsecutive",
       rust: "longest_consecutive",
+      swift: "longestConsecutive",
     },
   },
   testCases: [

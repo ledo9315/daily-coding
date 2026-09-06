@@ -10,6 +10,7 @@ const starter = {
   cpp: "int countVowels(string s) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int CountVowels(string s) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn count_vowels(s: String) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func countVowels(_ s: String) -> Int {\n    // Your solution here\n    return 0\n}\n",
   ruby: "def count_vowels(s)\n  # Your solution here\n  0\nend\n",
 };
 
@@ -111,6 +112,7 @@ export const challenge: ChallengeContent = {
       cpp: "countVowels",
       csharp: "CountVowels",
       rust: "count_vowels",
+      swift: "countVowels",
     },
   },
   testCases: [

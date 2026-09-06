@@ -13,6 +13,7 @@ const starter = {
   cpp: "int binarySearch(vector<int> arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
   csharp: "static int BinarySearch(int[] arr, int target) {\n    // Your solution here\n    return -1;\n}\n",
   rust: "fn binary_search(arr: Vec<i64>, target: i64) -> i64 {\n    // Your solution here\n    -1\n}\n",
+  swift: "func binarySearch(arr: [Int], target: Int) -> Int {\n    // Your solution here\n    return -1\n}\n",
   ruby: "def binary_search(data)\n  arr, target = data['arr'], data['target']\n  # Your solution here\n  -1\nend\n",
 };
 
@@ -122,6 +123,7 @@ export const challenge: ChallengeContent = {
       cpp: "binarySearch",
       csharp: "BinarySearch",
       rust: "binary_search",
+      swift: "binarySearch",
     },
   },
   testCases: [

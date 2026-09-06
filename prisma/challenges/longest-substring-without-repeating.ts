@@ -12,6 +12,7 @@ const starter = {
   cpp: "int lengthOfLongestSubstring(string s) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int LengthOfLongestSubstring(string s) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn length_of_longest_substring(s: String) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func lengthOfLongestSubstring(_ s: String) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -78,6 +79,7 @@ export const challenge: ChallengeContent = {
       cpp: "lengthOfLongestSubstring",
       csharp: "LengthOfLongestSubstring",
       rust: "length_of_longest_substring",
+      swift: "lengthOfLongestSubstring",
     },
   },
   testCases: [

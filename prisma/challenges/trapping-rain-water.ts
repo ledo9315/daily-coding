@@ -11,6 +11,7 @@ const starter = {
   cpp: "int trap(vector<int> height) {\n    // Your solution here\n    return 0;\n}\n",
   csharp: "static int Trap(int[] height) {\n    // Your solution here\n    return 0;\n}\n",
   rust: "fn trap(height: Vec<i64>) -> i64 {\n    // Your solution here\n    0\n}\n",
+  swift: "func trap(_ height: [Int]) -> Int {\n    // Your solution here\n    return 0\n}\n",
 };
 
 export const challenge: ChallengeContent = {
@@ -75,6 +76,7 @@ export const challenge: ChallengeContent = {
       cpp: "trap",
       csharp: "Trap",
       rust: "trap",
+      swift: "trap",
     },
   },
   testCases: [
