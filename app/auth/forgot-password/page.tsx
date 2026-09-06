@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,8 +57,8 @@ export default function ForgotPasswordPage() {
 
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
-          <h1 className="mb-2 flex items-center justify-center gap-3 font-pixel text-2xl leading-tight tracking-tighter">
-            <span className="text-xl text-primary">{">_"}</span>
+          <h1 className="mb-2 flex items-center justify-center gap-2 font-pixel text-2xl leading-tight tracking-tighter">
+            <BrandMark size={50} />
             {/* Stacked and left-aligned, the same shape as the header on every
                 signed-in page - one logo, not two. */}
             {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Menu, Close, Sliders, Tournament } from "@nsmr/pixelart-react";
+import { BrandMark } from "@/components/brand-mark";
 import {
   Sheet,
   SheetContent,
@@ -57,8 +58,8 @@ export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
       >
         <SheetHeader className="flex-row items-center justify-between border-b-4 border-border p-4">
           {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
-          <SheetTitle className="font-pixel text-xs tracking-tight">
-            <span className="text-primary">{">_"}</span> DAILY CODING
+          <SheetTitle className="flex items-center gap-2 font-pixel text-xs tracking-tight">
+            <BrandMark size={32} /> DAILY CODING
           </SheetTitle>
           {/* eslint-enable no-restricted-syntax */}
           <button
