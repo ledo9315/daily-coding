@@ -18,6 +18,7 @@
     "nameEmpty": "Name must not be empty.",
     "nameTooLong": "Name must be at most {max} characters long.",
     "nameTooFewAlphanumerics": "Name must contain at least two letters or digits.",
+    "nameBlocked": "This name is not allowed.",
     "commentEmpty": "Comment must not be empty.",
     "commentTooLong": "Comment must be at most {max} characters long.",
     "tokenInvalid": "Token invalid.",

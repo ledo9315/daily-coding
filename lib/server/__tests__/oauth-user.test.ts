@@ -177,6 +177,15 @@ describe("findOrCreateOAuthUser and display names", () => {
     expect(mockUserCreate.mock.calls[0][0].data.name).toBe("valid.user");
   });
 
+  it("falls back to the email name when the provider name is on the blocklist", async () => {
+    mockUserFindUnique.mockResolvedValue(null);
+
+    await findOrCreateOAuthUser({ email: "valid.user@gmail.com", name: "Hitler" }, account);
+
+    // Rejecting is not an option here, so the hateful name is dropped rather than refused.
+    expect(mockUserCreate.mock.calls[0][0].data.name).toBe("valid.user");
+  });
+
   it("uses a safe default when neither provider nor email has a valid name", async () => {
     mockUserFindUnique.mockResolvedValue(null);
 

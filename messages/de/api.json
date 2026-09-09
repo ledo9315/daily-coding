@@ -18,6 +18,7 @@
     "nameEmpty": "Name darf nicht leer sein.",
     "nameTooLong": "Name darf höchstens {max} Zeichen lang sein.",
     "nameTooFewAlphanumerics": "Name muss mindestens zwei Buchstaben oder Zahlen enthalten.",
+    "nameBlocked": "Dieser Name ist nicht erlaubt.",
     "commentEmpty": "Kommentar darf nicht leer sein.",
     "commentTooLong": "Kommentar darf höchstens {max} Zeichen lang sein.",
     "tokenInvalid": "Token ungültig.",

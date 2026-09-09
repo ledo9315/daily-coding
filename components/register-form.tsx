@@ -50,6 +50,8 @@ export function RegisterForm({
         return t("registerForm.nameErrorTooLong", { max: error.max });
       case "tooFewAlphanumerics":
         return t("registerForm.nameErrorTooFewLetters");
+      case "blocked":
+        return t("registerForm.nameErrorBlocked");
     }
   };
 
