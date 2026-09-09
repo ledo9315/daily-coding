@@ -41,6 +41,8 @@ export async function POST(request: NextRequest) {
         return t("validation.nameTooLong", { max: error.max });
       case "tooFewAlphanumerics":
         return t("validation.nameTooFewAlphanumerics");
+      case "blocked":
+        return t("validation.nameBlocked");
     }
   };
 

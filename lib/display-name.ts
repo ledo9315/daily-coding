@@ -1,3 +1,5 @@
+import { containsBlockedTerm } from "@/lib/display-name-blocklist";
+
 /**
  * Display names have to be distinguishable: two accounts with the same name and - since
  * the starter avatar is drawn from a set of 20 (#101) - possibly the same picture were
@@ -27,7 +29,8 @@ export const DISPLAY_NAME_MAX_LENGTH = 50;
 export type DisplayNameError =
   | { code: "empty" }
   | { code: "tooLong"; max: number }
-  | { code: "tooFewAlphanumerics" };
+  | { code: "tooFewAlphanumerics" }
+  | { code: "blocked" };
 
 /**
  * Display names may contain punctuation, spaces and emoji, but those decorations must not
@@ -46,6 +49,9 @@ export function displayNameValidationError(name: string): DisplayNameError | nul
   if (lettersOrNumbers < 2) {
     return { code: "tooFewAlphanumerics" };
   }
+
+  // Last, so a name that is both too short and hateful reports the plainer problem.
+  if (containsBlockedTerm(displayName)) return { code: "blocked" };
 
   return null;
 }

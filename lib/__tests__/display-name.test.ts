@@ -86,3 +86,27 @@ describe("uniqueDisplayName", () => {
     expect(await uniqueDisplayName("  Max   Müller  ", async () => false)).toBe("Max Müller");
   });
 });
+
+describe("blocked display names", () => {
+  it.each([
+    "Hitler, Nazi Germany",
+    "hitler",
+    "H1TLER",
+    "Нitler",
+    "Adolf H i t l e r",
+    "Sieg Heil",
+    "Nazi",
+    "der Führer",
+    "1488",
+    "sw4stika",
+  ])("rejects a name that glorifies Nazism or carries a slur: %s", (name) => {
+    expect(displayNameValidationError(name)).toEqual({ code: "blocked" });
+  });
+
+  it.each(["Ashkenazi", "Nazira", "Владислав Ключев", "Nikunj Saini", "Simon Sr.", "Max 88"])(
+    "keeps a legitimate name that merely contains a short blocked term: %s",
+    (name) => {
+      expect(displayNameValidationError(name)).toBeNull();
+    }
+  );
+});
