@@ -38,6 +38,7 @@
   "notifications": {
     "title": "Notifications",
     "labelUnread": "Notifications, {count} unread",
+    "clearAll": "Delete all",
     "empty": "Nothing yet. As soon as someone comments on or rates your solution, it shows up here."
   },
   "feed": {

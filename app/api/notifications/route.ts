@@ -66,3 +66,18 @@ export async function GET(request: Request) {
     unreadCount,
   });
 }
+
+/**
+ * The bin in the menu. Opening the menu has already marked everything read, so there is
+ * nothing here a reader could lose unseen - hence no confirmation and no per-entry variant.
+ */
+export async function DELETE() {
+  const session = await getSessionUserId();
+  if (session.error) return session.error;
+
+  const { count } = await prisma.notification.deleteMany({
+    where: { userId: session.userId },
+  });
+
+  return NextResponse.json({ deleted: count });
+}

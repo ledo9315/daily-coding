@@ -495,6 +495,10 @@ export function markNotificationsRead(): Promise<{ read: number }> {
   return apiFetch("/api/notifications/read", { method: "POST" });
 }
 
+export function clearNotifications(): Promise<{ deleted: number }> {
+  return apiFetch("/api/notifications", { method: "DELETE" });
+}
+
 export interface EmailNotificationSettings {
   notifyByEmail: boolean;
   notifyDailyReminder: boolean;

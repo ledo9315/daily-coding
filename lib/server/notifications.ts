@@ -104,6 +104,22 @@ export async function notifySolutionActivity(activity: Activity): Promise<void> 
   }
 }
 
+export const READ_NOTIFICATION_MAX_AGE_DAYS = 7;
+
+/**
+ * The nightly sweep behind the bin in the menu, for everyone who never presses it.
+ *
+ * Read entries only: an unread one has not been seen yet and stays until it is, however
+ * old it gets. Seven days keeps the way back to last week's comment open.
+ */
+export async function pruneReadNotifications(now = new Date()): Promise<number> {
+  const cutoff = new Date(now.getTime() - READ_NOTIFICATION_MAX_AGE_DAYS * 86_400_000);
+  const { count } = await prisma.notification.deleteMany({
+    where: { readAt: { lt: cutoff } },
+  });
+  return count;
+}
+
 /**
  * Take back what a withdrawn vote announced.
  *

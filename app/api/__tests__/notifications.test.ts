@@ -31,6 +31,7 @@ import { NextResponse } from "next/server";
 const mockFindMany = vi.fn();
 const mockCount = vi.fn();
 const mockUpdateMany = vi.fn();
+const mockDeleteMany = vi.fn();
 const mockUserFindUnique = vi.fn();
 const mockUserUpdate = vi.fn();
 const mockGetSessionUserId = vi.fn();
@@ -41,6 +42,7 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => mockFindMany(...a),
       count: (...a: unknown[]) => mockCount(...a),
       updateMany: (...a: unknown[]) => mockUpdateMany(...a),
+      deleteMany: (...a: unknown[]) => mockDeleteMany(...a),
     },
     user: {
       findUnique: (...a: unknown[]) => mockUserFindUnique(...a),
@@ -53,7 +55,7 @@ vi.mock("@/lib/auth-session", () => ({
   getSessionUserId: () => mockGetSessionUserId(),
 }));
 
-import { GET as listHandler } from "../notifications/route";
+import { GET as listHandler, DELETE as clearHandler } from "../notifications/route";
 import { POST as readHandler } from "../notifications/read/route";
 import {
   GET as settingHandler,
@@ -79,6 +81,7 @@ beforeEach(() => {
   mockFindMany.mockResolvedValue([]);
   mockCount.mockResolvedValue(0);
   mockUpdateMany.mockResolvedValue({ count: 0 });
+  mockDeleteMany.mockResolvedValue({ count: 0 });
 });
 
 describe("GET /api/notifications", () => {
@@ -135,6 +138,27 @@ describe("POST /api/notifications/read", () => {
       data: { readAt: expect.any(Date) },
     });
     expect(body).toEqual({ read: 2 });
+  });
+});
+
+describe("DELETE /api/notifications", () => {
+  it("rejects an anonymous caller", async () => {
+    mockGetSessionUserId.mockResolvedValue({
+      error: NextResponse.json({ error: "Nicht authentifiziert." }, { status: 401 }),
+    });
+
+    expect((await clearHandler()).status).toBe(401);
+    expect(mockDeleteMany).not.toHaveBeenCalled();
+  });
+
+  /** Read or not: opening the menu has marked everything read before the bin is reachable. */
+  it("deletes every notification of the caller and nobody else's", async () => {
+    mockDeleteMany.mockResolvedValue({ count: 4 });
+
+    const body = await (await clearHandler()).json();
+
+    expect(mockDeleteMany).toHaveBeenCalledWith({ where: { userId: "user-me" } });
+    expect(body).toEqual({ deleted: 4 });
   });
 });
 

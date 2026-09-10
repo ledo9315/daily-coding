@@ -38,6 +38,7 @@
   "notifications": {
     "title": "Benachrichtigungen",
     "labelUnread": "Benachrichtigungen, {count} ungelesen",
+    "clearAll": "Alle löschen",
     "empty": "Noch nichts passiert. Sobald jemand deine Lösung kommentiert oder bewertet, steht es hier."
   },
   "feed": {
