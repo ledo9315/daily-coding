@@ -103,6 +103,29 @@ describe("blocked display names", () => {
     expect(displayNameValidationError(name)).toEqual({ code: "blocked" });
   });
 
+  it.each(["Arschloch", "hurensohn", "Sch3isse", "fuck you", "MotherFucker", "Gang Bang Gary", "bimbos"])(
+    "rejects profanity from the LDNOOBW lists, matched on whole words: %s",
+    (name) => {
+      expect(displayNameValidationError(name)).toEqual({ code: "blocked" });
+    }
+  );
+
+  it.each([
+    "Cassandra",
+    "Charles Dickens",
+    "Peter Sexauer",
+    "Assmann",
+    "Dick Schmidt",
+    "Ali Mufti",
+    "XXX",
+    "Scunthorpe",
+    "Anna Schmidt",
+    "Max Mustermann",
+    "kirreth89",
+  ])("keeps a real name that a substring dictionary would hit: %s", (name) => {
+    expect(displayNameValidationError(name)).toBeNull();
+  });
+
   it.each(["Ashkenazi", "Nazira", "Владислав Ключев", "Nikunj Saini", "Simon Sr.", "Max 88"])(
     "keeps a legitimate name that merely contains a short blocked term: %s",
     (name) => {

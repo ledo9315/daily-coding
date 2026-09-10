@@ -1,3 +1,5 @@
+import { LDNOOBW_DE, LDNOOBW_EN } from "@/lib/blocklist/ldnoobw";
+
 /**
  * Display names that glorify Nazism or carry a slur are refused at registration; the OAuth
  * path falls back to the e-mail's local part instead (see `findOrCreateOAuthUser`).
@@ -47,16 +49,33 @@ const DIGITS: Record<string, string> = {
 
 /** Lower-case Latin letters and spaces; everything that is not a letter becomes a space. */
 export function normaliseForBlocklist(name: string): string {
+  // NFKD splits "ö" into "o" plus a combining mark, but "ß" has no decomposition.
   const folded = name
     .normalize("NFKD")
     .replace(/[̀-ͯ]/gu, "")
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/ß/gu, "ss");
   let out = "";
   for (const ch of folded) {
     const mapped = LOOKALIKES[ch] ?? DIGITS[ch] ?? ch;
     out += /[a-z]/u.test(mapped) ? mapped : " ";
   }
   return out.replace(/\s+/gu, " ").trim();
+}
+
+/*
+  The dictionary part. LDNOOBW is about profanity, not hate, and a dictionary can only ever be
+  matched on whole words in a field that holds surnames (Cassandra, Dickens, Sexauer). Entries
+  are normalised the same way as the name, so "Scheiße" and "scheisse" meet as one word; the
+  multi-word entries are kept as phrases and looked up with a space on either side.
+*/
+const DICTIONARY_WORDS = new Set<string>();
+const DICTIONARY_PHRASES: string[] = [];
+for (const entry of [...LDNOOBW_DE, ...LDNOOBW_EN]) {
+  const normalised = normaliseForBlocklist(entry);
+  if (!normalised) continue;
+  if (normalised.includes(" ")) DICTIONARY_PHRASES.push(normalised);
+  else DICTIONARY_WORDS.add(normalised);
 }
 
 export function containsBlockedTerm(name: string): boolean {
@@ -69,5 +88,9 @@ export function containsBlockedTerm(name: string): boolean {
   // Digit-only tokens such as "1488" are turned into letters above, so check the raw form too.
   const rawTokens = name.toLowerCase().split(/[^\p{L}\p{N}]+/u);
   const tokens = new Set([...normalised.split(" "), ...rawTokens]);
-  return BLOCKED_TOKENS.some((term) => tokens.has(term));
+  if (BLOCKED_TOKENS.some((term) => tokens.has(term))) return true;
+
+  if ([...tokens].some((token) => DICTIONARY_WORDS.has(token))) return true;
+  const padded = ` ${normalised} `;
+  return DICTIONARY_PHRASES.some((phrase) => padded.includes(` ${phrase} `));
 }
