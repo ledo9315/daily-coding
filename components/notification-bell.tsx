@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Notification as Bell } from "@nsmr/pixelart-react";
+import { Notification as Bell, Trash } from "@nsmr/pixelart-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  clearNotifications,
   getNotifications,
   markNotificationsRead,
   type NotificationItem,
@@ -54,6 +55,15 @@ export function NotificationBell() {
     // only means the next load brings the count back.
     setUnread(0);
     markNotificationsRead().catch(() => {});
+  }
+
+  function onClear() {
+    if (items.length === 0) return;
+    // Optimistic like the badge: the list is empty at once, and a failed request means the
+    // next load brings the entries back.
+    setItems([]);
+    setUnread(0);
+    clearNotifications().catch(load);
   }
 
   return (
@@ -96,9 +106,23 @@ export function NotificationBell() {
         forceMount
         {...contentProps}
       >
-        <p className="border-b-2 border-border p-3 font-sans text-sm uppercase tracking-wider text-muted-foreground">
-          {t("notifications.title")}
-        </p>
+        <div className="flex items-center justify-between border-b-2 border-border pl-3 pr-1 py-1">
+          <p className="font-sans text-sm uppercase tracking-wider text-muted-foreground">
+            {t("notifications.title")}
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("notifications.clearAll")}
+            title={t("notifications.clearAll")}
+            disabled={items.length === 0}
+            onClick={onClear}
+            className="rounded-none text-muted-foreground hover:bg-card dark:hover:bg-card hover:text-primary focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
+          >
+            <Trash className="size-4" />
+          </Button>
+        </div>
         {items.length === 0 ? (
           <p className="p-4 text-base text-muted-foreground">
             {t("notifications.empty")}

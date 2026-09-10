@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { runDailyReminder } from "@/lib/server/daily-reminder";
+import { pruneReadNotifications } from "@/lib/server/notifications";
 
 /**
  * A run sends one mail at a time with a pause in between, so it is long by design.
@@ -44,6 +45,9 @@ export async function GET(request: NextRequest) {
     return unauthorized();
   }
 
+  // The one scheduled run of the day carries the housekeeping too; a second cron for a
+  // single deleteMany is not worth its own schedule entry.
+  const prunedNotifications = await pruneReadNotifications();
   const result = await runDailyReminder();
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, prunedNotifications });
 }

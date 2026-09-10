@@ -6,6 +6,11 @@ vi.mock("@/lib/server/daily-reminder", () => ({
   runDailyReminder: (...args: unknown[]) => mockRun(...args),
 }));
 
+const mockPrune = vi.fn();
+vi.mock("@/lib/server/notifications", () => ({
+  pruneReadNotifications: (...args: unknown[]) => mockPrune(...args),
+}));
+
 import { GET } from "@/app/api/cron/daily-reminder/route";
 
 const ORIGINAL_SECRET = process.env.CRON_SECRET;
@@ -20,6 +25,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.CRON_SECRET = "top-secret";
   mockRun.mockResolvedValue({ sent: 3, failed: 0 });
+  mockPrune.mockResolvedValue(5);
 });
 
 afterEach(() => {
@@ -32,7 +38,7 @@ describe("GET /api/cron/daily-reminder", () => {
     const response = await GET(request("Bearer top-secret"));
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ sent: 3, failed: 0 });
+    expect(await response.json()).toEqual({ sent: 3, failed: 0, prunedNotifications: 5 });
   });
 
   it.each([
@@ -44,6 +50,7 @@ describe("GET /api/cron/daily-reminder", () => {
 
     expect(response.status).toBe(401);
     expect(mockRun).not.toHaveBeenCalled();
+    expect(mockPrune).not.toHaveBeenCalled();
   });
 
   /** An endpoint that mails every user must not fall open when it is misconfigured. */

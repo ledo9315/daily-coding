@@ -52,6 +52,7 @@ vi.mock("@/lib/server/email-service", () => ({
 import {
   forgetSolutionVote,
   notifySolutionActivity,
+  pruneReadNotifications,
 } from "@/lib/server/notifications";
 
 const HASH = "b".repeat(64);
@@ -160,6 +161,19 @@ describe("forgetSolutionVote", () => {
         kind: "clever",
         readAt: null,
       },
+    });
+  });
+});
+
+describe("pruneReadNotifications", () => {
+  it("deletes what was read more than seven days ago and leaves the unread alone", async () => {
+    mockNotificationDeleteMany.mockResolvedValue({ count: 12 });
+
+    const pruned = await pruneReadNotifications(new Date("2026-09-10T03:00:00Z"));
+
+    expect(pruned).toBe(12);
+    expect(mockNotificationDeleteMany).toHaveBeenCalledWith({
+      where: { readAt: { lt: new Date("2026-09-03T03:00:00Z") } },
     });
   });
 });
