@@ -26,6 +26,36 @@ export type ChangelogEntry = {
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "v0.5.0",
+    date: "2026-09-10",
+    changes: {
+      de: [
+        "Swift ist die elfte Sprache. 36 der 40 Aufgaben lassen sich in Swift lösen; die vier übrigen brauchen Typen, die sich in einer Signatur nicht sauber ausdrücken lassen.",
+        "Die Tagesaufgabe lässt sich ohne Konto lesen und ausprobieren, auch der Testlauf geht. Nur die Abgabe braucht ein Konto. Die Knöpfe auf der Startseite führen jetzt direkt zur Aufgabe statt zur Registrierung.",
+        "Wer die Tagesaufgabe noch nicht abgegeben hat, bekommt am frühen Abend eine Erinnerung per E-Mail. Der Schalter dafür steht in den Einstellungen getrennt von den übrigen Benachrichtigungen und lässt sich einzeln ausschalten.",
+        "Nach einer bestandenen Abgabe lässt sich das Ergebnis teilen: Wochenstreifen, Serie und Link zur Aufgabe, ohne Code und ohne Lösungsweg. Fertige Knöpfe für X, WhatsApp und LinkedIn, oder zum Kopieren.",
+        "Testläufe sind deutlich schneller. Die Server stehen jetzt in Frankfurt neben Datenbank und Sandbox, und die Testfälle laufen parallel: unter einer Sekunde statt bis zu vier. Für die kompilierten Sprachen Java, Go, C++, C#, Rust und Swift gilt ein gemeinsames Budget von 30 Läufen pro Minute; ist es aufgebraucht, heißt es kurz warten.",
+        "Der Run-Knopf ist dauerhaft grün, zeigt während des Laufs einen Spinner, und bestandene Tests melden sich mit einem Toast.",
+        "Ein neues Pixel-Logo ersetzt das „>_“ in Kopf- und Fußzeile, auf den Anmeldeseiten und als Favicon.",
+        "Im Benachrichtigungsmenü löscht ein Mülleimer alle Einträge auf einmal. Gelesene Benachrichtigungen verschwinden nach sieben Tagen von selbst.",
+        "Anzeigenamen, die Nazismus verherrlichen, ein Schimpfwort oder eine Beleidigung enthalten, werden bei der Registrierung abgelehnt. Echte Namen wie Cassandra oder Dickens bleiben erlaubt.",
+        "Daily Coding ist Open Source unter der MIT-Lizenz. Der Code liegt auf GitHub, mit einer Anleitung zum Mitmachen.",
+      ],
+      en: [
+        "Swift is the eleventh language. 36 of the 40 challenges can be solved in Swift; the remaining four need types that don't fit cleanly into a signature.",
+        "Today's challenge can be read and tried without an account, test runs included. Only submitting needs one. The buttons on the landing page now lead straight to the challenge instead of to sign-up.",
+        "If you haven't submitted today's challenge yet, an email reminds you in the early evening. Its switch in the settings sits apart from the other notifications and can be turned off on its own.",
+        "After a passing submission you can share the result: week strip, streak and a link to the challenge, without code and without giving away the solution. Ready-made buttons for X, WhatsApp and LinkedIn, or copy it.",
+        "Test runs are much faster. The servers now sit in Frankfurt next to the database and the sandbox, and the test cases run in parallel: under a second instead of up to four. The compiled languages Java, Go, C++, C#, Rust and Swift share a budget of 30 runs a minute; once it's used up, you wait a moment.",
+        "The run button is green for good, shows a spinner while running, and passing tests announce themselves with a toast.",
+        "A new pixel logo replaces the \">_\" in the header and footer, on the sign-in pages and as the favicon.",
+        "In the notifications menu a bin deletes all entries at once. Read notifications disappear after seven days on their own.",
+        "Display names that glorify Nazism or contain a slur or profanity are refused at registration. Real names like Cassandra or Dickens stay allowed.",
+        "Daily Coding is open source under the MIT license. The code is on GitHub, with a guide for contributing.",
+      ],
+    },
+  },
+  {
     version: "v0.4.0",
     date: "2026-09-04",
     changes: {
