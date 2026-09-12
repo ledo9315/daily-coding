@@ -7,6 +7,8 @@ import { localizedPath } from "@/lib/site";
 const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
 const BUG_REPORT_URL = `${REPOSITORY_URL}/issues/new?template=bug_report.yml`;
 const SUPPORT_EMAIL = "leonid.domahalskyy@icloud.com";
+const TINYLAUNCH_URL = "https://tinylaunch.com";
+const TINYLAUNCH_BADGE_URL = "https://www.tinylaunch.com/tinylaunch_badge_launching_soon.svg";
 const footerLinkClass = "transition-colors hover:text-primary focus-visible:text-primary";
 
 /**
@@ -106,12 +108,21 @@ export async function SiteFooter() {
           </nav>
         </div>
 
-        <div className="mt-12 border-t border-border pt-6">
+        <div className="mt-12 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-code text-xs text-muted-foreground">
             {/* A string, not a number: as an ICU argument the year would be grouped
                 into „2.026". */}
             {t("footer.copyright", { year: String(new Date().getFullYear()) })}
           </p>
+          <a href={TINYLAUNCH_URL} target="_blank" rel="noopener noreferrer">
+            <img
+              src={TINYLAUNCH_BADGE_URL}
+              alt="TinyLaunch Badge"
+              width={202}
+              height={61}
+              className="h-auto w-[202px]"
+            />
+          </a>
         </div>
       </div>
     </footer>
