@@ -192,9 +192,12 @@ in a server component, route handler or server action is reported with its route
 root layout throws. What the three inits share sits in `lib/sentry-options.ts`, and
 `next.config.mjs` holds the build half: source-map upload and the tunnel route.
 
-- **Off without a DSN.** `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` turn it on; a local
-  checkout and CI have neither and send nothing. On Vercel the Sentry Marketplace
-  integration sets both plus `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN`.
+- **Off without a DSN.** `NEXT_PUBLIC_SENTRY_DSN` turns it on (the server falls back to
+  it when `SENTRY_DSN` is unset); a local checkout and CI have neither and send nothing.
+  On Vercel the Sentry<->Vercel integration (installed from Sentry, Settings ->
+  Integrations -> Vercel, project `daily-coding` linked on both sides) sets it plus
+  `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN`, and tags each deploy as a
+  release.
 - **No browser source maps without the token.** `sourcemaps.disable` follows
   `SENTRY_AUTH_TOKEN`: the plugin would otherwise switch them on for an upload that
   then does not happen, and leave them on the CDN.
