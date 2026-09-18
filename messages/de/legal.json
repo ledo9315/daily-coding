@@ -79,20 +79,25 @@
       "title": "8. Reichweitenmessung",
       "p1": "Zur Auswertung der Seitennutzung setzen wir Vercel Web Analytics der Vercel Inc. ein. Erhoben werden aufgerufene Seiten, Verweisquelle, Gerätetyp und Land. Der Dienst arbeitet ohne Cookies und ohne Speicherung deiner IP-Adresse; es werden keine geräteübergreifenden Profile gebildet. Rechtsgrundlage ist unser berechtigtes Interesse an der statistischen Auswertung der Nutzung (Art. 6 Abs. 1 lit. f DSGVO)."
     },
+    "errorMonitoring": {
+      "title": "9. Fehlerüberwachung",
+      "p1": "Um technische Fehler zu erkennen und zu beheben, setzen wir Sentry der Functional Software, Inc. ein. Tritt beim Aufruf der Website oder bei der Verarbeitung deiner Anfrage ein Fehler auf, werden technische Angaben dazu an Sentry übermittelt: die Fehlermeldung samt Programmstelle, die betroffene Seite oder Schnittstelle, der Zeitpunkt, Browser- und Betriebssystemversion sowie die Sprache der Seite. Außerdem werden stichprobenartig Laufzeitdaten (z. B. die Dauer einer Anfrage) erhoben, um Leistungsprobleme zu erkennen.",
+      "p2": "Deine IP-Adresse wird dabei nicht gespeichert, dein Nutzerkonto nicht mit dem Fehler verknüpft, und es werden keine Bildschirmaufzeichnungen (Session Replay) erstellt. Die Daten werden in einem Rechenzentrum von Sentry innerhalb der EU gespeichert; Sentry ist insoweit als Auftragsverarbeiter (Art. 28 DSGVO) für uns tätig. Sentry ist ein US-Unternehmen; soweit dennoch ein Zugriff von außerhalb der EU/des EWR erfolgt, geschieht dies auf Grundlage geeigneter Garantien (z. B. EU-Standardvertragsklauseln). Rechtsgrundlage ist unser berechtigtes Interesse am sicheren und fehlerfreien Betrieb der Website (Art. 6 Abs. 1 lit. f DSGVO). Fehlerberichte werden nach 90 Tagen automatisch gelöscht."
+    },
     "cookies": {
-      "title": "9. Cookies",
+      "title": "10. Cookies",
       "p1": "Wir verwenden ein technisch notwendiges Cookie, um deine Anmeldung (Session) aufrechtzuerhalten. Dieses Cookie ist für den Betrieb des Login-Bereichs erforderlich; Rechtsgrundlage ist § 25 Abs. 2 TDDDG sowie Art. 6 Abs. 1 lit. f DSGVO. Tracking- oder Marketing-Cookies setzen wir nicht ein."
     },
     "retention": {
-      "title": "10. Speicherdauer",
+      "title": "11. Speicherdauer",
       "p1": "Wir speichern deine Daten, solange dein Konto besteht. Du kannst dein Konto jederzeit selbst in den Einstellungen löschen; dabei werden deine personenbezogenen Daten sowie die zugehörigen Einreichungen, Ranglisten- und Token-Daten gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen."
     },
     "rights": {
-      "title": "11. Deine Rechte",
+      "title": "12. Deine Rechte",
       "p1": "Dir stehen im Rahmen der gesetzlichen Vorgaben die folgenden Rechte zu: Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie Widerspruch gegen die Verarbeitung (Art. 21 DSGVO). Eine erteilte Einwilligung kannst du jederzeit mit Wirkung für die Zukunft widerrufen. Zur Ausübung genügt eine Nachricht an die oben genannten Kontaktdaten."
     },
     "complaints": {
-      "title": "12. Beschwerderecht",
+      "title": "13. Beschwerderecht",
       "p1": "Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist das Unabhängige Landeszentrum für Datenschutz Schleswig-Holstein (ULD), Holstenstraße 98, 24103 Kiel."
     }
   },

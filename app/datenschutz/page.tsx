@@ -108,6 +108,14 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="font-heading text-base text-foreground mb-2">
+              {t("privacy.errorMonitoring.title")}
+            </h2>
+            <p>{t("privacy.errorMonitoring.p1")}</p>
+            <p className="mt-2">{t("privacy.errorMonitoring.p2")}</p>
+          </section>
+
+          <section>
+            <h2 className="font-heading text-base text-foreground mb-2">
               {t("privacy.cookies.title")}
             </h2>
             <p>{t("privacy.cookies.p1")}</p>
