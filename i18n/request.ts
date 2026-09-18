@@ -20,6 +20,7 @@ const NAMESPACES = [
   "community",
   "dashboard",
   "email",
+  "error",
   "legal",
   "profile",
 ] as const;

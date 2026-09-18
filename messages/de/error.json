@@ -1,0 +1,8 @@
+{
+  "globalError": {
+    "title": "Da ist etwas schiefgelaufen.",
+    "description": "Der Fehler wurde automatisch gemeldet. Ein erneuter Versuch hilft meistens.",
+    "retry": "Erneut versuchen",
+    "home": "Zur Startseite"
+  }
+}

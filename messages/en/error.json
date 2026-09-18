@@ -1,0 +1,8 @@
+{
+  "globalError": {
+    "title": "Something went wrong.",
+    "description": "The error has been reported automatically. Trying again usually helps.",
+    "retry": "Try again",
+    "home": "Back to the start page"
+  }
+}

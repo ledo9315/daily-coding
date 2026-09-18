@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { getTranslations } from "next-intl/server";
 import type { AppLocale } from "@/lib/locale";
 import type { ChallengeTestCase } from "@/lib/api";
@@ -370,6 +371,12 @@ export async function runChallengeTests(
     }
     return await runPistonSmoke(challenge, code, language, mode, labels);
   } catch (e) {
+    /**
+     * The user sees a failed test case with the cause, so from the panel a sandbox that
+     * is down looks exactly like a program that does not compile. This is the one place
+     * the difference is known, and the only way an operator hears about the first case.
+     */
+    Sentry.captureException(e, { tags: { language, mode } });
     const msg = e instanceof Error ? e.message : String(e);
     return {
       testCases: [
