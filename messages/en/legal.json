@@ -79,20 +79,25 @@
       "title": "8. Audience measurement",
       "p1": "To evaluate how the site is used we use Vercel Web Analytics from Vercel Inc. What is collected is the pages requested, the referrer, device type and country. The service works without cookies and without storing your IP address; no cross-device profiles are built. The legal basis is our legitimate interest in a statistical evaluation of usage (Art. 6 (1) (f) GDPR)."
     },
+    "errorMonitoring": {
+      "title": "9. Error monitoring",
+      "p1": "To detect and fix technical errors we use Sentry from Functional Software, Inc. If an error occurs while the website is opened or while your request is being processed, technical details about it are transmitted to Sentry: the error message including the location in the code, the affected page or endpoint, the time, browser and operating system version as well as the language of the page. In addition, runtime data (e.g. the duration of a request) is collected on a sample basis in order to detect performance problems.",
+      "p2": "Your IP address is not stored in the process, your user account is not linked to the error, and no screen recordings (session replay) are made. The data is stored in a Sentry data center within the EU; to that extent Sentry acts as a processor (Art. 28 GDPR) on our behalf. Sentry is a US company; insofar as access from outside the EU/EEA nevertheless takes place, this happens on the basis of appropriate safeguards (e.g. EU standard contractual clauses). The legal basis is our legitimate interest in the secure and error-free operation of the website (Art. 6 (1) (f) GDPR). Error reports are deleted automatically after 90 days."
+    },
     "cookies": {
-      "title": "9. Cookies",
+      "title": "10. Cookies",
       "p1": "We use one technically necessary cookie to keep you signed in (session). This cookie is required to operate the login area; the legal basis is § 25 (2) TDDDG (German Telecommunications Digital Services Data Protection Act) as well as Art. 6 (1) (f) GDPR. We do not use tracking or marketing cookies."
     },
     "retention": {
-      "title": "10. Storage period",
+      "title": "11. Storage period",
       "p1": "We store your data for as long as your account exists. You can delete your account yourself at any time in the settings; your personal data as well as the associated submissions, leaderboard and token data are deleted in the process, unless statutory retention obligations stand in the way."
     },
     "rights": {
-      "title": "11. Your rights",
+      "title": "12. Your rights",
       "p1": "Within the statutory framework you have the following rights: access (Art. 15 GDPR), rectification (Art. 16 GDPR), erasure (Art. 17 GDPR), restriction of processing (Art. 18 GDPR), data portability (Art. 20 GDPR) as well as objection to the processing (Art. 21 GDPR). You can withdraw a consent you have given at any time with effect for the future. A message to the contact details named above is enough to exercise these rights."
     },
     "complaints": {
-      "title": "12. Right to lodge a complaint",
+      "title": "13. Right to lodge a complaint",
       "p1": "You have the right to lodge a complaint with a data protection supervisory authority. The authority responsible for us is the Unabhängiges Landeszentrum für Datenschutz Schleswig-Holstein (ULD, the data protection authority of Schleswig-Holstein), Holstenstraße 98, 24103 Kiel."
     }
   },
