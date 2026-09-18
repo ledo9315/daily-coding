@@ -30,6 +30,20 @@ describe("proxy", () => {
     return new NextRequest(new URL(url));
   }
 
+  /**
+   * Sentry's tunnel route (next.config.mjs). Turbopack cannot generate the exclusion, so
+   * the matcher has to carry the path by hand - and a matcher that catches it would set
+   * a locale cookie on every error report.
+   */
+  it("leaves the Sentry tunnel route out of the matcher", async () => {
+    const { config } = await import("./proxy");
+    const matcher = new RegExp(`^${config.matcher[0]}$`);
+    expect(matcher.test("/monitoring")).toBe(false);
+    expect(matcher.test("/monitoring/anything")).toBe(false);
+    expect(matcher.test("/profile")).toBe(true);
+    expect(matcher.test("/robots.txt")).toBe(false);
+  });
+
   it("passes through for unprotected paths without calling getToken", async () => {
     const res = await proxy(req("http://localhost:3000/login"));
     expect(mockGetToken).not.toHaveBeenCalled();

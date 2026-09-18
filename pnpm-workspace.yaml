@@ -9,9 +9,11 @@
 #   unrs-resolver             napi resolver, used by ESLint
 #   @swc/core                 next-intl's message extractor
 #   @parcel/watcher           next-intl's dev-time message reload
+#   @sentry/cli               sentry-cli binary, uploads source maps after next build
 allowBuilds:
   '@parcel/watcher': true
   '@prisma/engines': true
+  '@sentry/cli': true
   '@swc/core': true
   esbuild: true
   prisma: true

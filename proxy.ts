@@ -198,6 +198,11 @@ export const config = {
    * protected paths, but the noindex header, the locale cookie and the `.de` redirect
    * above have to reach the public pages too - those are the ones a crawler indexes
    * (#114). robots.txt and sitemap.xml are excluded so they stay statically cacheable.
+   * `/monitoring` is Sentry's tunnel route (next.config.mjs): a POST carrying an error
+   * event has no use for a locale cookie, and under Turbopack the route has to be left
+   * out here by name.
    */
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.png$).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|monitoring|.*\\.png$).*)",
+  ],
 };

@@ -1,4 +1,6 @@
+import process from "node:process";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 // Points at ./i18n/request.ts, which resolves the locale and loads the message namespaces.
 const withNextIntl = createNextIntlPlugin();
@@ -56,4 +58,35 @@ const nextConfig = {
   ],
 };
 
-export default withNextIntl(nextConfig);
+/**
+ * The build-time half of Sentry: source-map upload after `next build` and the tunnel
+ * route. The runtime half lives in instrumentation.ts and the three `sentry.*.config`
+ * files, with `lib/sentry-options.ts` holding what they share.
+ *
+ * Org, project and token come from the Vercel Marketplace integration as environment
+ * variables. Without the token - a local build, the CI build - the upload is skipped
+ * *and* no browser source maps are generated: Sentry would otherwise switch them on for
+ * the upload, and a build that then does not upload leaves them on the CDN for anyone.
+ */
+const sentryOptions = {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  telemetry: false,
+  /**
+   * A fixed path, not `true`: under Turbopack the proxy matcher has to exclude it by
+   * name, and a generated path cannot be excluded. Events go to our own origin and from
+   * there to Sentry, so a content blocker that knows the ingest domain does not swallow
+   * them. Not an English word a visitor would look for; `/monitoring` is what Sentry's
+   * own examples use.
+   */
+  tunnelRoute: "/monitoring",
+  widenClientFileUpload: true,
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+    deleteSourcemapsAfterUpload: true,
+  },
+};
+
+export default withSentryConfig(withNextIntl(nextConfig), sentryOptions);

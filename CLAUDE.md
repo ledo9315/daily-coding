@@ -183,6 +183,36 @@ script on the host itself against `127.0.0.1:2000` (Python is installed there, N
 From outside, the app's `run` endpoint answers the 21st request in a minute with 429, which
 is the limiter working, not the sandbox failing.
 
+### Error monitoring
+
+Sentry, through `@sentry/nextjs`. `instrumentation.ts` loads `sentry.server.config.ts` or
+`sentry.edge.config.ts` per runtime and exports `onRequestError`, so every uncaught error
+in a server component, route handler or server action is reported with its route;
+`instrumentation-client.ts` does the browser; `app/global-error.tsx` catches what the
+root layout throws. What the three inits share sits in `lib/sentry-options.ts`, and
+`next.config.mjs` holds the build half: source-map upload and the tunnel route.
+
+- **Off without a DSN.** `NEXT_PUBLIC_SENTRY_DSN` turns it on (the server falls back to
+  it when `SENTRY_DSN` is unset); a local checkout and CI have neither and send nothing.
+  On Vercel the Sentry<->Vercel integration (installed from Sentry, Settings ->
+  Integrations -> Vercel, project `daily-coding` linked on both sides) sets it plus
+  `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN`, and tags each deploy as a
+  release.
+- **No browser source maps without the token.** `sourcemaps.disable` follows
+  `SENTRY_AUTH_TOKEN`: the plugin would otherwise switch them on for an upload that
+  then does not happen, and leave them on the CDN.
+- **`/monitoring` is the tunnel route.** Events go to our origin first so a content
+  blocker does not swallow them. Under Turbopack the path has to be fixed and excluded
+  from the proxy matcher by name; a test in `middleware.test.ts` keeps it out.
+- **No personal data.** `sendDefaultPii` is off, no user id is attached, no session
+  replay. An issue is debugged by its stack trace. Adding any of that means a Datenschutz
+  update first.
+- Traces are sampled at 20 % in production and 100 % elsewhere
+  (`PRODUCTION_TRACES_SAMPLE_RATE`); errors are never sampled.
+- `runChallengeTests` reports the Piston catch: from the panel a sandbox that is down
+  looks exactly like a program that does not compile, and that catch is the one place
+  the difference is known.
+
 ### Authentication
 
 - `auth.ts` configures NextAuth with credentials provider
@@ -297,7 +327,7 @@ camelCase, nested by component or section (`{ "loginForm": { "title": … } }`).
 through ICU (`"{count, plural, one {# Punkt} other {# Punkte}}"`), interpolation through
 `t("greeting", { name })`.
 
-Nine namespaces, one file per language each:
+Ten namespaces, one file per language each:
 
 | Namespace | Covers |
 |---|---|
@@ -308,6 +338,7 @@ Nine namespaces, one file per language each:
 | `community` | header, nav, footer, notifications, community feed, comments, solution cards and votes |
 | `dashboard` | landing page and the signed-in dashboard, including today's card and the activity calendar |
 | `email` | every outgoing mail, plus the three notification sentences the bell shares with it |
+| `error` | the global error page - read directly from the JSON files by `app/global-error.tsx`, because the root layout and with it the message provider are gone when it renders |
 | `legal` | Impressum and Datenschutz |
 | `profile` | profile, settings, ranking, public profile, achievements |
 
