@@ -44,7 +44,14 @@ import {
 } from "@/lib/api";
 import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
 import { storeResultHandover } from "@/lib/challenge-result-handover";
-import { challengeResultPath } from "@/lib/navigation";
+import {
+  clearDrafts,
+  pruneDrafts,
+  readDraft,
+  writeDraft,
+} from "@/lib/challenge-draft-store";
+import { storeGuestResult } from "@/lib/guest-result-handover";
+import { GUEST_RESULT_PATH, challengeResultPath } from "@/lib/navigation";
 import { languageFileName, languageLabel } from "@/lib/challenge-languages";
 import { notifyUserStatsChanged } from "@/lib/user-stats-events";
 import {
@@ -60,6 +67,12 @@ import { cn } from "@/lib/utils";
 /** Interval for the silent API check that picks up a new UTC day / new challenge. */
 const CHALLENGE_POLL_MS = 60_000;
 
+/**
+ * How long typing has to pause before the draft is written. Short enough that closing the
+ * tab loses at most this much, long enough not to write on every keystroke.
+ */
+const DRAFT_SAVE_DELAY_MS = 400;
+
 export default function ChallengePage() {
   const [language, setLanguage] = useState<CodeLanguageId | null>(null);
   const [sources, setSources] = useState<Partial<Record<CodeLanguageId, string>>>({});
@@ -70,6 +83,12 @@ export default function ChallengePage() {
   const [compileError, setCompileError] = useState<string | null>(null);
   const [submittedAtLabel, setSubmittedAtLabel] = useState<string | undefined>();
   const prevChallengeIdRef = useRef<string | null>(null);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingDraftRef = useRef<{
+    challengeId: string;
+    language: CodeLanguageId;
+    code: string;
+  } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   /** `useLocale` is typed as a plain string; the API layer wants the union. */
@@ -111,16 +130,29 @@ export default function ChallengePage() {
       }
       prevChallengeIdRef.current = challenge.id;
 
-      if (challenge.todaySubmission) {
-        setLanguage(challenge.todaySubmission.language as CodeLanguageId);
-        setSources({
-          ...challenge.starterCodes,
-          [challenge.todaySubmission.language]: challenge.todaySubmission.code,
-        });
-      } else {
-        setLanguage(challenge.defaultLanguage);
-        setSources({ ...challenge.starterCodes });
+      // The ring moved on, so yesterday's drafts are of no use to anyone.
+      pruneDrafts(window.localStorage, challenge.id);
+
+      const restored: Partial<Record<CodeLanguageId, string>> = challenge.todaySubmission
+        ? {
+            ...challenge.starterCodes,
+            [challenge.todaySubmission.language]: challenge.todaySubmission.code,
+          }
+        : { ...challenge.starterCodes };
+
+      // A draft wins over both the template and the stored submission: it is by definition
+      // the text that was typed last and never handed in.
+      for (const supported of challenge.supportedLanguages) {
+        const draft = readDraft(window.localStorage, challenge.id, supported);
+        if (draft !== null) restored[supported] = draft;
       }
+
+      setLanguage(
+        challenge.todaySubmission
+          ? (challenge.todaySubmission.language as CodeLanguageId)
+          : challenge.defaultLanguage
+      );
+      setSources(restored);
 
       // Prefer the graded results of today's submission - otherwise the panel
       // showed the empty template ("0/5") next to "successfully submitted" after
@@ -144,6 +176,25 @@ export default function ChallengePage() {
       }
     }
   }, [challenge, locale, t]);
+
+  useEffect(() => {
+    /**
+     * Leaving the page cancels the pending timer, and the last seconds of typing are
+     * exactly what the reported bug lost. So the pending draft is written out here, on the
+     * way out, rather than trusted to a timer that will never fire.
+     */
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+      const pending = pendingDraftRef.current;
+      if (!pending) return;
+      writeDraft(
+        window.localStorage,
+        pending.challengeId,
+        pending.language,
+        pending.code
+      );
+    };
+  }, []);
 
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -192,6 +243,37 @@ export default function ChallengePage() {
     },
   });
 
+  /**
+   * A guest's submission. It runs through the very same `run` endpoint the test button
+   * uses - that one has been open to readers without an account all along, rate limited
+   * per IP - so nothing is written anywhere and no new way into the sandbox is opened.
+   * What is new is only where it ends: on a result page instead of at a wall.
+   */
+  const { mutate: guestSubmitMutation, isPending: isGuestSubmitting } = useMutation({
+    mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
+      runTests(challenge!.id, code, lang, locale),
+    onSuccess: (result, variables) => {
+      storeGuestResult(window.sessionStorage, {
+        challengeId: challenge!.id,
+        title: challenge!.title,
+        category: challenge!.category,
+        difficulty: challenge!.difficulty,
+        points: challenge!.points,
+        language: result.language ?? variables.lang,
+        // The same verdict the signed-in route stores as its status.
+        passed: result.runtimeOk !== false,
+        testCases: result.testCases,
+        ...(result.compileError ? { compileError: result.compileError } : {}),
+      });
+      router.push(GUEST_RESULT_PATH);
+    },
+    onError: (e) => {
+      toast.error(t("toasts.submitFailed.title"), {
+        description: e instanceof Error ? e.message : t("errors.unknown"),
+      });
+    },
+  });
+
   const { mutate: submitMutation, isPending: isSubmitting } = useMutation({
     mutationFn: ({ code, lang }: { code: string; lang: CodeLanguageId }) =>
       submitSolution(challenge!.id, code, lang, locale),
@@ -200,6 +282,8 @@ export default function ChallengePage() {
       setCompileError(result.compileError ?? null);
       setSubmittedAtLabel(formatTimeOfDay(new Date(), locale));
       setSubmitOutcome(result.status === "completed" ? "success" : "failed");
+      // What was handed in is held by the submission row from here on, not by a draft.
+      clearDrafts(window.localStorage, challenge!.id);
 
       if (result.success) {
         notifyUserStatsChanged();
@@ -236,8 +320,22 @@ export default function ChallengePage() {
   const currentCode = language != null ? (sources[language] ?? "") : "";
 
   const setCurrentCode = (next: string) => {
-    if (!language) return;
+    if (!language || !challenge) return;
     setSources((prev) => ({ ...prev, [language]: next }));
+
+    pendingDraftRef.current = { challengeId: challenge.id, language, code: next };
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      const pending = pendingDraftRef.current;
+      if (!pending) return;
+      writeDraft(
+        window.localStorage,
+        pending.challengeId,
+        pending.language,
+        pending.code
+      );
+      pendingDraftRef.current = null;
+    }, DRAFT_SAVE_DELAY_MS);
   };
 
   // Everything a test run produces. Defined once so it can live in the sidebar or, while
@@ -270,6 +368,11 @@ export default function ChallengePage() {
   const handleSubmit = () => {
     if (!challenge || !language || isSubmitting) return;
     submitMutation({ code: currentCode, lang: language });
+  };
+
+  const handleGuestSubmit = () => {
+    if (!challenge || !language || isGuestSubmitting) return;
+    guestSubmitMutation({ code: currentCode, lang: language });
   };
 
   if (isLoadingChallenge) {
@@ -489,21 +592,23 @@ export default function ChallengePage() {
             <div className="space-y-3">
               {isGuest ? (
                 <>
+                  {/*
+                    A real submission, not a wall. Stopping a reader right before the one
+                    moment that convinces anybody - the green test run - was the worst
+                    place in the funnel to ask for an account.
+                  */}
                   <Button
-                    asChild
                     size="lg"
-                    className="w-full gap-2 rounded-none cursor-pointer"
+                    className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    onClick={handleGuestSubmit}
+                    disabled={!language || isGuestSubmitting}
                   >
-                    {/* No `callbackUrl`: registering ends at the verification mail and then
-                        at /login, so the parameter would promise a return it cannot keep. */}
-                    <Link href="/register">
-                      <ArrowRight className="h-4 w-4" fill="currentColor" />
-                      {t("guest.action")}
-                    </Link>
+                    <ArrowRight className="h-4 w-4" fill="currentColor" />
+                    {isGuestSubmitting ? t("guest.submitting") : t("guest.submit")}
                   </Button>
 
                   {/* Not `text-xs`: at that size the pixel face turns to mush, and this is
-                      the sentence that explains why the button above says what it says. */}
+                      the sentence that says what the button does not do. */}
                   <div className="space-y-2 text-base leading-relaxed text-muted-foreground">
                     <p>{t("guest.hint")}</p>
                     <p>

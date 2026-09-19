@@ -39,6 +39,18 @@ describe("robots.txt", () => {
       expect(list).toContain(path);
     }
   );
+
+  /**
+   * Not behind the login - a guest's own result is exactly a page without one. It is
+   * excluded because it renders from that reader's `sessionStorage`, so a crawler would
+   * only ever index the empty state.
+   */
+  it("excludes the guest result, which has nothing to show a crawler", () => {
+    const rule = Array.isArray(rules.rules) ? rules.rules[0] : rules.rules;
+    const disallow = rule?.disallow;
+    const list = Array.isArray(disallow) ? disallow : [disallow];
+    expect(list).toContain("/result");
+  });
 });
 
 describe("sitemap.xml", () => {

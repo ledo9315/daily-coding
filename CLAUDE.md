@@ -247,6 +247,33 @@ root layout throws. What the three inits share sits in `lib/sentry-options.ts`, 
 - `proxy.ts` (Next 16's name for `middleware.ts`) protects `/challenge`, `/profile`, `/ranking`, `/settings` and `/admin` paths via JWT token check, and writes the locale cookie on every response
 - Admin role is checked **in route handlers** via `lib/server/require-admin-page.ts` / `lib/server/admin-session.ts` (not in the proxy, to avoid stale JWT role data)
 
+### Guests and the daily challenge
+
+`/challenge` is public (#287) and a reader without an account can now go all the way
+through: write code, hand it in, and see a result. The endpoint behind that submission is
+the **existing** `/api/challenge/[id]/run`, which has been open to guests all along and is
+limited per IP - a guest submission opens no new way into the sandbox and writes nothing
+to the database.
+
+What it does not get is the signed-in result. `/challenge/<id>/solutions` loads a
+submission row and shows other people's answers, their comments and their votes; the proxy
+shuts *everything* under `/challenge/` for that reason. The guest result therefore lives
+beside it at `/result`, renders purely from `sessionStorage`
+(`lib/guest-result-handover.ts`), makes no request and links nowhere near the community
+content - a test on the rendered markup holds that last part, because it is the half that
+would be expensive to get wrong. It is in `PRIVATE_PATHS` and carries `noindex`: a crawler
+would only ever see the empty state.
+
+The copy says plainly that the run counted for nothing. That is only honest because of the
+second half: the editor keeps its unsent code in `localStorage`
+(`lib/challenge-draft-store.ts`), per challenge and per language, written 400 ms after the
+last keystroke and flushed again when the page unmounts. Before that the code lived in
+React state alone and a click on any other tab threw it away - reported from r/webdev, and
+the reason someone who registers now finds their attempt still in the editor. A draft
+beats both the starter template and today's stored submission, is cleared once something
+is handed in, and every draft of another challenge is swept on arrival, or the store would
+grow by one entry per language per day.
+
 ### Challenge content
 
 Every challenge is a module under `prisma/challenges/<slug>.ts` exporting

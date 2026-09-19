@@ -102,6 +102,9 @@ export const PRIVATE_PATHS = [
   "/admin",
   "/challenge/",
   "/profile",
+  // A guest's own result, rendered from their sessionStorage. A crawler following the
+  // path would only ever reach the empty state.
+  "/result",
   "/settings",
   "/ranking",
 ] as const;

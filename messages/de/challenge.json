@@ -88,10 +88,23 @@
     "again": "Erneut abgeben"
   },
   "guest": {
-    "action": "Konto erstellen und abgeben",
-    "hint": "Lesen und Tests ausführen geht ohne Konto. Gespeichert werden Abgabe, Serie und Punkte erst mit einem.",
+    "submit": "Abgeben",
+    "submitting": "Wird geprüft …",
+    "hint": "Abgeben geht ohne Konto. Gezählt werden Abgabe, Serie und Punkte aber erst mit einem.",
+    "createAccount": "Konto erstellen",
     "haveAccount": "Schon ein Konto?",
     "login": "Anmelden"
+  },
+  "guestResult": {
+    "title": "Dein Ergebnis",
+    "passedHeadline": "Bestanden",
+    "passedBody": "Alle Testfälle laufen durch. Sauber gelöst.",
+    "failedHeadline": "Noch nicht bestanden",
+    "failedBody": "Mindestens ein Testfall scheitert noch. Zurück in den Editor und weiterprobieren.",
+    "notCounted": "Dieser Durchlauf wurde nirgends gezählt. Mit einem Konto zählen Abgabe, Punkte und Serie – und dein Code steht beim nächsten Besuch noch im Editor.",
+    "backToChallenge": "Zurück zur Aufgabe",
+    "empty": "Hier ist gerade kein Ergebnis zu sehen.",
+    "emptyAction": "Zur Tagesaufgabe"
   },
   "actions": {
     "toResult": "Zum Ergebnis"
