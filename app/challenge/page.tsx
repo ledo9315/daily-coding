@@ -652,7 +652,7 @@ export default function ChallengePage() {
                   // The outline variant's hairline disappears on this ground, so the border
                   // carries the button here. Spelled with `dark:` as well: the app forces the
                   // dark theme, and the variant's own `dark:` rules would otherwise win.
-                  className="w-full gap-2 rounded-none border-2 border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-transparent dark:hover:border-primary dark:hover:bg-primary/10 dark:hover:text-primary"
+                  className="pixel-btn w-full gap-2 rounded-none border-2 border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-transparent dark:hover:border-primary dark:hover:bg-primary/10 dark:hover:text-primary"
                 >
                   {/* No icon: the arrow of the button above it is the one that means
                       „weiter", and twice in a row it read as a list rather than as a choice. */}
