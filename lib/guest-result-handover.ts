@@ -35,15 +35,44 @@ type HandoverStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
  */
 const KEY = "guest-result";
 
+/**
+ * Written beside the payload and consumed on the first read, the way the signed-in
+ * handover works. The payload itself has to survive a reload - it is the page - so the
+ * "this just happened" part needs a key of its own, or the confetti would fire again
+ * every time the reader refreshes or comes back with the tab still open.
+ */
+const ARRIVAL_KEY = "guest-result-arrival";
+
 export function storeGuestResult(
   storage: HandoverStorage,
   payload: GuestResultHandover
 ): void {
   try {
     storage.setItem(KEY, JSON.stringify(payload));
+    storage.setItem(ARRIVAL_KEY, "1");
   } catch {
     // Storage access throws in private mode or with site data blocked.
   }
+}
+
+/**
+ * Whether the reader arrived straight from the editor, rather than reloading a page they
+ * already saw. True at most once per submission.
+ */
+export function takeGuestArrival(storage: HandoverStorage): boolean {
+  let raw: string | null;
+  try {
+    raw = storage.getItem(ARRIVAL_KEY);
+  } catch {
+    return false;
+  }
+  try {
+    storage.removeItem(ARRIVAL_KEY);
+  } catch {
+    // Removal may fail on its own; without it the celebration would repeat, which is a
+    // smaller problem than throwing on a page that has something to show.
+  }
+  return raw === "1";
 }
 
 /**
@@ -96,6 +125,7 @@ export function readGuestResult(storage: HandoverStorage): GuestResultHandover |
 
 export function clearGuestResult(storage: HandoverStorage): void {
   try {
+    storage.removeItem(ARRIVAL_KEY);
     storage.removeItem(KEY);
   } catch {
     // Same as above; nothing depends on the removal succeeding.
