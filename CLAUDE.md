@@ -264,6 +264,12 @@ content - a test on the rendered markup holds that last part, because it is the 
 would be expensive to get wrong. It is in `PRIVATE_PATHS` and carries `noindex`: a crawler
 would only ever see the empty state.
 
+A passing guest gets the same confetti a signed-in solve does. It hangs off a second key,
+`guest-result-arrival`, which is written with the payload and consumed on the first read:
+the payload itself must survive a reload because it *is* the page, so "this just happened"
+cannot be read off it. The marker is spent whether or not it is used, or a failed attempt
+followed by a reload and then a solve would inherit the earlier arrival.
+
 The copy says plainly that the run counted for nothing. That is only honest because of the
 second half: the editor keeps its unsent code in `localStorage`
 (`lib/challenge-draft-store.ts`), per challenge and per language, written 400 ms after the
