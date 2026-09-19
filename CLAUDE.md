@@ -213,7 +213,10 @@ root layout throws. What the three inits share sits in `lib/sentry-options.ts`, 
   `console.warn` and `console.error` (`FORWARDED_CONSOLE_LEVELS`), the browser forwards
   nothing. `scrubLog` runs as `beforeSendLog` and replaces anything shaped like an e-mail
   address, so a mail provider's error text cannot smuggle one out; the log statements
-  themselves carry user ids, never addresses. The daily-reminder cron writes one
+  themselves carry user ids, never addresses. The same handler drops Node's own process
+  warnings, recognised by the `(node:<pid>) ` prefix: `console.error` is where Node
+  prints them, so the console integration took a dependency's deprecation notice for an
+  application log and they filled the stream at every cold start. The daily-reminder cron writes one
   `Sentry.logger.info` line per run - the JSON it answers to the scheduler is not kept
   anywhere. Vercel Log Drains are not an option on the Hobby plan.
 - `runChallengeTests` reports the Piston catch: from the panel a sandbox that is down
