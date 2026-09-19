@@ -28,8 +28,10 @@ export function LandingNavbar() {
           >
             {t("nav.login")}
           </Link>
+          {/* Straight to the form: `/join` only redirects there, and every public page
+              carried that hop as its most prominent internal link. */}
           <Link
-            href="/join?token=12312"
+            href="/register"
             className="pixel-btn bg-primary text-primary-foreground hover:translate-x-1 hover:translate-y-1"
           >
             {t("nav.join")}

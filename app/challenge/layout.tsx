@@ -2,21 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { findDailyChallengeForApp } from "@/lib/server/challenge-day";
 import { localizedAlternates } from "@/lib/server/metadata";
-
-/** Roughly what a search result and a link preview show before they cut. */
-const EXCERPT_LENGTH = 155;
-
-/**
- * The first sentences of the description, ending on a word. Newlines collapse: a
- * description may use paragraphs, and a preview renders them as one line anyway.
- */
-function excerpt(text: string): string {
-  const flat = text.replace(/\s+/g, " ").trim();
-  if (flat.length <= EXCERPT_LENGTH) return flat;
-  const cut = flat.slice(0, EXCERPT_LENGTH);
-  const lastSpace = cut.lastIndexOf(" ");
-  return `${lastSpace > 0 ? cut.slice(0, lastSpace) : cut}…`;
-}
+import { excerpt } from "@/lib/excerpt";
 
 /**
  * The task is public since #287, so it carries a description and one canonical per
