@@ -225,6 +225,18 @@ root layout throws. What the three inits share sits in `lib/sentry-options.ts`, 
   application log and they filled the stream at every cold start. The daily-reminder cron writes one
   `Sentry.logger.info` line per run - the JSON it answers to the scheduler is not kept
   anywhere. Vercel Log Drains are not an option on the Hobby plan.
+- **Two monitors watch for silence**, which is the one failure an error report cannot
+  describe. The daily-reminder route wraps its work in `Sentry.withMonitor`, so Sentry
+  learns when a run starts, whether it ended well, and - the point of the exercise - when
+  a run that was due never arrived; `lib/server/cron-monitor.ts` holds the slug and the
+  config, and a test compares its crontab with the `crons` entry in `vercel.json`. The
+  margin is a generous 75 minutes because the Hobby plan schedules per hour, not per
+  minute (Vercel documents ±59 min), and `maxRuntime` sits above the route's
+  `maxDuration` so only a run the platform has already killed counts as a timeout. The
+  route flushes before answering: a serverless instance can be frozen the moment the
+  response leaves. Next to it an HTTP uptime monitor calls `https://daily-coding.dev/`
+  every five minutes; that page is `force-dynamic` and reads the ring, so a green check
+  means the app *and* the database answered. It lives only in Sentry, not in this repo.
 - `runChallengeTests` reports the Piston catch: from the panel a sandbox that is down
   looks exactly like a program that does not compile, and that catch is the one place
   the difference is known.
