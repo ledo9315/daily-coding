@@ -105,6 +105,27 @@ export function sentryEnvironment(vercelEnv: string | undefined): SentryEnvironm
  */
 export const PRODUCTION_TRACES_SAMPLE_RATE = 0.2;
 
+/**
+ * Session Replay, browser only. Every session that runs into an error is recorded, plus
+ * a sample of the ordinary ones, because a recording is worth most next to the error it
+ * explains and the quota is spent on the rest. Both rates live here rather than in
+ * `instrumentation-client.ts` so a change is one edit and has a test behind it.
+ */
+export const REPLAY_SESSION_SAMPLE_RATE = 0.1;
+export const REPLAY_ON_ERROR_SAMPLE_RATE = 1.0;
+
+/**
+ * What the recorder is allowed to see. Masking stays on in all three dimensions: text is
+ * replaced before it leaves the browser, input values likewise, images and video are not
+ * recorded at all. What comes back is the layout with clicks, scrolls and navigation on
+ * it, which is what a replay is looked at for.
+ */
+export const REPLAY_PRIVACY_OPTIONS = {
+  maskAllText: true,
+  maskAllInputs: true,
+  blockAllMedia: true,
+} as const;
+
 export function sentryBaseOptions({ dsn, environment }: SentryInitInput): SentryBaseOptions {
   const resolved = sentryEnvironment(environment);
   return {

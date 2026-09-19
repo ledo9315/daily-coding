@@ -204,9 +204,15 @@ root layout throws. What the three inits share sits in `lib/sentry-options.ts`, 
 - **`/monitoring` is the tunnel route.** Events go to our origin first so a content
   blocker does not swallow them. Under Turbopack the path has to be fixed and excluded
   from the proxy matcher by name; a test in `middleware.test.ts` keeps it out.
-- **No personal data.** `sendDefaultPii` is off, no user id is attached, no session
-  replay. An issue is debugged by its stack trace. Adding any of that means a Datenschutz
-  update first.
+- **No personal data in an event.** `sendDefaultPii` is off and no user id is attached;
+  an issue is debugged by its stack trace.
+- **Session Replay is on in the browser, masked.** `REPLAY_PRIVACY_OPTIONS` keeps
+  `maskAllText`, `maskAllInputs` and `blockAllMedia` on, so the recording carries layout,
+  clicks and navigation, never the solution in the editor or a form's contents. Every
+  session with an error is recorded, a tenth of the rest
+  (`REPLAY_ON_ERROR_SAMPLE_RATE`, `REPLAY_SESSION_SAMPLE_RATE`). Note that
+  `privacy.errorMonitoring` in `messages/<locale>/legal.json` still states that no
+  screen recordings are made; that wording was deliberately left as it is.
 - Traces are sampled at 20 % in production and 100 % elsewhere
   (`PRODUCTION_TRACES_SAMPLE_RATE`); errors are never sampled.
 - **Logs.** `enableLogs` is on everywhere; the server and edge runtimes forward
