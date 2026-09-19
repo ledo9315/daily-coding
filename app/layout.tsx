@@ -7,10 +7,11 @@ import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/locale";
-import { SITE_URL } from "@/lib/site";
+import { REPOSITORY_URL, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { JsonLd } from "@/components/json-ld";
 import { Providers } from "./providers";
 
 const vt323 = VT323({
@@ -117,7 +118,45 @@ export default async function RootLayout({
 }>) {
   // Was hardcoded `"en"` while the page shipped German - a screen reader announced the
   // wrong language, and Google read the wrong one.
-  const locale = await getLocale();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("dashboard")]);
+
+  /**
+   * Who runs the site and what it is, once for every page. The search result shows the
+   * brand name from `Organization` and the site name from `WebSite`; without them both
+   * are guessed from the domain, and "daily-coding.dev" is not the name.
+   */
+  const siteGraph = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: "Daily Coding",
+        url: SITE_URL,
+        logo: `${SITE_URL}/android-chrome-512x512.png`,
+        sameAs: [REPOSITORY_URL],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        name: "Daily Coding",
+        url: SITE_URL,
+        description: t("meta.description"),
+        inLanguage: locale,
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      },
+      {
+        "@type": "WebApplication",
+        name: "Daily Coding",
+        url: SITE_URL,
+        applicationCategory: "EducationalApplication",
+        operatingSystem: "Web",
+        isAccessibleForFree: true,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+        description: t("meta.description"),
+      },
+    ],
+  };
 
   return (
     <html
@@ -126,6 +165,7 @@ export default async function RootLayout({
       className={`${vt323.variable} ${pressStart.variable} ${jetbrainsMono.variable}`}
     >
       <body className="font-sans antialiased bg-background">
+        <JsonLd data={siteGraph} />
         {/* Forced, not merely the default: every colour token lives on `:root` and is dark.
             Following the system would strip the `dark` class, switching off every `dark:`
             override - the page would stay dark while shadcn's light-mode hovers took over

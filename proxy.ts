@@ -200,9 +200,10 @@ export const config = {
    * (#114). robots.txt and sitemap.xml are excluded so they stay statically cacheable.
    * `/monitoring` is Sentry's tunnel route (next.config.mjs): a POST carrying an error
    * event has no use for a locale cookie, and under Turbopack the route has to be left
-   * out here by name.
+   * out here by name. `manifest.webmanifest` is a metadata route like the two above and
+   * needs nothing this proxy adds.
    */
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|monitoring|.*\\.png$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|monitoring|manifest.webmanifest|.*\\.png$).*)",
   ],
 };

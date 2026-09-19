@@ -2,9 +2,8 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BrandMark } from "@/components/brand-mark";
 import { ChangelogLink } from "@/components/changelog-link";
-import { localizedPath } from "@/lib/site";
+import { REPOSITORY_URL, localizedPath } from "@/lib/site";
 
-const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
 const BUG_REPORT_URL = `${REPOSITORY_URL}/issues/new?template=bug_report.yml`;
 const SUPPORT_EMAIL = "leonid.domahalskyy@icloud.com";
 const footerLinkClass = "transition-colors hover:text-primary focus-visible:text-primary";

@@ -7,6 +7,9 @@ import { DEFAULT_LOCALE, LOCALES } from "@/lib/locale";
  */
 export const SITE_URL = "https://daily-coding.dev";
 
+/** The public source. Linked from the footer, and named as the site's `sameAs`. */
+export const REPOSITORY_URL = "https://github.com/ledo9315/daily-coding-challenge";
+
 /**
  * The domain the site launched on. It keeps redirecting rather than being dropped: the
  * links already shared point at it, and a German-language site whose German domain is
