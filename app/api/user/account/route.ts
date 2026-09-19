@@ -98,7 +98,6 @@ export async function DELETE(request: Request) {
   } catch (error) {
     console.warn("[user/account] deletion email failed", {
       userId: user.id,
-      email: user.email,
       error,
     });
   }

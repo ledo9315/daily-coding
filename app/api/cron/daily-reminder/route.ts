@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { runDailyReminder } from "@/lib/server/daily-reminder";
@@ -49,5 +50,7 @@ export async function GET(request: NextRequest) {
   // single deleteMany is not worth its own schedule entry.
   const prunedNotifications = await pruneReadNotifications();
   const result = await runDailyReminder();
+  // The JSON below answers the scheduler and is gone; this line is the run's record.
+  Sentry.logger.info("daily reminder run", { ...result, prunedNotifications });
   return NextResponse.json({ ...result, prunedNotifications });
 }
