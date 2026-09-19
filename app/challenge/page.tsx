@@ -649,10 +649,13 @@ export default function ChallengePage() {
                   asChild
                   size="lg"
                   variant="outline"
-                  // The outline variant's hairline disappears on this ground, so the border
-                  // carries the button here. Spelled with `dark:` as well: the app forces the
-                  // dark theme, and the variant's own `dark:` rules would otherwise win.
-                  className="pixel-btn w-full gap-2 rounded-none border-2 border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/10 hover:text-primary dark:border-primary/40 dark:bg-transparent dark:hover:border-primary dark:hover:bg-primary/10 dark:hover:text-primary"
+                  // Tinted rather than outlined, after the secondary button in the landing
+                  // draft: a filled surface in the accent at low alpha, a border of the same
+                  // colour, light text. Violet and not the primary lime, so the one lime
+                  // button in this column stays the one that submits. Spelled with `dark:` as
+                  // well: the app forces the dark theme, and the variant's own `dark:` rules
+                  // would otherwise win.
+                  className="pixel-btn w-full gap-2 rounded-none border-2 border-chart-5/55 bg-chart-5/15 text-foreground [--pixel-btn-lip:color-mix(in_srgb,var(--chart-5)_45%,black)] hover:border-chart-5 hover:bg-chart-5/25 hover:text-foreground dark:border-chart-5/55 dark:bg-chart-5/15 dark:hover:border-chart-5 dark:hover:bg-chart-5/25 dark:hover:text-foreground"
                 >
                   {/* No icon: the arrow of the button above it is the one that means
                       „weiter", and twice in a row it read as a list rather than as a choice. */}
