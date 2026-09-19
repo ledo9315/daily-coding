@@ -49,7 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       console.log("[auth] signIn callback", {
         provider: account?.provider,
         type: account?.type,
-        userEmail: user?.email,
+        hasEmail: Boolean(user?.email),
       });
       return true;
     },

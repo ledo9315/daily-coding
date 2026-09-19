@@ -209,6 +209,13 @@ root layout throws. What the three inits share sits in `lib/sentry-options.ts`, 
   update first.
 - Traces are sampled at 20 % in production and 100 % elsewhere
   (`PRODUCTION_TRACES_SAMPLE_RATE`); errors are never sampled.
+- **Logs.** `enableLogs` is on everywhere; the server and edge runtimes forward
+  `console.warn` and `console.error` (`FORWARDED_CONSOLE_LEVELS`), the browser forwards
+  nothing. `scrubLog` runs as `beforeSendLog` and replaces anything shaped like an e-mail
+  address, so a mail provider's error text cannot smuggle one out; the log statements
+  themselves carry user ids, never addresses. The daily-reminder cron writes one
+  `Sentry.logger.info` line per run - the JSON it answers to the scheduler is not kept
+  anywhere. Vercel Log Drains are not an option on the Hobby plan.
 - `runChallengeTests` reports the Piston catch: from the panel a sandbox that is down
   looks exactly like a program that does not compile, and that catch is the one place
   the difference is known.

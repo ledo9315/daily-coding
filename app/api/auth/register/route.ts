@@ -157,7 +157,6 @@ export async function POST(request: NextRequest) {
     verificationEmailSent = false;
     console.error("[auth/register] verification email failed", {
       userId: user.id,
-      email: canonicalEmail,
       error,
     });
   }
