@@ -88,10 +88,23 @@
     "again": "Submit again"
   },
   "guest": {
-    "action": "Create an account to submit",
-    "hint": "Reading the task and running the tests needs no account. Keeping your submission, streak and points does.",
+    "submit": "Submit",
+    "submitting": "Checking …",
+    "hint": "Submitting needs no account. Counting your submission, streak and points does.",
+    "createAccount": "Create an account",
     "haveAccount": "Already have an account?",
     "login": "Sign in"
+  },
+  "guestResult": {
+    "title": "Your result",
+    "passedHeadline": "Passed",
+    "passedBody": "Every test case runs through. Cleanly solved.",
+    "failedHeadline": "Not passed yet",
+    "failedBody": "At least one test case still fails. Back to the editor and keep trying.",
+    "notCounted": "This run was not counted anywhere. With an account your submission, points and streak count - and your code is still in the editor next time you come back.",
+    "backToChallenge": "Back to the task",
+    "empty": "There is no result to show right now.",
+    "emptyAction": "To today's challenge"
   },
   "actions": {
     "toResult": "To the result"

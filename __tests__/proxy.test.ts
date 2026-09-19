@@ -234,3 +234,38 @@ describe("locale prefix", () => {
     expect(localeCookieOf(response)).toBe("de");
   });
 });
+
+/**
+ * A guest can now hand in the daily challenge and gets a result page for it. That page had
+ * to be built *beside* `/challenge/`, not below it: everything below is shut because it
+ * shows other people's solutions, and opening a hole in that rule for a conversion page
+ * is how a spoiler ends up public. These tests hold both halves of that decision.
+ */
+describe("the guest result page and the gate around the solutions", () => {
+  it("lets a reader without an account reach their own result", async () => {
+    const response = await proxy(request("/result"));
+
+    expect(response.status).toBe(200);
+    expect(mockGetToken).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["another reader's solutions", "/challenge/abc/solutions"],
+    ["anything else below the challenge", "/challenge/abc/whatever"],
+  ])("still sends a guest asking for %s to the login", async (_case, path) => {
+    mockGetToken.mockResolvedValueOnce(null);
+
+    const response = await proxy(request(path));
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain("/login?callbackUrl=");
+  });
+
+  /** The task itself stayed public when the result page was added (#287). */
+  it("leaves the task page itself open", async () => {
+    const response = await proxy(request("/challenge"));
+
+    expect(response.status).toBe(200);
+    expect(mockGetToken).not.toHaveBeenCalled();
+  });
+});

@@ -39,3 +39,10 @@ export type NavItem = (typeof NAV_ITEMS)[number];
 export function challengeResultPath(challengeId: string): string {
   return `/challenge/${challengeId}/solutions`;
 }
+
+/**
+ * Where a guest lands after handing in. Top level on purpose: the proxy shuts everything
+ * under `/challenge/` because that is where other people's solutions live, and a page
+ * built for readers without an account has no business behind that gate.
+ */
+export const GUEST_RESULT_PATH = "/result";
