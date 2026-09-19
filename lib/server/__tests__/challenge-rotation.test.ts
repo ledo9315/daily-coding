@@ -31,6 +31,15 @@ vi.mock("@/lib/prisma", () => ({
     challenge: {
       findFirst: vi.fn(),
       findMany: (...args: unknown[]) => mockFindMany(...args),
+      /**
+       * The ring query returns id and position only; the winner is fetched by id. Resolved
+       * out of the pool the test seeded, so the fixtures stay in one place.
+       */
+      findUnique: async ({ where }: { where: { id: string } }) => {
+        const seeded = mockFindMany.mock.results;
+        const rows = seeded.length ? await seeded[seeded.length - 1].value : [];
+        return rows.find((row: { id: string }) => row.id === where.id) ?? null;
+      },
     },
     rotationState: {
       findUnique: (...args: unknown[]) => mockStateFind(...args),
