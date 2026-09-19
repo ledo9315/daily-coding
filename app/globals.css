@@ -243,19 +243,79 @@
       inset 2px 2px 0 0 rgba(255, 255, 255, 0.05);
   }
 
+  /**
+   * A key with a lip under it, not a sticker: the shadow sits straight below the button in a
+   * darker shade of its own colour, so the button reads as a solid object standing on the page.
+   * Hover lifts it and the lip grows with the gap; a press pushes it past its resting height,
+   * which is the half that makes the whole thing feel physical.
+   *
+   * The lip colour is a variable because it belongs to the button's face - a lime button needs a
+   * dark lime under it, and the neutral default only works for the dark surfaces. `.pixel-btn-primary`
+   * is the one that carries the site's colour and sets both.
+   */
   .pixel-btn {
+    --pixel-btn-lip: var(--border);
+    --pixel-btn-glow: transparent;
     @apply border-2 border-border px-4 py-2 font-sans text-lg uppercase tracking-wider transition-all;
-    box-shadow: 4px 4px 0 0 var(--border);
+    box-shadow: 0 4px 0 0 var(--pixel-btn-lip);
   }
 
-  .pixel-btn:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 0 var(--border);
+  /**
+   * Both colours are mixed from `--primary` rather than written down, because the dashboard
+   * hands its card a violet `--primary` (app/page.tsx) and a lip that knew it was lime drew a
+   * green edge around a violet button. Declared here, on the button, so the override reaches it -
+   * the same declaration up in `:root` would have baked the lime in before it could inherit.
+   */
+  .pixel-btn-primary {
+    --pixel-btn-lip: color-mix(in srgb, var(--primary) 62%, black);
+    --pixel-btn-glow: color-mix(in srgb, var(--primary) 30%, transparent);
+    border-color: var(--pixel-btn-lip);
   }
 
-  .pixel-btn:active {
-    transform: translate(4px, 4px);
-    box-shadow: none;
+  /**
+   * The lip without the pixel typography `.pixel-btn` carries with it, for the chrome that is
+   * shaped like a button: the streak chip, the bell, the avatar. They used to sit on `.pixel-box`
+   * and so kept the diagonal shadow of a card while everything clickable had moved to a lip.
+   *
+   * The movement below is scoped to `a` and `button`, because the streak chip is neither - an
+   * element that rises under the pointer promises a click it does not have.
+   */
+  .pixel-lift {
+    --pixel-btn-lip: var(--border);
+    --pixel-btn-glow: transparent;
+    @apply transition-all;
+    box-shadow: 0 4px 0 0 var(--pixel-btn-lip);
+  }
+
+  .pixel-btn:hover,
+  :is(a, button).pixel-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 6px 0 0 var(--pixel-btn-lip),
+      0 10px 26px -8px var(--pixel-btn-glow);
+  }
+
+  .pixel-btn:active,
+  :is(a, button).pixel-lift:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 var(--pixel-btn-lip);
+  }
+
+  /* Nothing to stand on while it is not clickable. */
+  .pixel-btn:disabled,
+  .pixel-lift:disabled {
+    transform: none;
+    box-shadow: 0 2px 0 0 var(--pixel-btn-lip);
+  }
+
+  /* The lip stays - it is the shape of the button, not the animation. */
+  @media (prefers-reduced-motion: reduce) {
+    .pixel-btn:hover,
+    .pixel-btn:active,
+    .pixel-lift:hover,
+    .pixel-lift:active {
+      transform: none;
+    }
   }
 
   .font-pixel {

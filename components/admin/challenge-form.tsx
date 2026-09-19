@@ -599,7 +599,7 @@ export function AdminChallengeForm({
       <Button
         type="submit"
         disabled={pending || categories.length === 0}
-        className="rounded-none pixel-btn w-full sm:w-auto"
+        className="rounded-none pixel-btn pixel-btn-primary w-full sm:w-auto"
       >
         {pending
           ? "Speichern…"

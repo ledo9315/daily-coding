@@ -193,7 +193,7 @@ export function RegisterForm({
 
       <Button
         type="submit"
-        className="pixel-btn w-full gap-2 mt-6 cursor-pointer"
+        className="pixel-btn pixel-btn-primary w-full gap-2 mt-6 cursor-pointer"
         disabled={isLoading}
       >
         {isLoading ? t("registerForm.submitting") : t("registerForm.submit")}

@@ -178,7 +178,7 @@ export function Header() {
         <div className="flex items-center gap-2 sm:gap-4">
           {status === "authenticated" && user ? (
             <>
-              <div className="pixel-box flex items-center gap-1.5 border-2 border-orange-500/20 px-2 py-2 text-orange-500 sm:gap-2 sm:px-4">
+              <div className="pixel-lift flex items-center gap-1.5 border-2 border-orange-500/20 bg-card px-2 py-2 text-orange-500 sm:gap-2 sm:px-4">
                 <Zap className="h-5 w-5 animate-pulse" />
                 <span className="text-xl font-sans">
                   {streak === null ? (
@@ -207,7 +207,7 @@ export function Header() {
                     // Cancels the ghost variant's orange `--accent` tint. Same modifiers on purpose:
                     // only then does tailwind-merge drop it instead of losing on specificity.
                     // `focus-visible:border-primary` replaces the base button's blue ring border.
-                    className="pixel-box relative h-12 w-12 p-0 hover:border-primary hover:bg-card dark:hover:bg-card cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary outline-none"
+                    className="pixel-lift relative h-12 w-12 border-2 bg-card p-0 hover:border-primary hover:bg-card dark:hover:bg-card cursor-pointer focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary outline-none"
                   >
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage src={avatar || undefined} alt={displayName} />
@@ -293,7 +293,7 @@ export function Header() {
               >
                 <Link href="/login">{t("header.login")}</Link>
               </Button>
-              <Button asChild className="pixel-btn rounded-none px-3 font-sans uppercase sm:px-4">
+              <Button asChild className="pixel-btn pixel-btn-primary rounded-none px-3 font-sans uppercase sm:px-4">
                 <Link href="/register">{t("header.register")}</Link>
               </Button>
             </div>

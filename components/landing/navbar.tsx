@@ -32,7 +32,7 @@ export function LandingNavbar() {
               carried that hop as its most prominent internal link. */}
           <Link
             href="/register"
-            className="pixel-btn bg-primary text-primary-foreground hover:translate-x-1 hover:translate-y-1"
+            className="pixel-btn pixel-btn-primary bg-primary text-primary-foreground"
           >
             {t("nav.join")}
           </Link>

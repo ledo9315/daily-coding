@@ -82,7 +82,7 @@ export function NotificationBell() {
              `hover:text-*` is spelled out because the ghost variant's `accent-foreground`
              is near-black on this card and swallowed the bell on hover. */
           className={cn(
-            "pixel-box flex h-12 items-center gap-1.5 border-2 px-2 py-2 sm:px-3 cursor-pointer rounded-none",
+            "pixel-lift flex h-12 items-center gap-1.5 border-2 bg-card px-2 py-2 sm:px-3 cursor-pointer rounded-none",
             "hover:bg-card dark:hover:bg-card hover:border-primary hover:text-primary",
             // The base button paints a blue `ring` border on focus, which has nothing to do
             // with this palette.

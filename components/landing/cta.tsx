@@ -67,7 +67,7 @@ export function LandingCTA() {
               #287 the link can keep that promise. */}
           <Link
             href={localizedPath("/challenge", locale)}
-            className="pixel-btn mt-8 inline-block bg-primary px-8 py-4 text-xl text-primary-foreground transition-transform hover:scale-105"
+            className="pixel-btn pixel-btn-primary mt-8 inline-block bg-primary px-8 py-4 text-xl text-primary-foreground"
           >
             {t("cta.action")}
           </Link>

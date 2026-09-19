@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
                 </div>
                 <Button
                   type="submit"
-                  className="pixel-btn w-full gap-2 mt-2 cursor-pointer"
+                  className="pixel-btn pixel-btn-primary w-full gap-2 mt-2 cursor-pointer"
                   disabled={isLoading}
                 >
                   {isLoading ? t("forgotPassword.submitting") : t("forgotPassword.submit")}
