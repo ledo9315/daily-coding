@@ -76,16 +76,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: t("meta.description"),
     /**
-     * The card a shared link shows: the landing above the fold in the language of the page,
-     * captured at 2400x1260 and scaled down, so the headline is the same one a visitor
-     * lands on. One file per locale, because `/de/...` links travel through German chats
-     * and `/...` links through English ones.
+     * The card a shared link shows. One file per locale, because `/de/...` links travel
+     * through German chats and `/...` links through English ones - and the headline on the
+     * card is set in the language of the page it points at.
      *
-     * The capture leaves out the navigation and the badge naming today's challenge: that
-     * name changes daily, and a file cached by every crawler and chat client would keep
-     * announcing a challenge from months ago.
+     * The two are no longer the same picture. The German one is still the landing above the
+     * fold, captured at 2400x1260 and scaled down; the English one is a composed card, the
+     * claim beside a shot of the dashboard. Whatever the layout, neither may show the name
+     * of a challenge: that name changes daily, and a file cached by every crawler and chat
+     * client would keep announcing a challenge from months ago.
      *
-     * Exactly 1200x630, the ratio every platform lays the card out for, and about 50 KB.
+     * Exactly 1200x630, the ratio every platform lays the card out for, and under 100 KB.
      * Size matters here: WhatsApp drops the preview above roughly 300 KB, and a chat
      * message is how a link like this travels.
      */
