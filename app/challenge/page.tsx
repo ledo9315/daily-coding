@@ -599,7 +599,7 @@ export default function ChallengePage() {
                   */}
                   <Button
                     size="lg"
-                    className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="pixel-btn pixel-btn-primary w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     onClick={handleGuestSubmit}
                     disabled={!language || isGuestSubmitting}
                   >
@@ -625,7 +625,7 @@ export default function ChallengePage() {
               ) : (
                 <Button
                   size="lg"
-                  className="w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="pixel-btn pixel-btn-primary w-full gap-2 rounded-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   onClick={handleSubmit}
                   // Disabled while the session is still loading: it is not yet known whether
                   // this submits or asks for an account, and a wrong label says more than a

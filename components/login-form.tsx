@@ -113,7 +113,7 @@ export function LoginForm({ githubEnabled = false, googleEnabled = false }: Logi
 
         <Button
           type="submit"
-          className="pixel-btn w-full gap-2 mt-6 cursor-pointer"
+          className="pixel-btn pixel-btn-primary w-full gap-2 mt-6 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? t("loginForm.submitting") : t("loginForm.submit")}

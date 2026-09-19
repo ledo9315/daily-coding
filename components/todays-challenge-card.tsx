@@ -89,7 +89,7 @@ export function TodaysChallengeCard({
             "pixel-btn inline-flex items-center gap-2 group",
             submittedToday
               ? "bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
-              : "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "pixel-btn-primary bg-primary text-primary-foreground hover:bg-primary/90"
           )}
         >
           {submittedToday ? (

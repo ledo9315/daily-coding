@@ -41,7 +41,7 @@ export default async function AdminChallengesPage() {
               für Tag der Rest. Nach der letzten geht es wieder oben los.
             </p>
           </div>
-          <Button asChild className="rounded-none pixel-btn w-fit">
+          <Button asChild className="rounded-none pixel-btn pixel-btn-primary w-fit">
             <Link href="/admin/challenges/new">Neue Aufgabe</Link>
           </Button>
         </div>

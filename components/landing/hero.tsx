@@ -104,7 +104,7 @@ export function LandingHero({
               before writing anything. */}
           <Link
             href={localizedPath("/challenge", locale)}
-            className="pixel-btn bg-primary text-primary-foreground min-w-50 text-center"
+            className="pixel-btn pixel-btn-primary bg-primary text-primary-foreground min-w-50 text-center"
           >
             {t("hero.startChallenge")}
           </Link>
