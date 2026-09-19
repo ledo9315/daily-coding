@@ -142,6 +142,16 @@ beforeEach(() => {
   mockAuth.mockResolvedValue(null);
   // The daily is the ring: the active pool plus a pointer at where it stands.
   mockChallengeFindMany.mockResolvedValue([activeChallenge]);
+  /**
+   * The ring itself only carries id and position now, so the challenge of the day is
+   * fetched by its id afterwards. Resolving it out of the ring the test just seeded keeps
+   * a modified fixture working; a test that wants a specific row still overrides per call.
+   */
+  mockFindUniqueChallenge.mockImplementation(async ({ where }: { where: { id: string } }) => {
+    const seeded = mockChallengeFindMany.mock.results;
+    const rows = seeded.length ? await seeded[seeded.length - 1].value : [];
+    return rows.find((row: { id: string }) => row.id === where.id) ?? activeChallenge;
+  });
   const startOfTodayUtc = new Date();
   startOfTodayUtc.setUTCHours(0, 0, 0, 0);
   mockRotationFindUnique.mockResolvedValue({
@@ -236,6 +246,11 @@ describe("GET /api/challenge/daily", () => {
     expect(mockChallengeFindMany.mock.calls[0][0]).toMatchObject({
       where: { isActive: true },
       orderBy: [{ position: "asc" }, { id: "asc" }],
+      // Order only: the content of the day's challenge comes from the lookup by id.
+      select: { id: true, position: true },
+    });
+    expect(mockFindUniqueChallenge).toHaveBeenCalledWith({
+      where: { id: "ch-1" },
       include: { category: true },
     });
   });

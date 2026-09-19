@@ -1,7 +1,7 @@
 import type { AppLocale } from "@/lib/locale";
 import { prisma } from "@/lib/prisma";
 import { startOfUtcDay } from "@/lib/server/ranking-period";
-import { resolveRingIndex } from "@/lib/server/challenge-ring";
+import { resolveRingIndex, type RingEntry } from "@/lib/server/challenge-ring";
 import { localizeChallenge } from "@/lib/server/content-translations";
 
 /** Start and end (exclusive) of the running UTC calendar day. */
@@ -50,13 +50,28 @@ export function publicSubmissionStatus(
 /**
  * The active pool in ring order. `position` first, `id` as the tie-break, matching
  * `compareRingEntries` - the admin list and the daily must agree on the order.
+ *
+ * Two columns, not the row: resolving the ring needs an order and an id, and nothing
+ * else. It used to select everything, which meant every landing page pulled the hints,
+ * examples, test cases and starter code of *every* active challenge out of the database
+ * to decide which single one is today's. Sentry measured it at 95 ms average and made
+ * `GET /` the slowest transaction in the app by a factor of three.
  */
-export async function findRingPool() {
+export async function findRingPool(): Promise<RingEntry[]> {
   return prisma.challenge.findMany({
     where: { isActive: true },
     orderBy: [{ position: "asc" }, { id: "asc" }],
-    include: { category: true },
+    select: { id: true, position: true },
   });
+}
+
+/**
+ * The one challenge the ring points at, with everything a reader needs. `null` when the
+ * row disappeared between the two queries, which only a deletion in that window can do;
+ * every caller already handles an empty day.
+ */
+function loadRingChallenge(id: string) {
+  return prisma.challenge.findUnique({ where: { id }, include: { category: true } });
 }
 
 /**
@@ -80,15 +95,15 @@ export async function findRingPool() {
  * a locale from (#288).
  */
 export async function findDailyChallengeRow() {
-  const pool = await findRingPool();
-  if (pool.length === 0) return null;
+  const ring = await findRingPool();
+  if (ring.length === 0) return null;
 
   const state = await prisma.rotationState.findUnique({ where: { id: "current" } });
   const now = new Date();
 
   if (!state) {
     // First run, or a database that predates the ring.
-    const first = pool[0];
+    const first = ring[0];
     await prisma.rotationState.create({
       data: {
         id: "current",
@@ -97,11 +112,11 @@ export async function findDailyChallengeRow() {
         day: startOfUtcDay(now),
       },
     });
-    return first;
+    return loadRingChallenge(first.id);
   }
 
-  const { index, changed } = resolveRingIndex(pool, state, now);
-  const current = pool[index];
+  const { index, changed } = resolveRingIndex(ring, state, now);
+  const current = ring[index];
 
   if (changed) {
     // Concurrent requests on the first hit of a new day compute the same target from the same
@@ -116,7 +131,7 @@ export async function findDailyChallengeRow() {
     });
   }
 
-  return current;
+  return loadRingChallenge(current.id);
 }
 
 /**
