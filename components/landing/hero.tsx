@@ -1,38 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Code, TrendingUp, Zap } from "@nsmr/pixelart-react";
 import Image from "next/image";
-import { motion, type Variants } from "framer-motion";
+import { ArrowRight, ArrowDown, Check, Flame, Terminal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { AnimatedFlickeringGrid } from "../ui/animated-flickering-grid";
-import { Meteors } from "../ui/meteors";
-import { BorderBeam } from "../ui/border-beam";
-import { localizedPath } from "@/lib/site";
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { type: "spring", stiffness: 100 },
-  },
-};
-
-/**
- * `todaysChallengeTitle` comes from the server. The badge used to hardcode
- * "Array Manipulation" - the one element on the page that claims to be live, and it would
- * have claimed the same thing forever. Null when the rotation pool is empty: a badge that
- * announces nothing is worse than no badge.
- */
 export function LandingHero({
   todaysChallengeTitle,
 }: {
@@ -45,124 +17,86 @@ export function LandingHero({
     : null;
 
   return (
-    <div className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
-      <AnimatedFlickeringGrid
-        className="absolute inset-0 z-0 mask-[radial-gradient(400px_circle_at_center,white,transparent)]"
-        squareSize={6}
-        gridGap={1}
-        color="#A371F7"
-        maxOpacity={0.2}
-        flickerChance={0.1}
-      />
-      {/* Background patterns */}
-      <Meteors number={20} />
-      <div className="absolute inset-0 z-0 opacity-20 scanlines" />
-      <div className="absolute top-20 right-0 h-150 w-150 bg-chart-5/35 blur-[130px] rounded-full mix-blend-screen" />
-      <div className="absolute bottom-0 left-0 h-125 w-125 bg-chart-5/35 blur-[110px] rounded-full mix-blend-screen" />
-
-      <motion.div
-        className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center z-10"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        {badge ? (
-          <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center gap-2 rounded border border-border bg-card/50 px-3 py-1 text-sm text-muted-foreground mb-8 backdrop-blur-sm"
-          >
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span aria-label={badge}>{badge}</span>
-          </motion.div>
-        ) : null}
-
-        <motion.h1
-          variants={itemVariants}
-          className="mx-auto max-w-4xl font-heading text-4xl leading-tight tracking-tight sm:text-6xl mb-6"
-        >
-          {t("hero.headlineLine1")}
-          <br />
-          <span className="text-chart-5 retro-glow">
+    <section className="lp-hero">
+      <div className="lp-container lp-hero-grid">
+        <div className="lp-hero-copy">
+          {badge ? (
+            <a href="/challenge" className="lp-today" aria-label={badge}>
+              <span />
+              {badge}
+              <ArrowRight size={14} aria-hidden />
+            </a>
+          ) : null}
+          <h1>
+            {t("hero.headlineLine1")}
+            <br />
             {t("hero.headlineLine2")}
-          </span>{" "}
-          <br />
-        </motion.h1>
-
-        <motion.p
-          variants={itemVariants}
-          className="mx-auto max-w-2xl text-xl text-muted-foreground mb-10"
-        >
-          {t("hero.subline")}
-        </motion.p>
-
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          {/* The button says "start the challenge", so it starts the challenge. Since #287
-              that needs no account - the sign-up sits in the navbar, for whoever wants one
-              before writing anything. */}
-          <Link
-            href={localizedPath("/challenge", locale)}
-            className="pixel-btn bg-primary text-primary-foreground min-w-50 text-center"
-          >
-            {t("hero.startChallenge")}
-          </Link>
-          <Link
-            href="#features"
-            className="pixel-btn bg-card hover:bg-muted min-w-50 text-center"
-          >
-            {t("hero.howADayWorks")}
-          </Link>
-        </motion.div>
-
-        <div className="relative mt-16 mx-auto max-w-4xl rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm">
-          <BorderBeam size={250} duration={12} delay={9} />
-          <Image
-            src={locale === "de" ? "/screen.de.webp" : "/screen.en.webp"}
-            alt={t("hero.screenshotAlt")}
-            width={3338}
-            height={2296}
-            sizes="(max-width: 896px) calc(100vw - 48px), 896px"
-            loading="eager"
-            fetchPriority="high"
-            className="rounded-lg border border-border"
-          />
+          </h1>
+          <p className="lp-lead">{t("hero.subline")}</p>
+          <div className="lp-actions">
+            <Link href="/register" className="lp-button lp-button-primary">
+              {t("landing.signup")}
+              <ArrowRight size={18} aria-hidden />
+            </Link>
+            <a href="#product-tour" className="lp-button lp-button-secondary">
+              {t("landing.explore")}
+              <ArrowDown size={17} aria-hidden />
+            </a>
+          </div>
+          <p className="lp-reassurance">
+            <Check size={15} aria-hidden />
+            {t("landing.noSetup")}
+          </p>
+          <div className="lp-hero-footnote">
+            <Terminal size={20} aria-hidden />
+            <span>{t("landing.heroNote")}</span>
+          </div>
         </div>
-
-        <motion.div
-          variants={itemVariants}
-          className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-5xl mx-auto border-t border-border pt-8"
-        >
-          <div className="flex flex-col items-center gap-2">
-            <Code className="h-8 w-8 text-chart-1" />
-            <span className="font-heading text-lg">
-              {t("hero.pillars.tasks.title")}
-            </span>
-            <span className="text-muted-foreground text-sm">
-              {t("hero.pillars.tasks.detail")}
-            </span>
+        <div className="lp-hero-visual">
+          <div className="lp-window">
+            <div className="lp-window-bar">
+              <span className="lp-window-dots" aria-hidden>
+                <i />
+                <i />
+                <i />
+              </span>
+              <span>{t("landing.yourDashboard")}</span>
+              <span className="lp-preview-label">{t("landing.preview")}</span>
+            </div>
+            <a href="#product-tour" aria-label={t("landing.explore")}>
+              <Image
+                src={locale === "de" ? "/screen.de.webp" : "/screen.en.webp"}
+                alt={t("hero.screenshotAlt")}
+                width={3338}
+                height={2296}
+                sizes="(max-width: 900px) 92vw, 740px"
+                loading="eager"
+                fetchPriority="high"
+                className="lp-dashboard-image"
+              />
+            </a>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <Zap className="h-8 w-8 text-accent" />
-            <span className="font-heading text-lg">
-              {t("hero.pillars.points.title")}
-            </span>
-            <span className="text-muted-foreground text-sm">
-              {t("hero.pillars.points.detail")}
-            </span>
+          <div className="lp-streak-sticker">
+            <Flame size={25} aria-hidden />
+            <div>
+              <strong>{t("landing.streakTitle")}</strong>
+              <span>{t("landing.streakDetail")}</span>
+            </div>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <TrendingUp className="h-8 w-8 text-primary" />
-            <span className="font-heading text-lg">
-              {t("hero.pillars.skills.title")}
-            </span>
-            <span className="text-muted-foreground text-sm">
-              {t("hero.pillars.skills.detail")}
-            </span>
+          <div className="lp-visual-caption">
+            <span aria-hidden>↳</span>
+            {t("landing.screenCaption")}
           </div>
-        </motion.div>
-      </motion.div>
-    </div>
+        </div>
+      </div>
+      <div className="lp-container lp-value-strip">
+        {(["daily", "languages", "progress"] as const).map((key) => (
+          <div key={key}>
+            <span className="lp-value-dot" />
+            <span>{t(`landing.values.${key}`)}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

@@ -8,9 +8,12 @@ export function LandingNavbar() {
   const locale = useLocale();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-border bg-background/80 backdrop-blur-sm">
+    <nav className="lp-nav fixed top-0 left-0 right-0 z-50">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={localizedPath("/", locale)} className="flex items-center gap-2 group">
+        <Link
+          href={localizedPath("/", locale)}
+          className="flex items-center gap-2 group"
+        >
           <BrandMark />
           {/* Two lines, like the header on every signed-in page - one logo, one shape. */}
           {/* eslint-disable no-restricted-syntax -- „DAILY CODING" is the product name, not copy. */}
@@ -22,17 +25,20 @@ export function LandingNavbar() {
           {/* eslint-enable no-restricted-syntax */}
         </Link>
         <div className="flex items-center gap-3 sm:gap-4">
-          <Link
-            href="/login"
-            className="text-sm font-medium hover:text-primary"
-          >
+          <a href="#product-tour" className="lp-nav-link">
+            {t("landing.navTour")}
+          </a>
+          <a href="#try-it" className="lp-nav-link">
+            {t("landing.navDemo")}
+          </a>
+          <Link href="/login" className="lp-login">
             {t("nav.login")}
           </Link>
           {/* Straight to the form: `/join` only redirects there, and every public page
               carried that hop as its most prominent internal link. */}
           <Link
             href="/register"
-            className="pixel-btn bg-primary text-primary-foreground hover:translate-x-1 hover:translate-y-1"
+            className="lp-button lp-button-primary lp-nav-signup"
           >
             {t("nav.join")}
           </Link>

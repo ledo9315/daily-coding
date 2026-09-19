@@ -1,94 +1,33 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useLocale, useTranslations } from "next-intl";
-import { CountdownTimer } from "@/components/countdown-timer";
-import { localizedPath } from "@/lib/site";
-import { AnimatedFlickeringGrid } from "@/components/ui/animated-flickering-grid";
+import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-/**
- * Closes with the running clock, and nothing else.
- *
- * Replaces a card inside a section with a centred slogan and a giant "?" at ten percent opacity,
- * the shape every landing page ends in. The counter says what that copy was reaching for, only
- * true and live: the next task arrives at midnight UTC, the same one for everybody.
- *
- * The midnight artwork was briefly here too and gave the section two focal points, which left the
- * day timeline above with none. It closes that section now. `CountdownTimer` is the component the
- * challenge page already uses.
- *
- * Background `#020912`, the same panel colour as the day timeline, so the page closes on a
- * defined surface instead of on the page background.
- */
 export function LandingCTA() {
-  const t = useTranslations("dashboard");
-  const locale = useLocale();
-
+  const t = useTranslations("dashboard.landing.close");
   return (
-    <section className="landing-deferred relative overflow-hidden bg-[#020912]">
-      {/*
-        The decorations wrap only the clock, not the whole section: the artwork below makes the
-        section far taller, and anything centred in it would sit in the middle of the picture.
-      */}
-      <div className="relative">
-        {/* <AmbientGlow side="left" className="bg-primary/8" /> */}
-        <AnimatedFlickeringGrid
-          className="absolute inset-0 z-0 mask-[radial-gradient(700px_260px_at_center,white,transparent)]"
-          squareSize={6}
-          gridGap={1}
-          color="#C4FE4D"
-          maxOpacity={0.08}
-          flickerChance={0.03}
-        />
-
-        <motion.div
-          className="relative mx-auto flex max-w-3xl flex-col items-center px-4 py-28 text-center"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="font-code text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            {t("cta.eyebrow")}
-          </p>
-
-          <CountdownTimer className="mt-8" variant="display" />
-
-          <h2 className="mt-14 font-heading text-2xl leading-tight sm:text-3xl">
-            {t("cta.heading")}
-          </h2>
-          <p className="mt-4 max-w-md text-lg text-muted-foreground">
-            {t("cta.body")}
-          </p>
-
-          {/* „Oder fang mit der von heute an" - the body promises today's task, and since
-              #287 the link can keep that promise. */}
-          <Link
-            href={localizedPath("/challenge", locale)}
-            className="pixel-btn mt-8 inline-block bg-primary px-8 py-4 text-xl text-primary-foreground transition-transform hover:scale-105"
-          >
-            {t("cta.action")}
+    <section className="lp-close">
+      <div className="lp-container lp-close-content">
+        <p className="lp-kicker">{t("eyebrow")}</p>
+        <h2>{t("title")}</h2>
+        <p>{t("body")}</p>
+        <div className="lp-actions">
+          <Link href="/register" className="lp-button lp-button-primary">
+            {t("action")}
+            <ArrowRight size={18} aria-hidden />
           </Link>
-        </motion.div>
+          <Link href="/challenge" className="lp-button lp-button-secondary">
+            {t("guest")}
+          </Link>
+        </div>
       </div>
-
-      {/*
-        Was closing the day timeline, and now closes the whole lower half. Both sections share
-        `#020912` and the timeline has no bottom border, so timeline, clock and picture read as
-        one block, and the picture is the last thing above the footer.
-
-        No fade needed: the top pixel row of this artwork is #020912 itself. Outside the decorated
-        block on purpose, pixel art with a scanline pattern over it reads as a dirty screen.
-      */}
       <Image
         src="/pixel/banner3.webp"
-        alt={t("cta.artworkAlt")}
+        alt=""
         width={2172}
         height={724}
         sizes="100vw"
-        className="relative block h-auto w-full [image-rendering:pixelated]"
+        className="lp-close-art"
       />
     </section>
   );

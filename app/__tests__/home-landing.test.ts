@@ -40,24 +40,22 @@ describe("home page for visitors without a session", () => {
 describe("the old landing URL", () => {
   it("redirects permanently to the apex, because it is in the sitemap Google has", () => {
     expect(nextConfig).toMatch(
-      /source:\s*["'`]\/landing["'`],\s*destination:\s*["'`]\/["'`],\s*permanent:\s*true/
+      /source:\s*["'`]\/landing["'`],\s*destination:\s*["'`]\/["'`],\s*permanent:\s*true/,
     );
   });
 });
 
-/**
- * #287: the task is readable without an account, so a button labelled "start the challenge"
- * has to start it. Both of these opened the registration form, which left the landing
- * promising something a visitor could not reach without signing up first.
- *
- * The navbar's "join now" is deliberately not in here - that one says what it does.
- */
+/** Registration is primary; visitors can still reach the public challenge directly. */
 describe("the landing's calls to action", () => {
   it.each([
     ["hero", hero],
     ["closing section", closingCta],
-  ])("sends the %s button to the challenge, not to the form", (_where, source) => {
-    expect(source).toContain('localizedPath("/challenge", locale)');
-    expect(source).not.toContain("/join?token");
-  });
+  ])(
+    "offers both registration and a guest challenge in the %s",
+    (_where, source) => {
+      expect(source).toContain('href="/register"');
+      expect(source).toContain('href="/challenge"');
+      expect(source).not.toContain("/join?token");
+    },
+  );
 });

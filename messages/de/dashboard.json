@@ -5,14 +5,14 @@
     "ogImageAlt": "Die Startseite von DAILY CODING: der Schriftzug „Eine Challenge jeden Tag“ im Pixel-Stil, darunter zwei Schaltflächen und der obere Rand der Übersichtsseite"
   },
   "nav": {
-    "login": "LOGIN",
-    "join": "JETZT BEITRETEN"
+    "login": "Anmelden",
+    "join": "Kostenlos starten"
   },
   "hero": {
     "todaysChallenge": "Heutige Challenge: {title}",
-    "headlineLine1": "EINE CHALLENGE",
-    "headlineLine2": "JEDEN TAG",
-    "subline": "Keine Sammlung mit Tausenden Aufgaben, in der du nicht weißt, wo du anfangen sollst. Eine Aufgabe am Tag: die, die heute für alle gilt.",
+    "headlineLine1": "Kleiner Code.",
+    "headlineLine2": "Großer Fortschritt.",
+    "subline": "Eine Aufgabe am Tag. Löse sie in deiner Sprache, sammle Punkte und mach aus „Ich müsste mal wieder coden“ deine neue Lieblingsroutine.",
     "startChallenge": "CHALLENGE STARTEN",
     "howADayWorks": "SO LÄUFT EIN TAG",
     "screenshotAlt": "Das Dashboard von Daily Coding mit Rang, Punkten, Streak und der heutigen Challenge",
@@ -148,5 +148,115 @@
     },
     "daysWithCompletion": "<big>{count}</big> von <num>{days}</num> Tagen mit Abschluss",
     "monthLabel": "Monat:"
+  },
+  "landing": {
+    "signup": "Kostenlos starten",
+    "explore": "Erst mal umschauen",
+    "noSetup": "Kostenlos. Direkt im Browser. Ohne Installation.",
+    "heroNote": "Weniger Tutorials sammeln. Mehr selbst lösen.",
+    "yourDashboard": "Dein nächster täglicher Check-in",
+    "preview": "Vorschau",
+    "streakTitle": "Heute gelöst. Morgen wieder.",
+    "streakDetail": "Aus kleinen Erfolgen wird eine Gewohnheit.",
+    "screenCaption": "Dein Code. Dein Fortschritt. Alles an einem Ort.",
+    "values": {
+      "daily": "Eine neue Challenge. Jeden Tag.",
+      "languages": "11 Sprachen. Kein Setup.",
+      "progress": "Streaks, Level und echte Aha-Momente."
+    },
+    "navTour": "Die Plattform",
+    "navDemo": "Ausprobieren",
+    "tour": {
+      "eyebrow": "Ein Blick in deinen nächsten Alltag",
+      "title": "Das ist dein Spielfeld.",
+      "intro": "Lösen, testen, besser werden. Klick dich durch die Plattform und entdecke, was auf dich wartet.",
+      "label": "Produktansichten",
+      "enlarge": "{view} vergrößern",
+      "zoom": "Vergrößern",
+      "close": "Vorschau schließen",
+      "disclaimer": "Beispielansichten · Screens auf Englisch",
+      "dashboard": {
+        "label": "Dashboard",
+        "alt": "Englische Beispielansicht des Dashboards mit Tages-Challenge, Punkten und Streak",
+        "caption": "Aufmachen. Heutige Challenge finden. Loslegen."
+      },
+      "editor": {
+        "label": "Code-Editor",
+        "alt": "Englische Beispielansicht des Code-Editors mit JavaScript und einzelnen Testergebnissen",
+        "caption": "Deine Sprache. Dein Lösungsweg. Sofort Feedback."
+      },
+      "profile": {
+        "label": "Fortschritt",
+        "alt": "Englische Beispielansicht eines Profils mit Level, Abzeichen und gelösten Challenges",
+        "caption": "Jeder gelöste Tag macht deinen Fortschritt sichtbar."
+      }
+    },
+    "demo": {
+      "eyebrow": "Dein erster Aha-Moment",
+      "title": "Steckt schon in dir. Probier’s aus.",
+      "intro": "Ein kleiner Vorgeschmack: Welche Bedingung behält nur die geraden Zahlen? Wähle eine Zeile und lass die Tests laufen.",
+      "note": "Das ist eine Mini-Demo. Die tägliche Challenge gibt dir einen vollständigen Editor.",
+      "realChallenge": "Direkt zur heutigen Challenge",
+      "example": "Mini-Demo",
+      "task": "Behalte nur die geraden Zahlen.",
+      "choose": "Welche Zeile macht den Job?",
+      "run": "Tests ausführen",
+      "reset": "Demo zurücksetzen",
+      "local": "Ohne Anmeldung ausprobieren",
+      "success": "Alle Tests bestanden!",
+      "retry": "Noch nicht ganz. Versuch’s noch mal.",
+      "passed": "Bestanden",
+      "failed": "Nicht bestanden",
+      "successDetail": "Gutes Gefühl, oder? Mit einem Konto zählt die echte Tages-Challenge für deinen Fortschritt.",
+      "hint": "Tipp: Gerade Zahlen haben beim Teilen durch 2 den Rest 0. Auch 0 und negative Zahlen zählen.",
+      "signup": "Jetzt deine eigene Serie starten"
+    },
+    "progression": {
+      "eyebrow": "Dein nächstes Level wartet",
+      "title": "Nicht nur gelöst. Weitergekommen.",
+      "intro": "Ein Konto macht aus einzelnen Aufgaben deine persönliche Coding-Geschichte.",
+      "alt": "Pixelillustration: Ein Abenteurer springt über schwebende Inseln zu einem leuchtenden Terminal-Pokal.",
+      "artCaption": "Ein gelöster Tag ist ein Schritt nach vorn.",
+      "streak": {
+        "title": "Mach morgen weiter",
+        "body": "Verlängere deine Serie mit jedem gelösten Tag. Dein Kalender zeigt dir, wann du drangeblieben bist."
+      },
+      "level": {
+        "title": "Sieh, wie du aufsteigst",
+        "body": "Sammle Punkte, erreiche neue Level und schalte Abzeichen für deine Meilensteine frei."
+      },
+      "community": {
+        "title": "Eine Aufgabe. Viele Lösungswege.",
+        "body": "Vergleiche nach deiner Abgabe andere Lösungen, tausche dich aus und finde deinen Platz im Ranking."
+      },
+      "action": "Meinen Fortschritt festhalten"
+    },
+    "faq": {
+      "eyebrow": "Gut zu wissen",
+      "title": "Noch eine Frage?",
+      "cost": {
+        "question": "Ist Daily Coding kostenlos?",
+        "answer": "Ja. Du kannst kostenlos ein Konto erstellen und an den täglichen Challenges teilnehmen. Du brauchst keine Kreditkarte."
+      },
+      "skill": {
+        "question": "Muss ich schon gut programmieren können?",
+        "answer": "Du solltest die Grundlagen einer Programmiersprache kennen. Die Schwierigkeit wechselt zwischen leicht, mittel und schwer. Testläufe helfen dir, deinen Ansatz zu prüfen."
+      },
+      "languages": {
+        "question": "Welche Sprachen kann ich nutzen?",
+        "answer": "Die Plattform unterstützt JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust und Swift. Welche davon verfügbar sind, siehst du in der jeweiligen Challenge."
+      },
+      "rules": {
+        "question": "Wie funktioniert die tägliche Challenge?",
+        "answer": "Um 00:00 UTC gibt es eine neue Aufgabe für alle. Du kannst deinen Code vor der Abgabe testen. Die gewertete Abgabe ist einmal pro Tag möglich. Nur ein gelöster Tag verlängert deinen Streak. Ohne Konto kannst du ausprobieren; Punkte und Fortschritt werden dabei nicht gespeichert."
+      }
+    },
+    "close": {
+      "eyebrow": "Dein erster Tag beginnt hier",
+      "title": "Bis morgen. Im nächsten Level.",
+      "body": "Eine Challenge heute. Ein bisschen besser morgen.",
+      "action": "Kostenloses Konto erstellen",
+      "guest": "Erst ohne Konto ausprobieren"
+    }
   }
 }

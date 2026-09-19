@@ -5,14 +5,14 @@
     "ogImageAlt": "The DAILY CODING landing page: the words \"One challenge every day\" in pixel lettering, two buttons below it and the top edge of the dashboard"
   },
   "nav": {
-    "login": "LOGIN",
-    "join": "JOIN NOW"
+    "login": "Log in",
+    "join": "Start for free"
   },
   "hero": {
     "todaysChallenge": "Today's challenge: {title}",
-    "headlineLine1": "ONE CHALLENGE",
-    "headlineLine2": "EVERY DAY",
-    "subline": "Not a library of thousands of exercises where you never know where to start. One task a day: the one that counts for everyone today.",
+    "headlineLine1": "A little code.",
+    "headlineLine2": "A little better.",
+    "subline": "One challenge a day. Solve it in your language, earn points, and turn “I should code more” into a habit you actually look forward to.",
     "startChallenge": "START THE CHALLENGE",
     "howADayWorks": "HOW A DAY WORKS",
     "screenshotAlt": "The Daily Coding dashboard with rank, points, streak and today's challenge",
@@ -148,5 +148,115 @@
     },
     "daysWithCompletion": "<big>{count}</big> of <num>{days}</num> days completed",
     "monthLabel": "Month:"
+  },
+  "landing": {
+    "signup": "Start for free",
+    "explore": "Take a look around",
+    "noSetup": "Free. In your browser. No installation.",
+    "heroNote": "Fewer saved tutorials. More problems solved.",
+    "yourDashboard": "Your next daily check-in",
+    "preview": "Preview",
+    "streakTitle": "Solved today. Back tomorrow.",
+    "streakDetail": "Small wins become a habit.",
+    "screenCaption": "Your code. Your progress. All in one place.",
+    "values": {
+      "daily": "One new challenge. Every day.",
+      "languages": "11 languages. Zero setup.",
+      "progress": "Streaks, levels, and real aha moments."
+    },
+    "navTour": "The platform",
+    "navDemo": "Try it out",
+    "tour": {
+      "eyebrow": "Meet your new daily ritual",
+      "title": "This is your playground.",
+      "intro": "Solve, test, get better. Click through the platform and see what’s waiting for you.",
+      "label": "Product views",
+      "enlarge": "Enlarge {view}",
+      "zoom": "Enlarge",
+      "close": "Close preview",
+      "disclaimer": "Example views · Screens in English",
+      "dashboard": {
+        "label": "Dashboard",
+        "alt": "Example dashboard showing the daily challenge, points, and a streak",
+        "caption": "Open it. Find today’s challenge. Get going."
+      },
+      "editor": {
+        "label": "Code editor",
+        "alt": "Example code editor showing JavaScript and individual test results",
+        "caption": "Your language. Your approach. Instant feedback."
+      },
+      "profile": {
+        "label": "Progress",
+        "alt": "Example profile showing a level, achievements, and solved challenges",
+        "caption": "Every solved day makes your progress visible."
+      }
+    },
+    "demo": {
+      "eyebrow": "Your first aha moment",
+      "title": "You’ve got this. Give it a try.",
+      "intro": "A little warm-up: which condition keeps only the even numbers? Pick a line and run the tests.",
+      "note": "This is a mini demo. The daily challenge gives you a full code editor.",
+      "realChallenge": "Go straight to today’s challenge",
+      "example": "Mini demo",
+      "task": "Keep only the even numbers.",
+      "choose": "Which line does the job?",
+      "run": "Run tests",
+      "reset": "Reset demo",
+      "local": "Try it without an account",
+      "success": "All tests passed!",
+      "retry": "Not quite yet. Give it another try.",
+      "passed": "Passed",
+      "failed": "Failed",
+      "successDetail": "Feels good, right? With an account, the real daily challenge counts toward your progress.",
+      "hint": "Hint: Even numbers leave a remainder of 0 when divided by 2. Zero and negative numbers count too.",
+      "signup": "Start a streak of your own"
+    },
+    "progression": {
+      "eyebrow": "Your next level is waiting",
+      "title": "More than solved. A step forward.",
+      "intro": "An account turns individual challenges into your own coding story.",
+      "alt": "Pixel illustration of an adventurer jumping across floating islands toward a glowing terminal trophy.",
+      "artCaption": "Every solved day is a step forward.",
+      "streak": {
+        "title": "Come back tomorrow",
+        "body": "Extend your streak with every solved day. Your calendar shows when you kept showing up."
+      },
+      "level": {
+        "title": "Watch yourself level up",
+        "body": "Earn points, reach new levels, and unlock achievements for your milestones."
+      },
+      "community": {
+        "title": "One challenge. Many approaches.",
+        "body": "Explore other solutions after submitting, exchange ideas, and find your place in the rankings."
+      },
+      "action": "Make my progress count"
+    },
+    "faq": {
+      "eyebrow": "Good to know",
+      "title": "One more question?",
+      "cost": {
+        "question": "Is Daily Coding free?",
+        "answer": "Yes. Creating an account and taking part in daily challenges is free. You don’t need a credit card."
+      },
+      "skill": {
+        "question": "Do I need to be an experienced programmer?",
+        "answer": "You should know the basics of a programming language. Challenges rotate between easy, medium, and hard. Test runs help you check your approach."
+      },
+      "languages": {
+        "question": "Which languages can I use?",
+        "answer": "The platform supports JavaScript, TypeScript, Python, PHP, Ruby, Java, Go, C++, C#, Rust, and Swift. Each challenge shows which languages are available."
+      },
+      "rules": {
+        "question": "How does the daily challenge work?",
+        "answer": "A new task arrives for everyone at 00:00 UTC. You can test your code before submitting. You get one scored submission per day. Only a solved day extends your streak. You can try it without an account, but points and progress won’t be saved."
+      }
+    },
+    "close": {
+      "eyebrow": "Your first day starts here",
+      "title": "See you at the next level.",
+      "body": "One challenge today. A little better tomorrow.",
+      "action": "Create a free account",
+      "guest": "Try it without an account first"
+    }
   }
 }
