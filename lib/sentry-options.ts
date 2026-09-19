@@ -25,7 +25,7 @@ export type SentryBaseOptions = {
   tracesSampleRate: number;
   sendDefaultPii: false;
   enableLogs: true;
-  beforeSendLog: typeof scrubLog;
+  beforeSendLog: typeof filterLog;
 };
 
 /**
@@ -69,6 +69,30 @@ export function scrubLog<T extends { message: string; attributes?: Record<string
   };
 }
 
+/**
+ * Node writes its own warnings - a deprecation, an experimental feature, the SSL notice
+ * `pg-connection-string` emits on the first connection - through `console.error`, so the
+ * console integration picks them up as if the app had written them. On the first morning
+ * of logging they were fifteen of sixteen lines: nothing here can act on them, they come
+ * from dependencies, and every new serverless instance repeats them at its cold start.
+ *
+ * Recognisable by the prefix Node puts in front, `(node:<pid>) `, which no log of ours
+ * carries - ours start with a `[area]` tag. Vercel's own log still has them, so a
+ * warning that does turn out to matter has not disappeared.
+ */
+const NODE_PROCESS_WARNING = /^\(node:\d+\)\s/;
+
+/**
+ * `beforeSendLog`: drops the runtime's own noise, scrubs what is left. Returning `null`
+ * means the line is never sent.
+ */
+export function filterLog<
+  T extends { message: string; attributes?: Record<string, unknown> },
+>(log: T): T | null {
+  if (NODE_PROCESS_WARNING.test(log.message)) return null;
+  return scrubLog(log);
+}
+
 export function sentryEnvironment(vercelEnv: string | undefined): SentryEnvironment {
   return vercelEnv === "production" || vercelEnv === "preview" ? vercelEnv : "development";
 }
@@ -107,6 +131,6 @@ export function sentryBaseOptions({ dsn, environment }: SentryInitInput): Sentry
      * opens the channel.
      */
     enableLogs: true,
-    beforeSendLog: scrubLog,
+    beforeSendLog: filterLog,
   };
 }

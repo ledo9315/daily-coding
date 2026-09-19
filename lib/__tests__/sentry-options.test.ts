@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   FORWARDED_CONSOLE_LEVELS,
   PRODUCTION_TRACES_SAMPLE_RATE,
+  filterLog,
   scrubLog,
   sentryBaseOptions,
   sentryEnvironment,
@@ -53,7 +54,7 @@ describe("logs", () => {
   it("opens the log channel and installs the scrubber", () => {
     const options = sentryBaseOptions({ dsn, environment: "production" });
     expect(options.enableLogs).toBe(true);
-    expect(options.beforeSendLog).toBe(scrubLog);
+    expect(options.beforeSendLog).toBe(filterLog);
   });
 
   it("forwards only warn and error from the console", () => {
@@ -87,5 +88,50 @@ describe("scrubLog", () => {
   it("leaves a log without addresses untouched", () => {
     const input = { level: "info", message: "daily reminder run", attributes: { sent: 3, failed: 0 } };
     expect(scrubLog(input)).toEqual(input);
+  });
+});
+
+/**
+ * The two shapes below are copied from what arrived in Sentry on the first morning, and
+ * from a probe against the SDK's own console integration: Node prefixes every process
+ * warning with its pid, and the console integration passes the line through unchanged.
+ */
+describe("filterLog", () => {
+  it("drops Node's process warnings, whatever they are called", () => {
+    expect(
+      filterLog({
+        level: "error",
+        message:
+          "(node:4) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.",
+      })
+    ).toBeNull();
+    expect(
+      filterLog({
+        level: "error",
+        message:
+          "(node:4) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature",
+      })
+    ).toBeNull();
+    expect(
+      filterLog({ level: "error", message: "(node:85743) [DEP0205] DeprecationWarning: x" })
+    ).toBeNull();
+  });
+
+  it("keeps the app's own logs and still scrubs them", () => {
+    const kept = filterLog({
+      level: "error",
+      message: "[daily-reminder] mail to max@example.com failed",
+      attributes: { userId: "u_1" },
+    });
+    expect(kept).toEqual({
+      level: "error",
+      message: "[daily-reminder] mail to [email] failed",
+      attributes: { userId: "u_1" },
+    });
+  });
+
+  it("keeps a line that only mentions node somewhere", () => {
+    const message = "[piston] node runtime missing (node:22 not installed)";
+    expect(filterLog({ level: "warn", message })?.message).toBe(message);
   });
 });
