@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   FORWARDED_CONSOLE_LEVELS,
+  REPLAY_ON_ERROR_SAMPLE_RATE,
+  REPLAY_PRIVACY_OPTIONS,
+  REPLAY_SESSION_SAMPLE_RATE,
   PRODUCTION_TRACES_SAMPLE_RATE,
   filterLog,
   scrubLog,
@@ -133,5 +136,26 @@ describe("filterLog", () => {
   it("keeps a line that only mentions node somewhere", () => {
     const message = "[piston] node runtime missing (node:22 not installed)";
     expect(filterLog({ level: "warn", message })?.message).toBe(message);
+  });
+});
+
+describe("session replay", () => {
+  it("records every session that hits an error and a sample of the rest", () => {
+    expect(REPLAY_ON_ERROR_SAMPLE_RATE).toBe(1.0);
+    expect(REPLAY_SESSION_SAMPLE_RATE).toBeGreaterThan(0);
+    expect(REPLAY_SESSION_SAMPLE_RATE).toBeLessThan(1);
+  });
+
+  /**
+   * The recorder runs on pages holding other people's source code, a profile form and an
+   * e-mail address. Masking is what keeps those out of the recording, so no single one of
+   * the three may be switched off without this test being changed on purpose.
+   */
+  it("keeps every masking switch on", () => {
+    expect(REPLAY_PRIVACY_OPTIONS).toEqual({
+      maskAllText: true,
+      maskAllInputs: true,
+      blockAllMedia: true,
+    });
   });
 });
