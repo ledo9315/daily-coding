@@ -2,7 +2,7 @@
   "meta": {
     "title": "Daily Coding · a coding challenge every day",
     "description": "Solve a new coding challenge every day in the language of your choice and climb the ranking.",
-    "ogImageAlt": "The DAILY CODING landing page: the words \"One challenge every day\" in pixel lettering, two buttons below it and the top edge of the dashboard"
+    "ogImageAlt": "DAILY CODING: the words \"A little code. Every single day.\" next to a screenshot of the dashboard with rank, points and streak"
   },
   "nav": {
     "login": "LOGIN",
