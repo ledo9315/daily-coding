@@ -9,10 +9,12 @@ import { PageAmbience } from "@/components/page-ambience";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { PointsChip } from "@/components/points-chip";
 import { TestResults, type TestCase } from "@/components/test-results";
+import { FullscreenConfetti } from "@/components/fullscreen-confetti";
 import { Button } from "@/components/ui/button";
 import { languageLabel } from "@/lib/challenge-languages";
 import {
   readGuestResult,
+  takeGuestArrival,
   type GuestResultHandover,
 } from "@/lib/guest-result-handover";
 import { cn } from "@/lib/utils";
@@ -37,13 +39,23 @@ export function GuestResult() {
    * hydrates. `undefined` is "not looked yet", `null` is "looked, nothing there".
    */
   const [result, setResult] = useState<GuestResultHandover | null | undefined>();
+  const [celebrate, setCelebrate] = useState(false);
 
   useEffect(() => {
-    setResult(readGuestResult(window.sessionStorage));
+    const stored = readGuestResult(window.sessionStorage);
+    /**
+     * Read in the same breath, so the marker is spent whether or not it is used: someone
+     * who fails, reloads, then solves it would otherwise inherit the earlier arrival.
+     * Only a pass is worth confetti - firing it over a red result would be mockery.
+     */
+    const arrived = takeGuestArrival(window.sessionStorage);
+
+    setResult(stored);
+    setCelebrate(arrived && stored?.passed === true);
   }, []);
 
   if (result === undefined) return null;
-  return <GuestResultView result={result} />;
+  return <GuestResultView result={result} celebrate={celebrate} />;
 }
 
 /**
@@ -51,12 +63,19 @@ export function GuestResult() {
  * render it: what matters about this page is as much what it does *not* contain as what
  * it does, and that is only checkable on real markup.
  */
-export function GuestResultView({ result }: { result: GuestResultHandover | null }) {
+export function GuestResultView({
+  result,
+  celebrate = false,
+}: {
+  result: GuestResultHandover | null;
+  celebrate?: boolean;
+}) {
   const t = useTranslations("challenge");
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <PageAmbience />
+      <FullscreenConfetti active={celebrate} />
       <Header />
 
       <main className="relative mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">

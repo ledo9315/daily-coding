@@ -3,6 +3,7 @@ import {
   clearGuestResult,
   readGuestResult,
   storeGuestResult,
+  takeGuestArrival,
   type GuestResultHandover,
 } from "@/lib/guest-result-handover";
 
@@ -99,5 +100,61 @@ describe("guest result handover", () => {
     expect(() => storeGuestResult(throwing, payload)).not.toThrow();
     expect(() => clearGuestResult(throwing)).not.toThrow();
     expect(readGuestResult(throwing)).toBeNull();
+  });
+});
+
+/**
+ * The confetti fires from this marker. The payload itself has to survive a reload - it is
+ * the page - so "this just happened" needs a key of its own, or a refresh would celebrate
+ * the same solve again.
+ */
+describe("the guest arrival marker", () => {
+  it("is set by storing a result", () => {
+    const storage = memoryStorage();
+    storeGuestResult(storage, payload);
+
+    expect(takeGuestArrival(storage)).toBe(true);
+  });
+
+  it("is spent on the first read, so a reload stays quiet", () => {
+    const storage = memoryStorage();
+    storeGuestResult(storage, payload);
+
+    takeGuestArrival(storage);
+    expect(takeGuestArrival(storage)).toBe(false);
+  });
+
+  it("reports nothing when no result was stored", () => {
+    expect(takeGuestArrival(memoryStorage())).toBe(false);
+  });
+
+  /** A second submission is a second arrival. */
+  it("comes back for the next result", () => {
+    const storage = memoryStorage();
+    storeGuestResult(storage, payload);
+    takeGuestArrival(storage);
+
+    storeGuestResult(storage, { ...payload, passed: false });
+    expect(takeGuestArrival(storage)).toBe(true);
+  });
+
+  it("goes away with the result it belongs to", () => {
+    const storage = memoryStorage();
+    storeGuestResult(storage, payload);
+    clearGuestResult(storage);
+
+    expect(takeGuestArrival(storage)).toBe(false);
+  });
+
+  it("stays quiet when the storage refuses", () => {
+    expect(
+      takeGuestArrival({
+        getItem: () => {
+          throw new Error("denied");
+        },
+        setItem: () => {},
+        removeItem: () => {},
+      })
+    ).toBe(false);
   });
 });
