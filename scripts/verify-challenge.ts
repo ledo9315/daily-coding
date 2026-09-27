@@ -5,7 +5,7 @@
  *   pnpm exec tsx scripts/verify-challenge.ts prisma/challenges/<slug>.ts <solutions dir> [lang,lang]
  *
  * The solutions dir holds one file per language - javascript.js typescript.ts python.py php.php
- * ruby.rb java.java go.go cpp.cpp csharp.cs rust.rs - and stays outside the repo: a reference
+ * ruby.rb java.java go.go cpp.cpp csharp.cs rust.rs swift.swift - and stays outside the repo: a reference
  * solution next to the challenge would be one `git log` away from every user. Languages without a
  * file are reported as MISSING. csharp runs only with RUN_CSHARP=1, because Mono cannot start
  * under the QEMU emulation the amd64 Piston image needs on Apple Silicon.
@@ -18,7 +18,7 @@ import { executeWithPiston } from "@/lib/server/piston-runner";
 
 const EXT: Record<string, string> = {
   javascript: "js", typescript: "ts", python: "py", php: "php", ruby: "rb",
-  java: "java", go: "go", cpp: "cpp", csharp: "cs", rust: "rs",
+  java: "java", go: "go", cpp: "cpp", csharp: "cs", rust: "rs", swift: "swift",
 };
 
 async function main() {
