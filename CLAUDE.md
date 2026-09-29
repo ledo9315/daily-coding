@@ -37,11 +37,33 @@ pnpm piston:install         # Install language runtimes into the running Piston 
 **Local DB URL:** `postgresql://daily_dev:daily_dev_secret@localhost:5433/daily_dev`
 
 **PostgreSQL version:** the local image in `docker-compose.yml` must track the major
-version of the production database (Neon, currently 17). `pg_dump` refuses to run
+version of the production database (the self-hosted container, currently 17). `pg_dump` refuses to run
 against a newer server, so a divergence means no usable backup of production. When
-Neon bumps its major version, bump the image too: the data directory in the
+production moves to a new major version, bump the image too: the data directory in the
 `daily_dev_pgdata` volume is version-specific, so dump first, remove the volume,
 then restore (a dump from an older major restores into a newer one, not the reverse).
+
+### Production database
+
+Since 2026-09-29 production runs on a self-hosted Postgres 17 container on the Piston
+host (`/opt/daily-coding-db` on 178.105.7.191, container `daily-coding-db`), not on Neon.
+Neon's free plan ran out of compute hours, because the Sentry uptime monitor woke the
+database every five minutes and Neon only suspends after five idle minutes.
+
+- **`APP_DATABASE_URL` wins over `DATABASE_URL`** (`lib/server/database-url.ts`). The Neon
+  integration owns `DATABASE_URL` and the other `POSTGRES_*` variables on Vercel; they are
+  locked and cannot point anywhere else. Deleting `APP_DATABASE_URL` and redeploying falls
+  back to Neon, which is the rollback.
+- **TLS with `sslmode=verify-full`**, using the Let's Encrypt certificate Caddy already keeps
+  for `piston.daily-coding.de`. `sync-cert.sh` copies it over nightly (04:23) and reloads
+  Postgres; `pg_hba.conf` admits only `hostssl` with scram-sha-256.
+- **Backups:** `backup.sh` dumps nightly at 03:17 into `/opt/daily-coding-db/backups`, kept
+  fourteen days. They sit on the same disk as the database, so a copy elsewhere is still
+  worth making by hand now and then.
+- The container runs at `cpu_shares: 2048` against Piston's default 1024, so a burst of
+  compiled submissions starves the sandbox before it starves the database.
+- For seeds and migrations against production, `PROD_DATABASE_URL` is this URL now, not
+  Neon's.
 
 ### Migration history
 
@@ -234,9 +256,11 @@ root layout throws. What the three inits share sits in `lib/sentry-options.ts`, 
   minute (Vercel documents ±59 min), and `maxRuntime` sits above the route's
   `maxDuration` so only a run the platform has already killed counts as a timeout. The
   route flushes before answering: a serverless instance can be frozen the moment the
-  response leaves. Next to it an HTTP uptime monitor calls `https://daily-coding.dev/`
-  every five minutes; that page is `force-dynamic` and reads the ring, so a green check
-  means the app *and* the database answered. It lives only in Sentry, not in this repo.
+  response leaves. Next to it an HTTP uptime monitor calls `https://daily-coding.dev/impressum`
+  every five minutes. It used to call `/`, which reads the ring, and that kept Neon awake
+  around the clock until the free plan ran out; so a green check now means the app answered,
+  not the database, and a database outage shows up as the errors of real requests. Never
+  point it back at a page that queries. It lives only in Sentry, not in this repo.
 - `runChallengeTests` reports the Piston catch: from the panel a sandbox that is down
   looks exactly like a program that does not compile, and that catch is the one place
   the difference is known.
