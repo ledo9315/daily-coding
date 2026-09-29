@@ -104,7 +104,7 @@ export function TestResults({ testCases, className, hideHeader }: TestResultsPro
                 (st === "failed" || st === "passed") && (
                   <div
                     className={cn(
-                      "mt-3 space-y-2 rounded-lg p-3 font-mono text-sm break-all",
+                      "mt-3 space-y-2 rounded-lg p-3 font-mono text-sm wrap-anywhere",
                       st === "failed"
                         ? "bg-rose-500/5"
                         : "bg-emerald-500/5 border border-emerald-500/15",
