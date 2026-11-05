@@ -7,6 +7,12 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /**
+   * The server runs as a container on our own host, not as Vercel functions. `standalone`
+   * emits `.next/standalone/server.js` with only the traced dependencies, so the image
+   * needs neither the lockfile nor a second `pnpm install`.
+   */
+  output: "standalone",
   async redirects() {
     return [
       { source: "/dashboard", destination: "/", permanent: true },

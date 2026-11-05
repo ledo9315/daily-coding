@@ -50,13 +50,18 @@ host (`/opt/daily-coding-db` on 178.105.7.191, container `daily-coding-db`), not
 Neon's free plan ran out of compute hours, because the Sentry uptime monitor woke the
 database every five minutes and Neon only suspends after five idle minutes.
 
-- **`APP_DATABASE_URL` wins over `DATABASE_URL`** (`lib/server/database-url.ts`). The Neon
-  integration owns `DATABASE_URL` and the other `POSTGRES_*` variables on Vercel; they are
-  locked and cannot point anywhere else. Deleting `APP_DATABASE_URL` and redeploying falls
-  back to Neon, which is the rollback.
+- **`DATABASE_URL` is the one that counts now.** `lib/server/database-url.ts` still prefers
+  `APP_DATABASE_URL`, and that split only ever existed because the Neon integration owned
+  `DATABASE_URL` on Vercel and locked it. Nothing locks it on the host, and
+  `prisma migrate deploy` reads `DATABASE_URL`, so `/opt/daily-coding/.env` sets that name.
 - **TLS with `sslmode=verify-full`**, using the Let's Encrypt certificate Caddy already keeps
   for `piston.daily-coding.de`. `sync-cert.sh` copies it over nightly (04:23) and reloads
   Postgres; `pg_hba.conf` admits only `hostssl` with scram-sha-256.
+- **The host in the URL stays `piston.daily-coding.de` even though both containers sit on
+  one machine**, because `verify-full` compares that certificate against the name that was
+  dialled. The database container answers to it as a Docker network alias, so the
+  connection never leaves the bridge and 5432 is published to the loopback only. Binding
+  the port down without adding the alias takes the site offline.
 - **Backups:** `backup.sh` dumps nightly at 03:17 into `/opt/daily-coding-db/backups`, kept
   fourteen days. They sit on the same disk as the database, so a copy elsewhere is still
   worth making by hand now and then.
@@ -64,6 +69,31 @@ database every five minutes and Neon only suspends after five idle minutes.
   compiled submissions starves the sandbox before it starves the database.
 - For seeds and migrations against production, `PROD_DATABASE_URL` is this URL now, not
   Neon's.
+
+### Hosting
+
+Since 2026-11-05 the app runs as a container on the same Hetzner host as Postgres and
+Piston, not on Vercel. Vercel paused the Hobby project for exceeding the Fluid Active CPU
+allowance (4 h 34 m against 4 h) and answered every route with 402 for the rest of the
+month. The database had already moved to this host five weeks earlier, so each request was
+crossing the internet for its eight round trips anyway; moving the app down to it took the
+landing page from about 0.8 s to 0.4 s.
+
+- **Caddy terminates TLS** and proxies to `127.0.0.1:3000`; the container is not reachable
+  from outside. The site block lives in `deploy/Caddyfile.snippet`.
+- **`next.config.mjs` sets `output: "standalone"`**, so the image carries `server.js` with
+  only the traced dependencies and needs no second install.
+- **Migrations run when the container starts** (`deploy/entrypoint.sh`), not during the
+  build. A rollback to an older image therefore does not roll the schema back.
+- **`.github/workflows/deploy.yml`** builds on push to `main`, pushes to GHCR and restarts
+  the container over SSH. Everything a browser sees is inlined by `next build`, so the
+  `NEXT_PUBLIC_*` values and the Sentry upload token are build arguments there rather than
+  entries in the host's `.env`.
+- **`/api/health`** queries the database and backs the container healthcheck - the point
+  being that a container with an unreachable database is restarted, not just a dead Node.
+- **The daily reminder is a systemd timer** (`daily-coding-reminder.timer`, 17:00 UTC), in
+  place of the Vercel cron in `vercel.json`.
+- `deploy/README.md` holds the runbook, the rollback and what is still outstanding.
 
 ### Migration history
 
@@ -195,10 +225,11 @@ each other; that, not the Piston limits, is what fails first. Consequences in th
 - `runPistonIoCases` in `lib/server/challenge-execution.ts` runs the first test case alone and
   the rest in parallel: two round trips instead of six. Not all six at once, because a program
   the compiler rejects would then be compiled six times for one answer.
-- `vercel.json` pins the functions to `fra1`. With Vercel's default `iad1` every database
-  round trip (about eight per run, Neon in `eu-central-1`) and both Piston calls crossed the
-  Atlantic: 2.5-3.8 s per test run, 0.8 s once in Frankfurt, 0.85 s locally. The second segment
-  of the `x-vercel-id` response header is the function region.
+- `vercel.json` pinned the functions to `fra1` while the app ran there. With Vercel's
+  default `iad1` every database round trip (about eight per run) and both Piston calls
+  crossed the Atlantic: 2.5-3.8 s per test run, 0.8 s once in Frankfurt, 0.85 s locally.
+  Moot since the move to the Hetzner host, where none of it leaves the machine, but worth
+  keeping in mind the moment anything is served from somewhere else again.
 
 Re-measuring: Caddy in front of Piston admits only the app's bearer token, so run a load
 script on the host itself against `127.0.0.1:2000` (Python is installed there, Node is not).

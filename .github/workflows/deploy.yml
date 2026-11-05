@@ -1,0 +1,107 @@
+name: Deploy
+
+# Replaces the Vercel git integration. Vercel built on every push and ran the migrations
+# as part of the build; here the image is built in CI and the migrations run when the
+# container starts (deploy/entrypoint.sh).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        run: echo "tag=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # Lowercase: the registry rejects an image path with capitals, and the owner is
+          # spelled with none, but the repository name is not guaranteed to be.
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Everything a browser needs is inlined at build time, so these cannot wait for
+          # the container's environment file.
+          build-args: |
+            NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+            NEXT_PUBLIC_APP_URL=https://daily-coding.dev
+            NEXT_PUBLIC_GITHUB_ENABLED=true
+            NEXT_PUBLIC_GOOGLE_ENABLED=true
+            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+            SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
+          # A build secret rather than a build-arg: ARG values survive in the layer
+          # history and in the exported build cache.
+          secrets: |
+            sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open the SSH session
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Pull and restart
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          TAG: ${{ needs.build.outputs.tag }}
+        run: |
+          ssh "$USER@$HOST" bash -se <<EOF
+            set -euo pipefail
+            cd /opt/daily-coding
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Pin the digest of this build rather than following :latest, so a rollback is
+            # a one-line edit and a restart never silently picks up something newer.
+            sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE }}:$TAG|" docker-compose.yml
+            docker compose pull app
+            docker compose up -d app
+            docker image prune -f --filter "until=168h"
+          EOF
+
+      - name: Wait for the health check
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          for i in $(seq 1 30); do
+            state=$(ssh "$USER@$HOST" "docker inspect -f '{{.State.Health.Status}}' daily-coding-app" || echo starting)
+            echo "health: $state"
+            [ "$state" = "healthy" ] && exit 0
+            sleep 10
+          done
+          echo "Container wurde nicht gesund, Logs:"
+          ssh "$USER@$HOST" "docker logs --tail 80 daily-coding-app"
+          exit 1

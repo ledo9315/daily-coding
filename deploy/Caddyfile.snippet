@@ -1,0 +1,19 @@
+# Append to /etc/caddy/Caddyfile, next to the existing piston block.
+#
+# Caddy terminates TLS and fetches the certificate itself; the app container only listens
+# on 127.0.0.1:3000 and is never reachable from outside.
+daily-coding.dev, www.daily-coding.dev {
+	encode zstd gzip
+
+	# Next emits content-hashed file names under this prefix, so they can be cached hard.
+	# Everything else carries the cache headers the app sets itself.
+	@immutable path /_next/static/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	reverse_proxy 127.0.0.1:3000 {
+		# Without this the app sees Caddy's address and every rate limit per IP would
+		# apply to the whole internet at once.
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

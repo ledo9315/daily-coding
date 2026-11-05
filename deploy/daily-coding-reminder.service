@@ -1,0 +1,14 @@
+[Unit]
+Description=Daily Coding reminder mail
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+# The secret lives in the same file the app reads, so both sides cannot drift apart.
+EnvironmentFile=/opt/daily-coding/.env
+# A run sends one mail at a time with a pause in between; the route itself allows 300 s.
+ExecStart=/usr/bin/curl --fail --silent --show-error --max-time 300 \
+  --header "Authorization: Bearer ${CRON_SECRET}" \
+  http://127.0.0.1:3000/api/cron/daily-reminder
+TimeoutStartSec=360

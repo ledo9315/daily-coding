@@ -1,0 +1,36 @@
+# Lives on the host at /opt/daily-coding/docker-compose.yml.
+#
+# The database keeps its own stack in /opt/daily-coding-db; this file only joins its
+# network. Postgres answers there to the alias `piston.daily-coding.de` - the name on its
+# certificate - so `sslmode=verify-full` still validates while the traffic stays on the
+# machine, and port 5432 is published to the loopback only.
+services:
+  app:
+    image: ghcr.io/ledo9315/daily-coding:latest
+    container_name: daily-coding-app
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - db
+    # Piston runs at the default weight of 1024 and takes every core it can get during a
+    # burst of compiled submissions. Without a higher share here the website would stall
+    # exactly when people are using it.
+    cpu_shares: 2048
+    mem_limit: 1536m
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+networks:
+  db:
+    external: true
+    name: daily-coding-db_default

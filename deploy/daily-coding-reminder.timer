@@ -1,0 +1,14 @@
+[Unit]
+Description=Daily Coding reminder mail, 17:00 UTC
+
+[Timer]
+# Same time Vercel's scheduler used (vercel.json, "0 17 * * *"). UTC rather than the host
+# clock, so the send time does not jump twice a year.
+OnCalendar=*-*-* 17:00:00 UTC
+# A host that was down at 17:00 still sends, late rather than never - the Sentry monitor
+# behind the route is what reports a run that never arrived.
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
