@@ -1,0 +1,15 @@
+.git
+.github
+node_modules
+.next
+.vercel
+coverage
+output
+.worktrees
+.playwright-mcp
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+lib/generated
