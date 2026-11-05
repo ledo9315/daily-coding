@@ -62,6 +62,10 @@ database every five minutes and Neon only suspends after five idle minutes.
   dialled. The database container answers to it as a Docker network alias, so the
   connection never leaves the bridge and 5432 is published to the loopback only. Binding
   the port down without adding the alias takes the site offline.
+- **That alias also shadows Piston**, which Caddy serves under the same name. `PISTON_API_URL`
+  therefore uses the second name from Caddy's site block, `piston.leonid-domahalskyy.de`;
+  pointing it at `piston.daily-coding.de` sends every submission to Postgres and fails them
+  with `Execution failed: fetch failed`, which reads exactly like a sandbox outage.
 - **Backups:** `backup.sh` dumps nightly at 03:17 into `/opt/daily-coding-db/backups`, kept
   fourteen days. They sit on the same disk as the database, so a copy elsewhere is still
   worth making by hand now and then.

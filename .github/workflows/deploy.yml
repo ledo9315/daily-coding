@@ -85,7 +85,11 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             # Pin the digest of this build rather than following :latest, so a rollback is
             # a one-line edit and a restart never silently picks up something newer.
-            sed -i "s|image: ghcr.io/.*|image: ${{ env.IMAGE }}:$TAG|" docker-compose.yml
+            # Any image line, not only one that already points at ghcr.io: a container
+            # built by hand on the host leaves `image: daily-coding:local` behind, and a
+            # pattern anchored on the registry would skip it and then pull a tag that
+            # exists nowhere.
+            sed -i "s|^\([[:space:]]*\)image:.*|\1image: ${{ env.IMAGE }}:$TAG|" docker-compose.yml
             docker compose pull app
             docker compose up -d app
             docker image prune -f --filter "until=168h"
