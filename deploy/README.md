@@ -90,6 +90,14 @@ workstation; from outside, 5432 is closed.
 The order matters when setting this up from scratch: bind the port to the loopback
 *without* adding the alias and the app cannot reach the database at all.
 
+**The alias shadows the name for everything in that network, not just Postgres.** Caddy
+serves Piston under `piston.daily-coding.de` as well, so once the alias exists, the app
+container resolves that name to the database and every submission dies with
+`Execution failed: fetch failed` - the sandbox looks down when it is fine. Caddy's site
+block carries a second name for Piston, and `PISTON_API_URL` uses that one
+(`piston.leonid-domahalskyy.de`). Giving Postgres its own hostname and certificate would
+untangle this properly; until then, the two names must not be the same.
+
 ## Afterwards
 
 - **Remove the Vercel project** once a few days have passed without a reason to go back,
